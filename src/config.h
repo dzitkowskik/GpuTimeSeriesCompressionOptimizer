@@ -15,23 +15,31 @@ using namespace std;
 
 namespace ddj
 {
-  class Config
-  {
-  private:
+
+class Config
+{
+private:
     static Config* _instance;
     po::variables_map _configMap;
 
     Config() {};
     virtual ~Config() {};
 
-  public:
-    template<class T> T GetValue(string name);
+public:
+    template<typename T> T GetValue(string settingName)
+    {
+        if (_configMap.count(settingName))
+            return _configMap[settingName].as<T>();
+        return T();
+    }
+
     bool HasValue(string settingName);
     void ListAllSettings();
     void InitOptions(int argc, char** argv, string path);
 
-  public:
+public:
     static Config* GetInstance();
-  };
+};
+
 } /* namespace ddj */
 #endif /* DDJ_CONFIG_H_ */

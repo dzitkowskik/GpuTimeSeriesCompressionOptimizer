@@ -9,18 +9,6 @@
 #include "config.h"
 #include <signal.h>
 #include "store.h"
-#include "thrust_test.cuh"
-#include <gtest/gtest.h>
-#include <boost/program_options.hpp>
-
-namespace po = boost::program_options;
-
-void initialize_logger()
-{
-  log4cplus::initialize();
-  LogLog::getLogLog()->setInternalDebugging(true);
-  PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("logger.prop"));
-}
 
 int wait_to_terminate()
 {
@@ -33,39 +21,19 @@ int wait_to_terminate()
   return EXIT_SUCCESS;
 }
 
-int configure_tests(int argc, char* argv[])
+void initialize_logger()
 {
-  auto conf = ddj::Config::GetInstance();
-
-  bool enableTest = false;
-  if(conf->HasValue("test"))
-  {
-    ::testing::GTEST_FLAG(filter) = "*Test*";
-    enableTest = true;
-  }
-  else if(conf->HasValue("performance"))
-  {
-    ::testing::GTEST_FLAG(filter) = "*Performance*";
-    enableTest = true;
-  }
-  if(enableTest)
-  {
-    Logger::getRoot().removeAllAppenders();
-    ::testing::InitGoogleTest(&argc, argv);
-    ::testing::FLAGS_gtest_repeat = 1;
-    return 1;
-  }
-  return 0;
+  log4cplus::initialize();
+  LogLog::getLogLog()->setInternalDebugging(true);
+  PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("logger.prop"));
 }
 
 int main(int argc, char* argv[])
 {
   ddj::Config::GetInstance()->InitOptions(argc, argv, "config.ini");
   initialize_logger();
-  if(configure_tests(argc, argv)) return RUN_ALL_TESTS();
 
   // START THE PROGRAM HERE
-  run_cuda();
 
   return wait_to_terminate();
 }

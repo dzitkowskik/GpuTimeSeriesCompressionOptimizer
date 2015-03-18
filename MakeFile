@@ -57,30 +57,26 @@ GENCODE_FLAGS   := $(GENCODE_SM20)
 
 debug: COMPILER += -DDEBUG -g
 debug: NVCC += --debug --device-debug
+debug: export EXCLUDED_MAIN_FILE := main_tests.cpp
+debug: export EXCLUDED_DIRECTORY := */tests/*
+debug: export BUILD_PATH := build/debug
+debug: export BIN_PATH := bin/debug
 
 release: COMPILER += -O3
 release: NVCC += -O3
-
-test: export EXCLUDED_MAIN_FILE := main.cpp
-release: export EXCLUDED_MAIN_FILE := Main_TestAll.cpp
-debug: export EXCLUDED_MAIN_FILE := Main_TestAll.cpp
-
-test: export EXCLUDED_DIRECTORY :=
+release: export EXCLUDED_MAIN_FILE := main_tests.cpp
 release: export EXCLUDED_DIRECTORY := */tests/*
-debug: export EXCLUDED_DIRECTORY := */tests/*
-
-# Build and output paths
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
+
+test: export EXCLUDED_MAIN_FILE := main.cpp
+test: export EXCLUDED_DIRECTORY :=
 test: export BUILD_PATH := build/test
 test: export BIN_PATH := bin/test
-debug: export BUILD_PATH := build/debug
-debug: export BIN_PATH := bin/debug
-install: export BIN_PATH := bin/release
 
 SRC_FILES := $(shell find $(SRC_PATH)/ -name '*.$(SRC_EXT)' \
-	-o -name '*.$(SRC_CUDA_EXT)' ! -iname '$(EXCLUDED_MAIN_FILE)' \
-	-not -path '$(EXCLUDED_DIRECTORY)' | sort -k 1nr | cut -f2-)
+	-not -iname '$(EXCLUDED_MAIN_FILE)' -not -path '$(EXCLUDED_DIRECTORY)' \
+	-o -name '*.$(SRC_CUDA_EXT)' | sort -k 1nr | cut -f2-)
 
 OBJS := $(SRC_FILES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
 OBJS := $(OBJS:$(SRC_PATH)/%.$(SRC_CUDA_EXT)=$(BUILD_PATH)/%.o)
@@ -137,7 +133,7 @@ all: $(BIN_PATH)/$(PROGRAM_NAME)
 	@ln -s $(BIN_PATH)/$(PROGRAM_NAME) $(PROGRAM_NAME)
 
 .PHONY: run
-run: all
+run:
 	./$(PROGRAM_NAME)
 
 ################################################################################

@@ -25,17 +25,6 @@ namespace ddj
     return _instance;
   }
 
-  template<class T>
-  T Config::GetValue(string settingName)
-  {
-    if (_configMap.count(settingName))
-    {
-      return _configMap[settingName].as<T>();
-    }
-
-    return T();
-  }
-
   bool Config::HasValue(string settingName)
   {
     return _configMap.count(settingName);
