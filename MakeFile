@@ -18,15 +18,14 @@ COMPILER := nvcc
 STANDART := --std=c++11
 NVCC_FLAGS := --cudart static --relocatable-device-code=false
 
+LIBS := -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread \
+	-lboost_program_options -llog4cplus -lgtest -lbenchmark
+
 ifeq ($(OS),Darwin)
 	LIB_DIRS := #-L"/usr/local/cuda/lib" -L"/usr/local/lib"
-	LIBS := -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread \
-		-lboost_program_options -llog4cplus -lgtest -lbenchmark
 	STANDART := -std=c++11
 else
 	LIB_DIRS := -L"/usr/local/cuda/lib64"
-	LIBS := -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread \
-		-lboost_program_options -llog4cplus -lgtest -lbenchmark
 	STANDART := -std=c++0x
 endif
 
@@ -55,28 +54,45 @@ GENCODE_SM30    := -gencode arch=compute_30,code=compute_30 -gencode arch=comput
 GENCODE_SM35		:= -gencode arch=compute_35,code=compute_35 -gencode arch=compute_35,code=sm_35
 GENCODE_FLAGS   := $(GENCODE_SM20)
 
-debug: COMPILER += -DDEBUG -g
-debug: NVCC += --debug --device-debug
-debug: export EXCLUDED_MAIN_FILE := main_tests.cpp
-debug: export EXCLUDED_DIRECTORY := */tests/*
+debug: COMPILER += -G -g -O0 --debug --device-debug
+debug: export EXCLUDED_FILES := \
+	-not -iname 'main_tests.cpp' \
+	-not -iname 'main_benchmarks.cpp'
+debug: export EXCLUDED_DIRECTORIES := \
+	-not -path '*/tests/*' \
+	-not -path '*/benchmarks/*'
 debug: export BUILD_PATH := build/debug
 debug: export BIN_PATH := bin/debug
 
 release: COMPILER += -O3
-release: NVCC += -O3
-release: export EXCLUDED_MAIN_FILE := main_tests.cpp
-release: export EXCLUDED_DIRECTORY := */tests/*
+release: export EXCLUDED_FILES := \
+	-not -iname 'main_tests.cpp' \
+	-not -iname 'main_benchmarks.cpp'
+release: export EXCLUDED_DIRECTORIES := \
+	-not -path '*/tests/*' \
+	-not -path '*/benchmarks/*'
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
-test: export EXCLUDED_MAIN_FILE := main.cpp
-test: export EXCLUDED_DIRECTORY :=
+test: export EXCLUDED_FILES := \
+	-not -iname 'main.cpp' \
+	-not -iname 'main_benchmarks.cpp'
+test: export EXCLUDED_DIRECTORIES := -not -path '*/benchmarks/*'
 test: export BUILD_PATH := build/test
 test: export BIN_PATH := bin/test
 
+benchmark: COMPILER += -O3
+benchmark: export EXCLUDED_FILES := \
+	-not -iname 'main.cpp' \
+	-not -iname 'main_tests.cpp'
+benchmark: export EXCLUDED_DIRECTORIES := -not -path '*/tests/*'
+benchmark: export BUILD_PATH := build/benchmark
+benchmark: export BIN_PATH := bin/benchmark
+
 SRC_FILES := $(shell find $(SRC_PATH)/ -name '*.$(SRC_EXT)' \
-	-not -iname '$(EXCLUDED_MAIN_FILE)' -not -path '$(EXCLUDED_DIRECTORY)' \
-	-o -name '*.$(SRC_CUDA_EXT)' | sort -k 1nr | cut -f2-)
+	$(EXCLUDED_FILES) $(EXCLUDED_DIRECTORIES) \
+	-o -name '*.$(SRC_CUDA_EXT)' $(EXCLUDED_DIRECTORIES) \
+	| sort -k 1nr | cut -f2-)
 
 OBJS := $(SRC_FILES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
 OBJS := $(OBJS:$(SRC_PATH)/%.$(SRC_CUDA_EXT)=$(BUILD_PATH)/%.o)
@@ -105,6 +121,15 @@ debug: dirs
 .PHONY: test
 test: dirs
 	@echo "Beginning test build"
+	@$(START_TIME)
+	@$(MAKE) all --no-print-directory
+	@echo "Total build time: "
+	@$(END_TIME)
+
+# Benchmark build for google benchmark
+.PHONY: benchmark
+benchmark: dirs
+	@echo "Beginning benchmark build"
 	@$(START_TIME)
 	@$(MAKE) all --no-print-directory
 	@echo "Total build time: "
