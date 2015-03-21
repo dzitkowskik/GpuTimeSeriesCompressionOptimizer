@@ -22,8 +22,6 @@ protected:
 
     virtual void SetUp()
     {
-        const char* argv = "";
-        cudaSetDevice(findCudaDevice(0, &argv));
     }
 };
 

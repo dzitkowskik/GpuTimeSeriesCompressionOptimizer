@@ -19,7 +19,7 @@ STANDART := --std=c++11
 NVCC_FLAGS := --cudart static --relocatable-device-code=false
 
 LIBS := -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread \
-	-lboost_program_options -llog4cplus -lgtest -lbenchmark
+	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand
 
 ifeq ($(OS),Darwin)
 	LIB_DIRS := #-L"/usr/local/cuda/lib" -L"/usr/local/lib"
