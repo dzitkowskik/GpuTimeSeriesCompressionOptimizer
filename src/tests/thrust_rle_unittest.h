@@ -28,11 +28,7 @@ protected:
     {
         int n = GetParam();
         curandGenerator_t gen;
-        CUDA_CALL(cudaMalloc((void**)&d_random_data, n * sizeof(float)));
-        CURAND_CALL(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
-        CURAND_CALL(curandSetPseudoRandomGeneratorSeed(gen, 1991ULL));
-        CURAND_CALL(curandGenerateUniform(gen, d_random_data, n));
-        CURAND_CALL(curandDestroyGenerator(gen));
+        d_random_data = generator.GenerateRandomDeviceArray(n);
     }
 
     virtual void TearDown()
@@ -42,6 +38,9 @@ protected:
 
     float* d_random_data;
     ThrustRleCompression compression;
+
+private:
+    HelperGenerator generator;
 };
 
 } /* namespace ddj */

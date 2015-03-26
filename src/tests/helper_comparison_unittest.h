@@ -28,22 +28,21 @@ protected:
     {
         int n = GetParam();
         curandGenerator_t gen;
-        CUDA_CALL(cudaMalloc((void**)&d_random_data, n * sizeof(float)));
-        CUDA_CALL(cudaMalloc((void**)&d_random_data_2, n * sizeof(float)));
-        CURAND_CALL(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
-        CURAND_CALL(curandSetPseudoRandomGeneratorSeed(gen, 1991ULL));
-        CURAND_CALL(curandGenerateUniform(gen, d_random_data, n));
-        CURAND_CALL(curandGenerateUniform(gen, d_random_data_2, n));
-        CURAND_CALL(curandDestroyGenerator(gen));
+        d_random_data = generator.GenerateRandomDeviceArray(n);
+        d_random_data_2 = generator.GenerateRandomDeviceArray(n);
     }
 
     virtual void TearDown()
     {
         CUDA_CALL(cudaFree(d_random_data));
+        CUDA_CALL(cudaFree(d_random_data_2));
     }
 
     float* d_random_data;
     float* d_random_data_2;
+
+private:
+    HelperGenerator generator;
 };
 
 } /* namespace ddj */
