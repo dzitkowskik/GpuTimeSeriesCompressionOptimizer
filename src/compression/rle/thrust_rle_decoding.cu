@@ -1,11 +1,12 @@
+#include "thrust_rle.cuh"
+#include "../../helpers/helper_print.h"
+
 #include <thrust/device_vector.h>
 #include <thrust/scan.h>
 #include <thrust/copy.h>
 #include <thrust/gather.h>
 #include <thrust/binary_search.h>
 #include <thrust/iterator/counting_iterator.h>
-#include "thrust_rle.cuh"
-
 #include <iostream>
 #include <iterator>
 
@@ -22,14 +23,6 @@ void* ThrustRleCompression::Decode(void* data, int in_size, int& out_size)
 
     thrust::device_vector<float> input(dev_ptr_float, dev_ptr_float + in_size);
     thrust::device_vector<int> lengths(dev_ptr_lengths, dev_ptr_lengths + in_size);
-
-    #if DDJ_THRUST_RLE_DEBUG
-        // print the initial data
-        std::cout << "run-length encoded input:" << std::endl;
-        for(size_t i = 0; i < in_size; i++)
-            std::cout << "(" << input[i] << "," << lengths[i] << ")";
-        std::cout << std::endl << std::endl;
-    #endif
 
     // scan the lengths
     thrust::inclusive_scan(lengths.begin(), lengths.end(), lengths.begin());
@@ -55,10 +48,8 @@ void* ThrustRleCompression::Decode(void* data, int in_size, int& out_size)
     thrust::gather(indices.begin(), indices.end(), input.begin(), dev_ptr);
 
     #if DDJ_THRUST_RLE_DEBUG
-        // print the initial data
-        std::cout << "decoded output:" << std::endl;
-        thrust::copy(dev_ptr, dev_ptr + N, std::ostream_iterator<float>(std::cout, ""));
-        std::cout << std::endl;
+    HelperPrint::PrintDeviceVectors(input, lengths, "Thrust RLE decoding input");
+    HelperPrint::PrintDevicePtr(dev_ptr, N, "Thrust RLE decoding output");
     #endif
 
     out_size = N;

@@ -9,8 +9,8 @@
 #define DDJ_GPUVEC_H_
 
 #include "storetypes.h"
-#include "config.h"
-#include "logger.h"
+#include "../core/config.h"
+#include "../core/logger.h"
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 

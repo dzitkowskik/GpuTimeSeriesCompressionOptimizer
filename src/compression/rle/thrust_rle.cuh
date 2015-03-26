@@ -1,7 +1,7 @@
 #ifndef DDJ_COMPRESSION_THRUST_RLE_CUH_
 #define DDJ_COMPRESSION_THRUST_RLE_CUH_
 
-#include "../../logger.h"
+#include "../../core/logger.h"
 
 #define DDJ_THRUST_RLE_DEBUG 0
 

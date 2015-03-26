@@ -1,9 +1,9 @@
-#ifndef DDJ_GPUVEC_UNITTEST_H_
-#define DDJ_GPUVEC_UNITTEST_H_
+#ifndef DDJ_HELPER_COMPARISON_UNITTEST_H_
+#define DDJ_HELPER_COMPARISON_UNITTEST_H_
 
-#include "../compression/rle/thrust_rle.cuh"
-#include "../helpers/helper_cuda.h"
 #include "../helpers/helper_macros.h"
+#include "../helpers/helper_comparison.cuh"
+#include "../helpers/helper_cuda.h"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -12,26 +12,28 @@
 
 namespace ddj {
 
-class ThrustRleCompressionTest : public testing::Test,
+class HelperComparisonTest : public testing::Test,
     public ::testing::WithParamInterface<int>
 {
 protected:
-    ThrustRleCompressionTest()
+    HelperComparisonTest()
     {
         HelperCuda hc;
         hc.SetCudaDeviceWithMaxFreeMem();
     }
 
-    ~ThrustRleCompressionTest(){}
+    ~HelperComparisonTest(){}
 
     virtual void SetUp()
     {
         int n = GetParam();
         curandGenerator_t gen;
         CUDA_CALL(cudaMalloc((void**)&d_random_data, n * sizeof(float)));
+        CUDA_CALL(cudaMalloc((void**)&d_random_data_2, n * sizeof(float)));
         CURAND_CALL(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
         CURAND_CALL(curandSetPseudoRandomGeneratorSeed(gen, 1991ULL));
         CURAND_CALL(curandGenerateUniform(gen, d_random_data, n));
+        CURAND_CALL(curandGenerateUniform(gen, d_random_data_2, n));
         CURAND_CALL(curandDestroyGenerator(gen));
     }
 
@@ -41,9 +43,9 @@ protected:
     }
 
     float* d_random_data;
-    ThrustRleCompression compression;
+    float* d_random_data_2;
 };
 
 } /* namespace ddj */
-#endif
 
+#endif /* DDJ_HELPER_COMPARISON_UNITTEST_H_ */

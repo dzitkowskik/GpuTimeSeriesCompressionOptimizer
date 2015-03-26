@@ -3,9 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
-#include "../gpuvec.h"
-#include "../cudacommons.h"
-#include "../helper_cuda.h"
+#include "../store/gpuvec.h"
+#include "../helpers/helper_cuda.h"
 
 namespace ddj {
 
@@ -14,8 +13,8 @@ class GpuVecTest : public testing::Test
 protected:
     GpuVecTest()
     {
-        CudaCommons cudaC;
-        cudaC.SetCudaDeviceWithMaxFreeMem();
+        HelperCuda hc;
+        hc.SetCudaDeviceWithMaxFreeMem();
     }
 
     ~GpuVecTest(){}

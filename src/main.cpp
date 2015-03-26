@@ -5,10 +5,10 @@
  * Author: Karol Dzitkowski
  */
 
-#include "logger.h"
-#include "config.h"
+#include "core/logger.h"
+#include "core/config.h"
 #include <signal.h>
-#include "store.h"
+#include "store/store.h"
 
 int wait_to_terminate()
 {

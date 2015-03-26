@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../logger.h"
-#include "../config.h"
+#include "../core/logger.h"
+#include "../core/config.h"
 
 void initialize_logger()
 {

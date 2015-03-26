@@ -45,6 +45,7 @@ ifeq ($(V),true)
 endif
 
 CUDA_INCLUDES := -I"/usr/local/cuda/include"
+#INCLUDES := -I"src"
 DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 

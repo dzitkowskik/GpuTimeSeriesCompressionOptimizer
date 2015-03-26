@@ -1,4 +1,5 @@
 #include "thrust_rle_unittest.h"
+#include "../helpers/helper_comparison.cuh"
 
 namespace ddj {
 
@@ -24,6 +25,27 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_size)
         decompressed_size);
 
     EXPECT_EQ(real_size, decompressed_size);
+}
+
+//areFloatArraysEqual(float* a, float* b, int size)
+
+TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_data)
+{
+    int real_size = GetParam();
+    int compressed_size;
+    int decompressed_size;
+
+    void* compressedData = compression.Encode(
+        d_random_data,
+        real_size,
+        compressed_size);
+
+    void* decompressedData = compression.Decode(
+        compressedData,
+        compressed_size,
+        decompressed_size);
+
+    EXPECT_TRUE(CompareDeviceArrays(d_random_data, (float*)decompressedData, real_size));
 }
 
 
