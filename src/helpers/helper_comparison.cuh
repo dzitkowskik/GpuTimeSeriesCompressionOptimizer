@@ -16,7 +16,7 @@ template <typename T>
  {
     unsigned int iElement = blockDim.x * blockIdx.x + threadIdx.x;
     if (iElement >= size) return;
-    out[iElement] = (a[iElement] != b[iElement]);
+    out[iElement] = a[iElement] != b[iElement] ? 1 : 0;
  }
 
 template <typename T>

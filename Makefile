@@ -52,10 +52,10 @@ WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter
 GENCODE_SM20    := -gencode arch=compute_20,code=compute_20 -gencode arch=compute_20,code=sm_20
 GENCODE_SM21    := -gencode arch=compute_20,code=compute_21 -gencode arch=compute_20,code=sm_21
 GENCODE_SM30    := -gencode arch=compute_30,code=compute_30 -gencode arch=compute_30,code=sm_30
-GENCODE_SM35		:= -gencode arch=compute_35,code=compute_35 -gencode arch=compute_35,code=sm_35
-GENCODE_FLAGS   := $(GENCODE_SM20)
+GENCODE_SM35	:= -gencode arch=compute_35,code=compute_35 -gencode arch=compute_35,code=sm_35
+GENCODE_FLAGS   := $(GENCODE_SM30)
 
-debug: COMPILER += -G -g -O0 --debug --device-debug
+debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug
 debug: export EXCLUDED_FILES := \
 	-not -iname 'main_tests.cpp' \
 	-not -iname 'main_benchmarks.cpp'
@@ -65,7 +65,7 @@ debug: export EXCLUDED_DIRECTORIES := \
 debug: export BUILD_PATH := build/debug
 debug: export BIN_PATH := bin/debug
 
-release: COMPILER += -O3
+release: export CODE_FLAGS := -O3
 release: export EXCLUDED_FILES := \
 	-not -iname 'main_tests.cpp' \
 	-not -iname 'main_benchmarks.cpp'
@@ -75,6 +75,7 @@ release: export EXCLUDED_DIRECTORIES := \
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
+test: export CODE_FLAGS := -G -g -O0 --debug --device-debug
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -iname 'main_benchmarks.cpp'
@@ -82,7 +83,7 @@ test: export EXCLUDED_DIRECTORIES := -not -path '*/benchmarks/*'
 test: export BUILD_PATH := build/test
 test: export BIN_PATH := bin/test
 
-benchmark: COMPILER += -O3
+benchmark: export CODE_FLAGS := -O3
 benchmark: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -iname 'main_tests.cpp'
@@ -167,7 +168,7 @@ run:
 $(BIN_PATH)/$(PROGRAM_NAME): $(OBJS)
 	@echo 'Linking target: $@'
 	@echo 'Invoking: $(NVCC) Linker'
-	$(COMPILER) $(STANDART) $(NVCC_FLAGS) $(LIBS) $(GENCODE_FLAGS) -link -o $(BIN_PATH)/$(PROGRAM_NAME) $(OBJS)
+	$(COMPILER) $(CODE_FLAGS) $(STANDART) $(NVCC_FLAGS) $(LIBS) $(GENCODE_FLAGS) -link -o $(BIN_PATH)/$(PROGRAM_NAME) $(OBJS)
 	chmod +x $(BIN_PATH)/$(PROGRAM_NAME)
 	@echo 'Finished building target: $@'
 	@echo ' '
@@ -176,7 +177,7 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.$(SRC_EXT)
 	@$(START_TIME)
 	@echo 'Building file: $< -> $@'
 	@echo 'Invoking: $(COMPILER) Compiler'
-	$(COMPILER) $(STANDART) --compile -o "$@" "$<"
+	$(COMPILER) $(CODE_FLAGS) $(STANDART) --compile -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo '\t Compile time: '
 	@$(END_TIME)
@@ -186,7 +187,7 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.$(SRC_CUDA_EXT)
 	@$(START_TIME)
 	@echo 'Building file: $< -> $@'
 	@echo 'Invoking: $(NVCC) Compiler'
-	$(COMPILER) $(STANDART) --compile $(CUDA_FLAGS) $(GENCODE_FLAGS) -x $(SRC_CUDA_EXT) -o "$@" "$<"
+	$(COMPILER) $(CODE_FLAGS) $(STANDART) --compile $(CUDA_FLAGS) $(GENCODE_FLAGS) -x $(SRC_CUDA_EXT) -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo '\t Compile time:'
 	@$(END_TIME)

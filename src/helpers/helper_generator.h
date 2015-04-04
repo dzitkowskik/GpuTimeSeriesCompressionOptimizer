@@ -7,20 +7,25 @@
 
 #include "../core/logger.h"
 #include "../core/config.h"
+#include <boost/noncopyable.hpp>
+#include <curand.h>
 
 namespace ddj {
 
-class HelperGenerator {
+class HelperGenerator : private boost::noncopyable
+{
 private:
     /* LOGGER & CONFIG */
     Logger _logger;
     Config* _config;
 
 public:
-    HelperGenerator()
-        : _logger(Logger::getRoot()), _config(Config::GetInstance()) { }
-
     float* GenerateRandomDeviceArray(int size);
+    curandGenerator_t gen;
+
+public:
+    HelperGenerator();
+    ~HelperGenerator();
 };
 
 } /* namespace ddj */

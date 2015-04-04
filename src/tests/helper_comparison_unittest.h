@@ -3,6 +3,7 @@
 
 #include "../helpers/helper_macros.h"
 #include "../helpers/helper_comparison.cuh"
+#include "../helpers/helper_generator.h"
 #include "../helpers/helper_cuda.h"
 
 #include <gtest/gtest.h>
@@ -27,7 +28,6 @@ protected:
     virtual void SetUp()
     {
         int n = GetParam();
-        curandGenerator_t gen;
         d_random_data = generator.GenerateRandomDeviceArray(n);
         d_random_data_2 = generator.GenerateRandomDeviceArray(n);
     }

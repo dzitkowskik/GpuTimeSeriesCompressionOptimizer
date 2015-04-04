@@ -14,14 +14,11 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 
-namespace ddj {
+namespace ddj
+{
 
 class GpuVec : public boost::noncopyable
 {
-public:
-    GpuVec();
-    virtual ~GpuVec();
-
 private:
     /* STORE MEMORY (on GPU) */
     ullint _memoryOffset;
@@ -29,23 +26,27 @@ private:
     void* _memoryPointer;
     ullint _memoryCapacity;
 
+private:
+    /* CONFIG & LOGGER */
     Logger _logger = Logger::getRoot();
     Config* _config = Config::GetInstance();
 
 public:
+    GpuVec();
+    GpuVec(ullint size);
+    virtual ~GpuVec();
+
+public:
     ullint Write(void* data, ullint size);
     void* Read(ullint offset, ullint size);
+    void* Get(ullint offset, ullint size);
     ullint Size();
 
 private:
-    ullint GetMemoryOffset();
-    void SetMemoryOffset(ullint offset);
     void* GetFirstFreeAddress();
     ullint GetCapacity();
     void Resize(ullint size);
-
-private:
-    void allocateGpuStorage();
+    void Init();
 };
 
 } /* namespace ddj */
