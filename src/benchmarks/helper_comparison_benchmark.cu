@@ -12,8 +12,8 @@ static void BM_CompareDeviceArrays(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        float* data_1 = generator.GenerateRandomDeviceArray(state.range_x());
-        float* data_2 = generator.GenerateRandomDeviceArray(state.range_x());
+        float* data_1 = generator.GenerateRandomFloatDeviceArray(state.range_x());
+        float* data_2 = generator.GenerateRandomFloatDeviceArray(state.range_x());
         state.ResumeTiming();
 
         // COMPARE DATA

@@ -2,7 +2,7 @@
 
 ### MY ###
 *.log
-
+.test_time
 
 ### OSX ###
 .DS_Store

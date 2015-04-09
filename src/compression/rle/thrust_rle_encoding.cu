@@ -1,10 +1,12 @@
 #include "thrust_rle.cuh"
+#include "../../helpers/helper_macros.h"
 #include <thrust/device_vector.h>
 #include <thrust/copy.h>
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/reduce.h>
 #include <iostream>
 #include <iterator>
+#include <thrust/system_error.h>
 
 namespace ddj {
 
@@ -32,12 +34,13 @@ void* ThrustRleCompression::Encode(void* data, const int in_size, int& out_size)
 
     // prepare data
     int* raw_ptr;
-    cudaMalloc((void **) &raw_ptr, len * sizeof(int) + len * sizeof(float));
+    int compressed_size = len * sizeof(int) + len * sizeof(float);
+    CUDA_CALL( cudaMalloc((void **) &raw_ptr, compressed_size) );
     float* raw_ptr_2 = reinterpret_cast<float*>(raw_ptr + len);
     thrust::device_ptr<int> dev_ptr_int(raw_ptr);
     thrust::device_ptr<float> dev_ptr_float(raw_ptr_2);
-    thrust::copy(lengths.begin(), lengths.end(), dev_ptr_int);
-    thrust::copy(output.begin(), output.end(), dev_ptr_float);
+    thrust::copy(lengths.begin(), lengths.begin()+len, dev_ptr_int);
+    thrust::copy(output.begin(), output.begin()+len, dev_ptr_float);
 
     out_size = len;
     return raw_ptr;

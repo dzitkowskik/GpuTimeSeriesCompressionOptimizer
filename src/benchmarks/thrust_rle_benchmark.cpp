@@ -15,7 +15,7 @@ static void BM_Thrust_RLE_Encode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        float* data = generator.GenerateRandomDeviceArray(state.range_x());
+        float* data = generator.GenerateRandomFloatDeviceArray(state.range_x());
         state.ResumeTiming();
 
         // ENCODE
@@ -41,7 +41,7 @@ static void BM_Thrust_RLE_Decode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        float* data = generator.GenerateRandomDeviceArray(state.range_x());
+        float* data = generator.GenerateRandomFloatDeviceArray(state.range_x());
         void* compr = compression.Encode(data, state.range_x(), out_size);
         state.ResumeTiming();
 
