@@ -103,14 +103,16 @@ __device__ __host__ __forceinline__ unsigned int BITLEN(unsigned int word)
     while (word >>= 1)
       ret++;
 #endif
-   return ret;
+   return ret+1;
 }
 
 __host__ __device__
 inline int ALT_BITLEN(int v)
 {
-    register unsigned int r; // result of log2(v) will go here
-    register unsigned int shift;
+	if (v < 0) return 8 * sizeof(int); // for negative
+
+    unsigned int r; // result of log2(v) will go here
+    unsigned int shift;
 
     r =     (v > 0xFFFF) << 4; v >>= r;
     shift = (v > 0xFF  ) << 3; v >>= shift; r |= shift;

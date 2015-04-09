@@ -7,16 +7,26 @@
 namespace ddj
 {
 
-class AFLCompression : private boost::noncopyable
+class AFLCompressionMetadata
 {
 public:
-	AFLCompression(){ max_size = 10000; }
-	~AFLCompression(){}
-    void* Encode(int* data, int in_size, int& out_size);
-    void* Decode(int* data, int in_size, int& out_size);
+	int min_bit;
+};
+
+class AFLCompression : private boost::noncopyable
+{
 private:
     Logger _logger = Logger::getInstance(LOG4CPLUS_TEXT("AFLCompression"));
     unsigned long max_size;
+
+public:
+	AFLCompression(){ max_size = 10000; }
+	~AFLCompression(){}
+    void* Encode(int* data, int in_size, int& out_size, AFLCompressionMetadata& metadata);
+    void* Decode(void* data, int in_size, int& out_size, AFLCompressionMetadata metadata);
+
+private:
+    int getMinBitCnt(int* data, int size);
 };
 
 } /* namespace ddj */
