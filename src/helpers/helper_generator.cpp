@@ -18,12 +18,20 @@ namespace ddj
 		CURAND_CALL(curandDestroyGenerator(gen));
 	}
 
-    float* HelperGenerator::GenerateRandomDeviceArray(int n)
+    float* HelperGenerator::GenerateRandomFloatDeviceArray(int n)
     {
         float* d_result;
         CUDA_CALL(cudaMalloc((void**)&d_result, n * sizeof(float)));
         CURAND_CALL(curandGenerateUniform(gen, d_result, n));
         return d_result;
     }
+
+    int* HelperGenerator::GenerateRandomIntDeviceArray(int n)
+	{
+		unsigned int* d_result;
+		CUDA_CALL(cudaMalloc((void**)&d_result, n * sizeof(int)));
+		CURAND_CALL(curandGenerate(gen, d_result, n));
+		return (int*)d_result;
+	}
 
 } /* nemespace ddj */

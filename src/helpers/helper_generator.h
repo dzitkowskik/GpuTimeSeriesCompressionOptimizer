@@ -20,7 +20,8 @@ private:
     Config* _config;
 
 public:
-    float* GenerateRandomDeviceArray(int size);
+    float* GenerateRandomFloatDeviceArray(int size);
+    int* GenerateRandomIntDeviceArray(int size);
     curandGenerator_t gen;
 
 public:

@@ -1,7 +1,7 @@
-#ifndef DDJ_THRUST_RLE_UNITTEST_H_
-#define DDJ_THRUST_RLE_UNITTEST_H_
+#ifndef DDJ_GPUVEC_UNITTEST_H_
+#define DDJ_GPUVEC_UNITTEST_H_
 
-#include "../compression/rle/thrust_rle.cuh"
+#include "../compression/afl/afl.cuh"
 #include "../helpers/helper_cuda.h"
 #include "../helpers/helper_macros.h"
 #include "../helpers/helper_generator.h"
@@ -9,28 +9,25 @@
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
 #include <cuda.h>
-#include <curand.h>
 
 namespace ddj {
 
-class ThrustRleCompressionTest : public testing::Test,
+class AflCompressionTest : public testing::Test,
     public ::testing::WithParamInterface<int>
 {
 protected:
-    ThrustRleCompressionTest()
+	AflCompressionTest() : d_random_data(NULL)
     {
         HelperCuda hc;
         hc.SetCudaDeviceWithMaxFreeMem();
-        d_random_data = NULL;
     }
 
-    ~ThrustRleCompressionTest(){}
+    ~AflCompressionTest(){}
 
     virtual void SetUp()
     {
         int n = GetParam();
-        curandGenerator_t gen;
-        d_random_data = generator.GenerateRandomFloatDeviceArray(n);
+        d_random_data = generator.GenerateRandomIntDeviceArray(n);
     }
 
     virtual void TearDown()
@@ -38,8 +35,8 @@ protected:
         CUDA_CALL(cudaFree(d_random_data));
     }
 
-    float* d_random_data;
-    ThrustRleCompression compression;
+    int* d_random_data;
+    AFLCompression compression;
 
 private:
     HelperGenerator generator;

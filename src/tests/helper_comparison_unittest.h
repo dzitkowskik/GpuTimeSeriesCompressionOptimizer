@@ -17,7 +17,7 @@ class HelperComparisonTest : public testing::Test,
     public ::testing::WithParamInterface<int>
 {
 protected:
-    HelperComparisonTest()
+    HelperComparisonTest() : d_random_data(NULL), d_random_data_2(NULL)
     {
         HelperCuda hc;
         hc.SetCudaDeviceWithMaxFreeMem();
@@ -28,8 +28,8 @@ protected:
     virtual void SetUp()
     {
         int n = GetParam();
-        d_random_data = generator.GenerateRandomDeviceArray(n);
-        d_random_data_2 = generator.GenerateRandomDeviceArray(n);
+        d_random_data = generator.GenerateRandomFloatDeviceArray(n);
+        d_random_data_2 = generator.GenerateRandomFloatDeviceArray(n);
     }
 
     virtual void TearDown()

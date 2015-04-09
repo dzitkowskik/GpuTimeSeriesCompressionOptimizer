@@ -1,15 +1,15 @@
-#include "thrust_rle_unittest.h"
+#include "afl_unittest.h"
 #include "../helpers/helper_comparison.cuh"
 
 namespace ddj
 {
 
 INSTANTIATE_TEST_CASE_P(
-    RandomFloatNumbersCompression_ThrustRle_Inst,
-    ThrustRleCompressionTest,
+    RandomFloatNumbersCompression_Afl_Inst,
+    AflCompressionTest,
     ::testing::Values(10, 20));
 
-TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_size)
+TEST_P(AflCompressionTest, CompressionOfRandomInt_size)
 {
     int real_size = GetParam();
     int compressed_size;
@@ -21,7 +21,7 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_size)
         compressed_size);
 
     void* decompressedData = compression.Decode(
-        compressedData,
+        (int*)compressedData,
         compressed_size,
         decompressed_size);
 
@@ -31,7 +31,7 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_size)
     CUDA_CALL(cudaFree(decompressedData));
 }
 
-TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_data)
+TEST_P(AflCompressionTest, CompressionOfRandomInt_data)
 {
     int real_size = GetParam();
     int compressed_size;
@@ -43,11 +43,11 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_data)
         compressed_size);
 
     void* decompressedData = compression.Decode(
-        compressedData,
+        (int*)compressedData,
         compressed_size,
         decompressed_size);
 
-    EXPECT_TRUE(CompareDeviceArrays(d_random_data, (float*)decompressedData, real_size));
+    EXPECT_TRUE(CompareDeviceArrays(d_random_data, (int*)decompressedData, real_size));
 
     CUDA_CALL(cudaFree(compressedData));
     CUDA_CALL(cudaFree(decompressedData));
