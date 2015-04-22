@@ -10,11 +10,12 @@
 
 namespace ddj {
 
-void* ThrustRleCompression::Encode(void* data, const int in_size, int& out_size)
+template<typename T>
+void* ThrustRleCompression::Encode(T* data, const int in_size, int& out_size)
 {
-    thrust::device_ptr<float> d_ptr(reinterpret_cast<float*>(data));
-    thrust::device_vector<float> input(d_ptr, d_ptr + in_size);
-    thrust::device_vector<float> output(in_size);
+    thrust::device_ptr<T> d_ptr(data);
+    thrust::device_vector<T> input(d_ptr, d_ptr + in_size);
+    thrust::device_vector<T> output(in_size);
     thrust::device_vector<int>  lengths(in_size);
 
     // compute run lengths
@@ -25,7 +26,7 @@ void* ThrustRleCompression::Encode(void* data, const int in_size, int& out_size)
         output.begin(),
         lengths.begin());
 
-    size_t len = result.first - output.begin();
+    int len = result.first - output.begin();
 
     #if DDJ_THRUST_RLE_DEBUG
         printInputData(input);
@@ -34,16 +35,18 @@ void* ThrustRleCompression::Encode(void* data, const int in_size, int& out_size)
 
     // prepare data
     int* raw_ptr;
-    int compressed_size = len * sizeof(int) + len * sizeof(float);
+    int compressed_size = len * sizeof(int) + len * sizeof(T);
     CUDA_CALL( cudaMalloc((void **) &raw_ptr, compressed_size) );
-    float* raw_ptr_2 = reinterpret_cast<float*>(raw_ptr + len);
+    float* raw_ptr_2 = reinterpret_cast<T*>(raw_ptr + len);
     thrust::device_ptr<int> dev_ptr_int(raw_ptr);
-    thrust::device_ptr<float> dev_ptr_float(raw_ptr_2);
+    thrust::device_ptr<T> dev_ptr_float(raw_ptr_2);
     thrust::copy(lengths.begin(), lengths.begin()+len, dev_ptr_int);
     thrust::copy(output.begin(), output.begin()+len, dev_ptr_float);
 
     out_size = len;
     return raw_ptr;
 }
+
+template void* ThrustRleCompression::Encode<float>(float* data, const int in_size, int& out_size);
 
 } /* namespace ddj */

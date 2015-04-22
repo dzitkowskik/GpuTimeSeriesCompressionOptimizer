@@ -11,8 +11,10 @@ class ThrustRleCompression
 {
 public:
     // For now I assume that data is an array of floats
-    void* Encode(void* data, int in_size, int& out_size);
-    void* Decode(void* data, int in_size, int& out_size);
+	template<typename T>
+    void* Encode(T* data, int in_size, int& out_size);
+	template<typename T>
+    T* Decode(void* data, int in_size, int& out_size);
 private:
     Logger _logger = Logger::getInstance(LOG4CPLUS_TEXT("ThrustRleCompression"));
 };

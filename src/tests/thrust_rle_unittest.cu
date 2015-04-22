@@ -20,7 +20,7 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_size)
         real_size,
         compressed_size);
 
-    void* decompressedData = compression.Decode(
+    float* decompressedData = compression.Decode<float>(
         compressedData,
         compressed_size,
         decompressed_size);
@@ -42,7 +42,7 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_data)
         real_size,
         compressed_size);
 
-    void* decompressedData = compression.Decode(
+    float* decompressedData = compression.Decode<float>(
         compressedData,
         compressed_size,
         decompressed_size);

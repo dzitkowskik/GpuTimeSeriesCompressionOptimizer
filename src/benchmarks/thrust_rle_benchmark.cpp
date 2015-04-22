@@ -46,7 +46,7 @@ static void BM_Thrust_RLE_Decode(benchmark::State& state)
         state.ResumeTiming();
 
         // DECODE
-        void* decpr = compression.Decode(compr, out_size, out_size_decoded);
+        float* decpr = compression.Decode<float>(compr, out_size, out_size_decoded);
 
         state.PauseTiming();
         cudaFree(data);
