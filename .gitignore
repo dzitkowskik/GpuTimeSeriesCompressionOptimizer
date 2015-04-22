@@ -3,6 +3,7 @@
 ### MY ###
 *.log
 .test_time
+gpuStore
 
 ### OSX ###
 .DS_Store
