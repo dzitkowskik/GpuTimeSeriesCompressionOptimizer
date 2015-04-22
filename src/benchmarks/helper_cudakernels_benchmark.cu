@@ -15,7 +15,7 @@ static void BM_Modulo_Kernel_Simple(benchmark::State& state)
 	int n = state.range_x();
 	int val = rand() % 101 + 1;
 	int mod = rand() % 13 + 3;
-    state.UseRealTime();
+
     thrust::device_vector<int> d_data(n);
     int* d_data_raw = thrust::raw_pointer_cast(d_data.data());
 
@@ -42,7 +42,7 @@ static void BM_Modulo_Thrust_Simple(benchmark::State& state)
 	int n = state.range_x();
 	int val = rand() % 101 + 1;
 	int mod = rand() % 13 + 3;
-    state.UseRealTime();
+
     thrust::device_vector<int> d_data(n);
     int* d_data_raw = thrust::raw_pointer_cast(d_data.data());
 
