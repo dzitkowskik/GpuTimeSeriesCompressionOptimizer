@@ -8,7 +8,7 @@ namespace ddj
 static void BM_CompareDeviceArrays(benchmark::State& state)
 {
     HelperGenerator generator;
-    state.UseRealTime();
+
     while (state.KeepRunning())
     {
         state.PauseTiming();

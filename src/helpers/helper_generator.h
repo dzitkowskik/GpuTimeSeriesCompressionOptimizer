@@ -5,28 +5,22 @@
 #ifndef DDJ_HELPER_GENERATOR_H_
 #define DDJ_HELPER_GENERATOR_H_
 
-#include "../core/logger.h"
-#include "../core/config.h"
 #include <boost/noncopyable.hpp>
 #include <curand.h>
 
-namespace ddj {
+namespace ddj
+{
 
 class HelperGenerator : private boost::noncopyable
 {
-private:
-    /* LOGGER & CONFIG */
-    Logger _logger;
-    Config* _config;
+public:
+    HelperGenerator();
+    ~HelperGenerator();
 
 public:
     float* GenerateRandomFloatDeviceArray(int size);
     int* GenerateRandomIntDeviceArray(int size);
     curandGenerator_t gen;
-
-public:
-    HelperGenerator();
-    ~HelperGenerator();
 };
 
 } /* namespace ddj */

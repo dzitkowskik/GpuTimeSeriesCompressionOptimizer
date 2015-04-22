@@ -11,7 +11,7 @@ static void BM_Thrust_RLE_Encode(benchmark::State& state)
     HelperGenerator generator;
     ThrustRleCompression compression;
     int out_size;
-    state.UseRealTime();
+
     while (state.KeepRunning())
     {
         state.PauseTiming();
@@ -37,7 +37,7 @@ static void BM_Thrust_RLE_Decode(benchmark::State& state)
     HelperGenerator generator;
     ThrustRleCompression compression;
     int out_size, out_size_decoded;
-    state.UseRealTime();
+
     while (state.KeepRunning())
     {
         state.PauseTiming();
