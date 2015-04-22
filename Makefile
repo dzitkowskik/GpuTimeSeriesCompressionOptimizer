@@ -5,7 +5,6 @@ PROGRAM_NAME := gpuStore
 
 RM := rm -rf
 OS := $(shell uname)
-DATE := gdate
 
 SRC_PATH := src
 BUILD_PATH := build
@@ -21,12 +20,19 @@ NVCC_FLAGS := --cudart static --relocatable-device-code=false
 LIBS := -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread \
 	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand
 
+GENCODE_SM20    := -gencode arch=compute_20,code=compute_20 -gencode arch=compute_20,code=sm_20
+GENCODE_SM21    := -gencode arch=compute_20,code=compute_21 -gencode arch=compute_20,code=sm_21
+GENCODE_SM30    := -gencode arch=compute_30,code=compute_30 -gencode arch=compute_30,code=sm_30
+GENCODE_SM35	:= -gencode arch=compute_35,code=compute_35 -gencode arch=compute_35,code=sm_35
+
 ifeq ($(OS),Darwin)
-	LIB_DIRS := #-L"/usr/local/cuda/lib" -L"/usr/local/lib"
-	STANDART := -std=c++11
+	LIB_DIRS := -L"/usr/local/cuda/lib" -L"/usr/local/lib"
+	DATE := gdate
+	GENCODE_FLAGS   := $(GENCODE_SM30)
 else
-	LIB_DIRS := -L"/usr/local/cuda/lib64"
-	STANDART := -std=c++0x
+	LIB_DIRS := -L"/usr/local/cuda/lib64" -L"/usr/local/lib"
+	DATE := date
+	GENCODE_FLAGS   := $(GENCODE_SM35)
 endif
 
 # Macros for timing compilation
@@ -48,12 +54,6 @@ CUDA_INCLUDES := -I"/usr/local/cuda/include"
 #INCLUDES := -I"src"
 DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
-
-GENCODE_SM20    := -gencode arch=compute_20,code=compute_20 -gencode arch=compute_20,code=sm_20
-GENCODE_SM21    := -gencode arch=compute_20,code=compute_21 -gencode arch=compute_20,code=sm_21
-GENCODE_SM30    := -gencode arch=compute_30,code=compute_30 -gencode arch=compute_30,code=sm_30
-GENCODE_SM35	:= -gencode arch=compute_35,code=compute_35 -gencode arch=compute_35,code=sm_35
-GENCODE_FLAGS   := $(GENCODE_SM30)
 
 debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug
 debug: export EXCLUDED_FILES := \
@@ -168,7 +168,7 @@ run:
 $(BIN_PATH)/$(PROGRAM_NAME): $(OBJS)
 	@echo 'Linking target: $@'
 	@echo 'Invoking: $(NVCC) Linker'
-	$(COMPILER) $(CODE_FLAGS) $(STANDART) $(NVCC_FLAGS) $(LIBS) $(GENCODE_FLAGS) -link -o $(BIN_PATH)/$(PROGRAM_NAME) $(OBJS)
+	$(COMPILER) $(LIB_DIRS) $(CODE_FLAGS) $(STANDART) $(NVCC_FLAGS) $(LIBS) $(GENCODE_FLAGS) -link -o $(BIN_PATH)/$(PROGRAM_NAME) $(OBJS)
 	chmod +x $(BIN_PATH)/$(PROGRAM_NAME)
 	@echo 'Finished building target: $@'
 	@echo ' '

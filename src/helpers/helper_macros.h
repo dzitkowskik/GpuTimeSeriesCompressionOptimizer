@@ -1,8 +1,4 @@
-// #ifdef DDJ_HELPER_MACROS_H_
-// #define DDJ_HELPER_MACROS_H_
-
-// namespace ddj
-// {
+#include <stdio.h>
 
 #define CUDA_CHECK_RETURN(value) {                               \
     cudaError_t _m_cudaStat = value;                             \
@@ -17,7 +13,3 @@
 
 #define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
     printf("Error at %s:%d\n",__FILE__,__LINE__);}} while(0)
-
-
-// } /* namespace ddj */
-// #endif /* DDJ_HELPER_MACROS_H_ */

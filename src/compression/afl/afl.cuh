@@ -1,7 +1,6 @@
 #ifndef DDJ_COMPRESSION_AFL_CUH_
 #define DDJ_COMPRESSION_AFL_CUH_
 
-#include "../../core/logger.h"
 #include <boost/noncopyable.hpp>
 
 namespace ddj
@@ -16,7 +15,6 @@ public:
 class AFLCompression : private boost::noncopyable
 {
 private:
-    Logger _logger = Logger::getInstance(LOG4CPLUS_TEXT("AFLCompression"));
     unsigned long max_size;
 
 public:

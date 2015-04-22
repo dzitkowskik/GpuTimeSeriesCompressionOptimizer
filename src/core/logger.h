@@ -2,7 +2,7 @@
  * Logger.h
  *
  *  Created on: 06-11-2013
- *      Author: ghash
+ *      Author: Karol Dzitkowski
  */
 
 #ifndef DDJ_LOGGER_H_
