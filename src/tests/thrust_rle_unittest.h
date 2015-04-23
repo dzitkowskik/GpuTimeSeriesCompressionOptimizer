@@ -1,10 +1,10 @@
 #ifndef DDJ_THRUST_RLE_UNITTEST_H_
 #define DDJ_THRUST_RLE_UNITTEST_H_
 
-#include "../compression/rle/thrust_rle.cuh"
-#include "../helpers/helper_cuda.h"
-#include "../helpers/helper_macros.h"
-#include "../helpers/helper_generator.h"
+#include "compression/rle/thrust_rle.cuh"
+#include "helpers/helper_cuda.h"
+#include "helpers/helper_macros.h"
+#include "helpers/helper_generator.h"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -24,7 +24,7 @@ protected:
         d_random_data = NULL;
     }
 
-    ~ThrustRleCompressionTest(){}
+    virtual ~ThrustRleCompressionTest(){}
 
     virtual void SetUp()
     {

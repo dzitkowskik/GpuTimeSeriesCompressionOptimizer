@@ -50,8 +50,7 @@ ifeq ($(V),true)
 	CMD_PREFIX :=
 endif
 
-CUDA_INCLUDES := -I"/usr/local/cuda/include"
-#INCLUDES := -I"src"
+INCLUDES := -I"src"
 DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
@@ -177,7 +176,7 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.$(SRC_EXT)
 	@$(START_TIME)
 	@echo 'Building file: $< -> $@'
 	@echo 'Invoking: $(COMPILER) Compiler'
-	$(COMPILER) $(CODE_FLAGS) $(STANDART) --compile -o "$@" "$<"
+	$(COMPILER) $(INCLUDES) $(CODE_FLAGS) $(STANDART) --compile -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo '\t Compile time: '
 	@$(END_TIME)
@@ -187,7 +186,7 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.$(SRC_CUDA_EXT)
 	@$(START_TIME)
 	@echo 'Building file: $< -> $@'
 	@echo 'Invoking: $(NVCC) Compiler'
-	$(COMPILER) $(CODE_FLAGS) $(STANDART) --compile $(CUDA_FLAGS) $(GENCODE_FLAGS) -x $(SRC_CUDA_EXT) -o "$@" "$<"
+	$(COMPILER) $(INCLUDES) $(CODE_FLAGS) $(STANDART) --compile $(CUDA_FLAGS) $(GENCODE_FLAGS) -x $(SRC_CUDA_EXT) -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo '\t Compile time:'
 	@$(END_TIME)

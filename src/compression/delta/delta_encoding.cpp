@@ -12,17 +12,20 @@ namespace ddj
 {
 
 template<typename T>
-void* Encode(T* data, int in_size, int& out_size, DeltaEncodingMetadata<T>& metadata)
+void* DeltaEncoding::Encode(T* data, int in_size, int& out_size, DeltaEncodingMetadata<T>& metadata)
 {
 	out_size = in_size - 1;
 	return deltaEncode(data, in_size, metadata.first);
 }
 
 template<typename T>
-T* Decode(void* data, int in_size, int& out_size, DeltaEncodingMetadata<T> metadata)
+T* DeltaEncoding::Decode(void* data, int in_size, int& out_size, DeltaEncodingMetadata<T> metadata)
 {
 	out_size = in_size + 1;
-	return deltaDecode(data, out_size, metadata.first);
+	return deltaDecode((T*)data, out_size, metadata.first);
 }
+
+template void* DeltaEncoding::Encode<float>(float* data, int in_size, int& out_size, DeltaEncodingMetadata<float>& metadata);
+template float* DeltaEncoding::Decode<float>(void* data, int in_size, int& out_size, DeltaEncodingMetadata<float> metadata);
 
 } /* namespace ddj */
