@@ -1,6 +1,7 @@
 #include "scale.cuh"
 #include "helpers/helper_macros.h"
 #include <cuda_runtime_api.h>
+#include "compression/macros.cuh"
 
 #define SCALE_ENCODING_GPU_BLOCK_SIZE 64
 #define SCALE_DECODING_GPU_BLOCK_SIZE 64
@@ -52,7 +53,9 @@ T* scaleDecode(T* data, int size, T& min)
 	return result;
 }
 
-template float* scaleEncode<float>(float* data, int size, float& min);
-template float* scaleDecode<float>(float* data, int size, float& min);
+#define SCALE_SPEC(X) \
+	template X* scaleEncode<X>(X* data, int size, X& min); \
+	template X* scaleDecode<X>(X* data, int size, X& min);
+FOR_EACH(SCALE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
 
 } /* namespace ddj */
