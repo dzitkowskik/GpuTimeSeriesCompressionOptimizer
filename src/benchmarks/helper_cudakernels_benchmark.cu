@@ -29,7 +29,7 @@ static void BM_Modulo_Kernel_Simple(benchmark::State& state)
 
         HelperCudaKernels::ModuloKernel(d_data_raw, n, mod);
     }
-    int it_processed = state.iterations() * state.range_x();
+    long long int it_processed = state.iterations() * state.range_x();
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(int));
 }
@@ -56,7 +56,7 @@ static void BM_Modulo_Thrust_Simple(benchmark::State& state)
 
         HelperCudaKernels::ModuloThrust(d_data_raw, n, mod);
     }
-    int it_processed = state.iterations() * state.range_x();
+    long long int it_processed = state.iterations() * state.range_x();
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(int));
 }

@@ -24,7 +24,7 @@ static void BM_CompareDeviceArrays(benchmark::State& state)
         cudaFree(data_2);
         state.ResumeTiming();
     }
-    int it_processed = state.iterations() * state.range_x();
+    long long int it_processed = state.iterations() * state.range_x();
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(float));
 }
