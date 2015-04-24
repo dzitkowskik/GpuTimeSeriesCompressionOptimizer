@@ -1,7 +1,6 @@
 #include "delta.cuh"
-#include "../../helpers/helper_macros.h"
+#include "helpers/helper_macros.h"
 #include <cuda_runtime_api.h>
-#include <utility>
 
 //a  a  b  b  a  a  b  b  a  a  b  b  a  a
 //1  2  2  3  3  4  4  4  5  1  2  3  3  3

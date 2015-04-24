@@ -36,7 +36,6 @@ public:
 	virtual void SetUp()
 	{
 		int n = GetParam();
-		curandGenerator_t gen;
 		d_random_data = generator.GenerateRandomFloatDeviceArray(n);
 	}
 
