@@ -18,14 +18,18 @@ __global__ void scaleEncodeKernel(T* data, int size, T* result, T min)
 }
 
 template<typename T>
-T* scaleEncode(T* data, int size, T& min)
+SharedCudaPtr<char> scaleEncode(SharedCudaPtr<T> data, T& min)
 {
 	int block_size = SCALE_ENCODING_GPU_BLOCK_SIZE;
-	int block_cnt = (size + block_size - 1) / block_size;
+	int block_cnt = (data->size() + block_size - 1) / block_size;
 
-	T* result;
-	CUDA_CALL( cudaMalloc((void**)&result, size*sizeof(T)) );
-	scaleEncodeKernel<T><<<block_size, block_cnt>>>(data, size, result, min);
+	auto result = CudaPtr<char>::make_shared(data->size()*sizeof(T));
+
+	scaleEncodeKernel<T><<<block_size, block_cnt>>>(
+			data->get(),
+			data->size(),
+			(T*)result->get(),
+			min);
 	cudaDeviceSynchronize();
 
 	return result;
@@ -40,22 +44,27 @@ __global__ void scaleDecodeKernel(T* data, int size, T* result, T min)
 }
 
 template<typename T>
-T* scaleDecode(T* data, int size, T& min)
+SharedCudaPtr<T> scaleDecode(SharedCudaPtr<char> data, T& min)
 {
 	int block_size = SCALE_ENCODING_GPU_BLOCK_SIZE;
-	int block_cnt = (size + block_size - 1) / block_size;
+	int block_cnt = (data->size() + block_size - 1) / block_size;
 
-	T* result;
-	CUDA_CALL( cudaMalloc((void**)&result, size*sizeof(T)) );
-	scaleDecodeKernel<T><<<block_size, block_cnt>>>(data, size, result, min);
+	auto result = CudaPtr<T>::make_shared(data->size());
+
+	scaleDecodeKernel<T><<<block_size, block_cnt>>>(
+			(T*)data->get(),
+			data->size(),
+			result->get(),
+			min);
+
 	cudaDeviceSynchronize();
 
 	return result;
 }
 
 #define SCALE_SPEC(X) \
-	template X* scaleEncode<X>(X* data, int size, X& min); \
-	template X* scaleDecode<X>(X* data, int size, X& min);
+	template SharedCudaPtr<char> scaleEncode<X>(SharedCudaPtr<X> data, X& min); \
+	template SharedCudaPtr<X> scaleDecode<X>(SharedCudaPtr<char> data, X& min);
 FOR_EACH(SCALE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
 
 } /* namespace ddj */

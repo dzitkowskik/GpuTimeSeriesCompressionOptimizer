@@ -12,21 +12,19 @@ namespace ddj
 {
 
 template<typename T>
-void* ScaleEncoding::Encode(T* data, int in_size, int& out_size, ScaleEncodingMetadata<T>& metadata)
+SharedCudaPtr<char> ScaleEncoding::Encode(SharedCudaPtr<T> data, ScaleEncodingMetadata<T>& metadata)
 {
-	out_size = in_size;
-	return scaleEncode(data, in_size, metadata.min);
+	return scaleEncode(data, metadata.min);
 }
 
 template<typename T>
-T* ScaleEncoding::Decode(void* data, int in_size, int& out_size, ScaleEncodingMetadata<T> metadata)
+SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtr<char> data, ScaleEncodingMetadata<T> metadata)
 {
-	out_size = in_size;
-	return scaleDecode((float*)data, in_size, metadata.min);
+	return scaleDecode(data, metadata.min);
 }
 
-template void* ScaleEncoding::Encode<float>(float* data, int in_size, int& out_size, ScaleEncodingMetadata<float>& metadata);
-template float* ScaleEncoding::Decode<float>(void* data, int in_size, int& out_size, ScaleEncodingMetadata<float> metadata);
+template SharedCudaPtr<char> ScaleEncoding::Encode<float>(SharedCudaPtr<float> data, ScaleEncodingMetadata<float>& metadata);
+template SharedCudaPtr<float> ScaleEncoding::Decode<float>(SharedCudaPtr<char> data, ScaleEncodingMetadata<float> metadata);
 
 
 } /* namespace ddj */

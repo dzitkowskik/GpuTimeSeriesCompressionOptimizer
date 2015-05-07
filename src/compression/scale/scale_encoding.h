@@ -8,6 +8,8 @@
 #ifndef DDJ_SCALE_ENCODING_H_
 #define DDJ_SCALE_ENCODING_H_
 
+#include "core/cuda_ptr.h"
+
 namespace ddj
 {
 
@@ -22,9 +24,9 @@ class ScaleEncoding
 {
 public:
 	template<typename T>
-    void* Encode(T* data, int in_size, int& out_size, ScaleEncodingMetadata<T>& metadata);
+	SharedCudaPtr<char> Encode(SharedCudaPtr<T> data, ScaleEncodingMetadata<T>& metadata);
 	template<typename T>
-    T* Decode(void* data, int in_size, int& out_size, ScaleEncodingMetadata<T> metadata);
+	SharedCudaPtr<T> Decode(SharedCudaPtr<char> data, ScaleEncodingMetadata<T> metadata);
 };
 
 } /* namespace ddj */

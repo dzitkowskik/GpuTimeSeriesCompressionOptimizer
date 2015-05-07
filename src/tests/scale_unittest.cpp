@@ -7,15 +7,9 @@
 
 #include "scale_unittest.h"
 
-namespace ddj {
+namespace ddj
+{
 
-ScaleEncodingTest::ScaleEncodingTest() {
-	// TODO Auto-generated constructor stub
 
-}
-
-ScaleEncodingTest::~ScaleEncodingTest() {
-	// TODO Auto-generated destructor stub
-}
 
 } /* namespace ddj */
