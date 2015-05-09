@@ -34,7 +34,7 @@ public:
 	CudaPtr(T* ptr, size_t size) : _pointer(ptr), _size(size){}
 
 	~CudaPtr()
-	{ printf("Release %p\n", _pointer); CUDA_CHECK_RETURN( cudaFree(_pointer) ); }
+	{ CUDA_CHECK_RETURN( cudaFree(_pointer) ); }
 
 public:
 	T* get() { return _pointer; }

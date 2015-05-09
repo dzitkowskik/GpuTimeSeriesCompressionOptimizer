@@ -8,10 +8,12 @@
 #ifndef DDJ_DELTA_UNITTEST_H_
 #define DDJ_DELTA_UNITTEST_H_
 
-#include "compression/delta/delta_encoding.h"
 #include "helpers/helper_cuda.h"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_generator.h"
+#include "helpers/helper_print.h"
+#include <thrust/device_vector.h>
+#include "core/cuda_ptr.h"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -21,31 +23,27 @@
 namespace ddj
 {
 
-class DeltaEncodingTest : public testing::Test,
+class CompressionTest : public testing::Test,
     public ::testing::WithParamInterface<int>
 {
 public:
-	DeltaEncodingTest()
+	CompressionTest()
 	{
 		HelperCuda hc;
 		hc.SetCudaDeviceWithMaxFreeMem();
-		d_random_data = NULL;
 	}
-	virtual ~DeltaEncodingTest(){}
 
 	virtual void SetUp()
 	{
 		int n = GetParam();
-		d_random_data = generator.GenerateRandomFloatDeviceArray(n);
+		d_float_random_data = CudaPtr<float>::make_shared(
+				generator.GenerateRandomFloatDeviceArray(n), n);
+		d_int_random_data = CudaPtr<int>::make_shared(
+				generator.GenerateRandomIntDeviceArray(n), n);
 	}
 
-	virtual void TearDown()
-	{
-		CUDA_CALL(cudaFree(d_random_data));
-	}
-
-	float* d_random_data;
-	DeltaEncoding compression;
+	SharedCudaPtr<float> d_float_random_data;
+	SharedCudaPtr<int> d_int_random_data;
 
 private:
 	HelperGenerator generator;

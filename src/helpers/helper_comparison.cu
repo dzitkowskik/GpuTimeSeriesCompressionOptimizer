@@ -1,27 +1,7 @@
 #include "helper_comparison.cuh"
 #include "compression/macros.cuh"
-
-template <typename T>
-__global__ void _compareElementsKernel(T* a, T*b, int size, bool* out)
-{
-	unsigned int iElement = blockDim.x * blockIdx.x + threadIdx.x;
-	if (iElement >= size) return;
-	out[iElement] = a[iElement] != b[iElement];
-}
-
-template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
-{
-    bool* out;
-    CUDA_CALL(cudaMalloc((void**)&out, size*sizeof(T)));
-    int blocks = (size + COMP_THREADS_PER_BLOCK - 1) / COMP_THREADS_PER_BLOCK;
-    _compareElementsKernel<<<blocks, COMP_THREADS_PER_BLOCK>>>(a, b, size, out);
-    cudaDeviceSynchronize();
-    thrust::device_vector<bool> out_vector(out, out+size);
-    thrust::inclusive_scan(out_vector.begin(), out_vector.end(), out_vector.begin());
-    int result = out_vector.back();
-    CUDA_CALL(cudaFree(out));
-    return result == 0;
-}
+#include "helper_macros.h"
+#include <boost/type_traits/is_same.hpp>
 
 // ulp = units in the last place; maxulps = maximum number of
 // representable floating point numbers by which x and y may differ.
@@ -44,12 +24,23 @@ __global__ void _compareFloatsKernel(float* a, float* b, int size, bool* out)
 	out[iElement] = !_floatsEqual(a[iElement], b[iElement], 5);
 }
 
-bool CompareDeviceFloatArrays(float* a, float* b, int size)
+template <typename T>
+__global__ void _compareElementsKernel(T* a, T*b, int size, bool* out)
+{
+	unsigned int iElement = blockDim.x * blockIdx.x + threadIdx.x;
+	if (iElement >= size) return;
+	out[iElement] = a[iElement] != b[iElement];
+}
+
+template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
 {
     bool* out;
-    CUDA_CALL(cudaMalloc((void**)&out, size*sizeof(float)));
+    CUDA_CALL(cudaMalloc((void**)&out, size*sizeof(T)));
     int blocks = (size + COMP_THREADS_PER_BLOCK - 1) / COMP_THREADS_PER_BLOCK;
-    _compareFloatsKernel<<<blocks, COMP_THREADS_PER_BLOCK>>>(a, b, size, out);
+    if(boost::is_same<T, float>::value)
+    	_compareFloatsKernel<<<blocks, COMP_THREADS_PER_BLOCK>>>((float*)a, (float*)b, size, out);
+    else
+    	_compareElementsKernel<<<blocks, COMP_THREADS_PER_BLOCK>>>(a, b, size, out);
     cudaDeviceSynchronize();
     thrust::device_vector<bool> out_vector(out, out+size);
     thrust::inclusive_scan(out_vector.begin(), out_vector.end(), out_vector.begin());

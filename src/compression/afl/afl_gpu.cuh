@@ -2,6 +2,7 @@
 #define DDJ_AFL_GPU_H_
 
 #include "../macros.cuh"
+#include "helpers/helper_macros.h"
 #include <stdio.h>
 
 // CWARP_SIZE is given in template to allow the compiler to optimize it (i.e. possible values are 32 or 1)
