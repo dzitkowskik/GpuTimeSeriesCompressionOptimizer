@@ -60,18 +60,16 @@ __global__ void scaleDecodeKernel(T* data, int size, T* result, T min)
 template<typename T>
 SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtr<char> data)
 {
+	int size = data->size()/sizeof(T)-1;
 	int block_size = SCALE_ENCODING_GPU_BLOCK_SIZE;
 	int block_cnt = (data->size() + block_size - 1) / block_size;
 
-	auto result = CudaPtr<T>::make_shared(data->size()/sizeof(T)-1);
 	thrust::device_ptr<T> data_ptr((T*)data->get());
 	auto min = data_ptr[0];
 
+	auto result = CudaPtr<T>::make_shared(size);
 	scaleDecodeKernel<T><<<block_size, block_cnt>>>(
-			(T*)(data->get()+sizeof(T)),
-			data->size(),
-			result->get(),
-			min);
+			(T*)(data->get()+sizeof(T)), size, result->get(), min);
 	cudaDeviceSynchronize();
 
 	return result;

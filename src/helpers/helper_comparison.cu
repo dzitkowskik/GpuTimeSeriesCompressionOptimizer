@@ -3,6 +3,8 @@
 #include "helper_macros.h"
 #include <boost/type_traits/is_same.hpp>
 
+#define MAX_FLOAT_DIFF 0.000001f
+
 // ulp = units in the last place; maxulps = maximum number of
 // representable floating point numbers by which x and y may differ.
 __host__ __device__ bool _floatsEqual(float a, float b, int maxulps)
@@ -21,7 +23,9 @@ __global__ void _compareFloatsKernel(float* a, float* b, int size, bool* out)
 {
 	unsigned int iElement = blockDim.x * blockIdx.x + threadIdx.x;
 	if (iElement >= size) return;
-	out[iElement] = !_floatsEqual(a[iElement], b[iElement], 5);
+	out[iElement] =
+			!_floatsEqual(a[iElement], b[iElement], 5) &&
+			abs(a[iElement] - b[iElement]) > MAX_FLOAT_DIFF;
 }
 
 template <typename T>

@@ -49,5 +49,8 @@ private:
 	HelperGenerator generator;
 };
 
+class ScaleCompressionTest : public CompressionTest {};
+class DeltaCompressionTest : public CompressionTest {};
+
 } /* namespace ddj */
 #endif /* DDJ_DELTA_UNITTEST_H_ */
