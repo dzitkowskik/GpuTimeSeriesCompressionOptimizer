@@ -1,5 +1,5 @@
-#include "afl_unittest.h"
-#include "../helpers/helper_comparison.cuh"
+#include "afl_unittest.hpp"
+#include "helpers/helper_comparison.cuh"
 
 namespace ddj
 {

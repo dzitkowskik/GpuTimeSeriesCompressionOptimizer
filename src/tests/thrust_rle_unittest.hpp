@@ -2,9 +2,9 @@
 #define DDJ_THRUST_RLE_UNITTEST_H_
 
 #include "compression/rle/thrust_rle.cuh"
-#include "helpers/helper_cuda.h"
+#include "helpers/helper_cuda.hpp"
 #include "helpers/helper_macros.h"
-#include "helpers/helper_generator.h"
+#include "helpers/helper_generator.hpp"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -46,4 +46,3 @@ private:
 
 } /* namespace ddj */
 #endif
-

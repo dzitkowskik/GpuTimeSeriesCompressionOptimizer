@@ -2,7 +2,7 @@
  * helper_cuda.cpp 26-03-2015 Karol Dzitkowski
  */
 
-#include "helper_cuda.h"
+#include "helper_cuda.hpp"
 #include "helper_macros.h"
 
 namespace ddj {

@@ -1,5 +1,5 @@
 /*
- * delta_encoding.h
+ * delta_encoding.cuh
  *
  *  Created on: 18-04-2015
  *      Author: Karol Dzitkowski
@@ -8,10 +8,9 @@
 #ifndef DELTA_ENCODING_H_
 #define DELTA_ENCODING_H_
 
-#include "core/cuda_ptr.h"
+#include "core/cuda_ptr.hpp"
 
-namespace ddj
-{
+namespace ddj {
 
 class DeltaEncoding
 {

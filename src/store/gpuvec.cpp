@@ -1,6 +1,6 @@
-#include "gpuvec.h"
+#include "gpuvec.hpp"
 #include <cuda_runtime_api.h>
-#include "../helpers/helper_macros.h"
+#include "helpers/helper_macros.h"
 
 namespace ddj
 {

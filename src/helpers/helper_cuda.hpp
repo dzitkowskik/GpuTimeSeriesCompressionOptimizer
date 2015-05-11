@@ -1,11 +1,11 @@
 /*
- * helper_cuda.h 26-03-2015 Karol Dzitkowski
+ * helper_cuda.hpp 26-03-2015 Karol Dzitkowski
  */
 
 #ifndef DDJ_HELPER_CUDA_H_
 #define DDJ_HELPER_CUDA_H_
 
-#include "../core/config.h"
+#include "core/config.hpp"
 #include <cuda_runtime_api.h>
 
 namespace ddj {

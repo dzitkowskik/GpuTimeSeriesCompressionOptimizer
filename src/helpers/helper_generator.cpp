@@ -1,4 +1,4 @@
-#include "helper_generator.h"
+#include "helper_generator.hpp"
 #include "helper_macros.h"
 #include <time.h>       /* time */
 

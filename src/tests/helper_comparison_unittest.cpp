@@ -1,8 +1,7 @@
-#include "helper_comparison_unittest.h"
-#include "../helpers/helper_comparison.cuh"
+#include "helper_comparison_unittest.hpp"
+#include "helpers/helper_comparison.cuh"
 
-namespace ddj
-{
+namespace ddj {
 
 INSTANTIATE_TEST_CASE_P(
     HelperComparisonTest_RandomFloats_Inst,

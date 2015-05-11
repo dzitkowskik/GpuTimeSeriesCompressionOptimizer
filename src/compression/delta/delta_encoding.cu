@@ -1,3 +1,10 @@
+/*
+ * delta_encoding.cu
+ *
+ *  Created on: 18-04-2015
+ *      Author: Karol Dzitkowski
+ */
+
 #include "delta_encoding.cuh"
 #include "helpers/helper_macros.h"
 #include <cuda_runtime_api.h>

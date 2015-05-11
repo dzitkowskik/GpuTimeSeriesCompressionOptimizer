@@ -1,10 +1,17 @@
+/*
+ *  afl_unittest.hpp
+ *
+ *  Created on: 22-04-2015
+ *      Author: Karol Dzitkowski
+ */
+
 #ifndef DDJ_GPUVEC_UNITTEST_H_
 #define DDJ_GPUVEC_UNITTEST_H_
 
-#include "../compression/afl/afl.cuh"
-#include "../helpers/helper_cuda.h"
-#include "../helpers/helper_macros.h"
-#include "../helpers/helper_generator.h"
+#include "compression/afl/afl.cuh"
+#include "helpers/helper_cuda.hpp"
+#include "helpers/helper_macros.h"
+#include "helpers/helper_generator.hpp"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -44,4 +51,3 @@ private:
 
 } /* namespace ddj */
 #endif
-

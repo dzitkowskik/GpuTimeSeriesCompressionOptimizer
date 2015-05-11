@@ -1,10 +1,10 @@
 #ifndef DDJ_HELPER_COMPARISON_UNITTEST_H_
 #define DDJ_HELPER_COMPARISON_UNITTEST_H_
 
-#include "../helpers/helper_macros.h"
-#include "../helpers/helper_comparison.cuh"
-#include "../helpers/helper_generator.h"
-#include "../helpers/helper_cuda.h"
+#include "helpers/helper_macros.h"
+#include "helpers/helper_comparison.cuh"
+#include "helpers/helper_generator.hpp"
+#include "helpers/helper_cuda.hpp"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -46,5 +46,4 @@ private:
 };
 
 } /* namespace ddj */
-
 #endif /* DDJ_HELPER_COMPARISON_UNITTEST_H_ */

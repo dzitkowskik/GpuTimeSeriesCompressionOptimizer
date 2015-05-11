@@ -1,11 +1,10 @@
-#include "helpers/helper_generator.h"
+#include "helpers/helper_generator.hpp"
 #include "compression/scale/scale_encoding.cuh"
-#include "core/cuda_ptr.h"
+#include "core/cuda_ptr.hpp"
 #include <benchmark/benchmark.h>
 #include <cuda_runtime_api.h>
 
-namespace ddj
-{
+namespace ddj {
 
 static void BM_Scale_Float_Encode(benchmark::State& state)
 {

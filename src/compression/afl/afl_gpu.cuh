@@ -1,7 +1,7 @@
 #ifndef DDJ_AFL_GPU_H_
 #define DDJ_AFL_GPU_H_
 
-#include "../macros.cuh"
+#include "compression/macros.cuh"
 #include "helpers/helper_macros.h"
 #include <stdio.h>
 

@@ -1,10 +1,9 @@
-#include "../helpers/helper_generator.h"
-#include "../compression/rle/thrust_rle.cuh"
+#include "helpers/helper_generator.hpp"
+#include "compression/rle/thrust_rle.cuh"
 #include <benchmark/benchmark.h>
 #include <cuda_runtime_api.h>
 
-namespace ddj
-{
+namespace ddj {
 
 static void BM_Thrust_RLE_Encode(benchmark::State& state)
 {

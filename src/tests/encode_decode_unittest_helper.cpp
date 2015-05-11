@@ -2,13 +2,13 @@
  * encode_decode_unittest_helper.cpp
  *
  *  Created on: 07-05-2015
- *      Author: ghash
+ *      Author: Karol Dzitkowski
  */
 
-#include "encode_decode_unittest_helper.h"
+#include "encode_decode_unittest_helper.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_macros.h"
-#include "helpers/helper_print.h"
+#include "helpers/helper_print.hpp"
 
 namespace ddj
 {

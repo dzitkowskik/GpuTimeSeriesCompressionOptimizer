@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include "../core/config.h"
+#include "core/config.hpp"
 
 int main(int argc, char** argv)
 {

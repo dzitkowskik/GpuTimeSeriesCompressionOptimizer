@@ -1,5 +1,5 @@
 /*
- * Config.h
+ * Config.hpp
  *
  *  Created on: Mar 13, 2015
  *      Author: Karol Dzitkowski

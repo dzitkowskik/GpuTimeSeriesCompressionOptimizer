@@ -1,9 +1,8 @@
-#include "../helpers/helper_comparison.cuh"
-#include "../helpers/helper_generator.h"
+#include "helpers/helper_comparison.cuh"
+#include "helpers/helper_generator.hpp"
 #include <benchmark/benchmark.h>
 
-namespace ddj
-{
+namespace ddj {
 
 static void BM_CompareDeviceArrays(benchmark::State& state)
 {

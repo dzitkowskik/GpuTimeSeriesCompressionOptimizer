@@ -1,5 +1,5 @@
 /*
-* gpuvec.h
+* gpuvec.hpp
 *
 * Created on: Mar 10, 2015
 * Author: Karol Dzitkowski
@@ -9,8 +9,8 @@
 #define DDJ_GPUVEC_H_
 
 #include "storetypes.h"
-#include "../core/config.h"
-#include "../core/logger.h"
+#include "core/config.hpp"
+#include "core/logger.h"
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 

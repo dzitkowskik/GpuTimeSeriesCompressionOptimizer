@@ -5,7 +5,7 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "config.h"
+#include "config.hpp"
 #include <iostream>
 #include <fstream>
 #include <iterator>

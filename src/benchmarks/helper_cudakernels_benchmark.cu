@@ -1,12 +1,11 @@
-#include "../helpers/helper_cudakernels.cuh"
+#include "helpers/helper_cudakernels.cuh"
 #include <stdlib.h>
 #include <time.h>
 #include <thrust/device_vector.h>
 #include <thrust/fill.h>
 #include <benchmark/benchmark.h>
 
-namespace ddj
-{
+namespace ddj {
 
 static void BM_Modulo_Kernel_Simple(benchmark::State& state)
 {

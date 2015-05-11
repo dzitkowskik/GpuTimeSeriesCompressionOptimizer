@@ -1,5 +1,5 @@
 /*
- * helper_print.h 26-03-2015 Karol Dzitkowski
+ * helper_print.hpp 26-03-2015 Karol Dzitkowski
  */
 #ifndef DDJ_HELPER_PRINT_H_
 #define DDJ_HELPER_PRINT_H_

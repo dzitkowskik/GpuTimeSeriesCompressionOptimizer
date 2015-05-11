@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
-#include "../store/gpuvec.h"
-#include "../helpers/helper_cuda.h"
+#include "store/gpuvec.hpp"
+#include "helpers/helper_cuda.hpp"
 
 namespace ddj {
 
@@ -26,4 +26,3 @@ protected:
 
 } /* namespace ddj */
 #endif
-

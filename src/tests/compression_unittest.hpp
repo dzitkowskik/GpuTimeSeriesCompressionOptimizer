@@ -1,5 +1,5 @@
 /*
- * delta_unittest.h
+ * delta_unittest.hpp
  *
  *  Created on: 22-04-2015
  *      Author: Karol Dzitkowski
@@ -8,12 +8,12 @@
 #ifndef DDJ_DELTA_UNITTEST_H_
 #define DDJ_DELTA_UNITTEST_H_
 
-#include "helpers/helper_cuda.h"
+#include "helpers/helper_cuda.hpp"
 #include "helpers/helper_macros.h"
-#include "helpers/helper_generator.h"
-#include "helpers/helper_print.h"
+#include "helpers/helper_generator.hpp"
+#include "helpers/helper_print.hpp"
 #include <thrust/device_vector.h>
-#include "core/cuda_ptr.h"
+#include "core/cuda_ptr.hpp"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>

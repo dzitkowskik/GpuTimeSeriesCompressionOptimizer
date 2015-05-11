@@ -1,5 +1,5 @@
 /*
- * helper_generator.h 26-03-2015 Karol Dzitkowski
+ * helper_generator.hpp 26-03-2015 Karol Dzitkowski
  */
 
 #ifndef DDJ_HELPER_GENERATOR_H_
@@ -20,6 +20,10 @@ public:
 public:
     float* GenerateRandomFloatDeviceArray(int size);
     int* GenerateRandomIntDeviceArray(int size);
+
+    template<typename T>
+    T* GenerateRandomDeviceArray(int size);
+
     curandGenerator_t gen;
 };
 

@@ -17,8 +17,7 @@
 #define SCALE_ENCODING_GPU_BLOCK_SIZE 64
 #define SCALE_DECODING_GPU_BLOCK_SIZE 64
 
-namespace ddj
-{
+namespace ddj {
 
 template<typename T>
 __global__ void scaleEncodeKernel(T* data, int size, T* result, T min)

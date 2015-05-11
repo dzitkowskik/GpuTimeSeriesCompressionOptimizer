@@ -1,5 +1,5 @@
 /*
- * semaphore.h
+ * semaphore.hpp
  *
  *  Created on: 30-10-2013
  *      Author: Karol Dzitkowski

@@ -1,8 +1,8 @@
 /*
- * encode_decode_unittest_helper.h
+ * encode_decode_unittest_helper.hpp
  *
  *  Created on: 07-05-2015
- *      Author: ghash
+ *      Author: Karol Dzitkowski
  */
 
 #ifndef ENCODE_DECODE_UNITTEST_HELPER_H_
@@ -10,7 +10,7 @@
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include "core/cuda_ptr.h"
+#include "core/cuda_ptr.hpp"
 
 namespace ddj
 {

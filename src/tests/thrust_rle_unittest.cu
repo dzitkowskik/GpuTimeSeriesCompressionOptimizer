@@ -1,8 +1,7 @@
-#include "thrust_rle_unittest.h"
-#include "../helpers/helper_comparison.cuh"
+#include "thrust_rle_unittest.hpp"
+#include "helpers/helper_comparison.cuh"
 
-namespace ddj
-{
+namespace ddj {
 
 INSTANTIATE_TEST_CASE_P(
     RandomFloatNumbersCompression_ThrustRle_Inst,
@@ -52,6 +51,5 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_data)
     CUDA_CALL(cudaFree(compressedData));
     CUDA_CALL(cudaFree(decompressedData));
 }
-
 
 } /* namespace ddj */

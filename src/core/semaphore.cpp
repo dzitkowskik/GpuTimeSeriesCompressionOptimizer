@@ -5,7 +5,7 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "semaphore.h"
+#include "semaphore.hpp"
 
 namespace ddj
 {

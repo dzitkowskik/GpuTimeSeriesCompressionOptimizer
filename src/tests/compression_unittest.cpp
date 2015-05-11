@@ -5,10 +5,10 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "compression_unittest.h"
+#include "compression_unittest.hpp"
 #include "helpers/helper_comparison.cuh"
-#include "helpers/helper_print.h"
-#include "encode_decode_unittest_helper.h"
+#include "helpers/helper_print.hpp"
+#include "encode_decode_unittest_helper.hpp"
 #include "compression/scale/scale_encoding.cuh"
 #include "compression/delta/delta_encoding.cuh"
 

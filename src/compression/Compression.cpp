@@ -5,7 +5,7 @@
  *      Author: ghash
  */
 
-#include "Compression.h"
+#include "Compression.hpp"
 
 namespace ddj
 {

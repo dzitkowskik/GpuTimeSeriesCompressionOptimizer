@@ -1,5 +1,5 @@
 /*
- * cuda_ptr.h
+ * cuda_ptr.hpp
  *
  *  Created on: 07-05-2015
  *      Author: Karol Dzitkowski

@@ -1,10 +1,8 @@
-#include "gpuvec_unittest.h"
-#include "../helpers/helper_generator.h"
-#include "../helpers/helper_comparison.cuh"
-#include <thrust/version.h>
+#include "gpuvec_unittest.hpp"
+#include "helpers/helper_generator.hpp"
+#include "helpers/helper_comparison.cuh"
 
-namespace ddj
-{
+namespace ddj {
 
 // check thrust version
 TEST_F(GpuVecTest, GpuVec_Constructor_ZeroSize)

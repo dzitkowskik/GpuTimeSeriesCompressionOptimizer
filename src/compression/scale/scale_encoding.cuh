@@ -1,5 +1,5 @@
 /*
- * scale_encoding.h
+ * scale_encoding.cuh
  *
  *  Created on: 24-04-2015
  *      Author: Karol Dzitkowski
@@ -8,7 +8,7 @@
 #ifndef DDJ_SCALE_ENCODING_H_
 #define DDJ_SCALE_ENCODING_H_
 
-#include "core/cuda_ptr.h"
+#include "core/cuda_ptr.hpp"
 
 namespace ddj
 {
