@@ -1,5 +1,5 @@
 #include "helpers/helper_generator.h"
-#include "compression/delta/delta_encoding.cuh"
+#include "compression/scale/scale_encoding.cuh"
 #include "core/cuda_ptr.h"
 #include <benchmark/benchmark.h>
 #include <cuda_runtime_api.h>
@@ -7,10 +7,10 @@
 namespace ddj
 {
 
-static void BM_Delta_Float_Encode(benchmark::State& state)
+static void BM_Scale_Float_Encode(benchmark::State& state)
 {
     HelperGenerator generator;
-    DeltaEncoding compression;
+    ScaleEncoding compression;
 
     while (state.KeepRunning())
     {
@@ -27,12 +27,12 @@ static void BM_Delta_Float_Encode(benchmark::State& state)
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(float));
 }
-BENCHMARK(BM_Delta_Float_Encode)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Scale_Float_Encode)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
 
-static void BM_Delta_Float_Decode(benchmark::State& state)
+static void BM_Scale_Float_Decode(benchmark::State& state)
 {
     HelperGenerator generator;
-    DeltaEncoding compression;
+    ScaleEncoding compression;
 
     while (state.KeepRunning())
     {
@@ -49,6 +49,6 @@ static void BM_Delta_Float_Decode(benchmark::State& state)
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(float));
 }
-BENCHMARK(BM_Delta_Float_Decode)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Scale_Float_Decode)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
 
 } /* namespace ddj */
