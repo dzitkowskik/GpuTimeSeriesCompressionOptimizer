@@ -13,8 +13,7 @@
 #define DELTA_ENCODING_GPU_BLOCK_SIZE 64
 #define DELTA_DECODING_GPU_BLOCK_SIZE 64
 
-namespace ddj
-{
+namespace ddj {
 
 template<typename T>
 __global__ void deltaEncodeKernel(T* data, int size, T* result)

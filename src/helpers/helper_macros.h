@@ -1,5 +1,11 @@
 #include <stdio.h>
 
+#define CPY_DTD cudaMemcpyDeviceToDevice
+#define CPY_DTH cudaMemcpyDeviceToHost
+#define CPY_HTD cudaMemcpyHostToDevice
+#define CPY_HTH cudaMemcpyHostToHost
+
+
 #define CUDA_CHECK_RETURN(value) {                               \
     cudaError_t _m_cudaStat = value;                             \
     if (_m_cudaStat != cudaSuccess) {                            \
