@@ -54,6 +54,14 @@ public:
 		_size = size;
 	}
 
+	void fill(T* ptr, size_t size)
+	{
+		if(_size < size) reset(size);
+		CUDA_CHECK_RETURN( 
+			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyDeviceToDevice)
+			);
+	}
+
 public:
 	static SharedCudaPtr<T> make_shared()
 	{ return SharedCudaPtr<T>(new CudaPtr()); }
