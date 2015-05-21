@@ -27,8 +27,8 @@ __global__ void splitPrepareKernel(T* data, int size, int* out, T low, T high)
     else out[idx] = 0;
 }
 
-template<typename T> tuple<SharedCudaPtr<T>, SharedCudaPtr<T>>
-SimplePatch<T>::split(SharedCudaPtr<T> data)
+template<typename T>
+tuple<SharedCudaPtr<T>, SharedCudaPtr<T>> SimplePatch<T>::split(SharedCudaPtr<T> data)
 {
     int size = data->size();
 	int block_size = SPLIT_ENCODING_GPU_BLOCK_SIZE;

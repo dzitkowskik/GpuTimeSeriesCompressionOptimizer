@@ -5,33 +5,63 @@
  *      Author: Karol Dzitkowski
  */
 
+#include "utils/prefix_sum.cuh"
 #include "helper_cudakernels.cuh"
 #include <thrust/device_vector.h>
 #include <thrust/fill.h>
+#include <tuple>
 
-__global__ void _moduloKernel(int* data, int size, int mod)
-{
-	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
-	if (idx >= size) return;
-	data[idx] %= mod;
-}
+#define SPLIT_KERNEL_BLOCK_SIZE 32
 
 namespace ddj
 {
 
-void HelperCudaKernels::ModuloKernel(int* data, int size, int mod)
+template<typename T>
+__global__ void _copyIfKernel(
+	T* data, int* prefixSum, int* stencil, size_t size, T* out_true, T* out_false)
 {
-	const int tpb = 32;
-	int blocks = (size + tpb - 1) / tpb;
-	_moduloKernel<<<blocks, tpb>>>(data, size, mod);
+	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	if (idx >= size) return;
+	size_t out_idx = prefixSum[idx];
+	T value = data[idx];
+	if (stencil[idx]) out_true[out_idx] = value;
+	else out_false[out_idx] = value;
 }
 
-void HelperCudaKernels::ModuloThrust(int* data, int size, int mod)
+template<typename T>
+std::tuple<SharedCudaPtr<T>> SplitKernel(
+	SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
-	thrust::device_vector<int> d_mod(size);
-	thrust::device_ptr<int> dp(data);
-	thrust::fill(d_mod.begin(), d_mod.end(), mod);
-	thrust::transform(dp, dp+size, d_mod.begin(), dp, thrust::modulus<int>());
+	int out_size = 0;
+	int block_size = SPLIT_KERNEL_BLOCK_SIZE;
+	int block_cnt = (data->size() + block_size - 1) / block_size;
+	auto prefixSum = inclusivePrefixSum_thrust(stencil, out_size);
+	auto yes = CudaPtr<T>::make_shared(out_size);
+	auto no = CudaPtr<T>::make_shared(data->size()-out_size);
+
+	_copyIfKernel<<<block_size, block_cnt>>>(
+		data->get(),
+		prefixSum->get(),
+		stencil->get(),
+		data->size(),
+		yes->get(),
+		no->get());
+
+	return std::make_tuple(yes, no);
+}
+
+template<typename T>
+SharedCudaPtr<T> CopyIfKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
+{
+	auto result = SplitKernel(data, stencil);
+	return std::get<0>(result);
+}
+
+template<typename T>
+SharedCudaPtr<T> CopyIfNotKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
+{
+	auto result = SplitKernel(data, stencil);
+	return std::get<1>(result);
 }
 
 } /* namespace ddj */

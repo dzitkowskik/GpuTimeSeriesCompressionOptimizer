@@ -3,6 +3,7 @@
 ### MY ###
 *.log
 .test_time
+.clang_complete
 gpuStore
 
 ### OSX ###

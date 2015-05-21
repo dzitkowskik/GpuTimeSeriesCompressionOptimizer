@@ -8,14 +8,22 @@
 #ifndef HELPER_CUDAKERNELS_CUH_
 #define HELPER_CUDAKERNELS_CUH_
 
+#include "core/cuda_ptr.hpp"
+
 namespace ddj
 {
 
 class HelperCudaKernels
 {
 public:
-	static void ModuloKernel(int* data, int size, int mod);
-	static void ModuloThrust(int* data, int size, int mod);
+	template<typename T> std::tuple<SharedCudaPtr<T>>
+	SplitKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+
+	template<typename T> SharedCudaPtr<T>
+	CopyIfKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+
+	template<typename T> SharedCudaPtr<T>
+	CopyIfNotKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 };
 
 } /* namespace ddj */

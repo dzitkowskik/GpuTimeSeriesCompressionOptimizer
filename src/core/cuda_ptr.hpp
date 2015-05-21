@@ -57,9 +57,16 @@ public:
 	void fill(T* ptr, size_t size)
 	{
 		if(_size < size) reset(size);
-		CUDA_CHECK_RETURN( 
+		CUDA_CHECK_RETURN(
 			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyDeviceToDevice)
 			);
+	}
+
+	SharedCudaPtr<T> copy()
+	{
+		SharedCudaPtr<T> result;
+		result.fill(_pointer, _size);
+		return result;
 	}
 
 public:
