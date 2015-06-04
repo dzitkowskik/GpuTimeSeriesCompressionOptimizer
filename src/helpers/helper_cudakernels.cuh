@@ -13,11 +13,17 @@
 namespace ddj
 {
 
+template<class T>
+using SharedCudaPtrTuple = std::tuple<SharedCudaPtr<T>, SharedCudaPtr<T>>;
+
 class HelperCudaKernels
 {
 public:
-	template<typename T> std::tuple<SharedCudaPtr<T>>
+	template<typename T> SharedCudaPtrTuple<T>
 	SplitKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+
+	template<typename T> SharedCudaPtrTuple<T>
+	SplitKernel2(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 
 	template<typename T> SharedCudaPtr<T>
 	CopyIfKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);

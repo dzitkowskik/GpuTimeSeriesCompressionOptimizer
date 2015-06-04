@@ -12,6 +12,7 @@
 #define COMP_THREADS_PER_BLOCK 512
 
 template <typename T> bool CompareDeviceArrays(T* a, T* b, int size);
-bool CompareDeviceFloatArrays(float* a, float* b, int size);
+
+// TODO: Dopisać funkcje przyjmujące SharedCudaPtr
 
 #endif
