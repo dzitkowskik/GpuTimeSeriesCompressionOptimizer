@@ -2,6 +2,9 @@
 
 ### MY ###
 *.log
+.tags
+.tags1
+tags
 .test_time
 .clang_complete
 gpuStore

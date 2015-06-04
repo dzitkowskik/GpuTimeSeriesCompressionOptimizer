@@ -9,8 +9,7 @@
 #define DDJ_SPLITTING_SIMPLE_PATCH_CUH_
 
 #include "core/cuda_ptr.hpp"
-#include "compression/patch/operators.cuh"
-
+#include "helpers/helper_cudakernels.cuh"
 #include <tuple>
 #include <boost/noncopyable.hpp>
 
@@ -40,6 +39,7 @@ private:
 	PartData _data;
 	Stencil _stencil;
 	UnaryOperator _op;
+    HelperCudaKernels _kernels;
 };
 
 } /* namespace ddj */
