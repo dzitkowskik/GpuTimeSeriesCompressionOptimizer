@@ -32,14 +32,8 @@ protected:
         d_random_data_2 = generator.GenerateRandomFloatDeviceArray(n);
     }
 
-    virtual void TearDown()
-    {
-        CUDA_CALL(cudaFree(d_random_data));
-        CUDA_CALL(cudaFree(d_random_data_2));
-    }
-
-    float* d_random_data;
-    float* d_random_data_2;
+    SharedCudaPtr<float> d_random_data;
+    SharedCudaPtr<float> d_random_data_2;
 
 private:
     HelperGenerator generator;

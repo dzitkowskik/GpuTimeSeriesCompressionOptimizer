@@ -52,6 +52,18 @@ void PatchedData<DT, OPT>::Init(SharedCudaPtr<DT> data)
     this->_data = this->_kernels.SplitKernel(data, this->_stencil);
 }
 
-template class PatchedData<int, outsideOperator<int>>;
+template<typename DT, typename OPT>
+SharedCudaPtr<DT> PatchedData<DT, OPT>::GetFirst()
+{
+    return get<0>(this->_data);
+}
+
+template<typename DT, typename OPT>
+SharedCudaPtr<DT> PatchedData<DT, OPT>::GetSecond()
+{
+    return get<1>(this->_data);
+}
+
+template class PatchedData<int, OutsideOperator<int>>;
 
 } /* namespace ddj */

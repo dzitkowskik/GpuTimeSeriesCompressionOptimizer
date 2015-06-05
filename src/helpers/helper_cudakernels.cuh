@@ -30,6 +30,15 @@ public:
 
 	template<typename T> SharedCudaPtr<T>
 	CopyIfNotKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+
+	template<typename T> SharedCudaPtr<T>
+	ModuloKernel(SharedCudaPtr<T> data, int mod);
+
+	template<typename T> void
+	ModuloInPlaceKernel(SharedCudaPtr<T> data, int mod);
+
+	template<typename T> SharedCudaPtr<T>
+	CreateConsecutiveNumbersArray(int size, T start);
 };
 
 } /* namespace ddj */

@@ -18,10 +18,6 @@ protected:
     }
 
     ~GpuVecTest(){}
-
-    virtual void SetUp()
-    {
-    }
 };
 
 } /* namespace ddj */

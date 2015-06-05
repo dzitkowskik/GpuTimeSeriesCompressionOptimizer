@@ -16,7 +16,7 @@ TEST_P(AflCompressionTest, CompressionOfRandomInt_size)
     int decompressed_size;
     AFLCompressionMetadata metadata;
     void* compressedData = compression.Encode(
-        d_random_data,
+        d_random_data->get(),
         real_size,
         compressed_size,
         metadata);
@@ -40,7 +40,7 @@ TEST_P(AflCompressionTest, CompressionOfRandomInt_data)
     int decompressed_size;
     AFLCompressionMetadata metadata;
     void* compressedData = compression.Encode(
-        d_random_data,
+        d_random_data->get(),
         real_size,
         compressed_size,
         metadata);
@@ -51,7 +51,9 @@ TEST_P(AflCompressionTest, CompressionOfRandomInt_data)
         decompressed_size,
         metadata);
 
-    EXPECT_TRUE(CompareDeviceArrays(d_random_data, decompressedData, real_size));
+    EXPECT_TRUE(
+        CompareDeviceArrays(d_random_data->get(), decompressedData, real_size)
+        );
 
     CUDA_CALL(cudaFree(compressedData));
     CUDA_CALL(cudaFree(decompressedData));

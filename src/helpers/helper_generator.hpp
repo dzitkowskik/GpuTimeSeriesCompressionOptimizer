@@ -5,6 +5,7 @@
 #ifndef DDJ_HELPER_GENERATOR_H_
 #define DDJ_HELPER_GENERATOR_H_
 
+#include "core/cuda_ptr.hpp"
 #include <boost/noncopyable.hpp>
 #include <curand.h>
 
@@ -18,12 +19,11 @@ public:
     ~HelperGenerator();
 
 public:
-    float* GenerateRandomFloatDeviceArray(int size);
-    int* GenerateRandomIntDeviceArray(int size);
+    SharedCudaPtr<float> GenerateRandomFloatDeviceArray(int size);
+    SharedCudaPtr<int> GenerateRandomIntDeviceArray(int size);
+    SharedCudaPtr<int> GenerateConsecutiveIntDeviceArray(int size);
 
-    template<typename T>
-    T* GenerateRandomDeviceArray(int size);
-
+private:
     curandGenerator_t gen;
 };
 

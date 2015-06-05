@@ -1,5 +1,5 @@
 /*
- * helper_cudakernels.cu
+ * helper_cudakernels_split.cu
  *
  *  Created on: 09-04-2015
  *      Author: Karol Dzitkowski
@@ -122,10 +122,16 @@ SharedCudaPtr<T> HelperCudaKernels::CopyIfNotKernel(
 	return std::get<1>(result);
 }
 
-#define SCALE_SPEC(X) \
-	template SharedCudaPtrTuple<X> HelperCudaKernels::SplitKernel(SharedCudaPtr<X>, SharedCudaPtr<int>); \
-	template SharedCudaPtrTuple<X> HelperCudaKernels::SplitKernel2(SharedCudaPtr<X>, SharedCudaPtr<int>);
-FOR_EACH(SCALE_SPEC, float, int)
+#define CUDA_KERNELS_SPEC(X) \
+	template SharedCudaPtrTuple<X> \
+	HelperCudaKernels::SplitKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	template SharedCudaPtrTuple<X> \
+	HelperCudaKernels::SplitKernel2<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	template SharedCudaPtr<X> \
+	HelperCudaKernels::CopyIfKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	template SharedCudaPtr<X> \
+	HelperCudaKernels::CopyIfNotKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>);
+FOR_EACH(CUDA_KERNELS_SPEC, float, int)
 
 
 } /* namespace ddj */

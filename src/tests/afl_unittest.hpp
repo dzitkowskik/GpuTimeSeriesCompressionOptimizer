@@ -23,7 +23,7 @@ class AflCompressionTest : public testing::Test,
     public ::testing::WithParamInterface<int>
 {
 protected:
-	AflCompressionTest() : d_random_data(NULL)
+	AflCompressionTest()
     {
         HelperCuda hc;
         hc.SetCudaDeviceWithMaxFreeMem();
@@ -37,12 +37,7 @@ protected:
         d_random_data = generator.GenerateRandomIntDeviceArray(n);
     }
 
-    virtual void TearDown()
-    {
-        CUDA_CALL(cudaFree(d_random_data));
-    }
-
-    int* d_random_data;
+    SharedCudaPtr<int> d_random_data;
     AFLCompression compression;
 
 private:

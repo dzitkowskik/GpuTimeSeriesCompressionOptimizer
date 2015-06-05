@@ -9,7 +9,7 @@
 #define OPERATORS_CUH_
 
 template<typename T>
-struct outsideOperator
+struct OutsideOperator
 {
 	T low;
 	T high;
@@ -21,5 +21,29 @@ struct outsideOperator
 		else return true;
 	}
 };
+
+template<typename T>
+struct InsideOperator
+{
+	T low;
+	T high;
+
+	__host__ __device__
+	bool operator()(const T &value) const
+	{
+		if(value > high || value < low) return true;
+		else return false;
+	}
+};
+
+template<typename T>
+struct ModulusOperator
+{
+    T mod;
+
+    __host__ __device__
+    T operator()(T x) { return x % mod; }
+};
+
 
 #endif /* OPERATORS_CUH_ */

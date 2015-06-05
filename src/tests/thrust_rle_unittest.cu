@@ -15,7 +15,7 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_size)
     int decompressed_size;
 
     void* compressedData = compression.Encode(
-        d_random_data,
+        d_random_data->get(),
         real_size,
         compressed_size);
 
@@ -37,7 +37,7 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_data)
     int decompressed_size;
 
     void* compressedData = compression.Encode(
-        d_random_data,
+        d_random_data->get(),
         real_size,
         compressed_size);
 
@@ -46,7 +46,8 @@ TEST_P(ThrustRleCompressionTest, CompressionOfRandomFloats_data)
         compressed_size,
         decompressed_size);
 
-    EXPECT_TRUE(CompareDeviceArrays(d_random_data, (float*)decompressedData, real_size));
+    EXPECT_TRUE(CompareDeviceArrays(
+        d_random_data->get(), (float*)decompressedData, real_size));
 
     CUDA_CALL(cudaFree(compressedData));
     CUDA_CALL(cudaFree(decompressedData));

@@ -1,7 +1,9 @@
 #include "helper_generator.hpp"
 #include "helper_macros.h"
-#include <time.h>       /* time */
+#include "helper_cudakernels.cuh"
+#include "core/cuda_ptr.hpp"
 
+#include <time.h>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
 
@@ -18,20 +20,24 @@ namespace ddj
 		CURAND_CALL(curandDestroyGenerator(gen));
 	}
 
-    float* HelperGenerator::GenerateRandomFloatDeviceArray(int n)
+	SharedCudaPtr<float> HelperGenerator::GenerateRandomFloatDeviceArray(int n)
     {
-        float* d_result;
-        CUDA_CALL(cudaMalloc((void**)&d_result, n * sizeof(float)));
-        CURAND_CALL(curandGenerateUniform(gen, d_result, n));
-        return d_result;
+        auto result = CudaPtr<float>::make_shared(n);
+        CURAND_CALL(curandGenerateUniform(gen, result->get(), n));
+        return result;
     }
 
-    int* HelperGenerator::GenerateRandomIntDeviceArray(int n)
+	SharedCudaPtr<int> HelperGenerator::GenerateRandomIntDeviceArray(int n)
 	{
-		unsigned int* d_result;
-		CUDA_CALL(cudaMalloc((void**)&d_result, n * sizeof(int)));
-		CURAND_CALL(curandGenerate(gen, d_result, n));
-		return (int*)d_result;
+		auto result = CudaPtr<int>::make_shared(n);
+		CURAND_CALL(curandGenerate(gen, (unsigned int*)result->get(), n));
+		return result;
+	}
+
+	SharedCudaPtr<int> HelperGenerator::GenerateConsecutiveIntDeviceArray(int size)
+	{
+		HelperCudaKernels kernels;
+		return kernels.CreateConsecutiveNumbersArray<int>(size, 0);
 	}
 
 } /* nemespace ddj */

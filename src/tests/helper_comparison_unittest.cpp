@@ -11,13 +11,15 @@ INSTANTIATE_TEST_CASE_P(
 TEST_P(HelperComparisonTest, ComparisonOfRandomFloats_Equal)
 {
     int size = GetParam();
-    EXPECT_TRUE(CompareDeviceArrays(d_random_data, d_random_data, size));
+    EXPECT_TRUE(CompareDeviceArrays(
+        d_random_data->get(), d_random_data->get(), size));
 }
 
 TEST_P(HelperComparisonTest, ComparisonOfRandomFloats_NotEqual)
 {
     int size = GetParam();
-    EXPECT_FALSE(CompareDeviceArrays(d_random_data, d_random_data_2, size));
+    EXPECT_FALSE(CompareDeviceArrays(
+        d_random_data->get(), d_random_data_2->get(), size));
 }
 
 } /* namespace ddj */

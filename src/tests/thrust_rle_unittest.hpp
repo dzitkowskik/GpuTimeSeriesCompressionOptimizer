@@ -32,12 +32,7 @@ protected:
         d_random_data = generator.GenerateRandomFloatDeviceArray(n);
     }
 
-    virtual void TearDown()
-    {
-        CUDA_CALL(cudaFree(d_random_data));
-    }
-
-    float* d_random_data;
+    SharedCudaPtr<float> d_random_data;
     ThrustRleCompression compression;
 
 private:
