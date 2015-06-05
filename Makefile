@@ -20,10 +20,9 @@ NVCC_FLAGS := --cudart static --relocatable-device-code=false
 LIBS := -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread \
 	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand
 
-GENCODE_SM20    := -gencode arch=compute_20,code=compute_20 -gencode arch=compute_20,code=sm_20
-GENCODE_SM21    := -gencode arch=compute_20,code=compute_21 -gencode arch=compute_20,code=sm_21
-GENCODE_SM30    := -gencode arch=compute_30,code=compute_30 -gencode arch=compute_30,code=sm_30
-GENCODE_SM35	:= -gencode arch=compute_35,code=compute_35 -gencode arch=compute_35,code=sm_35
+GENCODE_SM20    := -gencode arch=compute_20,code=sm_20
+GENCODE_SM30    := -gencode arch=compute_30,code=sm_30
+GENCODE_SM35	:= -gencode arch=compute_35,code=sm_35
 
 ifeq ($(OS),Darwin)
 	LIB_DIRS := -L"/usr/local/cuda/lib" -L"/usr/local/lib"
