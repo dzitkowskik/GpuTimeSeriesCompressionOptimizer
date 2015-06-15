@@ -48,7 +48,7 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomFloats_data)
 INSTANTIATE_TEST_CASE_P(
 	DeltaEncoding_Compression_Inst,
 	DeltaCompressionTest,
-    ::testing::Values(10, 100));
+    ::testing::Values(10, 1000, 10000));
 
 TEST_P(DeltaCompressionTest, EncodingOfRandomFloats_size)
 {

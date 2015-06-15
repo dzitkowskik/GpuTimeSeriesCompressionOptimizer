@@ -3,7 +3,7 @@
 #include "helper_macros.h"
 #include <boost/type_traits/is_same.hpp>
 
-#define MAX_FLOAT_DIFF 0.000001f
+#define MAX_FLOAT_DIFF 0.00001f
 
 // ulp = units in the last place; maxulps = maximum number of
 // representable floating point numbers by which x and y may differ.
@@ -24,7 +24,7 @@ __global__ void _compareFloatsKernel(float* a, float* b, int size, bool* out)
 	unsigned int iElement = blockDim.x * blockIdx.x + threadIdx.x;
 	if (iElement >= size) return;
 	out[iElement] =
-			!_floatsEqual(a[iElement], b[iElement], 5) &&
+			!_floatsEqual(a[iElement], b[iElement], 8) &&
 			abs(a[iElement] - b[iElement]) > MAX_FLOAT_DIFF;
 }
 
@@ -55,4 +55,3 @@ template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
 
 #define COMP_SPEC(X) template bool CompareDeviceArrays <X> (X* a, X* b, int size);
 FOR_EACH(COMP_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
-

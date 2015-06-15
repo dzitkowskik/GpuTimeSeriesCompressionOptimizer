@@ -8,7 +8,7 @@
 #ifndef DDJ_PATCH_UNITTEST_H_
 #define DDJ_PATCH_UNITTEST_H_
 
-#include "helpers/helper_cuda.hpp"
+#include "helpers/helper_device.hpp"
 #include "helpers/helper_generator.hpp"
 #include "core/cuda_ptr.hpp"
 #include "helpers/helper_cudakernels.cuh"
@@ -21,7 +21,7 @@ class PatchedDataTest : public testing::Test
 protected:
     PatchedDataTest() : size(10000)
     {
-        HelperCuda hc;
+        HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
     }
 

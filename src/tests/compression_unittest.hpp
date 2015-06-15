@@ -8,7 +8,7 @@
 #ifndef DDJ_DELTA_UNITTEST_H_
 #define DDJ_DELTA_UNITTEST_H_
 
-#include "helpers/helper_cuda.hpp"
+#include "helpers/helper_device.hpp"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_generator.hpp"
 #include "helpers/helper_print.hpp"
@@ -29,7 +29,7 @@ class CompressionTest : public testing::Test,
 public:
 	CompressionTest()
 	{
-		HelperCuda hc;
+        HelperDevice hc;
 		hc.SetCudaDeviceWithMaxFreeMem();
 	}
 

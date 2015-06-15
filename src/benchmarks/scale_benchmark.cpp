@@ -14,8 +14,7 @@ static void BM_Scale_Float_Encode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = CudaPtr<float>::make_shared(
-        	generator.GenerateRandomFloatDeviceArray(state.range_x()), state.range_x());
+        auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
         state.ResumeTiming();
 
         // ENCODE
@@ -36,8 +35,7 @@ static void BM_Scale_Float_Decode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = CudaPtr<float>::make_shared(
-        	generator.GenerateRandomFloatDeviceArray(state.range_x()), state.range_x());
+        auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
         auto compr = compression.Encode(data);
         state.ResumeTiming();
 

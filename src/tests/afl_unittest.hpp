@@ -9,7 +9,7 @@
 #define DDJ_GPUVEC_UNITTEST_H_
 
 #include "compression/afl/afl.cuh"
-#include "helpers/helper_cuda.hpp"
+#include "helpers/helper_device.hpp"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_generator.hpp"
 
@@ -25,7 +25,7 @@ class AflCompressionTest : public testing::Test,
 protected:
 	AflCompressionTest()
     {
-        HelperCuda hc;
+        HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
     }
 

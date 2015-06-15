@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
 #include "store/gpuvec.hpp"
-#include "helpers/helper_cuda.hpp"
+#include "helpers/helper_device.hpp"
 
 namespace ddj {
 
@@ -13,7 +13,7 @@ class GpuVecTest : public testing::Test
 protected:
     GpuVecTest()
     {
-        HelperCuda hc;
+        HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
     }
 

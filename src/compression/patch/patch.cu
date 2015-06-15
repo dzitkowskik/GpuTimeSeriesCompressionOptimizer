@@ -6,6 +6,7 @@
  */
 
 #include "patch.cuh"
+#include "helpers/helper_cuda.cuh"
 #include <thrust/sort.h>
 #include <thrust/device_ptr.h>
 #include <thrust/reduce.h>
@@ -42,13 +43,14 @@ template<typename DT, typename OPT>
 void PatchedData<DT, OPT>::Init(SharedCudaPtr<DT> data)
 {
     int size = data->size();
-	int block_size = SPLIT_ENCODING_GPU_BLOCK_SIZE;
-	int block_cnt = (size + block_size - 1) / block_size;
 
+    // Create stencil
     this->_stencil = CudaPtr<int>::make_shared(size);
-    stencilKernel<DT, OPT><<<block_size, block_cnt>>>(
+    this->_policy.setSize(size);
+    cudaLaunch(this->_policy, stencilKernel<DT, OPT>,
         data->get(), data->size(), this->_stencil->get(), _op);
 
+    // Split according to the stencil
     this->_data = this->_kernels.SplitKernel(data, this->_stencil);
 }
 

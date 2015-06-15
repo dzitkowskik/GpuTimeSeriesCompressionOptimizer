@@ -4,7 +4,7 @@
 #include "helpers/helper_macros.h"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_generator.hpp"
-#include "helpers/helper_cuda.hpp"
+#include "helpers/helper_device.hpp"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -19,7 +19,7 @@ class HelperComparisonTest : public testing::Test,
 protected:
     HelperComparisonTest() : d_random_data(NULL), d_random_data_2(NULL)
     {
-        HelperCuda hc;
+        HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
     }
 

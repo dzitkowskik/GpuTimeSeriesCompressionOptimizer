@@ -7,8 +7,10 @@
 
 #include "delta_encoding.cuh"
 #include "helpers/helper_macros.h"
+#include "helpers/helper_cuda.cuh"
 #include <cuda_runtime_api.h>
 #include <thrust/device_ptr.h>
+#include <thrust/scan.h>
 
 #define DELTA_ENCODING_GPU_BLOCK_SIZE 64
 #define DELTA_DECODING_GPU_BLOCK_SIZE 64
@@ -28,14 +30,11 @@ __global__ void deltaEncodeKernel(T* data, int size, T* result)
 template<typename T>
 SharedCudaPtr<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 {
-	int block_size = DELTA_ENCODING_GPU_BLOCK_SIZE;
-	int block_cnt = (data->size() + block_size - 1) / block_size;
-
 	auto result = CudaPtr<char>::make_shared(data->size()*sizeof(T));
-	deltaEncodeKernel<T><<<block_size, block_cnt>>>(
-			data->get(),
-			data->size(),
-			(T*)(result->get()+sizeof(T)));
+
+	this->policy.setSize(data->size());
+	cudaLaunch(this->policy, deltaEncodeKernel<T>,
+		data->get(), data->size(), (T*)(result->get()+sizeof(T)));
 
 	CUDA_CALL( cudaMemcpy(result->get(), data->get(), sizeof(T), cudaMemcpyDeviceToDevice) );
 	cudaDeviceSynchronize();
@@ -44,29 +43,14 @@ SharedCudaPtr<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 }
 
 template<typename T>
-__global__ void deltaDecodeKernel(T* data, int size, T first, T* result)
-{
-	unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
-	if (idx >= size) return;
-	for(int i=0; i<idx; i++)
-		first += data[i];
-	result[idx] = first;
-}
-
-template<typename T>
 SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtr<char> data)
 {
 	int size = data->size()/sizeof(T);
-	int block_size = DELTA_DECODING_GPU_BLOCK_SIZE;
-	int block_cnt = (size + block_size - 1) / block_size;
+	auto result = CudaPtr<T>::make_shared(size);
 
 	thrust::device_ptr<T> data_ptr((T*)data->get());
-	auto first = data_ptr[0];
-
-	auto result = CudaPtr<T>::make_shared(size);
-	deltaDecodeKernel<T><<<block_size, block_cnt>>>(
-			(T*)(data->get()+sizeof(T)), size, first, result->get());
-	cudaDeviceSynchronize();
+	thrust::device_ptr<T> result_ptr(result->get());
+	thrust::inclusive_scan(data_ptr, data_ptr+size, result_ptr);
 
 	return result;
 }

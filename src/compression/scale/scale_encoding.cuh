@@ -10,8 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 
-namespace ddj
-{
+namespace ddj {
 
 class ScaleEncoding
 {

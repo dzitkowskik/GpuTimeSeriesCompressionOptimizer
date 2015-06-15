@@ -2,7 +2,7 @@
 #define DDJ_THRUST_RLE_UNITTEST_H_
 
 #include "compression/rle/thrust_rle.cuh"
-#include "helpers/helper_cuda.hpp"
+#include "helpers/helper_device.hpp"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_generator.hpp"
 
@@ -19,9 +19,8 @@ class ThrustRleCompressionTest : public testing::Test,
 protected:
     ThrustRleCompressionTest()
     {
-        HelperCuda hc;
+        HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
-        d_random_data = NULL;
     }
 
     virtual ~ThrustRleCompressionTest(){}

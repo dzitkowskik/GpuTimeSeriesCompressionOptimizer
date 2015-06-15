@@ -16,8 +16,7 @@ static void EncodeTest(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = CudaPtr<T>::make_shared(
-          generator.GenerateRandomFloatDeviceArray(state.range_x()), state.range_x());
+        auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
         state.ResumeTiming();
 
         // ENCODE
@@ -37,12 +36,16 @@ static void BM_Delta_Float_Encode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = CudaPtr<float>::make_shared(
-          generator.GenerateRandomFloatDeviceArray(state.range_x()), state.range_x());
+        auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
         state.ResumeTiming();
 
         // ENCODE
         auto compr = compression.Encode(data);
+
+        state.PauseTiming();
+        data.reset();
+        compr.reset();
+        state.ResumeTiming();
     }
 
     long long int it_processed = state.iterations() * state.range_x();
@@ -60,13 +63,18 @@ static void BM_Delta_Float_Decode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = CudaPtr<float>::make_shared(
-        	generator.GenerateRandomFloatDeviceArray(state.range_x()), state.range_x());
+        auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
         auto compr = compression.Encode(data);
         state.ResumeTiming();
 
         // DECODE
         auto decpr = compression.Decode<float>(compr);
+
+        state.PauseTiming();
+        data.reset();
+        compr.reset();
+        decpr.reset();
+        state.ResumeTiming();
     }
     long long int it_processed = state.iterations() * state.range_x();
     state.SetItemsProcessed(it_processed);
@@ -82,12 +90,16 @@ static void BM_Delta_Int_Encode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = CudaPtr<int>::make_shared(
-          generator.GenerateRandomIntDeviceArray(state.range_x()), state.range_x());
+        auto data = generator.GenerateRandomIntDeviceArray(state.range_x());
         state.ResumeTiming();
 
         // ENCODE
         auto compr = compression.Encode(data);
+
+        state.PauseTiming();
+        data.reset();
+        compr.reset();
+        state.ResumeTiming();
     }
 
     long long int it_processed = state.iterations() * state.range_x();
@@ -105,8 +117,7 @@ static void BM_Delta_Int_Decode(benchmark::State& state)
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = CudaPtr<int>::make_shared(
-        	generator.GenerateRandomIntDeviceArray(state.range_x()), state.range_x());
+        auto data = generator.GenerateRandomIntDeviceArray(state.range_x());
         auto compr = compression.Encode(data);
         state.ResumeTiming();
 

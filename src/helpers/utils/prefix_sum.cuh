@@ -2,6 +2,9 @@
 #include <thrust/scan.h>
 #include <thrust/device_ptr.h>
 
+#ifndef DDJ_PREFIX_SUM_CUH_
+#define DDJ_PREFIX_SUM_CUH_
+
 namespace ddj
 {
 
@@ -55,3 +58,4 @@ SharedCudaPtr<T> exclusivePrefixSum_thrust(SharedCudaPtr<T> data, T& last)
 }
 
 } /* namespace ddj */
+#endif /* DDJ_PREFIX_SUM_CUH_ */

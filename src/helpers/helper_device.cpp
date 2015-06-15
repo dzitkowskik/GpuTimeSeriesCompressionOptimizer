@@ -2,12 +2,12 @@
  * helper_cuda.cpp 26-03-2015 Karol Dzitkowski
  */
 
-#include "helper_cuda.hpp"
+#include "helper_device.hpp"
 #include "helper_macros.h"
 
 namespace ddj {
 
-int HelperCuda::CudaGetDevicesCount()
+int HelperDevice::CudaGetDevicesCount()
 {
 	int count = 0;
 	cudaError_t error = cudaGetDeviceCount(&count);
@@ -16,7 +16,7 @@ int HelperCuda::CudaGetDevicesCount()
 	else return -1;
 }
 
-bool HelperCuda::CudaCheckDeviceForRequirements(int n)
+bool HelperDevice::CudaCheckDeviceForRequirements(int n)
 {
 	int driverVersion = 0, runtimeVersion = 0;
 	cudaDeviceProp prop;
@@ -33,7 +33,7 @@ bool HelperCuda::CudaCheckDeviceForRequirements(int n)
 	return true;
 }
 
-cudaError_t HelperCuda::CudaAllocateArray(size_t size, void** array)
+cudaError_t HelperDevice::CudaAllocateArray(size_t size, void** array)
 {
 	size_t mbSize = this->_config->GetValue<int>(std::string("MB_SIZE_IN_BYTES"));
 	size_t freeMemory, totalMemory;
@@ -51,12 +51,12 @@ cudaError_t HelperCuda::CudaAllocateArray(size_t size, void** array)
 	return result;
 }
 
-void HelperCuda::GetMemoryCount(size_t* freeMemory, size_t* totalMemory)
+void HelperDevice::GetMemoryCount(size_t* freeMemory, size_t* totalMemory)
 {
 	cudaMemGetInfo(freeMemory, totalMemory);
 }
 
-int HelperCuda::SetCudaDeviceWithMaxFreeMem()
+int HelperDevice::SetCudaDeviceWithMaxFreeMem()
 {
 	int deviceId = 0;
 	size_t free;
