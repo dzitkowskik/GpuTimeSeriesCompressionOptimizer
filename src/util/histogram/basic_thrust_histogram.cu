@@ -2,9 +2,9 @@
 
 namespace ddj {
 
-SharedCudaPtr<int> BasicThrustHistogram::IntegerHistogram(SharedCudaPtr<int> data)
+SharedCudaPtrPair<int, int> BasicThrustHistogram::IntegerHistogram(SharedCudaPtr<int> data)
 {
-    return SharedCudaPtr<int>();
+    return SharedCudaPtrPair<int, int>(SharedCudaPtr<int>(), SharedCudaPtr<int>());
 }
 
 } /* namespace ddj */

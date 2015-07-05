@@ -5,12 +5,17 @@
 #ifndef DDJ_UTIL_HISTOGRAM_BASE_CUH_
 #define DDJ_UTIL_HISTOGRAM_BASE_CUH_
 
+#include <utility>
+
+template<typename L, typename R>
+using SharedCudaPtrPair = std::pair<SharedCudaPtr<L>, SharedCudaPtr<R>>;
+
 namespace ddj {
 
 class HistogramBase
 {
 public:
-    virtual SharedCudaPtr<int> IntegerHistogram(SharedCudaPtr<int> data) = 0;
+    virtual SharedCudaPtrPair<int, int> IntegerHistogram(SharedCudaPtr<int> data) = 0;
 };
 
 } /* namespace ddj */

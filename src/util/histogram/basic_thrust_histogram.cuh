@@ -13,7 +13,7 @@ namespace ddj {
 class BasicThrustHistogram : public HistogramBase
 {
 public:
-    virtual SharedCudaPtr<int> IntegerHistogram(SharedCudaPtr<int> data);
+    virtual SharedCudaPtrPair<int, int> IntegerHistogram(SharedCudaPtr<int> data);
 };
 
 } /* namespace ddj */

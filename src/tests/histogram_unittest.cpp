@@ -19,7 +19,7 @@ TEST(SimpleCpuHistogramTest, AllOnes)
     std::vector<int> expected(N);
     for(int i = 0; i < N; i++) expected[i] = 1;
     auto actual = histogram.Histogram(data);
-    ASSERT_EQ(expected, actual);
+    ASSERT_EQ(expected.size(), actual.size());
     for(int i = 0; i < N; i++) EXPECT_EQ(expected[i], actual[i]);
 }
 
@@ -33,34 +33,61 @@ TEST(SimpleCpuHistogramTest, RepeatedNumbers_Modulo)
     std::vector<int> expected(M);
     for(int i = 0; i < M; i++) expected[i] = N/M;
     auto actual = histogram.Histogram(data);
-    ASSERT_EQ(expected, actual);
-    printf("OK\n");
-    for(int i = 0; i < M; i++)
-    {
-        printf("OK %d\n", i);
-        EXPECT_EQ(expected[i], actual[i]); 
-    }
-    printf("DONE\n");
+    ASSERT_EQ(expected.size(), actual.size());
+    for(int i = 0; i < M; i++) EXPECT_EQ(expected[i], actual[i]);
 }
 
-// void HistogramTest::RandomIntegerArrayTestCase(HistogramBase& histogram)
-// {
-//     int* h_data = new int[size];
-//     CUDA_CALL( cudaMemcpy(h_data, d_int_random_data->get(), size*sizeof(int), CPY_DTH) );
-//     auto h_data_vector = std::vector<int>(h_data, h_data+size);
-//     auto serial_alg_answer = cpu_histogram.Histogram(h_data_vector);
-//     ScopedCudaPtr<int> expected(new CudaPtr<int>());
-//     expected->fillFromHost(serial_alg_answer.data(), serial_alg_answer.size());
-//     auto actual = histogram.IntegerHistogram(d_int_random_data);
-//     EXPECT_EQ( expected->size(), actual->size() );
-//     EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
-//     delete [] h_data;
-// }
-//
-// TEST_F(HistogramTest, BasicThrustHistogram_RandomIntegerArray)
-// {
-//     auto histogram = BasicThrustHistogram();
-//     RandomIntegerArrayTestCase(histogram);
-// }
+template<typename T>
+std::map<T, int> TransformToHostMap(const SharedCudaPtrPair<T, int>& d_map_data)
+{
+	if(d_map_data.first->size() != d_map_data.second->size())
+		throw new std::runtime_error("sizes of arrays must match");
+	int size = d_map_data.second->size();
+	std::map<T, int> result;
+	if(size > 0)
+	{
+		T* keys = new T[size];
+		int* counts = new int[size];
+		CUDA_CALL( cudaMemcpy(keys, d_map_data.first->get(), size*sizeof(T), CPY_DTH) );
+		CUDA_CALL( cudaMemcpy(counts, d_map_data.second->get(), size*sizeof(int), CPY_DTH) );
+
+
+		for(int i = 0; i < size; i++)
+			result.insert(std::make_pair(keys[i], counts[i]));
+
+		delete [] keys;
+		delete [] counts;
+	}
+	return result;
+}
+
+template<typename T>
+bool CompareHistograms(std::map<T, int> A, std::map<T, int> B)
+{
+	for(auto&& elem : A)
+		if(elem.second != B[elem.first]) return false;
+	return true;
+}
+
+void HistogramTest::RandomIntegerArrayTestCase(HistogramBase& histogram)
+{
+	int* h_data = new int[size];
+	CUDA_CALL( cudaMemcpy(h_data, d_int_random_data->get(), size*sizeof(int), CPY_DTH) );
+	auto h_data_vector = std::vector<int>(h_data, h_data+size);
+	auto h_expected = cpu_histogram.Histogram(h_data_vector);
+	auto d_actual = histogram.IntegerHistogram(d_int_random_data);
+	ASSERT_TRUE(d_actual.first != NULL);
+	ASSERT_TRUE(d_actual.second != NULL);
+	auto h_actual = TransformToHostMap(d_actual);
+	ASSERT_EQ( h_expected.size(), h_actual.size() );
+	EXPECT_TRUE( CompareHistograms(h_expected, h_actual) );
+	delete [] h_data;
+}
+
+TEST_F(HistogramTest, BasicThrustHistogram_RandomIntegerArray)
+{
+	auto histogram = BasicThrustHistogram();
+	RandomIntegerArrayTestCase(histogram);
+}
 
 } /* namespace ddj */

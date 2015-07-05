@@ -14,19 +14,14 @@ class SimpleCpuHistogram
 {
 public:
     template<typename T>
-    std::vector<int> Histogram(std::vector<T>& data)
+    std::map<T, int> Histogram(std::vector<T>& data)
     {
         std::map<T, int> histogram;
 
         for (auto&& elem : data)
             ++histogram[elem];
 
-        std::vector<int> result(histogram.size());
-
-        for (int i = 0; i < data.size(); i++)
-            result[i] = histogram[data[i]];
-
-        return result;
+        return histogram;
     }
 };
 
