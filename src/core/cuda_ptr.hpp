@@ -62,6 +62,14 @@ public:
 			);
 	}
 
+	void fillFromHost(T* ptr, size_t size)
+	{
+		if(_size < size) reset(size);
+		CUDA_CHECK_RETURN(
+			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyHostToDevice)
+			);
+	}
+
 	SharedCudaPtr<T> copy()
 	{
 		SharedCudaPtr<T> result;
@@ -78,15 +86,6 @@ public:
 	{ return SharedCudaPtr<T>(new CudaPtr(ptr)); }
 	static SharedCudaPtr<T> make_shared(T* ptr, size_t size)
 	{ return SharedCudaPtr<T>(new CudaPtr(ptr, size)); }
-
-	static ScopedCudaPtr<T> make_scoped()
-	{ return ScopedCudaPtr<T>(new CudaPtr()); }
-	static ScopedCudaPtr<T> make_scoped(size_t size)
-	{ return ScopedCudaPtr<T>(new CudaPtr(size)); }
-	static ScopedCudaPtr<T> make_scoped(T* ptr)
-	{ return ScopedCudaPtr<T>(new CudaPtr(ptr)); }
-	static ScopedCudaPtr<T> make_scoped(T* ptr, size_t size)
-	{ return ScopedCudaPtr<T>(new CudaPtr(ptr, size)); }
 
 private:
 	T* _pointer;
