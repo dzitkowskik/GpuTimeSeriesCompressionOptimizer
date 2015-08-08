@@ -1,5 +1,5 @@
 #include "helpers/helper_generator.hpp"
-#include "compression/scale/scale_encoding.cuh"
+#include "compression/scale/scale_encoding.hpp"
 #include "core/cuda_ptr.hpp"
 #include <benchmark/benchmark.h>
 #include <cuda_runtime_api.h>

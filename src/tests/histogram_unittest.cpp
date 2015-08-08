@@ -2,8 +2,8 @@
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_macros.h"
 #include "core/cuda_ptr.hpp"
-#include "util/histogram/basic_thrust_histogram.cuh"
-
+#include "util/histogram/basic_thrust_histogram.hpp"
+#include "util/histogram/simple_cpu_histogram.hpp"
 #include <cuda_runtime_api.h>
 #include <vector>
 
@@ -71,6 +71,7 @@ bool CompareHistograms(std::map<T, int> A, std::map<T, int> B)
 
 void HistogramTest::RandomIntegerArrayTestCase(HistogramBase& histogram)
 {
+    SimpleCpuHistogram cpu_histogram;
 	int* h_data = new int[size];
 	CUDA_CALL( cudaMemcpy(h_data, d_int_random_data->get(), size*sizeof(int), CPY_DTH) );
 	auto h_data_vector = std::vector<int>(h_data, h_data+size);

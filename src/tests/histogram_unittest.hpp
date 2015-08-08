@@ -10,7 +10,6 @@
 
 #include "helpers/helper_device.hpp"
 #include "helpers/helper_generator.hpp"
-#include "util/histogram/simple_cpu_histogram.hpp"
 #include "core/cuda_ptr.hpp"
 #include "util/histogram/histogram_base.hpp"
 #include <gtest/gtest.h>
@@ -44,7 +43,6 @@ protected:
 
 private:
 	HelperGenerator generator;
-	SimpleCpuHistogram cpu_histogram;
 };
 
 } /* namespace ddj */

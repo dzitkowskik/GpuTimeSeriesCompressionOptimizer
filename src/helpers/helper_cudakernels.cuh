@@ -39,6 +39,9 @@ public:
 
 	template<typename T> SharedCudaPtr<T>
 	CreateConsecutiveNumbersArray(int size, T start);
+
+	// Result 0 - Minimum, Result 1 - Maximum
+	template<typename T> std::tuple<T,T> MinMax(SharedCudaPtr<T> data);
 };
 
 } /* namespace ddj */

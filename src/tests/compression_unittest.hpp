@@ -49,6 +49,7 @@ private:
 
 class ScaleCompressionTest : public CompressionTest {};
 class DeltaCompressionTest : public CompressionTest {};
+class AflCompressionTest : public CompressionTest {};
 
 } /* namespace ddj */
 #endif /* DDJ_DELTA_UNITTEST_H_ */

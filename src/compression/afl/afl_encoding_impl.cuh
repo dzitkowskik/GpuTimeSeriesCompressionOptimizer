@@ -1,5 +1,5 @@
-#ifndef DDJ_AFL_GPU_H_
-#define DDJ_AFL_GPU_H_
+#ifndef DDJ_AFL_ENCODING_IMPL_CUH_
+#define DDJ_AFL_ENCODING_IMPL_CUH_
 
 #include "compression/macros.cuh"
 #include "helpers/helper_macros.h"
@@ -163,4 +163,4 @@ __device__ __host__ void afl_decompress_base_gpu(
     }
 }
 
-#endif /* DDJ_AFL_GPU_H_ */
+#endif /* DDJ_AFL_ENCODING_IMPL_CUH_ */

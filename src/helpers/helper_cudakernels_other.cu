@@ -6,6 +6,9 @@
  */
 
 #include "helper_cudakernels.cuh"
+#include <thrust/device_ptr.h>
+#include <thrust/extrema.h>
+#include <thrust/pair.h>
 
 #define MODULO_KERNEL_BLOCK_SIZE 32
 #define CREATE_NUM_KERNEL_BLOCK_SIZE 32
@@ -68,16 +71,23 @@ HelperCudaKernels::CreateConsecutiveNumbersArray(int size, T start)
     return result;
 }
 
+template<typename T> std::tuple<T,T> HelperCudaKernels::MinMax(SharedCudaPtr<T> data)
+{
+	thrust::device_ptr<T> dp(data->get());
+	auto tuple = thrust::minmax_element(dp, dp+data->size());
+	T min = *(tuple.first);
+	T max = *(tuple.second);
+	return std::make_tuple(min, max);
+}
+
 #define MODULO_SPEC(X) \
-    template SharedCudaPtr<X> \
-	HelperCudaKernels::ModuloKernel<X>(SharedCudaPtr<X>, int); \
-    template void \
-	HelperCudaKernels::ModuloInPlaceKernel<X>(SharedCudaPtr<X>, int);
+    template SharedCudaPtr<X> HelperCudaKernels::ModuloKernel<X>(SharedCudaPtr<X>, int); \
+    template void HelperCudaKernels::ModuloInPlaceKernel<X>(SharedCudaPtr<X>, int);
 FOR_EACH(MODULO_SPEC, unsigned int, int)
 
 #define CUDA_KERNELS_OTHER_SPEC(X) \
-	template SharedCudaPtr<X> \
-	HelperCudaKernels::CreateConsecutiveNumbersArray<X>(int, X);
-FOR_EACH(CUDA_KERNELS_OTHER_SPEC, float, int)
+	template SharedCudaPtr<X> HelperCudaKernels::CreateConsecutiveNumbersArray<X>(int, X); \
+	template std::tuple<X,X> HelperCudaKernels::MinMax<X>(SharedCudaPtr<X> data);
+FOR_EACH(CUDA_KERNELS_OTHER_SPEC, float, int, long int, long long int)
 
 } /* namespace ddj */

@@ -1,14 +1,14 @@
 #include "helpers/helper_generator.hpp"
 #include "core/cuda_ptr.hpp"
 #include "benchmark_base_inline.hpp"
-#include "util/histogram/basic_thrust_histogram.cuh"
+#include "util/histogram/basic_thrust_histogram.hpp"
 #include <benchmark/benchmark.h>
 #include <cuda_runtime_api.h>
 
 namespace ddj
 {
 
-static void BM_BasicThrustHistogram_ConsecutiveNumbers(benchmark::State& state)
+static void BM_HISTOGRAM_BasicThrustHistogram_ConsecutiveNumbers(benchmark::State& state)
 {
     HelperGenerator generator;
     BasicThrustHistogram histogram;
@@ -21,9 +21,9 @@ static void BM_BasicThrustHistogram_ConsecutiveNumbers(benchmark::State& state)
 
     Set_Statistics(state);
 }
-BENCHMARK(BM_BasicThrustHistogram_ConsecutiveNumbers)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_HISTOGRAM_BasicThrustHistogram_ConsecutiveNumbers)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
 
-static void BM_BasicThrustHistogram_RandomNumbers(benchmark::State& state)
+static void BM_HISTOGRAM_BasicThrustHistogram_RandomNumbers(benchmark::State& state)
 {
     HelperGenerator generator;
     BasicThrustHistogram histogram;
@@ -37,6 +37,6 @@ static void BM_BasicThrustHistogram_RandomNumbers(benchmark::State& state)
 
     Set_Statistics(state);
 }
-BENCHMARK(BM_BasicThrustHistogram_RandomNumbers)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_HISTOGRAM_BasicThrustHistogram_RandomNumbers)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
 
 } /* namespace ddj */
