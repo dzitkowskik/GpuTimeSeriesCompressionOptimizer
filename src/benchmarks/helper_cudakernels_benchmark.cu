@@ -24,7 +24,7 @@ static void BM_Modulo_Kernel_Normal(benchmark::State& state)
 
     Set_Statistics(state);
 }
-BENCHMARK(BM_Modulo_Kernel_Normal)->Arg(1<<10)->Arg(1<<16)->Arg(1<<20);
+BENCHMARK(BM_Modulo_Kernel_Normal)->Arg(1<<20);
 
 static void BM_Modulo_Kernel_InPlace(benchmark::State& state)
 {
@@ -40,6 +40,6 @@ static void BM_Modulo_Kernel_InPlace(benchmark::State& state)
 
     Set_Statistics(state);
 }
-BENCHMARK(BM_Modulo_Kernel_InPlace)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Modulo_Kernel_InPlace)->Arg(1<<20);
 
 } /* namespace ddj */

@@ -1,7 +1,7 @@
 #ifndef DDJ_AFL_ENCODING_IMPL_CUH_
 #define DDJ_AFL_ENCODING_IMPL_CUH_
 
-#include "compression/macros.cuh"
+#include "core/cuda_macros.cuh"
 #include "helpers/helper_macros.h"
 #include <stdio.h>
 

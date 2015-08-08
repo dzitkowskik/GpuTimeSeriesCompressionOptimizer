@@ -8,7 +8,7 @@
 namespace ddj
 {
 
-static void BM_HISTOGRAM_BasicThrustHistogram_ConsecutiveNumbers(benchmark::State& state)
+static void BM_Histogram_BasicThrustHistogram_ConsecutiveNumbers(benchmark::State& state)
 {
     HelperGenerator generator;
     BasicThrustHistogram histogram;
@@ -21,9 +21,9 @@ static void BM_HISTOGRAM_BasicThrustHistogram_ConsecutiveNumbers(benchmark::Stat
 
     Set_Statistics(state);
 }
-BENCHMARK(BM_HISTOGRAM_BasicThrustHistogram_ConsecutiveNumbers)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Histogram_BasicThrustHistogram_ConsecutiveNumbers)->Arg(1<<15)->Arg(1<<20)->Arg(1<<22);
 
-static void BM_HISTOGRAM_BasicThrustHistogram_RandomNumbers(benchmark::State& state)
+static void BM_Histogram_BasicThrustHistogram_RandomNumbers(benchmark::State& state)
 {
     HelperGenerator generator;
     BasicThrustHistogram histogram;
@@ -37,6 +37,6 @@ static void BM_HISTOGRAM_BasicThrustHistogram_RandomNumbers(benchmark::State& st
 
     Set_Statistics(state);
 }
-BENCHMARK(BM_HISTOGRAM_BasicThrustHistogram_RandomNumbers)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Histogram_BasicThrustHistogram_RandomNumbers)->Arg(1<<15)->Arg(1<<20)->Arg(1<<22);
 
 } /* namespace ddj */

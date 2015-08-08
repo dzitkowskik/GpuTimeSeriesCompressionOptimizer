@@ -5,7 +5,7 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "delta_encoding.cuh"
+#include "delta_encoding.hpp"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_cuda.cuh"
 #include <cuda_runtime_api.h>

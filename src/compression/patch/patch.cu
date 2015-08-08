@@ -11,7 +11,7 @@
 #include <thrust/device_ptr.h>
 #include <thrust/reduce.h>
 #include "helpers/helper_macros.h"
-#include "compression/operators.cuh"
+#include "core/operators.cuh"
 
 #define SPLIT_ENCODING_GPU_BLOCK_SIZE 64
 

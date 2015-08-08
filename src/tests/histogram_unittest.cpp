@@ -4,6 +4,7 @@
 #include "core/cuda_ptr.hpp"
 #include "util/histogram/basic_thrust_histogram.hpp"
 #include "util/histogram/simple_cpu_histogram.hpp"
+#include "util/histogram/cuda_histogram.hpp"
 #include <cuda_runtime_api.h>
 #include <vector>
 
@@ -88,6 +89,12 @@ void HistogramTest::RandomIntegerArrayTestCase(HistogramBase& histogram)
 TEST_F(HistogramTest, BasicThrustHistogram_RandomIntegerArray)
 {
 	auto histogram = BasicThrustHistogram();
+	RandomIntegerArrayTestCase(histogram);
+}
+
+TEST_F(HistogramTest, CudaHistogram_RandomIntegerArray)
+{
+	auto histogram = CudaHistogram();
 	RandomIntegerArrayTestCase(histogram);
 }
 

@@ -5,9 +5,9 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "scale_encoding.cuh"
+#include "scale_encoding.hpp"
 #include "helpers/helper_macros.h"
-#include "compression/macros.cuh"
+#include "core/cuda_macros.cuh"
 
 #include <cuda_runtime_api.h>
 #include <thrust/extrema.h>

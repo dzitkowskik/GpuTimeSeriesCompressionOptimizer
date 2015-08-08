@@ -5,18 +5,19 @@
  *      Author: Karol Dzitkowski
  */
 
-#ifndef COMPRESSION_H_
-#define COMPRESSION_H_
+#ifndef DDJ_COMPRESSION_HPP_
+#define DDJ_COMPRESSION_HPP_
 
-namespace ddj
-{
+namespace ddj {
 
 class Compression
 {
 public:
-	Compression();
-	virtual ~Compression();
+	SharedCudaPtr<char> Encode(SharedCudaPtr<int> data);
+	SharedCudaPtr<char> Encode(SharedCudaPtr<float> data);
+	SharedCudaPtr<int> Decode(SharedCudaPtr<char> data);
+	SharedCudaPtr<float> Decode(SharedCudaPtr<char> data);
 };
 
 } /* namespace ddj */
-#endif /* COMPRESSION_H_ */
+#endif /* DDJ_COMPRESSION_HPP_ */
