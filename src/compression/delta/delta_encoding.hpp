@@ -1,5 +1,5 @@
 /*
- * delta_encoding.cuh
+ *  delta_encoding.hpp
  *
  *  Created on: 18-04-2015
  *      Author: Karol Dzitkowski
@@ -15,7 +15,7 @@ namespace ddj {
 
 class DeltaEncoding
 {
-	ExecutionPolicy policy;
+	ExecutionPolicy _policy;
 
 public:
 	template<typename T> SharedCudaPtr<char> Encode(SharedCudaPtr<T> data);

@@ -1,11 +1,11 @@
 /*
- *  simple_patch.cu
+ *  patched_data.cu
  *
  *  Created on: 13-05-2015
  *      Author: Karol Dzitkowski
  */
 
-#include "patch.cuh"
+#include "patched_data.hpp"
 #include "helpers/helper_cuda.cuh"
 #include <thrust/sort.h>
 #include <thrust/device_ptr.h>

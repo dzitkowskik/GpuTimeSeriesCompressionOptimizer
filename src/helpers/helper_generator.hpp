@@ -22,6 +22,7 @@ public:
     SharedCudaPtr<float> GenerateRandomFloatDeviceArray(int size);
     SharedCudaPtr<int> GenerateRandomIntDeviceArray(int size);
     SharedCudaPtr<int> GenerateConsecutiveIntDeviceArray(int size);
+    SharedCudaPtr<int> GenerateRandomStencil(int size);
 
 private:
     curandGenerator_t gen;

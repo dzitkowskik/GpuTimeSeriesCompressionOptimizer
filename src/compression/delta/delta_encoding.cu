@@ -32,8 +32,8 @@ SharedCudaPtr<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 {
 	auto result = CudaPtr<char>::make_shared(data->size()*sizeof(T));
 
-	this->policy.setSize(data->size());
-	cudaLaunch(this->policy, deltaEncodeKernel<T>,
+	this->_policy.setSize(data->size());
+	cudaLaunch(this->_policy, deltaEncodeKernel<T>,
 		data->get(), data->size(), (T*)(result->get()+sizeof(T)));
 
 	CUDA_CALL( cudaMemcpy(result->get(), data->get(), sizeof(T), cudaMemcpyDeviceToDevice) );

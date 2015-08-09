@@ -1,4 +1,4 @@
-#include "../compression/macros.cuh"
+#include "core/cuda_macros.cuh"
 #include <gtest/gtest.h>
 
 TEST(BITLEN, Macros_Alt_Bitlen_Small)

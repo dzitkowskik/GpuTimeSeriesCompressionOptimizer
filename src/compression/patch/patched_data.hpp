@@ -1,12 +1,12 @@
 /*
- *  simple_patch.cuh
+ *  patched_data.hpp
  *
  *  Created on: 13-05-2015
  *      Author: Karol Dzitkowski
  */
 
-#ifndef DDJ_SPLITTING_SIMPLE_PATCH_CUH_
-#define DDJ_SPLITTING_SIMPLE_PATCH_CUH_
+#ifndef DDJ_PATCHED_DATA_HPP_
+#define DDJ_PATCHED_DATA_HPP_
 
 #include "core/cuda_ptr.hpp"
 #include "helpers/helper_cudakernels.cuh"
@@ -45,4 +45,4 @@ private:
 };
 
 } /* namespace ddj */
-#endif /* DDJ_SPLITTING_SIMPLE_PATCH_CUH_ */
+#endif /* DDJ_PATCHED_DATA_HPP_ */

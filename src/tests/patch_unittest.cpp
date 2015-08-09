@@ -1,6 +1,6 @@
 #include "tests/patch_unittest.hpp"
-#include "compression/patch/patch.cuh"
-#include "compression/operators.cuh"
+#include "compression/patch/patched_data.hpp"
+#include "core/operators.cuh"
 #include "helpers/helper_print.hpp"
 
 namespace ddj {

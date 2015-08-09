@@ -40,4 +40,12 @@ namespace ddj
 		return kernels.CreateConsecutiveNumbersArray<int>(size, 0);
 	}
 
+	SharedCudaPtr<int> HelperGenerator::GenerateRandomStencil(int n)
+	{
+		HelperCudaKernels kernels;
+		auto result = this->GenerateRandomIntDeviceArray(n);
+		kernels.ModuloInPlaceKernel(result, 2);
+		return result;
+	}
+
 } /* nemespace ddj */
