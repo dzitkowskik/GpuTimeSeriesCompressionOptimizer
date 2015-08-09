@@ -25,6 +25,9 @@ private:
     SharedCudaPtr<int> GetMostFrequentStencil(
         SharedCudaPtr<int> data,
         SharedCudaPtr<int> mostFrequent);
+
+    SharedCudaPtr<char> CompressMostFrequent(
+        SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent);
 };
 
 } /* namespace ddj */
