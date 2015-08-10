@@ -48,4 +48,17 @@ namespace ddj
 		return result;
 	}
 
+	SharedCudaPtr<int> HelperGenerator::GenerateRandomIntDeviceArray(int n, int from, int to)
+	{
+		if(to <= from)
+			throw std::runtime_error("HelperGenerator - from must be less than to");
+		int distance = to - from;
+		HelperCudaKernels kernels;
+		auto result = CudaPtr<int>::make_shared(n);
+		CURAND_CALL(curandGenerate(gen, (unsigned int*)result->get(), n));
+		kernels.ModuloInPlaceKernel(result, distance);
+		kernels.AdditionInPlaceKernel(result, from);
+		return result;
+	}
+
 } /* nemespace ddj */

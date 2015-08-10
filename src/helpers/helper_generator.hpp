@@ -21,6 +21,7 @@ public:
 public:
     SharedCudaPtr<float> GenerateRandomFloatDeviceArray(int size);
     SharedCudaPtr<int> GenerateRandomIntDeviceArray(int size);
+    SharedCudaPtr<int> GenerateRandomIntDeviceArray(int size, int from, int to);
     SharedCudaPtr<int> GenerateConsecutiveIntDeviceArray(int size);
     SharedCudaPtr<int> GenerateRandomStencil(int size);
 

@@ -42,8 +42,43 @@ struct ModulusOperator
     T mod;
 
     __host__ __device__
-    T operator()(T x) { return x % mod; }
+    T operator()(const T &x) { return x % mod; }
 };
 
+template<typename T>
+struct AdditionOperator
+{
+	T value;
+
+	__host__ __device__
+	T operator()(const T &x) { return x + value; }
+};
+
+template<typename T>
+struct SubtractionOperator
+{
+	T value;
+
+	__host__ __device__
+	T operator()(const T &x) { return x - value; }
+};
+
+template<typename T>
+struct MultiplicationOperator
+{
+	T value;
+
+	__host__ __device__
+	T operator()(const T &x) { return x * value; }
+};
+
+template<typename T>
+struct DivisionOperator
+{
+	T value;
+
+	__host__ __device__
+	T operator()(const T &x) { return x / value; }
+};
 
 #endif /* OPERATORS_CUH_ */

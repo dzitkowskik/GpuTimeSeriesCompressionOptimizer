@@ -53,18 +53,6 @@ SharedCudaPtr<int> DictEncoding::GetMostFrequentStencil(
     return result;
 }
 
-__device__ __host__
-unsigned int SaveNbitIntValToWord(int nbit, int position, int value, unsigned int word)
-{
-    return word | (value << (nbit * position));
-}
-
-__device__ __host__
-int ReadNbitIntValFromWord(int nbit, int position, unsigned int word)
-{
-    return GETNPBITS(word, nbit, position * nbit);
-}
-
 __global__ void CompressMostFrequentKernel(
     int* data,
     int dataSize,

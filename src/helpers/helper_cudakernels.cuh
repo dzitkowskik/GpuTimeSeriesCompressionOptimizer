@@ -32,10 +32,16 @@ public:
 	CopyIfNotKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 
 	template<typename T> SharedCudaPtr<T>
-	ModuloKernel(SharedCudaPtr<T> data, int mod);
+	ModuloKernel(SharedCudaPtr<T> data, T mod);
 
 	template<typename T> void
-	ModuloInPlaceKernel(SharedCudaPtr<T> data, int mod);
+	ModuloInPlaceKernel(SharedCudaPtr<T> data, T mod);
+
+	template<typename T> SharedCudaPtr<T>
+	AdditionKernel(SharedCudaPtr<T> data, T mod);
+
+	template<typename T> void
+	AdditionInPlaceKernel(SharedCudaPtr<T> data, T mod);
 
 	template<typename T> SharedCudaPtr<T>
 	CreateConsecutiveNumbersArray(int size, T start);

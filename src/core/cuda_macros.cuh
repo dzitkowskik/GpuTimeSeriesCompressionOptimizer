@@ -125,4 +125,16 @@ inline int ALT_BITLEN(int v)
 #define SGN(a) (int)((unsigned int)((int)a) >> (sizeof(int) * CHAR_BIT - 1))
 #define GETNSGNBITS(a,n,b) ((SGN(a) << (n-1)) | GETNBITS(((a)>>(b-n)), (n-1)))
 
+__device__ __host__
+unsigned int SaveNbitIntValToWord(int nbit, int position, int value, unsigned int word)
+{
+    return word | (value << (nbit * position));
+}
+
+__device__ __host__
+int ReadNbitIntValFromWord(int nbit, int position, unsigned int word)
+{
+    return GETNPBITS(word, nbit, position * nbit);
+}
+
 #endif
