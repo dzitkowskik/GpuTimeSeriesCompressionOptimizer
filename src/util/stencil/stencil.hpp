@@ -22,7 +22,7 @@ public:
     { return this->_data; }
 
     SharedCudaPtr<char> pack();
-    Stencil unpack(SharedCudaPtr<char> data, int numElements);
+    static Stencil unpack(SharedCudaPtr<char> data, int numElements);
 
 private:
     SharedCudaPtr<int> _data;

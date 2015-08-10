@@ -1,5 +1,5 @@
-#ifndef macros
-#define macros 0
+#ifndef DDJ_CUDA_MACROS_CUH_
+#define DDJ_CUDA_MACROS_CUH_
 
 // This should work independently from _CUDA_ARCH__ number
 
@@ -125,16 +125,16 @@ inline int ALT_BITLEN(int v)
 #define SGN(a) (int)((unsigned int)((int)a) >> (sizeof(int) * CHAR_BIT - 1))
 #define GETNSGNBITS(a,n,b) ((SGN(a) << (n-1)) | GETNBITS(((a)>>(b-n)), (n-1)))
 
-__device__ __host__
+__device__ __host__ __forceinline__
 unsigned int SaveNbitIntValToWord(int nbit, int position, int value, unsigned int word)
 {
     return word | (value << (nbit * position));
 }
 
-__device__ __host__
+__device__ __host__ __forceinline__
 int ReadNbitIntValFromWord(int nbit, int position, unsigned int word)
 {
     return GETNPBITS(word, nbit, position * nbit);
 }
 
-#endif
+#endif /* DDJ_CUDA_MACROS_CUH_ */

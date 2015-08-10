@@ -56,10 +56,11 @@ SharedCudaPtr<char> Stencil::pack()
 
 Stencil Stencil::unpack(SharedCudaPtr<char> data, int numElements)
 {
+    ExecutionPolicy policy;
     auto result = CudaPtr<int>::make_shared(numElements);
-
-    this->_policy.setSize(data->size());
-    cudaLaunch(this->_policy, unpackKernel,
+    
+    policy.setSize(data->size());
+    cudaLaunch(policy, unpackKernel,
         data->get(), data->size(), result->get(), result->size());
 
     return Stencil(result);
