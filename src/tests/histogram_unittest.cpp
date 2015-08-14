@@ -2,7 +2,8 @@
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_macros.h"
 #include "core/cuda_ptr.hpp"
-#include "util/histogram/basic_thrust_histogram.hpp"
+#include "util/histogram/thrust_dense_histogram.hpp"
+#include "util/histogram/thrust_sparse_histogram.hpp"
 #include "util/histogram/simple_cpu_histogram.hpp"
 #include "util/histogram/cuda_histogram.hpp"
 #include <cuda_runtime_api.h>
@@ -96,17 +97,23 @@ void HistogramTest::RandomIntegerArrayTestCase(HistogramBase& histogram)
 	EXPECT_EQ( h_expected.size(), h_actual.size() );
 	EXPECT_TRUE( CompareHistograms(h_expected, h_actual) );
 
-    PrintHostHistogram(h_expected, "Expected");
-    PrintHostHistogram(h_actual, "Actual");
+//    PrintHostHistogram(h_expected, "Expected");
+//    PrintHostHistogram(h_actual, "Actual");
 
 	delete [] h_data;
 }
 
-//TEST_F(HistogramTest, BasicThrustHistogram_RandomIntegerArray)
-//{
-//	auto histogram = BasicThrustHistogram();
-//	RandomIntegerArrayTestCase(histogram);
-//}
+TEST_F(HistogramTest, ThrustDenseHistogram_RandomIntegerArray)
+{
+	auto histogram = ThrustDenseHistogram();
+	RandomIntegerArrayTestCase(histogram);
+}
+
+TEST_F(HistogramTest, ThrustSparseHistogram_RandomIntegerArray)
+{
+	auto histogram = ThrustSparseHistogram();
+	RandomIntegerArrayTestCase(histogram);
+}
 
 TEST_F(HistogramTest, CudaHistogram_RandomIntegerArray)
 {
