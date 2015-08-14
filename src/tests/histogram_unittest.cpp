@@ -93,25 +93,25 @@ void HistogramTest::RandomIntegerArrayTestCase(HistogramBase& histogram)
 	ASSERT_TRUE(d_actual.first != NULL);
 	ASSERT_TRUE(d_actual.second != NULL);
 	auto h_actual = TransformToHostMap(d_actual);
-	ASSERT_EQ( h_expected.size(), h_actual.size() );
+	EXPECT_EQ( h_expected.size(), h_actual.size() );
 	EXPECT_TRUE( CompareHistograms(h_expected, h_actual) );
 
-    // PrintHostHistogram(h_expected, "Expected");
-    // PrintHostHistogram(h_actual, "Actual");
+    PrintHostHistogram(h_expected, "Expected");
+    PrintHostHistogram(h_actual, "Actual");
 
 	delete [] h_data;
 }
 
-TEST_F(HistogramTest, BasicThrustHistogram_RandomIntegerArray)
-{
-	auto histogram = BasicThrustHistogram();
-	RandomIntegerArrayTestCase(histogram);
-}
-
-//TEST_F(HistogramTest, CudaHistogram_RandomIntegerArray)
+//TEST_F(HistogramTest, BasicThrustHistogram_RandomIntegerArray)
 //{
-//	auto histogram = CudaHistogram();
+//	auto histogram = BasicThrustHistogram();
 //	RandomIntegerArrayTestCase(histogram);
 //}
+
+TEST_F(HistogramTest, CudaHistogram_RandomIntegerArray)
+{
+	auto histogram = CudaHistogram();
+	RandomIntegerArrayTestCase(histogram);
+}
 
 } /* namespace ddj */

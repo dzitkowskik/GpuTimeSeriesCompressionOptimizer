@@ -50,6 +50,12 @@ public:
 	AbsoluteInPlaceKernel(SharedCudaPtr<T> data);
 
 	template<typename T> SharedCudaPtr<T>
+	ZeroKernel(SharedCudaPtr<T> data);
+
+	template<typename T> void
+	ZeroInPlaceKernel(SharedCudaPtr<T> data);
+
+	template<typename T> SharedCudaPtr<T>
 	CreateConsecutiveNumbersArray(int size, T start);
 
 	// Result 0 - Minimum, Result 1 - Maximum

@@ -88,4 +88,18 @@ struct AbsoluteOperator
 	T operator()(const T &x) { return x > 0 ? x : -x; }
 };
 
+template<typename T>
+struct ZeroOperator
+{
+	__host__ __device__
+	T operator()(const T &x) { return 0; }
+};
+
+template<typename T>
+struct OneOperator
+{
+	__host__ __device__
+	T operator()(const T &x) { return 1; }
+};
+
 #endif /* OPERATORS_CUH_ */
