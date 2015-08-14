@@ -2,7 +2,7 @@
 #include "helper_macros.h"
 #include "helper_cudakernels.cuh"
 #include "core/cuda_ptr.hpp"
-
+#include <cmath>
 #include <time.h>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
@@ -44,18 +44,18 @@ namespace ddj
 	{
 		HelperCudaKernels kernels;
 		auto result = this->GenerateRandomIntDeviceArray(n);
+		kernels.AbsoluteInPlaceKernel(result);
 		kernels.ModuloInPlaceKernel(result, 2);
 		return result;
 	}
 
 	SharedCudaPtr<int> HelperGenerator::GenerateRandomIntDeviceArray(int n, int from, int to)
 	{
-		if(to <= from)
-			throw std::runtime_error("HelperGenerator - from must be less than to");
-		int distance = to - from;
+		int distance = std::abs(to - from);
 		HelperCudaKernels kernels;
 		auto result = CudaPtr<int>::make_shared(n);
 		CURAND_CALL(curandGenerate(gen, (unsigned int*)result->get(), n));
+		kernels.AbsoluteInPlaceKernel(result);
 		kernels.ModuloInPlaceKernel(result, distance);
 		kernels.AdditionInPlaceKernel(result, from);
 		return result;

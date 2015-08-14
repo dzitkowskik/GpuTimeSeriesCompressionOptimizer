@@ -47,14 +47,15 @@ __global__ void _negateStencilKernel(int* stencil, int size, int* out)
 
 SharedCudaPtr<int> NegateStencilKernel(SharedCudaPtr<int> stencil)
 {
-	int block_size = NEGATE_KERNEL_BLOCK_SIZE;
-	int block_cnt = (stencil->size() + block_size - 1) / block_size;
-
 	auto result = CudaPtr<int>::make_shared(stencil->size());
 
-	_negateStencilKernel<<<block_size, block_cnt>>>(
-			stencil->get(), stencil->size(), result->get());
-
+	if(stencil->size() > 0)
+	{
+		int block_size = NEGATE_KERNEL_BLOCK_SIZE;
+		int block_cnt = (stencil->size() + block_size - 1) / block_size;
+		_negateStencilKernel<<<block_size, block_cnt>>>(
+				stencil->get(), stencil->size(), result->get());
+	}
 	return result;
 }
 

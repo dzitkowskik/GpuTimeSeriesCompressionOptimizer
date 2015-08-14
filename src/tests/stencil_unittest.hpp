@@ -18,7 +18,7 @@ namespace ddj {
 class StencilTest : public testing::Test
 {
 protected:
-    StencilTest() : size(10000)
+    StencilTest() : size(100)
     {
         HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();

@@ -29,8 +29,11 @@ class CudaPtr : private boost::noncopyable
 public:
 	CudaPtr() : _pointer(NULL), _size(0){}
 	CudaPtr(T* ptr) : _pointer(ptr), _size(0){}
-	CudaPtr(size_t size) : _size(size)
-	{ CUDA_CHECK_RETURN( cudaMalloc((void**)&_pointer, _size*sizeof(T)) ); }
+	CudaPtr(size_t size) : _pointer(NULL), _size(size)
+	{
+		if(_size > 0)
+			CUDA_CHECK_RETURN( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
+	}
 	CudaPtr(T* ptr, size_t size) : _pointer(ptr), _size(size){}
 
 	~CudaPtr()

@@ -38,10 +38,16 @@ public:
 	ModuloInPlaceKernel(SharedCudaPtr<T> data, T mod);
 
 	template<typename T> SharedCudaPtr<T>
-	AdditionKernel(SharedCudaPtr<T> data, T mod);
+	AdditionKernel(SharedCudaPtr<T> data, T val);
 
 	template<typename T> void
-	AdditionInPlaceKernel(SharedCudaPtr<T> data, T mod);
+	AdditionInPlaceKernel(SharedCudaPtr<T> data, T val);
+
+	template<typename T> SharedCudaPtr<T>
+	AbsoluteKernel(SharedCudaPtr<T> data);
+
+	template<typename T> void
+	AbsoluteInPlaceKernel(SharedCudaPtr<T> data);
 
 	template<typename T> SharedCudaPtr<T>
 	CreateConsecutiveNumbersArray(int size, T start);

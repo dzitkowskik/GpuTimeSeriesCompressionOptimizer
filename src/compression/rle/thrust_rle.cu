@@ -86,11 +86,6 @@ void* ThrustRleCompression::Encode(T* data, const int in_size, int& out_size)
 
     int len = result.first - output.begin();
 
-    #if DDJ_THRUST_RLE_DEBUG
-        printInputData(input);
-        printOutputData(output, lengths);
-    #endif
-
     // prepare data
     int* raw_ptr;
     int compressed_size = len * sizeof(int) + len * sizeof(T);

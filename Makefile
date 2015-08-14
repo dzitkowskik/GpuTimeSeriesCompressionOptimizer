@@ -53,7 +53,7 @@ INCLUDES := -I"src"
 DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
-debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug
+debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
 debug: export EXCLUDED_FILES := \
 	-not -iname 'main_tests.cpp' \
 	-not -iname 'main_benchmarks.cpp'
@@ -73,7 +73,7 @@ release: export EXCLUDED_DIRECTORIES := \
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
-test: export CODE_FLAGS := -G -g -O0 --debug --device-debug
+test: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -iname 'main_benchmarks.cpp'

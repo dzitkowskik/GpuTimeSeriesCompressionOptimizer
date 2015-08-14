@@ -31,7 +31,7 @@ protected:
 	{
 		int n = size;
 		d_float_random_data = generator.GenerateRandomFloatDeviceArray(n);
-		d_int_random_data = generator.GenerateRandomIntDeviceArray(n);
+		d_int_random_data = generator.GenerateRandomIntDeviceArray(n, 100, 1000);
 	}
 
 	SharedCudaPtr<float> d_float_random_data;

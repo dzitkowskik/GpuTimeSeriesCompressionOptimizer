@@ -95,6 +95,20 @@ HelperCudaKernels::AdditionInPlaceKernel(SharedCudaPtr<T> data, T val)
 }
 
 template<typename T> SharedCudaPtr<T>
+HelperCudaKernels::AbsoluteKernel(SharedCudaPtr<T> data)
+{
+	AbsoluteOperator<T> op;
+    return Transform(data, op);
+}
+
+template<typename T> void
+HelperCudaKernels::AbsoluteInPlaceKernel(SharedCudaPtr<T> data)
+{
+	AbsoluteOperator<T> op;
+    TransformInPlace(data, op);
+}
+
+template<typename T> SharedCudaPtr<T>
 HelperCudaKernels::CreateConsecutiveNumbersArray(int size, T start)
 {
     const int tpb = CREATE_NUM_KERNEL_BLOCK_SIZE;
@@ -115,9 +129,11 @@ template<typename T> std::tuple<T,T> HelperCudaKernels::MinMax(SharedCudaPtr<T> 
 }
 
 #define MODULO_SPEC(X) \
+	template SharedCudaPtr<X> HelperCudaKernels::AbsoluteKernel<X>(SharedCudaPtr<X>); 		\
+	template void HelperCudaKernels::AbsoluteInPlaceKernel<X>(SharedCudaPtr<X>);			\
     template SharedCudaPtr<X> HelperCudaKernels::ModuloKernel<X>(SharedCudaPtr<X>, X); 		\
     template void HelperCudaKernels::ModuloInPlaceKernel<X>(SharedCudaPtr<X>, X);			\
-	template SharedCudaPtr<X> HelperCudaKernels::AdditionKernel<X>(SharedCudaPtr<X>, X); 		\
+	template SharedCudaPtr<X> HelperCudaKernels::AdditionKernel<X>(SharedCudaPtr<X>, X); 	\
     template void HelperCudaKernels::AdditionInPlaceKernel<X>(SharedCudaPtr<X>, X);
 FOR_EACH(MODULO_SPEC, unsigned int, int)
 

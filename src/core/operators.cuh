@@ -81,4 +81,11 @@ struct DivisionOperator
 	T operator()(const T &x) { return x / value; }
 };
 
+template<typename T>
+struct AbsoluteOperator
+{
+	__host__ __device__
+	T operator()(const T &x) { return x > 0 ? x : -x; }
+};
+
 #endif /* OPERATORS_CUH_ */

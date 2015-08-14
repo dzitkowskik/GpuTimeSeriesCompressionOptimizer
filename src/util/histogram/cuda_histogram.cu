@@ -27,7 +27,7 @@ struct test_sumfun
 SharedCudaPtrPair<int, int> CudaHistogram::IntegerHistogram(SharedCudaPtr<int> data)
 {
     auto minMax = this->_cudaKernels.MinMax(data);
-    int distance = std::abs(std::get<1>(minMax) - std::get<0>(minMax));
+    int distance = std::abs(std::get<1>(minMax) - std::get<0>(minMax)) + 1;
     auto counts = CudaPtr<int>::make_shared(distance);
     test_xform xform;
     test_sumfun sum;
