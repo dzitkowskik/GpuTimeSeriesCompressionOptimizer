@@ -137,4 +137,17 @@ int ReadNbitIntValFromWord(int nbit, int position, unsigned int word)
     return GETNPBITS(word, nbit, position * nbit);
 }
 
+__device__ __host__ __forceinline__
+char SetNthBit(int n, int bit, char value)
+{
+	return value ^ ((-bit ^ value) & (1 << n));
+}
+
+__device__ __host__ __forceinline__
+bool GetNthBit(int n, char value)
+{
+	return (value >> n) & 1;
+}
+
+
 #endif /* DDJ_CUDA_MACROS_CUH_ */

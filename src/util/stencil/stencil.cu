@@ -1,25 +1,28 @@
 #include "stencil.hpp"
 #include "helpers/helper_cuda.cuh"
+#include "core/cuda_macros.cuh"
 
 namespace ddj {
 
 __global__ void packKernel(int* data, int dataSize, char* output, int outputSize)
 {
-    unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x; // char array index
-    unsigned int input_idx_start = idx * 8;
-	if(idx >= outputSize) return;
-    char part = 0xFF, x = 0xFF;
+    unsigned int output_idx = threadIdx.x + blockIdx.x * blockDim.x; // char array index
+    unsigned int input_idx_start = output_idx * 8;
+    unsigned int input_idx;
+	if(output_idx >= outputSize) return;
+    char part = 0;
+    int number = 0;
 
     #pragma unroll
     for(int i = 0; i < 8; i++)
     {
-        idx = input_idx_start + i;
-        idx = idx < dataSize ? idx : dataSize - 1;
-        x = (char)data[idx];
-        part ^= (-x ^ part) & (1 << i);
+    	input_idx = input_idx_start + i;
+    	input_idx = input_idx < dataSize ? input_idx : dataSize - 1;
+        number = data[input_idx];
+        part = SetNthBit(i, number, part);
     }
 
-    output[idx] = part;
+    output[output_idx] = part;
 }
 
 __global__ void unpackKernel(char* data, int dataSize, int* output, int outputSize)
@@ -28,16 +31,14 @@ __global__ void unpackKernel(char* data, int dataSize, int* output, int outputSi
     unsigned int output_idx_start = idx * 8;
     if(idx >= dataSize) return;
     char number = data[idx];
-    int bit = 0xFF;
 
     // from now idx is the output index
     #pragma unroll
     for(int i = 0; i < 8; i++)
     {
-        bit = (number >> i) & 1;
         idx = output_idx_start + i;
         idx = idx < outputSize ? idx : outputSize - 1;
-        output[idx] = bit;
+        output[idx] = GetNthBit(i, number) ? 1 : 0;
     }
 }
 
