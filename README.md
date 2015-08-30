@@ -7,10 +7,10 @@
 * Cuda device with compute capability greater than 2.0
 * gtest, google benchmark, log4cplus, Thrust
 * boost
-  * to install boost on Ubuntu type:
-  ```
-  sudo apt-get install libboost-all-dev
-  ```
+    * to install boost on Ubuntu type:
+    ```
+    sudo apt-get install libboost-all-dev
+    ```
 
 
 ### Install ###
@@ -31,7 +31,6 @@ export PATH=/usr/local/cuda-7.0/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-7.0/lib64:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
-
 
 ### How do I get set up? ###
 
