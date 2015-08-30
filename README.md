@@ -6,16 +6,23 @@
 * CUDA 7
 * Cuda device with compute capability greater than 2.0
 * gtest, google benchmark, log4cplus, Thrust
+* boost
+  * to install boost on Ubuntu type:
+  ```
+  sudo apt-get install libboost-all-dev
+  ```
+
 
 ### Install ###
 
 ```
 git clone https://dzitkowskik@bitbucket.org/dzitkowskik/gpustore.git
 cd gpuStore
-sudo apt-get install libboost-all-dev
+cd install
 ./log4plus_install.sh
 ./gtest_install.sh
 ./benchmark_install.sh
+cd ..
 ```
 
 ### How do I get set up? ###
