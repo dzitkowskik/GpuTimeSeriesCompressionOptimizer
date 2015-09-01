@@ -5,6 +5,7 @@
 #include <thrust/sort.h>
 #include <thrust/device_ptr.h>
 #include <thrust/copy.h>
+#include "util/histogram/cuda_histogram.hpp"
 
 namespace ddj {
 
@@ -111,20 +112,28 @@ SharedCudaPtr<char> DictEncoding::CompressMostFrequent(
     return result;
 }
 
+// DICT ENCODING ALGORITHM
+//
+//  1. CREATE HISTOGRAM
+//  2. GET N MOST FREQUENT VALUES
+//  3. SPLIT TO MOST FREQUENT AND OTHERS
+//  4. PACK STENCIL
+//  5. COMPRESS MOST FREQUENT
+//       a) GET DISTINCT NUMBERS AND GIVE THEM THE SHORTEST UNIQUE KEYS POSSIBLE
+//       b) LEAVE N UNIQUE VALUES AT BEGINNING
+//       c) REPLACE OTHER OCCURENCES OF THESE NUMBERS BY THEIR CODES (GREY CODE)
+//  6. RETURN A PAIR OF ARRAYS (MOST FREQUENT (COMPRESSED), OTHERS (UNCOMPRESSED))
+
+// SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
+// {
+//     auto histogram = CudaHistogram.IntegerHistogram(data);
+//     auto mostFrequent = GetMostFrequent(histogram, 4);
+//     auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
+//     auto splittedData = _cudaKernels.SplitKernel(data, mostFrequentStencil);
+//     auto packedMostFrequentStencil = Stencil(std::get<0>(splittedData)).pack();
+//     return NULL;
+// }
 
 
-
-//     1. CREATE HISTOGRAM
-//
-//     2. GET N MOST FREQUENT VALUES
-//
-//     3. SPLIT TO MOST FREQUENT AND OTHERS
-//
-//     4. PACK STENCIL
-//
-//     5. COMPRESS MOST FREQUENT
-//          a) GET DISTINCT NUMBERS AND GIVE THEM THE SHORTEST UNIQUE KEYS POSSIBLE
-//          b) LEAVE N UNIQUE VALUES AT BEGINNING
-//          c) REPLACE OTHER OCCURENCES OF THESE NUMBERS BY THEIR CODES (GREY CODE)
 
 } /* namespace ddj */

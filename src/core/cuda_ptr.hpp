@@ -14,6 +14,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include "helpers/helper_macros.h"
+#include <vector>
+#include <utility>
 
 template<class T> class CudaPtr;
 
@@ -22,6 +24,15 @@ using SharedCudaPtr = boost::shared_ptr<CudaPtr<T>>;
 
 template<class T>
 using ScopedCudaPtr = boost::scoped_ptr<CudaPtr<T>>;
+
+template<class T>
+using SharedCudaPtrVector = std::vector<SharedCudaPtr<T>>;
+
+template<class T>
+using SharedCudaPtrTuple = std::tuple<SharedCudaPtr<T>, SharedCudaPtr<T>>;
+
+template<typename L, typename R>
+using SharedCudaPtrPair = std::pair<SharedCudaPtr<L>, SharedCudaPtr<R>>;
 
 template<class T>
 class CudaPtr : private boost::noncopyable

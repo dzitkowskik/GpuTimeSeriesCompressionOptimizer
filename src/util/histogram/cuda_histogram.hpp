@@ -17,6 +17,8 @@ class CudaHistogram : public HistogramBase
 public:
     virtual SharedCudaPtrPair<int, int> IntegerHistogram(SharedCudaPtr<int> data);
 
+    // TODO: Implement Histogram also as a template
+
 private:
     HelperCudaKernels _cudaKernels;
 

@@ -5,10 +5,7 @@
 #ifndef DDJ_UTIL_HISTOGRAM_BASE_CUH_
 #define DDJ_UTIL_HISTOGRAM_BASE_CUH_
 
-#include <utility>
-
-template<typename L, typename R>
-using SharedCudaPtrPair = std::pair<SharedCudaPtr<L>, SharedCudaPtr<R>>;
+#include "core/cuda_ptr.hpp"
 
 namespace ddj {
 

@@ -13,9 +13,6 @@
 namespace ddj
 {
 
-template<class T>
-using SharedCudaPtrTuple = std::tuple<SharedCudaPtr<T>, SharedCudaPtr<T>>;
-
 class HelperCudaKernels
 {
 public:
@@ -59,7 +56,8 @@ public:
 	CreateConsecutiveNumbersArray(int size, T start);
 
 	// Result 0 - Minimum, Result 1 - Maximum
-	template<typename T> std::tuple<T,T> MinMax(SharedCudaPtr<T> data);
+	template<typename T> std::tuple<T,T>
+	MinMax(SharedCudaPtr<T> data);
 };
 
 } /* namespace ddj */
