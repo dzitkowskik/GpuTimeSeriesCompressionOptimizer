@@ -1,10 +1,36 @@
-# OPTYMALIZATOR KOMPRESJI SZEREGĂW CZASOWYCH NA KARTACH GPU W TECHNOLOGII CUDA #
+# OPTYMALIZATOR KOMPRESJI SZEREGÓW CZASOWYCH NA KARTACH GPU W TECHNOLOGII CUDA #
+# TIME SERIES COMPRESSION OPTIMIZER ON GPU USING CUDA #
 
 ### Requirements ###
 
 * CUDA 7
 * Cuda device with compute capability greater than 2.0
 * gtest, google benchmark, log4cplus, Thrust
+* boost
+    * to install boost on Ubuntu type:
+    ```
+    sudo apt-get install libboost-all-dev
+    ```
+
+
+### Install ###
+
+To install application run following instructions:
+```
+git clone https://dzitkowskik@bitbucket.org/dzitkowskik/gpustore.git
+cd gpuStore
+cd install
+./log4plus_install.sh
+./gtest_install.sh
+./benchmark_install.sh
+cd ..
+```
+After that make sure that you have these env variables set:
+```
+export PATH=/usr/local/cuda-7.0/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-7.0/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+```
 
 ### How do I get set up? ###
 
