@@ -27,10 +27,13 @@ public:
 	// Decode(SharedCudaPtr<char> dataMostFrequent, SharedCudaPtr<char> dataRest);
 
 	// ONLY FOR NOW
-	SharedCudaPtrVector<char> Encode(SharedCudaPtr<int> data);
+	// SharedCudaPtrVector<char> Encode(SharedCudaPtr<int> data);
 	// SharedCudaPtr<T> Decode(SharedCudaPtr<char> dataMostFrequent, SharedCudaPtr<char> dataRest);
 
 private:
+	SharedCudaPtr<int> GetMostFrequent(
+		SharedCudaPtrPair<int, int> histogram, int freqCnt);
+
     SharedCudaPtr<int> GetMostFrequentStencil(
 		SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent);
 
@@ -41,6 +44,9 @@ private:
 		SharedCudaPtr<char> data);
 
 	HelperCudaKernels _cudaKernels;
+
+	friend class DictCompressionTest;
+  	FRIEND_TEST(DictCompressionTest, GetMostFrequent_fake_data);
 };
 
 } /* namespace ddj */

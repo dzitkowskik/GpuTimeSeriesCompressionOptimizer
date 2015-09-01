@@ -9,7 +9,7 @@
 
 namespace ddj {
 
-SharedCudaPtr<int> GetMostFrequent(SharedCudaPtrPair<int, int> histogram, int freqCnt)
+SharedCudaPtr<int> DictEncoding::GetMostFrequent(SharedCudaPtrPair<int, int> histogram, int freqCnt)
 {
     thrust::device_ptr<int> keys_ptr(histogram.first->get());
     thrust::device_ptr<int> counts_ptr(histogram.second->get());
@@ -124,15 +124,15 @@ SharedCudaPtr<char> DictEncoding::CompressMostFrequent(
 //       c) REPLACE OTHER OCCURENCES OF THESE NUMBERS BY THEIR CODES (GREY CODE)
 //  6. RETURN A PAIR OF ARRAYS (MOST FREQUENT (COMPRESSED), OTHERS (UNCOMPRESSED))
 
-// SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
-// {
-//     auto histogram = CudaHistogram.IntegerHistogram(data);
-//     auto mostFrequent = GetMostFrequent(histogram, 4);
-//     auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
-//     auto splittedData = _cudaKernels.SplitKernel(data, mostFrequentStencil);
-//     auto packedMostFrequentStencil = Stencil(std::get<0>(splittedData)).pack();
-//     return NULL;
-// }
+//SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
+//{
+//    auto histogram = CudaHistogram.IntegerHistogram(data);
+//    auto mostFrequent = GetMostFrequent(histogram, 4);
+//    auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
+//    auto splittedData = _cudaKernels.SplitKernel(data, mostFrequentStencil);
+//    auto packedMostFrequentStencil = Stencil(std::get<0>(splittedData)).pack();
+//    return NULL;
+//}
 
 
 
