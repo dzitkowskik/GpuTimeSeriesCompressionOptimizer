@@ -1,6 +1,7 @@
 #include "dict_compression_unittest.hpp"
 #include "util/histogram/cuda_histogram.hpp"
 #include "helpers/helper_print.hpp"
+#include "helpers/helper_comparison.cuh"
 #include "compression/dict/dict_encoding.hpp"
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
@@ -89,6 +90,34 @@ TEST_F(DictCompressionTest, CompressMostFrequent_no_exception)
     auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
     auto result = dictEncoding.CompressMostFrequent(d_int_random_data, mostFrequent);
+}
+
+TEST_F(DictCompressionTest, DecompressMostFrequent_no_exception)
+{
+    DictEncoding dictEncoding;
+    CudaHistogram histogram;
+    int mostFreqCnt = 1;
+    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
+    auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
+    auto encoded = dictEncoding.CompressMostFrequent(d_int_random_data, mostFrequent);
+    auto decoded = dictEncoding.DecompressMostFrequent(encoded, size);
+}
+ 
+TEST_F(DictCompressionTest, CompressDecompressMostFrequent_random_int)
+{
+    DictEncoding dictEncoding;
+    CudaHistogram histogram;
+    int mostFreqCnt = 1;
+    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
+    auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
+    auto encoded = dictEncoding.CompressMostFrequent(d_int_random_data, mostFrequent);
+    auto decoded = dictEncoding.DecompressMostFrequent(encoded, size);
+
+    HelperPrint::PrintSharedCudaPtr(d_int_random_data, "Expected:");
+    HelperPrint::PrintSharedCudaPtr(decoded, "Actual:");
+
+    EXPECT_EQ(d_int_random_data->size(), decoded->size());
+    EXPECT_TRUE( CompareDeviceArrays(d_int_random_data->get(), decoded->get(), size) );
 }
 
 } /* namespace ddj */

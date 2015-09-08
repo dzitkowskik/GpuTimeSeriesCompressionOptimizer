@@ -54,6 +54,16 @@ SharedCudaPtr<int> DictEncoding::GetMostFrequentStencil(
     return result;
 }
 
+
+// MOST FREQUENT COMPRESSION ALGORITHM
+//
+// As the first block we save an array of most frequent values
+// Then we compress all data (values from a set of most frequent values) using N bits
+// N is the smallest number of bits we can use to encode most frequent array length
+// We encode this way each value as it's index in most frequent values array. We save
+// as many values as possible in unsigned int values. For example if we need 4 bits to
+// encode single value, we put 8 values in one unsigned int and store it in output table.
+// We call that single unsigned int value an unit.
 __global__ void CompressMostFrequentKernel(
     int* data,
     int dataSize,
@@ -87,11 +97,11 @@ __global__ void CompressMostFrequentKernel(
 SharedCudaPtr<char> DictEncoding::CompressMostFrequent(
     SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent)
 {
-    int cnt = mostFrequent->size();
-    int bitsNeeded = ALT_BITLEN(cnt-1);
-    int outputItemBitSize = 8 * sizeof(unsigned int);
-    int dataPerOutputCnt = outputItemBitSize / bitsNeeded;
-    int outputSize = (data->size() + dataPerOutputCnt - 1) / dataPerOutputCnt;
+    int cnt = mostFrequent->size();                         // how many distinct items to encode
+    int bitsNeeded = ALT_BITLEN(cnt-1);                     // min bits needed to encode
+    int outputItemBitSize = 8 * sizeof(unsigned int);       // how many bits are in output unit
+    int dataPerOutputCnt = outputItemBitSize / bitsNeeded;  // how many items will be encoded in single unit
+    int outputSize = (data->size() + dataPerOutputCnt - 1) / dataPerOutputCnt;  // output units cnt
     int outputSizeInBytes = outputSize * sizeof(unsigned int);
     int mostFrequentSizeInBytes = mostFrequent->size() * sizeof(int);
     auto result = CudaPtr<char>::make_shared(outputSizeInBytes + mostFrequentSizeInBytes);
@@ -112,6 +122,57 @@ SharedCudaPtr<char> DictEncoding::CompressMostFrequent(
     return result;
 }
 
+
+// MOST FREQUENT DECOMPRESSION ALGORITHM
+//
+// Having the number of most frequent values we restore the original array of most freq values
+// Then we count how many unsigned int values fit in encoded data and what is the minimal bit
+// number to encode the number of most frequent values. Using that we can compute how many values
+// are stored in sigle unsigned int number. Then we take in parallel each unsigned int and decode it
+// as the values from the array at index equal to that N bit block stored in unsigned int number
+// casted to integer. We call that single unsigned int value an unit.
+__global__ void DecompressMostFrequentKernel(
+    unsigned int* data,
+    int* mostFrequent,
+    const int size,
+    int* output,
+    const int bitsNeeded,
+    const int dataPerUnitCnt
+    )
+{
+    unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x; // output index
+    if(idx >= size) return;
+    int value, index;
+    for(int i=0; i<dataPerUnitCnt; i++)
+    {
+        index = ReadNbitIntValFromWord(bitsNeeded, i, data[idx]);
+        value = mostFrequent[index];
+        output[idx * dataPerUnitCnt + i] = value;
+    }
+}
+
+SharedCudaPtr<int> DictEncoding::DecompressMostFrequent(SharedCudaPtr<char> data, int freqCnt)
+{
+    int bitsNeeded = ALT_BITLEN(freqCnt-1);                 // min bit cnt to encode freqCnt values
+    int outputItemBitSize = 8 * sizeof(unsigned int);       // single encoded unit size
+    int dataPerUnitCnt = outputItemBitSize / bitsNeeded;    // how many items are in one unit
+    int unitCnt =  data->size() / outputItemBitSize;        // how many units are in data
+    int outputSize = unitCnt * dataPerUnitCnt;              // how many items were compressed
+    int mostFrequentSizeInBytes = freqCnt * sizeof(int);    // size in bytes of most frequent array
+    auto result = CudaPtr<int>::make_shared(outputSize);
+    this->_policy.setSize(unitCnt);
+    cudaLaunch(this->_policy, DecompressMostFrequentKernel,
+        (unsigned int*)(data->get()+mostFrequentSizeInBytes),
+        (int*)data->get(),
+        unitCnt,
+        result->get(),
+        bitsNeeded,
+        dataPerUnitCnt);
+
+    cudaDeviceSynchronize();
+    return result;
+}
+ 
 // DICT ENCODING ALGORITHM
 //
 //  1. CREATE HISTOGRAM
