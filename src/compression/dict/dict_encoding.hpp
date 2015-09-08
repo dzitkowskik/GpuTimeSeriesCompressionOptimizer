@@ -47,6 +47,7 @@ private:
 
 	friend class DictCompressionTest;
   	FRIEND_TEST(DictCompressionTest, GetMostFrequent_fake_data);
+	FRIEND_TEST(DictCompressionTest, GetMostFrequent_random_data);
 };
 
 } /* namespace ddj */

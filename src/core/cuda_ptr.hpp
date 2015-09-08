@@ -91,6 +91,15 @@ public:
 		return result;
 	}
 
+	boost::shared_ptr<std::vector<T>> copyToHost()
+	{
+		boost::shared_ptr<std::vector<T>> result(new std::vector<T>(_size));
+		CUDA_CHECK_RETURN(
+			cudaMemcpy( result->data(), this->get(), this->size()*sizeof(T), CPY_DTH )
+			);
+		return result;
+	}
+
 public:
 	static SharedCudaPtr<T> make_shared()
 	{ return SharedCudaPtr<T>(new CudaPtr()); }
