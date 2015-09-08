@@ -64,3 +64,19 @@ TEST(ALT_BITLEN, Macros_Alt_Bitlen_Negative_Big)
 	int expected = 32;
 	EXPECT_EQ(expected, result);
 }
+
+TEST(ALT_BITLEN, Macros_Alt_Bitlen_Zero)
+{
+	int value = 0;
+	int result = ALT_BITLEN(value);
+	int expected = 1;
+	EXPECT_EQ(expected, result);
+}
+
+TEST(ALT_BITLEN, Macros_Alt_Bitlen_One)
+{
+	int value = 1;
+	int result = ALT_BITLEN(value);
+	int expected = 1;
+	EXPECT_EQ(expected, result);
+}

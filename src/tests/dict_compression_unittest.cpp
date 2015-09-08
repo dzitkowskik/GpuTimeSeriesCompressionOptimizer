@@ -28,11 +28,9 @@ SharedCudaPtrPair<int, int> fakeHistogram(int size)
 
 TEST_F(DictCompressionTest, GetMostFrequent_fake_data)
 {
+	DictEncoding dictEncoding;
     auto fakedHistogram = fakeHistogram(size);
-    // HelperPrint::PrintSharedCudaPtrPair(fakedHistogram, "fakedHistogram");
-    DictEncoding dictEncoding;
     auto mostFrequent = dictEncoding.GetMostFrequent(fakedHistogram, 1);
-    // HelperPrint::PrintArray(mostFrequent->get(), mostFrequent->size(), "mostFrequent");
     int expected = size;
     int actual;
     CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
@@ -57,27 +55,40 @@ bool CheckMostFrequent(
         thrust::greater<int>());
 
     for(int i = 0; i < mostFreqCnt; i++)
-    {
         if(h_mostFrequent->at(i) != h_histogramKeys->at(i))
-        {
-            // printf("Expected: %d, Actual: %d\n", h_histogramKeys->at(i), h_mostFrequent->at(i));
             return false;
-        }
-    }
 
     return true;
 }
 
-TEST_F(DictCompressionTest, GetMostFrequent_random_data)
+TEST_F(DictCompressionTest, GetMostFrequent_random_data_with_most_freq_cnt_1)
 {
+	DictEncoding dictEncoding;
     int mostFreqCnt = 1;
     CudaHistogram histogram;
     auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
-    // HelperPrint::PrintSharedCudaPtrPair(randomHistogram, "randomHistogram");
-    DictEncoding dictEncoding;
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
-    // HelperPrint::PrintArray(mostFrequent->get(), mostFrequent->size(), "mostFrequent");
     EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
+}
+
+TEST_F(DictCompressionTest, GetMostFrequent_random_data_with_most_freq_cnt_5)
+{
+	DictEncoding dictEncoding;
+    int mostFreqCnt = 5;
+    CudaHistogram histogram;
+    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
+    auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
+    EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
+}
+
+TEST_F(DictCompressionTest, CompressMostFrequent_no_exception)
+{
+    DictEncoding dictEncoding;
+    CudaHistogram histogram;
+    int mostFreqCnt = 1;
+    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
+    auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
+    auto result = dictEncoding.CompressMostFrequent(d_int_random_data, mostFrequent);
 }
 
 } /* namespace ddj */
