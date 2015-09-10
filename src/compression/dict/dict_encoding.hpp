@@ -11,6 +11,7 @@
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
 #include "helpers/helper_cudakernels.cuh"
+#include <gtest/gtest.h>
 
 namespace ddj {
 
@@ -41,16 +42,13 @@ private:
         SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent);
 
 	SharedCudaPtr<int> DecompressMostFrequent(
-		SharedCudaPtr<char> data, int freqCnt);
+		SharedCudaPtr<char> data, int freqCnt, int outputSize);
 
 	HelperCudaKernels _cudaKernels;
 
 	friend class DictCompressionTest;
  	FRIEND_TEST(DictCompressionTest, GetMostFrequent_fake_data);
-	FRIEND_TEST(DictCompressionTest, GetMostFrequent_random_data_with_most_freq_cnt_1);
-	FRIEND_TEST(DictCompressionTest, GetMostFrequent_random_data_with_most_freq_cnt_5);
-	FRIEND_TEST(DictCompressionTest, CompressMostFrequent_no_exception);
-	FRIEND_TEST(DictCompressionTest, DecompressMostFrequent_no_exception);
+	FRIEND_TEST(DictCompressionTest, GetMostFrequent_random_int);
 	FRIEND_TEST(DictCompressionTest, CompressDecompressMostFrequent_random_int);
 };
 

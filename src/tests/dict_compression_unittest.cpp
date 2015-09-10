@@ -3,6 +3,7 @@
 #include "helpers/helper_print.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "compression/dict/dict_encoding.hpp"
+#include "helpers/helper_cudakernels.cuh"
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
 
@@ -25,17 +26,6 @@ SharedCudaPtrPair<int, int> fakeHistogram(int size)
     d_fakeData->fillFromHost(h_fakeData.data(), size);
     CudaHistogram histogram;
     return histogram.IntegerHistogram(d_fakeData);
-}
-
-TEST_F(DictCompressionTest, GetMostFrequent_fake_data)
-{
-	DictEncoding dictEncoding;
-    auto fakedHistogram = fakeHistogram(size);
-    auto mostFrequent = dictEncoding.GetMostFrequent(fakedHistogram, 1);
-    int expected = size;
-    int actual;
-    CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
-    EXPECT_EQ(expected, actual);
 }
 
 bool CheckMostFrequent(
@@ -62,62 +52,60 @@ bool CheckMostFrequent(
     return true;
 }
 
-TEST_F(DictCompressionTest, GetMostFrequent_random_data_with_most_freq_cnt_1)
+INSTANTIATE_TEST_CASE_P(MostFreqCnt_Inst, DictCompressionTest, ::testing::Values(1, 5));
+
+TEST_P(DictCompressionTest, GetMostFrequent_fake_data)
 {
 	DictEncoding dictEncoding;
-    int mostFreqCnt = 1;
+
+    int mostFreqCnt = GetParam();
+
+    auto fakedHistogram = fakeHistogram(size);
+    auto mostFrequent = dictEncoding.GetMostFrequent(fakedHistogram, mostFreqCnt);
+    int expected = size;
+    int actual;
+    CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_P(DictCompressionTest, GetMostFrequent_random_int)
+{
+	DictEncoding dictEncoding;
+    int mostFreqCnt = GetParam();
     CudaHistogram histogram;
     auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
     EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
 }
 
-TEST_F(DictCompressionTest, GetMostFrequent_random_data_with_most_freq_cnt_5)
-{
-	DictEncoding dictEncoding;
-    int mostFreqCnt = 5;
-    CudaHistogram histogram;
-    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
-    auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
-    EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
-}
-
-TEST_F(DictCompressionTest, CompressMostFrequent_no_exception)
+TEST_P(DictCompressionTest, CompressDecompressMostFrequent_random_int)
 {
     DictEncoding dictEncoding;
     CudaHistogram histogram;
-    int mostFreqCnt = 1;
+    HelperCudaKernels kernels;
+
+    int mostFreqCnt = GetParam();
     auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
-    auto result = dictEncoding.CompressMostFrequent(d_int_random_data, mostFrequent);
-}
 
-TEST_F(DictCompressionTest, DecompressMostFrequent_no_exception)
-{
-    DictEncoding dictEncoding;
-    CudaHistogram histogram;
-    int mostFreqCnt = 1;
-    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
-    auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
-    auto encoded = dictEncoding.CompressMostFrequent(d_int_random_data, mostFrequent);
-    auto decoded = dictEncoding.DecompressMostFrequent(encoded, size);
-}
- 
-TEST_F(DictCompressionTest, CompressDecompressMostFrequent_random_int)
-{
-    DictEncoding dictEncoding;
-    CudaHistogram histogram;
-    int mostFreqCnt = 1;
-    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
-    auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
-    auto encoded = dictEncoding.CompressMostFrequent(d_int_random_data, mostFrequent);
-    auto decoded = dictEncoding.DecompressMostFrequent(encoded, size);
+    auto stencil = dictEncoding.GetMostFrequentStencil(d_int_random_data, mostFrequent);
+    auto mostFrequentDataPart = std::get<0>(kernels.SplitKernel(d_int_random_data, stencil));
 
-    HelperPrint::PrintSharedCudaPtr(d_int_random_data, "Expected:");
-    HelperPrint::PrintSharedCudaPtr(decoded, "Actual:");
+    auto encoded = dictEncoding.CompressMostFrequent(mostFrequentDataPart, mostFrequent);
+    auto decoded =
+        dictEncoding.DecompressMostFrequent(
+            encoded,
+            mostFrequent->size(),
+            mostFrequentDataPart->size()
+            );
 
-    EXPECT_EQ(d_int_random_data->size(), decoded->size());
-    EXPECT_TRUE( CompareDeviceArrays(d_int_random_data->get(), decoded->get(), size) );
+    EXPECT_EQ(mostFrequentDataPart->size(), decoded->size());
+    EXPECT_TRUE(
+        CompareDeviceArrays(
+            mostFrequentDataPart->get(),
+            decoded->get(),
+            mostFrequentDataPart->size())
+        );
 }
 
 } /* namespace ddj */

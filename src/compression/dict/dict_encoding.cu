@@ -151,13 +151,17 @@ __global__ void DecompressMostFrequentKernel(
     }
 }
 
-SharedCudaPtr<int> DictEncoding::DecompressMostFrequent(SharedCudaPtr<char> data, int freqCnt)
+SharedCudaPtr<int> DictEncoding::DecompressMostFrequent(
+    SharedCudaPtr<char> data,
+    int freqCnt,
+    int outputSize  // how many items were compressed
+    )
 {
     int bitsNeeded = ALT_BITLEN(freqCnt-1);                 // min bit cnt to encode freqCnt values
-    int outputItemBitSize = 8 * sizeof(unsigned int);       // single encoded unit size
-    int dataPerUnitCnt = outputItemBitSize / bitsNeeded;    // how many items are in one unit
-    int unitCnt =  data->size() / outputItemBitSize;        // how many units are in data
-    int outputSize = unitCnt * dataPerUnitCnt;              // how many items were compressed
+    int unitSize = sizeof(unsigned int);                    // single unit size in bytes
+    int unitBitSize = 8 * sizeof(unsigned int);             // single unit size in bits
+    int dataPerUnitCnt = unitBitSize / bitsNeeded;          // how many items are in one unit
+    int unitCnt =  data->size() / unitSize;                 // how many units are in data
     int mostFrequentSizeInBytes = freqCnt * sizeof(int);    // size in bytes of most frequent array
     auto result = CudaPtr<int>::make_shared(outputSize);
     this->_policy.setSize(unitCnt);
@@ -172,7 +176,7 @@ SharedCudaPtr<int> DictEncoding::DecompressMostFrequent(SharedCudaPtr<char> data
     cudaDeviceSynchronize();
     return result;
 }
- 
+
 // DICT ENCODING ALGORITHM
 //
 //  1. CREATE HISTOGRAM

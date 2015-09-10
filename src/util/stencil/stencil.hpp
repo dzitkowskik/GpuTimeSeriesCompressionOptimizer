@@ -18,6 +18,7 @@ class Stencil
 public:
     Stencil(SharedCudaPtr<int> data) { _data = data; };
     ~Stencil() {}
+
     SharedCudaPtr<int> operator->() const
     { return this->_data; }
 

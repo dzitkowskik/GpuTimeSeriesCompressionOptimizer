@@ -15,7 +15,8 @@
 
 namespace ddj {
 
-class DictCompressionTest : public testing::Test
+class DictCompressionTest : public testing::Test,
+    public ::testing::WithParamInterface<int>
 {
 protected:
 	DictCompressionTest() : size(10000)
