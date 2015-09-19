@@ -8,18 +8,28 @@
 #ifndef DDJ_DELTA_ENCODING_HPP_
 #define DDJ_DELTA_ENCODING_HPP_
 
+#include "compression/encoding.hpp"
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
 
 namespace ddj {
 
-class DeltaEncoding
+class DeltaEncoding : public Encoding
 {
-	ExecutionPolicy _policy;
-
 public:
-	template<typename T> SharedCudaPtr<char> Encode(SharedCudaPtr<T> data);
-	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtr<char> data);
+	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data) override
+	{ return this.Encode<int>(data); }
+	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data) override
+	{ return this.Decode<int>(data); }
+	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data) override;
+	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data) override;
+
+private:
+	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);
+	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtrVector<char> data);
+
+private:
+	ExecutionPolicy _policy;
 };
 
 } /* namespace ddj */
