@@ -100,6 +100,19 @@ public:
 		return result;
 	}
 
+	template<typename FROM, typename TO>
+	friend SharedCudaPtr<TO> MoveSharedCudaPtr(SharedCudaPtr<FROM> data);
+
+private:
+	template<typename S> CudaPtr<S>* move()
+	{
+		size_t new_size = _size * sizeof(T) / sizeof(S);
+		auto result = new CudaPtr<S>((S*)(this->_pointer), new_size);
+		this->_pointer = 0;
+		this->_size = 0;
+		return result;
+	}
+
 public:
 	static SharedCudaPtr<T> make_shared()
 	{ return SharedCudaPtr<T>(new CudaPtr()); }
@@ -114,5 +127,11 @@ private:
 	T* _pointer;
 	size_t _size;
 };
+
+template<typename FROM, typename TO>
+SharedCudaPtr<TO> MoveSharedCudaPtr(SharedCudaPtr<FROM> data)
+{
+	return SharedCudaPtr<TO>(data->template move<TO>());
+}
 
 #endif /* CUDA_PTR_H_ */

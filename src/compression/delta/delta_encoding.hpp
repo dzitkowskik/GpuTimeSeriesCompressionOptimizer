@@ -8,7 +8,7 @@
 #ifndef DDJ_DELTA_ENCODING_HPP_
 #define DDJ_DELTA_ENCODING_HPP_
 
-#include "compression/encoding.hpp"
+// #include "compression/encoding.hpp"
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
 
@@ -17,16 +17,20 @@ namespace ddj {
 class DeltaEncoding : public Encoding
 {
 public:
-	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data) override
-	{ return this.Encode<int>(data); }
-	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data) override
-	{ return this.Decode<int>(data); }
-	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data) override;
-	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data) override;
+	using Encoding::Encoding;
 
-private:
-	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);
-	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtrVector<char> data);
+	SharedCudaPtr<char> EncodeInt(SharedCudaPtr<int> data) override
+	{ return this->Encode<int>(data); }
+	SharedCudaPtr<int> DecodeInt(SharedCudaPtr<char> data) override
+	{ return this->Decode<int>(data); }
+	SharedCudaPtr<char> EncodeFloat(SharedCudaPtr<float> data) override
+	{ return this->Encode<float>(data); }
+	SharedCudaPtr<float> DecodeFloat(SharedCudaPtr<char> data) override
+	{ return this->Decode<float>(data); }
+
+public:
+	template<typename T> SharedCudaPtr<char> Encode(SharedCudaPtr<T> data);
+	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtr<char> data);
 
 private:
 	ExecutionPolicy _policy;

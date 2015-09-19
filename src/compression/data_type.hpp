@@ -5,7 +5,15 @@
  *      Author: Karol Dzitkowski
  */
 
-enum DataType {
+ #ifndef DDJ_DATA_TYPE_HPP_
+ #define DDJ_DATA_TYPE_HPP_
+
+namespace ddj {
+
+enum class DataType {
     d_int,
     d_float
 };
+
+} /* namespace ddj */
+#endif /* DDJ_DATA_TYPE_HPP_ */

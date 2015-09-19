@@ -8,12 +8,13 @@
 #ifndef DDJ_ENCODING_FACTORY_HPP_
 #define DDJ_ENCODING_FACTORY_HPP_
 
-namespace ddj {
-
 #include "encoding.hpp"
 #include "encoding_type.hpp"
 #include "data_type.hpp"
 #include "compression/delta/delta_encoding.hpp"
+#include "core/not_implemented_exception.hpp"
+
+namespace ddj {
 
 class EncodingFactory
 {
@@ -22,13 +23,13 @@ public:
     {
         switch(encodingType)
         {
-            case EncodingType.delta:
+			case EncodingType::delta:
                 return DeltaEncoding(dataType);
-            case default:
-                throw std::runtime_error("No encoding for this encoding type found");
+			default:
+				throw NotImplementedException("No such encoding type - encoding not implemented");
         }
     }
 };
 
 } /* namespace ddj */
-#endif /* DDJ_ENCODING_RESULT_HPP_ */
+#endif /* DDJ_ENCODING_FACTORY_HPP_ */

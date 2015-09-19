@@ -8,11 +8,11 @@
 #ifndef DDJ_ENCODING_HPP_
 #define DDJ_ENCODING_HPP_
 
-namespace ddj {
-
 #include "core/cuda_ptr.hpp"
 #include "data_type.hpp"
 #include <boost/pointer_cast.hpp>
+
+namespace ddj {
 
 class Encoding
 {
@@ -23,40 +23,34 @@ public:
 	Encoding(Encoding&& other) noexcept : _type(std::move(other._type)) {}
 
 public:
-	EncodingResult Encode(SharedCudaPtr<char> data)
+	SharedCudaPtr<char> Encode(SharedCudaPtr<char> data)
 	{
-		switch(this._type)
+		switch(this->_type)
 		{
-			case DataType.int:
-				auto int_data = boost::reinterpret_pointer_cast<CudaPtr<int>>(data);
-				return EncodeInt();
-			case DataType.float:
-				auto float_data = boost::reinterpret_pointer_cast<CudaPtr<float>>(data);
-				return EncodeFloat(float_data);
-			case default:
-				throw std::runtime_error("Not implemented type for this encoding");
+			case DataType::d_int:
+				return EncodeInt(MoveSharedCudaPtr<char, int>(data));
+			case DataType::d_float:
+				return EncodeFloat(MoveSharedCudaPtr<char, float>(data));
 		}
 	}
 
-	SharedCudaPtr<char> Decode(EncodingResult data)
+	SharedCudaPtr<char> Decode(SharedCudaPtr<char> data)
 	{
-		switch(this._type)
+		switch(this->_type)
 		{
-			case DataType.int:
-				return DecodeInt(data);
-			case DataType.float:
-				return DecodeFloat(data);
-			case default:
-				throw std::runtime_error("Not implemented type for this encoding");
+			case DataType::d_int:
+				return MoveSharedCudaPtr<int, char>(DecodeInt(data));
+			case DataType::d_float:
+				return MoveSharedCudaPtr<float, char>(DecodeFloat(data));
 		}
 	}
 
 protected:
-	virtual SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data) = 0;
-	virtual SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data) = 0;
+	virtual SharedCudaPtr<char> EncodeInt(SharedCudaPtr<int> data) = 0;
+	virtual SharedCudaPtr<int> DecodeInt(SharedCudaPtr<char> data) = 0;
 
-	virtual SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data) = 0;
-	virtual SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data) = 0;
+	virtual SharedCudaPtr<char> EncodeFloat(SharedCudaPtr<float> data) = 0;
+	virtual SharedCudaPtr<float> DecodeFloat(SharedCudaPtr<char> data) = 0;
 
 private:
 	DataType _type;

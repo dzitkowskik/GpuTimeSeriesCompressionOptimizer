@@ -15,7 +15,16 @@ namespace ddj {
 class NotImplementedException : public std::logic_error
 {
 public:
-    virtual char const * what() const { return "Function not yet implemented."; }
+    NotImplementedException()
+        : std::logic_error("Not implemented exception"), _text("")
+    {}
+    NotImplementedException(std::string customText)
+        : std::logic_error("Not implemented exception"), _text(customText)
+    {}
+    virtual char const * what() const _NOEXCEPT { return this->_text.data(); }
+
+private:
+    std::string _text;
 };
 
 } /* namespace ddj */

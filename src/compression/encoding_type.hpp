@@ -5,12 +5,20 @@
  *      Author: Karol Dzitkowski
  */
 
-enum EncodingType {
-    afl,
+#ifndef DDJ_ENCODING_TYPE_HPP_
+#define DDJ_ENCODING_TYPE_HPP_
+
+namespace ddj {
+
+enum class EncodingType {
     delta,
-    scale,
-    rle,
-    dict,
-    split,
+    // afl,
+    // scale,
+    // rle,
+    // dict,
+    // split,
     length
 };
+
+} /* namespace ddj */
+#endif /* DDJ_ENCODING_TYPE_HPP_ */

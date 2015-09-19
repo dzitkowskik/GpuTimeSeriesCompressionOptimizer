@@ -8,10 +8,10 @@
 #ifndef DDJ_COMPRESSION_TREE_HPP_
 #define DDJ_COMPRESSION_TREE_HPP_
 
-namespace ddj {
-
 #include "compression_node.hpp"
 #include "core/cuda_ptr.hpp"
+
+namespace ddj {
 
 class CompressionTree
 {
@@ -19,13 +19,13 @@ public:
     SharedCudaPtr<char> Compress(SharedCudaPtr<char> data);
     SharedCudaPtr<char> Decompress(SharedCudaPtr<char> data);
 
-    uint AddNode(CompressionNodePtr node, uint parentNo);
+    uint AddNode(SharedCompressionNodePtr node, uint parentNo);
     void RemoveNode(uint nodeNo);
-    CompressionNodePtr GetNode(uint nodeNo);
-    CompressionNodePtr GetRoot();
+    SharedCompressionNodePtr GetNode(uint nodeNo);
+    SharedCompressionNodePtr GetRoot();
 
 private:
-    CompressionNodePtr _root;
+    SharedCompressionNodePtr _root;
 };
 
 } /* namespace ddj */

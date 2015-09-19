@@ -5,20 +5,22 @@
  *      Author: Karol Dzitkowski
  */
 
- #ifndef DDJ_COMPRESSION_NODE_HPP_
- #define DDJ_COMPRESSION_NODE_HPP_
+#ifndef DDJ_COMPRESSION_NODE_HPP_
+#define DDJ_COMPRESSION_NODE_HPP_
 
- namespace ddj {
+#include <boost/shared_ptr.hpp>
+#include <core/cuda_ptr.hpp>
+#include "compression/encoding_type.hpp"
+#include "compression/data_type.hpp"
+#include "compression/encoding_factory.hpp"
+
+namespace ddj {
 
 class CompressionNode;
 
-#include <boost/shared_ptr.hpp>
-
-template<class T>
+using uint = unsigned int;
 using SharedCompressionNodePtr = boost::shared_ptr<CompressionNode>;
-
-template<class T>
-using SharedCompressionNodePtrVector = std::vector<SharedNodePtr>;
+using SharedCompressionNodePtrVector = std::vector<SharedCompressionNodePtr>;
 
 class CompressionNode
 {
@@ -37,6 +39,7 @@ private:
     bool _isLeaf;
     SharedCudaPtr<char> _data;
     SharedCudaPtr<char> _metadata;
+    uint _no;
 };
 
 } /* namespace ddj */
