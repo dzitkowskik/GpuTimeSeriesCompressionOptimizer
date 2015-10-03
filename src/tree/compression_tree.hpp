@@ -30,6 +30,7 @@ public:
 
 private:
     SharedCompressionNodePtr _root;
+    uint nextNo;
 };
 
 } /* namespace ddj */

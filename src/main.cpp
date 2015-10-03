@@ -9,6 +9,8 @@
 #include "core/config.hpp"
 #include <signal.h>
 
+using namespace std;
+
 int wait_to_terminate()
 {
   //wait for SIGINT

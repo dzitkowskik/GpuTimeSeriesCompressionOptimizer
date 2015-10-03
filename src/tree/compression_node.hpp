@@ -25,11 +25,22 @@ using SharedCompressionNodePtrVector = std::vector<SharedCompressionNodePtr>;
 class CompressionNode
 {
 public:
+	CompressionNode(uint no, EncodingType encodingType, DataType dataType);
+	~CompressionNode();
+	CompressionNode(const CompressionNode& other);
+//	CompressionNode(CompressionNode&& other) = default;
+
+public:
     void Compress(SharedCudaPtr<char> data);
     void Decompress(SharedCudaPtr<char> data);
 
     SharedCudaPtr<char> Serialize();
     void Deserialize(SharedCudaPtr<char> data);
+
+    void AddChild(SharedCompressionNodePtr node);
+    uint GetNo();
+    void RemoveChild(uint no);
+
 
 private:
     SharedCompressionNodePtrVector _children;
