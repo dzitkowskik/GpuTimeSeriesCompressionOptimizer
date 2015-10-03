@@ -6,9 +6,8 @@
  */
 
 #include "core/logger.h"
-#include "core/config.h"
+#include "core/config.hpp"
 #include <signal.h>
-#include "store/store.h"
 
 int wait_to_terminate()
 {
