@@ -21,7 +21,7 @@ public:
 	virtual ~Encoding(){}
 
 public:
-	SharedCudaPtr<char> Encode(SharedCudaPtr<char> data, DataType type)
+	SharedCudaPtrVector<char> Encode(SharedCudaPtr<char> data, DataType type)
 	{
 		switch(type)
 		{
@@ -34,7 +34,7 @@ public:
 		}
 	}
 
-	SharedCudaPtr<char> Decode(SharedCudaPtr<char> data, DataType type)
+	SharedCudaPtr<char> Decode(SharedCudaPtrVector<char> data, DataType type)
 	{
 		switch(type)
 		{
@@ -47,11 +47,16 @@ public:
 		}
 	}
 
+	virtual unsigned int GetNumberOfResults() = 0;
+
 protected:
-	virtual SharedCudaPtr<char> EncodeInt(SharedCudaPtr<int> data) = 0;
-	virtual SharedCudaPtr<int> DecodeInt(SharedCudaPtr<char> data) = 0;
-	virtual SharedCudaPtr<char> EncodeFloat(SharedCudaPtr<float> data) = 0;
-	virtual SharedCudaPtr<float> DecodeFloat(SharedCudaPtr<char> data) = 0;
+	// INT
+	virtual SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data) = 0;
+	virtual SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data) = 0;
+
+	// FLOAT
+	virtual SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data) = 0;
+	virtual SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data) = 0;
 };
 
 } /* namespace ddj */

@@ -77,7 +77,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomInts_size)
 {
 	DeltaEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize<int>(
+    EncodeDecodeUnittestHelper::TestSize2<int>(
 		boost::bind(&DeltaEncoding::Encode<int>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -88,7 +88,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomInts_data)
 {
 	DeltaEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent<int>(
+	EncodeDecodeUnittestHelper::TestContent2<int>(
 		boost::bind(&DeltaEncoding::Encode<int>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -99,7 +99,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_size)
 {
 	DeltaEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize<float>(
+    EncodeDecodeUnittestHelper::TestSize2<float>(
 		boost::bind(&DeltaEncoding::Encode<float>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -110,7 +110,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_data)
 {
 	DeltaEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent<float>(
+	EncodeDecodeUnittestHelper::TestContent2<float>(
 		boost::bind(&DeltaEncoding::Encode<float>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)

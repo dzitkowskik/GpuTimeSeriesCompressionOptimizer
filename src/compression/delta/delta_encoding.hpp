@@ -20,30 +20,33 @@ public:
 	DeltaEncoding(){}
 	~DeltaEncoding(){}
 
+public:
+	unsigned int GetNumberOfResults() { return 1; }
+
 protected:
-	SharedCudaPtr<char> EncodeInt(SharedCudaPtr<int> data)
+	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data)
 	{
 		return this->Encode<int>(data);
 	}
 
-	SharedCudaPtr<int> DecodeInt(SharedCudaPtr<char> data)
+	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data)
 	{
 		return this->Decode<int>(data);
 	}
 
-	SharedCudaPtr<char> EncodeFloat(SharedCudaPtr<float> data)
+	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data)
 	{
 		return this->Encode<float>(data);
 	}
 
-	SharedCudaPtr<float> DecodeFloat(SharedCudaPtr<char> data)
+	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data)
 	{
 		return this->Decode<float>(data);
 	}
 
 public:
-	template<typename T> SharedCudaPtr<char> Encode(SharedCudaPtr<T> data);
-	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtr<char> data);
+	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);
+	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtrVector<char> data);
 
 private:
 	ExecutionPolicy _policy;

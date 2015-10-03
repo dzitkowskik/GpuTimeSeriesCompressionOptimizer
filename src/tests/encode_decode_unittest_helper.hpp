@@ -29,6 +29,18 @@ public:
 			boost::function<SharedCudaPtr<char> (SharedCudaPtr<T>)> encodeFunction,
 			boost::function<SharedCudaPtr<T> (SharedCudaPtr<char>)> decodeFunction,
 			SharedCudaPtr<T> data);
+
+	template<typename T>
+	static bool TestSize2(
+			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<T> data)> encodeFunction,
+			boost::function<SharedCudaPtr<T> (SharedCudaPtrVector<char> data)> decodeFunction,
+			SharedCudaPtr<T> data);
+
+	template<typename T>
+	static bool TestContent2(
+			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<T>)> encodeFunction,
+			boost::function<SharedCudaPtr<T> (SharedCudaPtrVector<char>)> decodeFunction,
+			SharedCudaPtr<T> data);
 };
 
 } /* namespace ddj */

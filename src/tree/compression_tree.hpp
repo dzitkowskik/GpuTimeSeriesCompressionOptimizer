@@ -19,8 +19,12 @@ public:
     SharedCudaPtr<char> Compress(SharedCudaPtr<char> data);
     SharedCudaPtr<char> Decompress(SharedCudaPtr<char> data);
 
+    SharedCudaPtr<char> Serialize();
+    static CompressionTree Deserialize(SharedCudaPtr<char> data);
+
     uint AddNode(SharedCompressionNodePtr node, uint parentNo);
     void RemoveNode(uint nodeNo);
+
     SharedCompressionNodePtr GetNode(uint nodeNo);
     SharedCompressionNodePtr GetRoot();
 
