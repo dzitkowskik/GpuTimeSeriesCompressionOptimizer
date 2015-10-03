@@ -1,5 +1,5 @@
 /*
- * delta_encoding.cu
+ *  delta_encoding.cu
  *
  *  Created on: 18-04-2015
  *      Author: Karol Dzitkowski
