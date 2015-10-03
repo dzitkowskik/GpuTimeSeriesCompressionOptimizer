@@ -5,17 +5,26 @@
 TEST(OtherTests, SharedCudaPtr_ReinterpretCast)
 {
     const int N = 100;
-    auto ptr = CudaPtr<int>::make_shared(N);
+
+    // Create fake int data
     int h_data[N];
     for(int i = 0; i < N; i++)
         h_data[i] = i;
 
-    int* h_data_int_ptr = (int*)&h_data[0];
+    // Copy to device
+    auto ptr = CudaPtr<int>::make_shared(N);
+    ptr->fillFromHost((int*)h_data, N);
+    auto expected = ptr->copyToHost();
 
-    ptr->fillFromHost(h_data_int_ptr, N);
-
+    // Convert to float vector
     auto ptr_float = boost::reinterpret_pointer_cast<CudaPtr<float>>(ptr);
-    auto h_vector = ptr_float->copyToHost();
-    for(auto& item : *h_vector)
-        std::cout << item << std::endl;
+    auto h_vector_float = ptr_float->copyToHost();
+
+    // Convert back to int vector
+    auto ptr_int = boost::reinterpret_pointer_cast<CudaPtr<int>>(ptr_float);
+    auto actual = ptr_int->copyToHost();
+
+    // Compare vectors
+    for(int i=0; i<expected->size(); i++)
+        EXPECT_EQ((*expected)[i], (*actual)[i]);
 }

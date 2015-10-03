@@ -36,10 +36,12 @@ private:
     EncodingType _encodingType;
     DataType _dataType;
     EncodingFactory _encodingFactory;
-    bool _isLeaf;
+
     SharedCudaPtr<char> _data;
     SharedCudaPtr<char> _metadata;
-    uint _no;
+    
+    bool _isLeaf;
+    uint _nodeNo;
 };
 
 } /* namespace ddj */

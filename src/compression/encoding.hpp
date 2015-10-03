@@ -9,7 +9,7 @@
 #define DDJ_ENCODING_HPP_
 
 #include "core/cuda_ptr.hpp"
-#include "data_type.hpp"
+#include "compression/data_type.hpp"
 #include <boost/pointer_cast.hpp>
 
 namespace ddj {
