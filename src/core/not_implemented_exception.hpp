@@ -21,7 +21,11 @@ public:
     NotImplementedException(std::string customText)
         : std::logic_error("Not implemented exception"), _text(customText)
     {}
-    virtual char const * what() const _NOEXCEPT { return this->_text.data(); }
+
+    virtual const char* what() const noexcept
+	{
+    	return this->_text.data();
+	}
 
 private:
     std::string _text;

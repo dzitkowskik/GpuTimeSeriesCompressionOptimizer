@@ -14,19 +14,22 @@
 #include "compression/delta/delta_encoding.hpp"
 #include "core/not_implemented_exception.hpp"
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 namespace ddj {
 
 class EncodingFactory
 {
 public:
-	static Encoding Get(EncodingType encodingType, DataType dataType)
+	static Encoding* Get(EncodingType encodingType)
     {
         switch(encodingType)
         {
 			case EncodingType::delta:
-                return DeltaEncoding(dataType);
+                return new DeltaEncoding();
 			default:
-				throw NotImplementedException("No such encoding type - encoding not implemented");
+				throw NotImplementedException("Encoding of this type not implemented");
         }
     }
 };
