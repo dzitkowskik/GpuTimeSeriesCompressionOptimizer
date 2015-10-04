@@ -17,6 +17,7 @@ enum class EncodingType {
     // rle,
     // dict,
     // split,
+    none,
     length
 };
 

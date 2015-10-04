@@ -16,21 +16,29 @@ namespace ddj {
 class CompressionTree
 {
 public:
+	CompressionTree();
+	~CompressionTree();
+	CompressionTree(const CompressionTree& other);
+
+public:
     SharedCudaPtr<char> Compress(SharedCudaPtr<char> data);
     SharedCudaPtr<char> Decompress(SharedCudaPtr<char> data);
 
     SharedCudaPtr<char> Serialize();
     static CompressionTree Deserialize(SharedCudaPtr<char> data);
 
-    uint AddNode(SharedCompressionNodePtr node, uint parentNo);
-    void RemoveNode(uint nodeNo);
+    SharedCompressionNodePtr FindNode(uint nodeNo);
+    bool AddNode(SharedCompressionNodePtr node, uint parentNo);
+    bool RemoveNode(uint nodeNo);
+    void Reset();
 
-    SharedCompressionNodePtr GetNode(uint nodeNo);
-    SharedCompressionNodePtr GetRoot();
+private:
+    uint GetNextNo();
+    void ResetNodeNumbers();
 
 private:
     SharedCompressionNodePtr _root;
-    uint nextNo;
+    uint _nextNo;
 };
 
 } /* namespace ddj */

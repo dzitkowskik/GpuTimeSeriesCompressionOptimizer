@@ -8,6 +8,7 @@
 #include "core/logger.h"
 #include "core/config.hpp"
 #include <signal.h>
+#include "tree/compression_node.hpp"
 
 using namespace std;
 
@@ -35,6 +36,9 @@ int main(int argc, char* argv[])
   initialize_logger();
 
   // START THE PROGRAM HERE
+  ddj::SharedCompressionNodePtr node;
+  if(node == nullptr) printf("\n\nOK\n\n");
 
-  return wait_to_terminate();
+//  return wait_to_terminate();
+  return 0;
 }

@@ -22,12 +22,12 @@ namespace ddj {
 class EncodingFactory
 {
 public:
-	static Encoding* Get(EncodingType encodingType)
+	static boost::shared_ptr<Encoding> Get(EncodingType encodingType)
     {
         switch(encodingType)
         {
 			case EncodingType::delta:
-                return new DeltaEncoding();
+                return boost::make_shared<DeltaEncoding>();
 			default:
 				throw NotImplementedException("Encoding of this type not implemented");
         }

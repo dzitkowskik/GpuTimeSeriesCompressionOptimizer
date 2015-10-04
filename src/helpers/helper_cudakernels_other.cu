@@ -143,8 +143,8 @@ template<typename T> std::tuple<T,T> HelperCudaKernels::MinMax(SharedCudaPtr<T> 
 }
 
 #define MODULO_SPEC(X) \
-	template SharedCudaPtr<X> HelperCudaKernels::ZeroKernel<X>(SharedCudaPtr<X>); 		\
-	template void HelperCudaKernels::ZeroInPlaceKernel<X>(SharedCudaPtr<X>);			\
+	template SharedCudaPtr<X> HelperCudaKernels::ZeroKernel<X>(SharedCudaPtr<X>); 			\
+	template void HelperCudaKernels::ZeroInPlaceKernel<X>(SharedCudaPtr<X>);				\
 	template SharedCudaPtr<X> HelperCudaKernels::AbsoluteKernel<X>(SharedCudaPtr<X>); 		\
 	template void HelperCudaKernels::AbsoluteInPlaceKernel<X>(SharedCudaPtr<X>);			\
     template SharedCudaPtr<X> HelperCudaKernels::ModuloKernel<X>(SharedCudaPtr<X>, X); 		\
