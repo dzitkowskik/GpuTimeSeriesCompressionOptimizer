@@ -19,6 +19,7 @@ class DeltaEncoding : public Encoding
 public:
 	DeltaEncoding(){}
 	~DeltaEncoding(){}
+	DeltaEncoding(const DeltaEncoding&) = default;
 
 public:
 	unsigned int GetNumberOfResults() { return 1; }

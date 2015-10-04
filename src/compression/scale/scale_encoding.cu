@@ -8,75 +8,80 @@
 #include "scale_encoding.hpp"
 #include "helpers/helper_macros.h"
 #include "core/cuda_macros.cuh"
+#include "helpers/helper_cuda.cuh"
 
 #include <cuda_runtime_api.h>
 #include <thrust/extrema.h>
 #include <thrust/device_ptr.h>
 
-
-#define SCALE_ENCODING_GPU_BLOCK_SIZE 64
-#define SCALE_DECODING_GPU_BLOCK_SIZE 64
-
 namespace ddj {
 
 template<typename T>
-__global__ void scaleEncodeKernel(T* data, int size, T* result, T min)
+__global__ void scaleEncodeKernel(T* data, int size, T* result_data, T min, T* result_metadata)
 {
 	unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	if(idx >= size) return;
-	result[idx] = data[idx] - min;
+	result_data[idx] = data[idx] - min;
+	result_metadata[0] = min;
 }
 
 template<typename T>
-SharedCudaPtr<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
+SharedCudaPtrVector<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
 {
-	int block_size = SCALE_ENCODING_GPU_BLOCK_SIZE;
-	int block_cnt = (data->size() + block_size - 1) / block_size;
+	// ALLOCATE RESULTS
+	auto result_data = CudaPtr<char>::make_shared(data->size()*sizeof(T));
+	auto result_metadata = CudaPtr<char>::make_shared(sizeof(T));
 
+	// GET MIN VALUE OF DATA
 	thrust::device_ptr<T> data_ptr(data->get());
-	auto result = CudaPtr<char>::make_shared((data->size()+1)*sizeof(T));
 	T min = thrust::min_element(data_ptr, data_ptr+data->size())[0];
-	CUDA_CALL( cudaMemcpy(result->get(), &min, sizeof(T), cudaMemcpyHostToDevice) );
 
-	scaleEncodeKernel<T><<<block_size, block_cnt>>>(
+	// SCALE DATA BY MIN VALUE
+	this->_policy.setSize(data->size());
+	cudaLaunch(this->_policy, scaleEncodeKernel<T>,
 			data->get(),
 			data->size(),
-			(T*)(result->get()+sizeof(T)),
-			min);
+			(T*)result_data->get(),
+			min,
+			(T*)result_metadata->get());
+
 	cudaDeviceSynchronize();
 
-	return result;
+	return SharedCudaPtrVector<char> {result_metadata, result_data};
 }
 
 template<typename T>
-__global__ void scaleDecodeKernel(T* data, int size, T* result, T min)
+__global__ void scaleDecodeKernel(T* data, int size, T* result, T* min)
 {
 	unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	if(idx >= size) return;
-	result[idx] = data[idx] + min;
+	result[idx] = data[idx] + *min;
 }
 
 template<typename T>
-SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtr<char> data)
+SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	int size = data->size()/sizeof(T)-1;
-	int block_size = SCALE_ENCODING_GPU_BLOCK_SIZE;
-	int block_cnt = (data->size() + block_size - 1) / block_size;
+	auto metadata = input[0];
+	auto data = input[1];
 
-	thrust::device_ptr<T> data_ptr((T*)data->get());
-	auto min = data_ptr[0];
-
+	int size = data->size()/sizeof(T);
 	auto result = CudaPtr<T>::make_shared(size);
-	scaleDecodeKernel<T><<<block_size, block_cnt>>>(
-			(T*)(data->get()+sizeof(T)), size, result->get(), min);
+
+	this->_policy.setSize(size);
+	cudaLaunch(this->_policy, scaleDecodeKernel<T>,
+			(T*)data->get(),
+			size,
+			result->get(),
+			(T*)metadata->get());
+
 	cudaDeviceSynchronize();
 
 	return result;
 }
 
 #define SCALE_SPEC(X) \
-	template SharedCudaPtr<char> ScaleEncoding::Encode<X>(SharedCudaPtr<X> data); \
-	template SharedCudaPtr<X> ScaleEncoding::Decode<X>(SharedCudaPtr<char> data);
+	template SharedCudaPtrVector<char> ScaleEncoding::Encode<X>(SharedCudaPtr<X> data); \
+	template SharedCudaPtr<X> ScaleEncoding::Decode<X>(SharedCudaPtrVector<char> data);
 FOR_EACH(SCALE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
 
 } /* namespace ddj */

@@ -6,15 +6,12 @@
  */
 
 #include "delta_encoding.hpp"
-#include "compression/encoding_type.hpp"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_cuda.cuh"
+
 #include <cuda_runtime_api.h>
 #include <thrust/device_ptr.h>
 #include <thrust/scan.h>
-
-#define DELTA_ENCODING_GPU_BLOCK_SIZE 64
-#define DELTA_DECODING_GPU_BLOCK_SIZE 64
 
 namespace ddj {
 
@@ -26,19 +23,6 @@ __global__ void deltaEncodeKernel(T* data, int size, T* result)
 	register T v1 = data[idx];
 	register T v2 = data[idx+1];
 	result[idx] = v2 - v1;
-}
-
-// CREATE METADATA
-// TODO: Move to deltaEncodeKernel kernel and check performance
-template<typename T>
-SharedCudaPtr<char> EncodeMetadata(SharedCudaPtr<T> data)
-{
-	EncodingType type = EncodingType::delta;
-	auto result = CudaPtr<char>::make_shared(sizeof(EncodingType) + sizeof(T));
-	CUDA_CALL( cudaMemcpy(result->get(), &type, sizeof(EncodingType), cudaMemcpyHostToDevice) );
-	CUDA_CALL( cudaMemcpy(result->get()+sizeof(EncodingType), data->get(), sizeof(T), cudaMemcpyDeviceToDevice) );
-
-	return result;
 }
 
 template<typename T>
@@ -53,7 +37,10 @@ SharedCudaPtrVector<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 		(T*)(result_data->get())
 	);
 
-	auto result_metadata = EncodeMetadata<T>(data);
+	// SAVE FIRST VALUE TO METADATA
+	auto result_metadata = CudaPtr<char>::make_shared(sizeof(T));
+	CUDA_CALL( cudaMemcpy(result_metadata->get(), data->get(), sizeof(T), cudaMemcpyDeviceToDevice) );
+
 	cudaDeviceSynchronize();
 
 	return SharedCudaPtrVector<char> {result_metadata, result_data};
@@ -83,12 +70,11 @@ SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtrVector<char> input)
 	result_ptr[0] = 0;
 
 	// Add first value all elements
-	T* first_value = (T*)(metadata->get()+sizeof(EncodingType));
 	this->_policy.setSize(size);
 	cudaLaunch(this->_policy, addValueKernel<T>,
 		result->get(),
 		size,
-		first_value
+		(T*)metadata->get()
 	);
 
 	return result;
