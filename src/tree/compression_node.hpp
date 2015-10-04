@@ -54,6 +54,9 @@ public:
     void SetData(SharedCudaPtr<char> data);
 
 private:
+    SharedCudaPtr<char> PrepareMetadata(SharedCudaPtr<char> encodingMetadata);
+
+private:
     SharedCompressionNodePtrVector _children;
     EncodingType _encodingType;
     DataType _dataType;

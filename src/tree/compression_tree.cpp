@@ -81,9 +81,10 @@ SharedCudaPtr<char> CompressionTree::Compress(SharedCudaPtr<char> data)
 
 SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, size_t& offset)
 {
-	// GET METADATA HEADER
+	// READ METADATA HEADER
 	EncodingMetadataHeader header;
 	CUDA_CALL( cudaMemcpy(&header, compressed_data->get()+offset, sizeof(EncodingMetadataHeader), CPY_DTH) );
+	offset += sizeof(EncodingMetadataHeader);
 
 	// CREATE NODE
 	EncodingType encType = (EncodingType)header.EncodingType;
@@ -99,7 +100,7 @@ SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, si
 	{
 		// READ DATA AND UPDATE OFFSET
 		size_t data_size;
-		CUDA_CALL( cudaMemcpy(&data_size, metadata->get()+4, 4, CPY_DTH) );
+		CUDA_CALL( cudaMemcpy(&data_size, metadata->get(), 4, CPY_DTH) );
 		SharedCudaPtr<char> data;
 		data->fill(compressed_data->get()+offset, data_size);
 		offset += data_size;

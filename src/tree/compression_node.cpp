@@ -6,6 +6,7 @@
  */
 
 #include "compression_node.hpp"
+#include "compression/encoding_metadata_header.hpp"
 #include <algorithm>
 #include <vector>
 
@@ -75,6 +76,25 @@ void CompressionNode::SetParentNo(uint no) { _parentNo = no; }
 void CompressionNode::SetMetadata(SharedCudaPtr<char> metadata) { _metadata = metadata; }
 void CompressionNode::SetData(SharedCudaPtr<char> data) { _data = data; }
 
+SharedCudaPtr<char> CompressionNode::PrepareMetadata(SharedCudaPtr<char> encodingMetadata)
+{
+	EncodingMetadataHeader header;
+	header.EncodingType = (int16_t)_encodingType;
+	header.DataType = (int16_t)_dataType;
+	header.MetadataLength = encodingMetadata->size();
+	auto result = CudaPtr<char>::make_shared(sizeof(EncodingMetadataHeader)+encodingMetadata->size());
+	CUDA_CALL( cudaMemcpy(result->get(), &header, sizeof(EncodingMetadataHeader), CPY_HTD) );
+	CUDA_CALL(
+		cudaMemcpy(
+			result->get()+sizeof(EncodingMetadataHeader),
+			encodingMetadata->get(),
+			encodingMetadata->size(),
+			CPY_DTD
+		)
+	);
+	return result;
+}
+
 SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 {
 	auto encoding = _encodingFactory.Get(_encodingType);
@@ -85,7 +105,8 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 	// ELSE
 	int i = 0;
 	auto encodingMetadata = encodingResult[i++];
-	SharedCudaPtrVector<char> result = {encodingMetadata};
+	auto metadata = PrepareMetadata(encodingMetadata);
+	SharedCudaPtrVector<char> result = {metadata};
 	for(auto& child : _children)
 	{
 		auto childResult = child->Compress(encodingResult[i++]);
