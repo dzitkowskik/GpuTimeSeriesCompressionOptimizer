@@ -3,7 +3,8 @@
 #include "helpers/helper_print.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "compression/dict/dict_encoding.hpp"
-#include "helpers/helper_cudakernels.cuh"
+#include "util/splitter/splitter.hpp"
+
 #include <thrust/execution_policy.h>
 #include <thrust/sort.h>
 
@@ -82,14 +83,14 @@ TEST_P(DictCompressionTest, CompressDecompressMostFrequent_random_int)
 {
     DictEncoding dictEncoding;
     CudaHistogram histogram;
-    HelperCudaKernels kernels;
+    Splitter splitter;
 
     int mostFreqCnt = GetParam();
     auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
 
     auto stencil = dictEncoding.GetMostFrequentStencil(d_int_random_data, mostFrequent);
-    auto mostFrequentDataPart = std::get<0>(kernels.SplitKernel(d_int_random_data, stencil));
+    auto mostFrequentDataPart = std::get<0>(splitter.SplitKernel(d_int_random_data, stencil));
 
     auto encoded = dictEncoding.CompressMostFrequent(mostFrequentDataPart, mostFrequent);
     auto decoded =

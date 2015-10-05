@@ -11,6 +11,8 @@
 #include "core/cuda_ptr.hpp"
 #include "helpers/helper_cudakernels.cuh"
 #include "core/execution_policy.hpp"
+#include "util/splitter/splitter.hpp"
+
 #include <tuple>
 #include <boost/noncopyable.hpp>
 
@@ -40,8 +42,8 @@ private:
 	PartData _data;
 	Stencil _stencil;
 	UnaryOperator _op;
-    HelperCudaKernels _kernels;
     ExecutionPolicy _policy;
+    Splitter _splitter;
 };
 
 } /* namespace ddj */

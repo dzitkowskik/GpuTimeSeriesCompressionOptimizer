@@ -1,17 +1,20 @@
-#include "helper_cudakernels_unittest.hpp"
+#include "splitter_unittest.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_macros.h"
-#include <cuda_runtime_api.h>
 #include "core/cuda_ptr.hpp"
+#include "util/splitter/splitter.hpp"
+
+#include <cuda_runtime_api.h>
 
 namespace ddj
 {
 
-TEST_F(HelperCudaKernelsTest, SplitKernel_zero_size)
+TEST_F(SplitterTest, SplitKernel_zero_size)
 {
+    Splitter splitter;
     auto data = CudaPtr<int>::make_shared((size_t)0);
     auto stencil = CudaPtr<int>::make_shared((size_t)0);
-    auto result = kernels.SplitKernel(data, stencil);
+    auto result = splitter.SplitKernel(data, stencil);
 
     EXPECT_EQ(0, get<0>(result)->size());
     EXPECT_EQ(0, get<1>(result)->size());
@@ -19,45 +22,48 @@ TEST_F(HelperCudaKernelsTest, SplitKernel_zero_size)
     EXPECT_EQ(NULL, get<1>(result)->get());
 }
 
-TEST_F(HelperCudaKernelsTest, SplitKernel_yes_empty)
+TEST_F(SplitterTest, SplitKernel_yes_empty)
 {
+    Splitter splitter;
 	auto data = d_int_random_data;
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)
 		h_stencil[i] = 0;
 	CUDA_CALL( cudaMemcpy(d_stencil->get(), h_stencil, size*sizeof(int), CPY_HTD) );
-	auto result = kernels.SplitKernel(data, d_stencil);
+	auto result = splitter.SplitKernel(data, d_stencil);
 
     EXPECT_EQ(0, get<0>(result)->size());
     EXPECT_EQ(size, get<1>(result)->size());
     EXPECT_TRUE( CompareDeviceArrays(d_int_random_data->get(), get<1>(result)->get(), size) );
 }
 
-TEST_F(HelperCudaKernelsTest, SplitKernel_no_empty)
+TEST_F(SplitterTest, SplitKernel_no_empty)
 {
+    Splitter splitter;
 	auto data = d_int_random_data;
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)
 		h_stencil[i] = 1;
 	CUDA_CALL( cudaMemcpy(d_stencil->get(), h_stencil, size*sizeof(int), CPY_HTD) );
-	auto result = kernels.SplitKernel(data, d_stencil);
+	auto result = splitter.SplitKernel(data, d_stencil);
 
     EXPECT_EQ(size, get<0>(result)->size());
     EXPECT_EQ(0, get<1>(result)->size());
     EXPECT_TRUE( CompareDeviceArrays(d_int_random_data->get(), get<0>(result)->get(), size) );
 }
 
-TEST_F(HelperCudaKernelsTest, SplitKernel_normal_int)
+TEST_F(SplitterTest, SplitKernel_normal_int)
 {
+    Splitter splitter;
 	auto data = d_int_random_data;
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)
 		h_stencil[i] = i < size/2 ? 1 : 0;
 	CUDA_CALL( cudaMemcpy(d_stencil->get(), h_stencil, size*sizeof(int), CPY_HTD) );
-	auto result = kernels.SplitKernel(data, d_stencil);
+	auto result = splitter.SplitKernel(data, d_stencil);
 
 	EXPECT_EQ(size/2, get<0>(result)->size());
 	EXPECT_EQ(size/2, get<1>(result)->size());
@@ -71,8 +77,9 @@ TEST_F(HelperCudaKernelsTest, SplitKernel_normal_int)
 			size/2) );
 }
 
-TEST_F(HelperCudaKernelsTest, SplitKernel_normal_float)
+TEST_F(SplitterTest, SplitKernel_normal_float)
 {
+    Splitter splitter;
 	auto data = d_float_random_data;
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
@@ -84,7 +91,7 @@ TEST_F(HelperCudaKernelsTest, SplitKernel_normal_float)
 		else h_stencil[i] = 1;
 	}
 	CUDA_CALL( cudaMemcpy(d_stencil->get(), h_stencil, size*sizeof(int), CPY_HTD) );
-	auto result = kernels.SplitKernel(data, d_stencil);
+	auto result = splitter.SplitKernel(data, d_stencil);
 
 	EXPECT_EQ(size/2, get<0>(result)->size());
 	EXPECT_EQ(size/2, get<1>(result)->size());

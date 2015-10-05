@@ -104,4 +104,11 @@ struct OneOperator
 	T operator()(const T &x) { return 1; }
 };
 
+template<typename T>
+struct NegateOperator
+{
+	__host__ __device__
+	T operator()(const T &x) { return !x; }
+};
+
 #endif /* OPERATORS_CUH_ */

@@ -1,19 +1,18 @@
 /*
- * helper_cudakernels_split.cu
+ *  splitter.cu
  *
- *  Created on: 09-04-2015
+ *  Created on: 05-10-2015
  *      Author: Karol Dzitkowski
  */
 
-#include "utils/prefix_sum.cuh"
-#include "helper_cudakernels.cuh"
+#include "util/other/prefix_sum.cuh"
+#include "util/splitter/splitter.hpp"
+#include "helpers/helper_cuda.cuh"
+
 #include <thrust/device_vector.h>
 #include <thrust/fill.h>
 #include <tuple>
 #include <thrust/sort.h>
-
-#define SPLIT_KERNEL_BLOCK_SIZE 32
-#define NEGATE_KERNEL_BLOCK_SIZE 32
 
 namespace ddj
 {
@@ -23,7 +22,8 @@ __global__ void _copyIfKernel(
 	T* data,
 	int* prefixSum_true,
 	int* prefixSum_false,
-	int* stencil, size_t size,
+	int* stencil,
+    size_t size,
 	T* out_true,
 	T* out_false)
 {
@@ -45,49 +45,54 @@ __global__ void _negateStencilKernel(int* stencil, int size, int* out)
 	out[idx] = stencil[idx] == 1 ? 0 : 1;
 }
 
-SharedCudaPtr<int> NegateStencilKernel(SharedCudaPtr<int> stencil)
+// TODO: Change to use transform instead
+SharedCudaPtr<int> Splitter::NegateStencil(SharedCudaPtr<int> stencil)
 {
 	auto result = CudaPtr<int>::make_shared(stencil->size());
 
 	if(stencil->size() > 0)
 	{
-		int block_size = NEGATE_KERNEL_BLOCK_SIZE;
-		int block_cnt = (stencil->size() + block_size - 1) / block_size;
-		_negateStencilKernel<<<block_size, block_cnt>>>(
-				stencil->get(), stencil->size(), result->get());
+        this->_policy.setSize(stencil->size());
+        cudaLaunch(this->_policy, _negateStencilKernel,
+			stencil->get(),
+            stencil->size(),
+            result->get()
+        );
 	}
 	return result;
 }
 
 template<typename T>
-SharedCudaPtrTuple<T> HelperCudaKernels::SplitKernel(
+SharedCudaPtrTuple<T> Splitter::SplitKernel(
 	SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
 	int out_size = 0;
-	int block_size = SPLIT_KERNEL_BLOCK_SIZE;
-	int block_cnt = (data->size() + block_size - 1) / block_size;
 	auto prefixSum_true = exclusivePrefixSum_thrust(stencil, out_size);
-	auto neg_stencil = NegateStencilKernel(stencil);
+	auto neg_stencil = NegateStencil(stencil);
 	auto prefixSum_false = exclusivePrefixSum_thrust(neg_stencil);
 
 	auto yes = CudaPtr<T>::make_shared(out_size);
 	auto no = CudaPtr<T>::make_shared(data->size()-out_size);
 
 	if(data->size() > 0)
-		_copyIfKernel<<<block_size, block_cnt>>>(
+    {
+        this->_policy.setSize(data->size());
+        cudaLaunch(this->_policy, _copyIfKernel<T>,
 			data->get(),
 			prefixSum_true->get(),
 			prefixSum_false->get(),
 			stencil->get(),
 			data->size(),
 			yes->get(),
-			no->get());
+			no->get()
+        );
+    }
 
 	return std::make_tuple(yes, no);
 }
 
 template<typename T>
-SharedCudaPtrTuple<T> HelperCudaKernels::SplitKernel2(
+SharedCudaPtrTuple<T> Splitter::SplitKernel2(
 		SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
 	int size = data->size();
@@ -108,7 +113,7 @@ SharedCudaPtrTuple<T> HelperCudaKernels::SplitKernel2(
 }
 
 template<typename T>
-SharedCudaPtr<T> HelperCudaKernels::CopyIfKernel(
+SharedCudaPtr<T> Splitter::CopyIfKernel(
 		SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
 	auto result = SplitKernel(data, stencil);
@@ -116,7 +121,7 @@ SharedCudaPtr<T> HelperCudaKernels::CopyIfKernel(
 }
 
 template<typename T>
-SharedCudaPtr<T> HelperCudaKernels::CopyIfNotKernel(
+SharedCudaPtr<T> Splitter::CopyIfNotKernel(
 		SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
 	auto result = SplitKernel(data, stencil);
@@ -125,13 +130,13 @@ SharedCudaPtr<T> HelperCudaKernels::CopyIfNotKernel(
 
 #define CUDA_KERNELS_SPEC(X) \
 	template SharedCudaPtrTuple<X> \
-	HelperCudaKernels::SplitKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	Splitter::SplitKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtrTuple<X> \
-	HelperCudaKernels::SplitKernel2<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	Splitter::SplitKernel2<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtr<X> \
-	HelperCudaKernels::CopyIfKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	Splitter::CopyIfKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtr<X> \
-	HelperCudaKernels::CopyIfNotKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>);
+	Splitter::CopyIfNotKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>);
 FOR_EACH(CUDA_KERNELS_SPEC, float, int)
 
 

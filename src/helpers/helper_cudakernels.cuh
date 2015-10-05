@@ -16,18 +16,6 @@ namespace ddj
 class HelperCudaKernels
 {
 public:
-	template<typename T> SharedCudaPtrTuple<T>
-	SplitKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
-
-	template<typename T> SharedCudaPtrTuple<T>
-	SplitKernel2(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
-
-	template<typename T> SharedCudaPtr<T>
-	CopyIfKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
-
-	template<typename T> SharedCudaPtr<T>
-	CopyIfNotKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
-
 	template<typename T> SharedCudaPtr<T>
 	ModuloKernel(SharedCudaPtr<T> data, T mod);
 

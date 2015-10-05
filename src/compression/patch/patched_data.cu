@@ -7,13 +7,12 @@
 
 #include "patched_data.hpp"
 #include "helpers/helper_cuda.cuh"
-#include <thrust/sort.h>
-#include <thrust/device_ptr.h>
-#include <thrust/reduce.h>
 #include "helpers/helper_macros.h"
 #include "core/operators.cuh"
 
-#define SPLIT_ENCODING_GPU_BLOCK_SIZE 64
+#include <thrust/sort.h>
+#include <thrust/device_ptr.h>
+#include <thrust/reduce.h>
 
 namespace ddj {
 
@@ -51,7 +50,7 @@ void PatchedData<DT, OPT>::Init(SharedCudaPtr<DT> data)
         data->get(), data->size(), this->_stencil->get(), _op);
 
     // Split according to the stencil
-    this->_data = this->_kernels.SplitKernel(data, this->_stencil);
+    this->_data = this->_splitter.SplitKernel(data, this->_stencil);
 }
 
 template<typename DT, typename OPT>
