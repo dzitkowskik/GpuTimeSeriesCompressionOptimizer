@@ -8,6 +8,8 @@
 #ifndef OPERATORS_CUH_
 #define OPERATORS_CUH_
 
+// TODO: Rename to UNARY_OPERATORS
+
 template<typename T>
 struct OutsideOperator
 {

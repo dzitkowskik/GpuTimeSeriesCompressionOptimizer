@@ -1,9 +1,9 @@
 /*
- * helper_generator.hpp 26-03-2015 Karol Dzitkowski
+ * cuda_array_generator.hpp 26-03-2015 Karol Dzitkowski
  */
 
-#ifndef DDJ_HELPER_GENERATOR_H_
-#define DDJ_HELPER_GENERATOR_H_
+#ifndef DDJ_UTIL_CUDA_ARRAY_GENERATOR_HPP_
+#define DDJ_UTIL_CUDA_ARRAY_GENERATOR_HPP_
 
 #include "core/cuda_ptr.hpp"
 #include <boost/noncopyable.hpp>
@@ -12,11 +12,11 @@
 namespace ddj
 {
 
-class HelperGenerator : private boost::noncopyable
+class CudaArrayGenerator : private boost::noncopyable
 {
 public:
-    HelperGenerator();
-    ~HelperGenerator();
+    CudaArrayGenerator();
+    ~CudaArrayGenerator();
 
 public:
     SharedCudaPtr<float> GenerateRandomFloatDeviceArray(int size);
@@ -30,4 +30,4 @@ private:
 };
 
 } /* namespace ddj */
-#endif /* DDJ_HELPER_CUDA_H_ */
+#endif /* DDJ_UTIL_CUDA_ARRAY_GENERATOR_HPP_ */

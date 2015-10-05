@@ -2,9 +2,10 @@
 #define DDJ_HELPER_CUDAKERNELS_UNITTEST_H_
 
 #include "helpers/helper_device.hpp"
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
 #include "helpers/helper_cudakernels.cuh"
+
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -33,7 +34,7 @@ protected:
 	HelperCudaKernels kernels;
 
 private:
-	HelperGenerator generator;
+	CudaArrayGenerator generator;
 };
 
 } /* namespace ddj */

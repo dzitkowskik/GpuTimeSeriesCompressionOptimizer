@@ -8,6 +8,7 @@ tags
 .test_time
 .clang_complete
 gpuStore
+build/
 
 ### OSX ###
 .DS_Store

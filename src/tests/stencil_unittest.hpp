@@ -9,8 +9,9 @@
 #define DDJ_STENCIL_UNITTEST_HPP_
 
 #include "helpers/helper_device.hpp"
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
+
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -36,7 +37,7 @@ protected:
 	const int size;
 
 private:
-	HelperGenerator generator;
+	CudaArrayGenerator generator;
 };
 
 } /* namespace ddj */

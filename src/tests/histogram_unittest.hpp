@@ -9,9 +9,10 @@
 #define DDJ_HISTOGRAM_UNITTEST_HPP_
 
 #include "helpers/helper_device.hpp"
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
 #include "util/histogram/histogram_base.hpp"
+
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -42,7 +43,7 @@ protected:
 	void RandomIntegerArrayTestCase(HistogramBase& histogram);
 
 private:
-	HelperGenerator generator;
+	CudaArrayGenerator generator;
 };
 
 } /* namespace ddj */
