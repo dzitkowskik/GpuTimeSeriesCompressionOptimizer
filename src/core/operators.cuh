@@ -111,4 +111,13 @@ struct NegateOperator
 	T operator()(const T &x) { return !x; }
 };
 
+template<typename T>
+struct FillOperator
+{
+	T value;
+
+	__host__ __device__
+	T operator()(const T &x) { return value; }
+};
+
 #endif /* OPERATORS_CUH_ */

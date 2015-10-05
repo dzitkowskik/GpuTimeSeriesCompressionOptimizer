@@ -1,5 +1,6 @@
 #include "util/histogram/cuda_histogram.hpp"
 #include "util/histogram/cuda_histogram_impl.cuh"
+#include "core/operators.cuh"
 #include <cmath>
 
 namespace ddj {
@@ -32,7 +33,7 @@ SharedCudaPtrPair<int, int> CudaHistogram::IntegerHistogram(SharedCudaPtr<int> d
     int distance = std::abs(std::get<1>(minMax) - std::get<0>(minMax)) + 1;
 
     auto counts = CudaPtr<int>::make_shared(distance);
-    this->_cudaKernels.ZeroInPlaceKernel(counts);
+    this->_transform.TransformInPlace(counts, ZeroOperator<int>());
 
     test_xform xform { std::get<0>(minMax) };
     test_sumfun sum;

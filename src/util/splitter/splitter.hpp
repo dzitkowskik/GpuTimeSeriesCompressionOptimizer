@@ -5,8 +5,8 @@
  *      Author: Karol Dzitkowski
  */
 
-#ifndef HELPER_UTIL_SPLITTER_HPP_
-#define HELPER_UTIL_SPLITTER_HPP_
+#ifndef DDJ_UTIL_SPLITTER_HPP_
+#define DDJ_UTIL_SPLITTER_HPP_
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
@@ -37,4 +37,4 @@ private:
 };
 
 } /* namespace ddj */
-#endif /* HELPER_UTIL_SPLITTER_HPP_ */
+#endif /* DDJ_UTIL_SPLITTER_HPP_ */

@@ -19,44 +19,6 @@
 namespace ddj
 {
 
-template<typename T, typename UnaryOperator>
-__global__ void transformInPlaceKernel(T* data, int size, UnaryOperator op)
-{
-	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
-	if (idx >= size) return;
-	data[idx] = op(data[idx]);
-}
-
-template<typename T, typename UnaryOperator>
-__global__ void transformKernel(const T* data, int size, UnaryOperator op, T* output)
-{
-	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
-	if (idx >= size) return;
-	output[idx] = op(data[idx]);
-}
-
-template<typename T, typename UnaryOperator>
-void TransformInPlace(SharedCudaPtr<T> data, UnaryOperator op)
-{
-	ExecutionPolicy policy;
-	policy.setSize(data->size());
-	cudaLaunch(policy, transformInPlaceKernel<T, UnaryOperator>,
-		data->get(), data->size(), op);
-	cudaDeviceSynchronize();
-}
-
-template<typename T, typename UnaryOperator>
-SharedCudaPtr<T> Transform(SharedCudaPtr<T> data, UnaryOperator op)
-{
-	ExecutionPolicy policy;
-	policy.setSize(data->size());
-	auto result = CudaPtr<T>::make_shared(data->size());
-	cudaLaunch(policy, transformKernel<T, UnaryOperator>,
-		data->get(), data->size(), op, result->get());
-	cudaDeviceSynchronize();
-	return result;
-}
-
 template<typename T>
 __global__ void _createConsecutiveNumbersArrayKernel(
     T* data, int size, T start)
@@ -64,62 +26,6 @@ __global__ void _createConsecutiveNumbersArrayKernel(
     unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	if (idx >= size) return;
 	data[idx] = start + idx;
-}
-
-template<typename T> SharedCudaPtr<T>
-HelperCudaKernels::ModuloKernel(SharedCudaPtr<T> data, T mod)
-{
-	ModulusOperator<T> op{mod};
-    return Transform(data, op);
-}
-
-template<typename T> void
-HelperCudaKernels::ModuloInPlaceKernel(SharedCudaPtr<T> data, T mod)
-{
-	ModulusOperator<T> op{mod};
-    TransformInPlace(data, op);
-}
-
-template<typename T> SharedCudaPtr<T>
-HelperCudaKernels::AdditionKernel(SharedCudaPtr<T> data, T val)
-{
-	AdditionOperator<T> op{val};
-    return Transform(data, op);
-}
-
-template<typename T> void
-HelperCudaKernels::AdditionInPlaceKernel(SharedCudaPtr<T> data, T val)
-{
-	AdditionOperator<T> op{val};
-    TransformInPlace(data, op);
-}
-
-template<typename T> SharedCudaPtr<T>
-HelperCudaKernels::AbsoluteKernel(SharedCudaPtr<T> data)
-{
-	AbsoluteOperator<T> op;
-    return Transform(data, op);
-}
-
-template<typename T> void
-HelperCudaKernels::AbsoluteInPlaceKernel(SharedCudaPtr<T> data)
-{
-	AbsoluteOperator<T> op;
-    TransformInPlace(data, op);
-}
-
-template<typename T> SharedCudaPtr<T>
-HelperCudaKernels::ZeroKernel(SharedCudaPtr<T> data)
-{
-	ZeroOperator<T> op;
-    return Transform(data, op);
-}
-
-template<typename T> void
-HelperCudaKernels::ZeroInPlaceKernel(SharedCudaPtr<T> data)
-{
-	ZeroOperator<T> op;
-    TransformInPlace(data, op);
 }
 
 template<typename T> SharedCudaPtr<T>
@@ -141,17 +47,6 @@ template<typename T> std::tuple<T,T> HelperCudaKernels::MinMax(SharedCudaPtr<T> 
 	T max = *(tuple.second);
 	return std::make_tuple(min, max);
 }
-
-#define MODULO_SPEC(X) \
-	template SharedCudaPtr<X> HelperCudaKernels::ZeroKernel<X>(SharedCudaPtr<X>); 			\
-	template void HelperCudaKernels::ZeroInPlaceKernel<X>(SharedCudaPtr<X>);				\
-	template SharedCudaPtr<X> HelperCudaKernels::AbsoluteKernel<X>(SharedCudaPtr<X>); 		\
-	template void HelperCudaKernels::AbsoluteInPlaceKernel<X>(SharedCudaPtr<X>);			\
-    template SharedCudaPtr<X> HelperCudaKernels::ModuloKernel<X>(SharedCudaPtr<X>, X); 		\
-    template void HelperCudaKernels::ModuloInPlaceKernel<X>(SharedCudaPtr<X>, X);			\
-	template SharedCudaPtr<X> HelperCudaKernels::AdditionKernel<X>(SharedCudaPtr<X>, X); 	\
-    template void HelperCudaKernels::AdditionInPlaceKernel<X>(SharedCudaPtr<X>, X);
-FOR_EACH(MODULO_SPEC, unsigned int, int)
 
 #define CUDA_KERNELS_OTHER_SPEC(X) \
 	template SharedCudaPtr<X> HelperCudaKernels::CreateConsecutiveNumbersArray<X>(int, X); \

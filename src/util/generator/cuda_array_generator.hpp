@@ -6,6 +6,8 @@
 #define DDJ_UTIL_CUDA_ARRAY_GENERATOR_HPP_
 
 #include "core/cuda_ptr.hpp"
+#include "util/transform/cuda_array_transform.hpp"
+
 #include <boost/noncopyable.hpp>
 #include <curand.h>
 
@@ -26,7 +28,8 @@ public:
     SharedCudaPtr<int> GenerateRandomStencil(int size);
 
 private:
-    curandGenerator_t gen;
+    curandGenerator_t _gen;
+    CudaArrayTransform _transform;
 };
 
 } /* namespace ddj */

@@ -7,21 +7,20 @@
 
 #include "core/cuda_ptr.hpp"
 #include "histogram_base.hpp"
+#include "util/transform/cuda_array_transform.hpp"
 #include "helpers/helper_cudakernels.cuh"
 
 namespace ddj {
 
 class CudaHistogram : public HistogramBase
 {
-
+    // TODO: Implement Histogram also as a template
 public:
     virtual SharedCudaPtrPair<int, int> IntegerHistogram(SharedCudaPtr<int> data);
 
-    // TODO: Implement Histogram also as a template
-
 private:
     HelperCudaKernels _cudaKernels;
-
+    CudaArrayTransform _transform;
 };
 
 } /* namespace ddj */
