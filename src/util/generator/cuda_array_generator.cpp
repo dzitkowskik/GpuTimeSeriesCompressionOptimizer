@@ -38,8 +38,7 @@ namespace ddj
 
 	SharedCudaPtr<int> CudaArrayGenerator::GenerateConsecutiveIntDeviceArray(int size)
 	{
-		HelperCudaKernels kernels;
-		return kernels.CreateConsecutiveNumbersArray<int>(size, 0);
+		return CreateConsecutiveNumbersArray<int>(size, 0);
 	}
 
 	SharedCudaPtr<int> CudaArrayGenerator::GenerateRandomStencil(int n)

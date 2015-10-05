@@ -19,26 +19,6 @@
 namespace ddj
 {
 
-template<typename T>
-__global__ void _createConsecutiveNumbersArrayKernel(
-    T* data, int size, T start)
-{
-    unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
-	if (idx >= size) return;
-	data[idx] = start + idx;
-}
-
-template<typename T> SharedCudaPtr<T>
-HelperCudaKernels::CreateConsecutiveNumbersArray(int size, T start)
-{
-    const int tpb = CREATE_NUM_KERNEL_BLOCK_SIZE;
-    int blocks = (size + tpb - 1) / tpb;
-    auto result = CudaPtr<T>::make_shared(size);
-    _createConsecutiveNumbersArrayKernel<<<blocks, tpb>>>(
-        result->get(), size, start);
-    return result;
-}
-
 template<typename T> std::tuple<T,T> HelperCudaKernels::MinMax(SharedCudaPtr<T> data)
 {
 	thrust::device_ptr<T> dp(data->get());
@@ -49,7 +29,6 @@ template<typename T> std::tuple<T,T> HelperCudaKernels::MinMax(SharedCudaPtr<T> 
 }
 
 #define CUDA_KERNELS_OTHER_SPEC(X) \
-	template SharedCudaPtr<X> HelperCudaKernels::CreateConsecutiveNumbersArray<X>(int, X); \
 	template std::tuple<X,X> HelperCudaKernels::MinMax<X>(SharedCudaPtr<X> data);
 FOR_EACH(CUDA_KERNELS_OTHER_SPEC, float, int, long int, long long int)
 

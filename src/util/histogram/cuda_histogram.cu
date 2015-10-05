@@ -1,6 +1,7 @@
 #include "util/histogram/cuda_histogram.hpp"
 #include "util/histogram/cuda_histogram_impl.cuh"
 #include "core/operators.cuh"
+#include "util/generator/cuda_array_generator.hpp"
 #include <cmath>
 
 namespace ddj {
@@ -41,7 +42,7 @@ SharedCudaPtrPair<int, int> CudaHistogram::IntegerHistogram(SharedCudaPtr<int> d
     callHistogramKernel<histogram_atomic_add, 1>
       (data->get(), xform, sum, 0, (int)data->size(), 0, counts->get(), distance, true);
 
-    auto keys = this->_cudaKernels.CreateConsecutiveNumbersArray(distance, std::get<0>(minMax));
+    auto keys = CudaArrayGenerator().CreateConsecutiveNumbersArray<int>(distance, std::get<0>(minMax));
     return SharedCudaPtrPair<int, int>(keys, counts);
 }
 

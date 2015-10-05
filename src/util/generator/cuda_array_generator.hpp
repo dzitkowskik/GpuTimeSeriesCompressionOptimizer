@@ -7,6 +7,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "util/transform/cuda_array_transform.hpp"
+#include "core/execution_policy.hpp"
 
 #include <boost/noncopyable.hpp>
 #include <curand.h>
@@ -27,9 +28,12 @@ public:
     SharedCudaPtr<int> GenerateConsecutiveIntDeviceArray(int size);
     SharedCudaPtr<int> GenerateRandomStencil(int size);
 
+    template<typename T> SharedCudaPtr<T> CreateConsecutiveNumbersArray(int size, T start);
+
 private:
     curandGenerator_t _gen;
     CudaArrayTransform _transform;
+    ExecutionPolicy _policy;
 };
 
 } /* namespace ddj */
