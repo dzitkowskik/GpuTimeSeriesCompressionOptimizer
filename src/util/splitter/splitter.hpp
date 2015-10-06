@@ -29,6 +29,9 @@ public:
 	template<typename T> SharedCudaPtr<T>
 	CopyIfNot(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 
+	template<typename T> SharedCudaPtr<T>
+	Merge(SharedCudaPtrTuple<T> data, SharedCudaPtr<int> stencil);
+
 private:
 	SharedCudaPtr<int> NegateStencil(SharedCudaPtr<int> stencil);
 

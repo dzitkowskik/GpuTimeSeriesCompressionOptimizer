@@ -54,7 +54,7 @@ TEST_F(SplitterTest, Split_no_empty)
     EXPECT_TRUE( CompareDeviceArrays(d_int_random_data->get(), get<0>(result)->get(), size) );
 }
 
-TEST_F(SplitterTest, Split_normal_int)
+TEST_F(SplitterTest, Split_manual_simple_int)
 {
     Splitter splitter;
 	auto data = d_int_random_data;
@@ -77,7 +77,7 @@ TEST_F(SplitterTest, Split_normal_int)
 			size/2) );
 }
 
-TEST_F(SplitterTest, Split_normal_float)
+TEST_F(SplitterTest, Split_manual_complex_float)
 {
     Splitter splitter;
 	auto data = d_float_random_data;
@@ -111,6 +111,26 @@ TEST_F(SplitterTest, Split_normal_float)
 			d_float_random_data->get()+(3*size/4),
 			get<0>(result)->get()+(size/4),
 			size/4) );
+}
+
+TEST_F(SplitterTest, Merge_manual_complex_int)
+{
+    Splitter splitter;
+	auto data = d_int_random_data;
+	int h_stencil[size];
+	auto d_stencil = CudaPtr<int>::make_shared(size);
+	for(int i=0; i<size; i++)
+	{
+		if(i < size/4) h_stencil[i] = 0;
+		else if(i < size/2) h_stencil[i] = 1;
+		else if(i < 3*size/4) h_stencil[i] = 0;
+		else h_stencil[i] = 1;
+	}
+	CUDA_CALL( cudaMemcpy(d_stencil->get(), h_stencil, size*sizeof(int), CPY_HTD) );
+	auto splittedData = splitter.Split(data, d_stencil);
+	auto result = splitter.Merge(splittedData, d_stencil);
+
+	EXPECT_TRUE( CompareDeviceArrays(data->get(), result->get(), data->size()) );
 }
 
 } /* namespace ddj */

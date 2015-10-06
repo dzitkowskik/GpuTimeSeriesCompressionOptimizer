@@ -88,6 +88,8 @@ SharedCudaPtrTuple<T> Splitter::Split(
         );
     }
 
+	cudaDeviceSynchronize();
+
 	return std::make_tuple(yes, no);
 }
 
@@ -128,15 +130,55 @@ SharedCudaPtr<T> Splitter::CopyIfNot(
 	return std::get<1>(result);
 }
 
+template<typename T>
+__global__ void _mergeKernel(
+		const int* stencil,
+		const int size,
+		const T* in_true,
+		const T* in_false,
+		const int* prefixSum_true,
+		const int* prefixSum_false,
+		T* result)
+{
+	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	if (idx >= size) return;
+
+	if(stencil[idx])
+		result[idx] = in_true[prefixSum_true[idx]];
+	else
+		result[idx] = in_false[prefixSum_false[idx]];
+}
+
+template<typename T>
+SharedCudaPtr<T> Splitter::Merge(SharedCudaPtrTuple<T> data, SharedCudaPtr<int> stencil)
+{
+	int size = stencil->size();
+	auto result = CudaPtr<T>::make_shared(size);
+	auto prefixSum_true = exclusivePrefixSum_thrust(stencil);
+	auto prefixSum_false = exclusivePrefixSum_thrust(NegateStencil(stencil));
+
+	this->_policy.setSize(size);
+	cudaLaunch(this->_policy, _mergeKernel<T>,
+		stencil->get(),
+		size,
+		std::get<0>(data)->get(),
+		std::get<1>(data)->get(),
+		prefixSum_true->get(),
+		prefixSum_false->get(),
+		result->get()
+	);
+
+	cudaDeviceSynchronize();
+
+	return result;
+}
+
 #define SPLITTER_SPEC(X) \
-	template SharedCudaPtrTuple<X> \
-	Splitter::Split<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
-	template SharedCudaPtrTuple<X> \
-	Splitter::Split2<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
-	template SharedCudaPtr<X> \
-	Splitter::CopyIf<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
-	template SharedCudaPtr<X> \
-	Splitter::CopyIfNot<X>(SharedCudaPtr<X>, SharedCudaPtr<int>);
+	template SharedCudaPtrTuple<X> Splitter::Split<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	template SharedCudaPtrTuple<X> Splitter::Split2<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	template SharedCudaPtr<X> Splitter::CopyIf<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	template SharedCudaPtr<X> Splitter::CopyIfNot<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	template SharedCudaPtr<X> Splitter::Merge<X>(SharedCudaPtrTuple<X>, SharedCudaPtr<int>);
 FOR_EACH(SPLITTER_SPEC, float, int)
 
 
