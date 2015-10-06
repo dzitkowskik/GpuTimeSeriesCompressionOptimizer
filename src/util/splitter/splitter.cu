@@ -63,7 +63,7 @@ SharedCudaPtr<int> Splitter::NegateStencil(SharedCudaPtr<int> stencil)
 }
 
 template<typename T>
-SharedCudaPtrTuple<T> Splitter::SplitKernel(
+SharedCudaPtrTuple<T> Splitter::Split(
 	SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
 	int out_size = 0;
@@ -92,7 +92,7 @@ SharedCudaPtrTuple<T> Splitter::SplitKernel(
 }
 
 template<typename T>
-SharedCudaPtrTuple<T> Splitter::SplitKernel2(
+SharedCudaPtrTuple<T> Splitter::Split2(
 		SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
 	int size = data->size();
@@ -113,31 +113,31 @@ SharedCudaPtrTuple<T> Splitter::SplitKernel2(
 }
 
 template<typename T>
-SharedCudaPtr<T> Splitter::CopyIfKernel(
+SharedCudaPtr<T> Splitter::CopyIf(
 		SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
-	auto result = SplitKernel(data, stencil);
+	auto result = Split(data, stencil);
 	return std::get<0>(result);
 }
 
 template<typename T>
-SharedCudaPtr<T> Splitter::CopyIfNotKernel(
+SharedCudaPtr<T> Splitter::CopyIfNot(
 		SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
-	auto result = SplitKernel(data, stencil);
+	auto result = Split(data, stencil);
 	return std::get<1>(result);
 }
 
-#define CUDA_KERNELS_SPEC(X) \
+#define SPLITTER_SPEC(X) \
 	template SharedCudaPtrTuple<X> \
-	Splitter::SplitKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	Splitter::Split<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtrTuple<X> \
-	Splitter::SplitKernel2<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	Splitter::Split2<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtr<X> \
-	Splitter::CopyIfKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
+	Splitter::CopyIf<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtr<X> \
-	Splitter::CopyIfNotKernel<X>(SharedCudaPtr<X>, SharedCudaPtr<int>);
-FOR_EACH(CUDA_KERNELS_SPEC, float, int)
+	Splitter::CopyIfNot<X>(SharedCudaPtr<X>, SharedCudaPtr<int>);
+FOR_EACH(SPLITTER_SPEC, float, int)
 
 
 } /* namespace ddj */

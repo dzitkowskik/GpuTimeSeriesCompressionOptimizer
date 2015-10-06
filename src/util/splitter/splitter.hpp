@@ -18,16 +18,16 @@ class Splitter
 {
 public:
 	template<typename T> SharedCudaPtrTuple<T>
-	SplitKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+	Split(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 
 	template<typename T> SharedCudaPtrTuple<T>
-	SplitKernel2(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+	Split2(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 
 	template<typename T> SharedCudaPtr<T>
-	CopyIfKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+	CopyIf(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 
 	template<typename T> SharedCudaPtr<T>
-	CopyIfNotKernel(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
+	CopyIfNot(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
 
 private:
 	SharedCudaPtr<int> NegateStencil(SharedCudaPtr<int> stencil);

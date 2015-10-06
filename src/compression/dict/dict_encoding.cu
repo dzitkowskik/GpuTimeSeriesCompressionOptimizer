@@ -197,7 +197,7 @@ SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
     auto histogram = CudaHistogram().IntegerHistogram(data);
     auto mostFrequent = GetMostFrequent(histogram, MOST_FREQ_VALUES_CNT);
     auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
-    auto splittedData = this->_splitter.SplitKernel(data, mostFrequentStencil);
+    auto splittedData = this->_splitter.Split(data, mostFrequentStencil);
     auto packedMostFrequentStencil = Stencil(mostFrequentStencil).pack();
     auto mostFrequentCompressed = CompressMostFrequent(std::get<0>(splittedData), mostFrequent);
     auto otherData = MoveSharedCudaPtr<int, char>(std::get<1>(splittedData));

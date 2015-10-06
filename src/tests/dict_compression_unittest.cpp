@@ -90,7 +90,7 @@ TEST_P(DictCompressionTest, CompressDecompressMostFrequent_random_int)
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
 
     auto stencil = dictEncoding.GetMostFrequentStencil(d_int_random_data, mostFrequent);
-    auto mostFrequentDataPart = std::get<0>(splitter.SplitKernel(d_int_random_data, stencil));
+    auto mostFrequentDataPart = std::get<0>(splitter.Split(d_int_random_data, stencil));
 
     auto encoded = dictEncoding.CompressMostFrequent(mostFrequentDataPart, mostFrequent);
     auto decoded =

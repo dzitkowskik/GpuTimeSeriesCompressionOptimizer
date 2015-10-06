@@ -50,7 +50,7 @@ void PatchedData<DT, OPT>::Init(SharedCudaPtr<DT> data)
         data->get(), data->size(), this->_stencil->get(), _op);
 
     // Split according to the stencil
-    this->_data = this->_splitter.SplitKernel(data, this->_stencil);
+    this->_data = this->_splitter.Split(data, this->_stencil);
 }
 
 template<typename DT, typename OPT>
