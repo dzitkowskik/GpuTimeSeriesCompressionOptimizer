@@ -5,8 +5,7 @@
 #ifndef DDJ_BENCHMARK_BASE_INLINE_HPP_
 #define DDJ_BENCHMARK_BASE_INLINE_HPP_
 
-#include "helpers/helper_generator.hpp"
-#include "core/cuda_ptr.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include <benchmark/benchmark.h>
 
 namespace ddj {
@@ -21,7 +20,7 @@ inline void Set_Statistics(benchmark::State& state)
 inline SharedCudaPtr<int> PrepareRandomIntData(benchmark::State& state)
 {
     state.PauseTiming();
-    HelperGenerator generator;
+    CudaArrayGenerator generator;
     auto d_data_shared = generator.GenerateRandomIntDeviceArray(state.range_x());
     state.ResumeTiming();
     return d_data_shared;

@@ -1,5 +1,4 @@
-#include "helpers/helper_generator.hpp"
-#include "core/cuda_ptr.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include "compression/patch/patched_data.hpp"
 #include "core/operators.cuh"
 #include "helpers/helper_print.hpp"
@@ -12,8 +11,7 @@ namespace ddj
 static void BM_Patch_ConsecutiveNumbers_Low_High(benchmark::State& state)
 {
     int n = state.range_x();
-    HelperGenerator generator;
-    auto d_data = generator.GenerateConsecutiveIntDeviceArray(n);
+    auto d_data = CudaArrayGenerator().GenerateConsecutiveIntDeviceArray(n);
     OutsideOperator<int> op{n/3, 2*n/3};
 
     while (state.KeepRunning())

@@ -8,7 +8,7 @@
 #ifndef DDJ_BENCHMARK_TEMPLATES_HPP_
 #define DDJ_BENCHMARK_TEMPLATES_HPP_
 
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include <benchmark/benchmark.h>
 
 namespace ddj {
@@ -16,7 +16,7 @@ namespace ddj {
 template<class C>
 static void Random_Float_Encode_Template(benchmark::State& state)
 {
-    HelperGenerator generator;
+    CudaArrayGenerator generator;
     C compression;
 
     while (state.KeepRunning())
@@ -26,11 +26,11 @@ static void Random_Float_Encode_Template(benchmark::State& state)
         state.ResumeTiming();
 
         // ENCODE
-        auto compr = compression.Encode(data);
+        auto compr = compression.template Encode<float>(data);
 
         state.PauseTiming();
         data.reset();
-        compr.reset();
+        compr.clear();
         state.ResumeTiming();
     }
 
@@ -42,14 +42,14 @@ static void Random_Float_Encode_Template(benchmark::State& state)
 template<class C>
 static void Random_Float_Decode_Template(benchmark::State& state)
 {
-    HelperGenerator generator;
+	CudaArrayGenerator generator;
     C compression;
 
     while (state.KeepRunning())
     {
         state.PauseTiming();
         auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
-        auto compr = compression.Encode(data);
+        auto compr = compression.template Encode<float>(data);
         state.ResumeTiming();
 
         // DECODE
@@ -57,7 +57,7 @@ static void Random_Float_Decode_Template(benchmark::State& state)
 
         state.PauseTiming();
         data.reset();
-        compr.reset();
+        compr.clear();
         decpr.reset();
         state.ResumeTiming();
     }
@@ -70,7 +70,7 @@ static void Random_Float_Decode_Template(benchmark::State& state)
 template<class C>
 static void Random_Int_Encode_Template(benchmark::State& state)
 {
-    HelperGenerator generator;
+	CudaArrayGenerator generator;
     C compression;
 
     while (state.KeepRunning())
@@ -80,11 +80,11 @@ static void Random_Int_Encode_Template(benchmark::State& state)
         state.ResumeTiming();
 
         // ENCODE
-        auto compr = compression.Encode(data);
+        auto compr = compression.template Encode<int>(data);
 
         state.PauseTiming();
         data.reset();
-        compr.reset();
+        compr.clear();
         state.ResumeTiming();
     }
 
@@ -96,14 +96,14 @@ static void Random_Int_Encode_Template(benchmark::State& state)
 template<class C>
 static void Random_Int_Decode_Template(benchmark::State& state)
 {
-    HelperGenerator generator;
+	CudaArrayGenerator generator;
     C compression;
 
     while (state.KeepRunning())
     {
         state.PauseTiming();
         auto data = generator.GenerateRandomIntDeviceArray(state.range_x());
-        auto compr = compression.Encode(data);
+        auto compr = compression.template Encode<int>(data);
         state.ResumeTiming();
 
         // DECODE
@@ -111,7 +111,7 @@ static void Random_Int_Decode_Template(benchmark::State& state)
 
         state.PauseTiming();
         data.reset();
-        compr.reset();
+        compr.clear();
         decpr.reset();
         state.ResumeTiming();
     }

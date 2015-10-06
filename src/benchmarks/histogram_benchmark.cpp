@@ -1,4 +1,3 @@
-#include "helpers/helper_generator.hpp"
 #include "core/cuda_ptr.hpp"
 #include "benchmark_base_inline.hpp"
 #include <benchmark/benchmark.h>

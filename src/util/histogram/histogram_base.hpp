@@ -12,6 +12,12 @@ namespace ddj {
 class HistogramBase
 {
 public:
+	HistogramBase(){}
+	virtual ~HistogramBase(){}
+	HistogramBase(const HistogramBase&) = default;
+	HistogramBase(HistogramBase&&) = default;
+
+public:
     virtual SharedCudaPtrPair<int, int> IntegerHistogram(SharedCudaPtr<int> data) = 0;
 };
 
