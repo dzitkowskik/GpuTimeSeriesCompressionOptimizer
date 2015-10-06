@@ -16,6 +16,7 @@ namespace ddj {
 class Stencil
 {
 public:
+	Stencil() {}
 	Stencil(SharedCudaPtr<char> data);
     Stencil(SharedCudaPtr<int> data) { _data = data; };
     Stencil(const Stencil& other) : _data(other._data) {}

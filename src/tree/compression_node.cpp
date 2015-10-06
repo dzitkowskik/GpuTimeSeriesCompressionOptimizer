@@ -121,14 +121,14 @@ SharedCudaPtr<char> CompressionNode::Decompress()
 
 	// ELSE
 	auto encoding = _encodingFactory.Get(_encodingType);
-	SharedCudaPtrVector<char> data;
+	SharedCudaPtrVector<char> data { _metadata };
 	for(auto& child : _children)
 	{
 		auto childResult = child->Decompress();
 		data.push_back(childResult);
 	}
-	auto concatenatedData = Concatenate(data);
-	return encoding->Decode(SharedCudaPtrVector<char> {_metadata, concatenatedData}, _dataType);
+
+	return encoding->Decode(data, _dataType);
 }
 
 } /* namespace ddj */

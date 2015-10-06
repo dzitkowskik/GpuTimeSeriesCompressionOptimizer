@@ -210,10 +210,22 @@ SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
 // 2. GET MOST FREQUENT DATA COMPRESSED AND DECOMPRESS IT
 // 3. USE STENCIL TO MERGE MOST FREQUENT DATA AND OTHER
 // 4. RETURN MERGED DATA
-//SharedCudaPtr<char> DictEncoding::Decode(SharedCudaPtrVector<char> data)
-//{
-//	auto stencil = data[0];
-//
-//}
+SharedCudaPtr<char> DictEncoding::Decode(SharedCudaPtrVector<char> input)
+{
+	// UNPACK STENCIL
+	auto stencil = Stencil(input[0]);
+	auto mostFrequentCompressed = input[1];
+	auto other = MoveSharedCudaPtr<char, int>(input[2]);
+
+	// DECOMPRESS MOST FREQUENT
+	thrust::device_ptr<int> stencil_ptr(stencil->get());
+	auto mostFrequentSize = thrust::count(stencil_ptr, stencil_ptr + stencil->size(), 1);
+	auto mostFrequent = DecompressMostFrequent(
+			mostFrequentCompressed, MOST_FREQ_VALUES_CNT, mostFrequentSize);
+
+	// MERGE DATA
+	auto merged = this->_splitter.Merge<int>(std::make_tuple(mostFrequent, other), *stencil);
+	return MoveSharedCudaPtr<int, char>(merged);
+}
 
 } /* namespace ddj */
