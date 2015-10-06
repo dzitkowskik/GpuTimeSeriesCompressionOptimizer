@@ -1,11 +1,15 @@
 #include "dict_encoding.hpp"
 #include "core/cuda_macros.cuh"
+#include "util/stencil/stencil.hpp"
+#include "util/histogram/cuda_histogram.hpp"
 #include "util/histogram/cuda_histogram.hpp"
 #include "helpers/helper_cuda.cuh"
+
 #include <thrust/sort.h>
 #include <thrust/device_ptr.h>
 #include <thrust/copy.h>
-#include "util/histogram/cuda_histogram.hpp"
+
+#define MOST_FREQ_VALUES_CNT 4
 
 namespace ddj {
 
@@ -57,7 +61,7 @@ SharedCudaPtr<int> DictEncoding::GetMostFrequentStencil(
 
 // MOST FREQUENT COMPRESSION ALGORITHM
 //
-// As the first block we save an array of most frequent values
+// As the first part we save an array of most frequent values
 // Then we compress all data (values from a set of most frequent values) using N bits
 // N is the smallest number of bits we can use to encode most frequent array length
 // We encode this way each value as it's index in most frequent values array. We save
@@ -187,18 +191,29 @@ SharedCudaPtr<int> DictEncoding::DecompressMostFrequent(
 //       a) GET DISTINCT NUMBERS AND GIVE THEM THE SHORTEST UNIQUE KEYS POSSIBLE
 //       b) LEAVE N UNIQUE VALUES AT BEGINNING
 //       c) REPLACE OTHER OCCURENCES OF THESE NUMBERS BY THEIR CODES (GREY CODE)
-//  6. RETURN A PAIR OF ARRAYS (MOST FREQUENT (COMPRESSED), OTHERS (UNCOMPRESSED))
+//  6. RETURN A VECTOR (STENCIL, MOST FREQUENT (COMPRESSED), OTHERS (UNCOMPRESSED))
+SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
+{
+    auto histogram = CudaHistogram().IntegerHistogram(data);
+    auto mostFrequent = GetMostFrequent(histogram, MOST_FREQ_VALUES_CNT);
+    auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
+    auto splittedData = this->_splitter.SplitKernel(data, mostFrequentStencil);
+    auto packedMostFrequentStencil = Stencil(mostFrequentStencil).pack();
+    auto mostFrequentCompressed = CompressMostFrequent(std::get<0>(splittedData), mostFrequent);
+    auto otherData = MoveSharedCudaPtr<int, char>(std::get<1>(splittedData));
+    return SharedCudaPtrVector<char> {packedMostFrequentStencil, mostFrequentCompressed, otherData};
+}
 
-//SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
+// DICT DECODING ALGORITHM
+//
+// 1. UNPACK STENCIL
+// 2. GET MOST FREQUENT DATA COMPRESSED AND DECOMPRESS IT
+// 3. USE STENCIL TO MERGE MOST FREQUENT DATA AND OTHER
+// 4. RETURN MERGED DATA
+//SharedCudaPtr<char> DictEncoding::Decode(SharedCudaPtrVector<char> data)
 //{
-//    auto histogram = CudaHistogram.IntegerHistogram(data);
-//    auto mostFrequent = GetMostFrequent(histogram, 4);
-//    auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
-//    auto splittedData = _cudaKernels.SplitKernel(data, mostFrequentStencil);
-//    auto packedMostFrequentStencil = Stencil(std::get<0>(splittedData)).pack();
-//    return NULL;
+//	auto stencil = data[0];
+//
 //}
-
-
 
 } /* namespace ddj */

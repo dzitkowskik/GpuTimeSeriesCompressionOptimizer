@@ -10,7 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
-#include "helpers/helper_cudakernels.cuh"
+#include "util/splitter/splitter.hpp"
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -20,16 +20,9 @@ class DictEncoding
 	ExecutionPolicy _policy;
 
 public:
-	// TODO: Implement as templates (DictEncoding)
-	// template<typename T> SharedCudaPtrVector<char>
-	// Encode(SharedCudaPtr<T> data);
-	//
-	// template<typename T> SharedCudaPtr<T>
-	// Decode(SharedCudaPtr<char> dataMostFrequent, SharedCudaPtr<char> dataRest);
-
-	// ONLY FOR NOW
-	// SharedCudaPtrVector<char> Encode(SharedCudaPtr<int> data);
-	// SharedCudaPtr<T> Decode(SharedCudaPtr<char> dataMostFrequent, SharedCudaPtr<char> dataRest);
+	// TODO: Implement as templates
+	SharedCudaPtrVector<char> Encode(SharedCudaPtr<int> data);
+	SharedCudaPtr<char> Decode(SharedCudaPtrVector<char> data);
 
 private:
 	SharedCudaPtr<int> GetMostFrequent(
@@ -41,15 +34,15 @@ private:
     SharedCudaPtr<char> CompressMostFrequent(
         SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent);
 
-	SharedCudaPtr<int> DecompressMostFrequent(
-		SharedCudaPtr<char> data, int freqCnt, int outputSize);
-
-	HelperCudaKernels _cudaKernels;
+	SharedCudaPtr<int> DecompressMostFrequent(SharedCudaPtr<char> data, int freqCnt, int outputSize);
 
 	friend class DictCompressionTest;
  	FRIEND_TEST(DictCompressionTest, GetMostFrequent_fake_data);
 	FRIEND_TEST(DictCompressionTest, GetMostFrequent_random_int);
 	FRIEND_TEST(DictCompressionTest, CompressDecompressMostFrequent_random_int);
+
+private:
+	Splitter _splitter;
 };
 
 } /* namespace ddj */

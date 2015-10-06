@@ -4,6 +4,11 @@
 
 namespace ddj {
 
+Stencil::Stencil(SharedCudaPtr<char> data)
+{
+	this->_data = unpack(data);
+}
+
 __global__ void packKernel(int* data, int dataSize, char* output, int outputSize)
 {
     unsigned int output_idx = threadIdx.x + blockIdx.x * blockDim.x; // char array index
@@ -46,25 +51,43 @@ SharedCudaPtr<char> Stencil::pack()
 {
     int dataSize = this->_data->size();
     int charsNeeded = (dataSize + 7) / 8;
-    auto result = CudaPtr<char>::make_shared(charsNeeded);
+    auto result = CudaPtr<char>::make_shared(charsNeeded + 1);
 
     this->_policy.setSize(charsNeeded);
     cudaLaunch(this->_policy, packKernel,
-        this->_data->get(), dataSize, result->get(), result->size());
+        this->_data->get(), dataSize, result->get()+1, result->size()-1);
+
+    char rest = dataSize % 8;
+    CUDA_CALL( cudaMemcpy(result->get(), &rest, 1, CPY_HTD) );
+
+    cudaDeviceSynchronize();
 
     return result;
 }
 
-Stencil Stencil::unpack(SharedCudaPtr<char> data, int numElements)
+SharedCudaPtr<int> Stencil::unpack(SharedCudaPtr<char> data)
 {
-    ExecutionPolicy policy;
+	// GET NUMBER OF ELEMENTS
+	char rest;
+	CUDA_CALL( cudaMemcpy(&rest, data->get(), 1, CPY_DTH) );
+	int numElements = (data->size()-1)*8;
+	if(rest) numElements -= 8 - rest;
+
+	// PREAPARE MEMORY FOR RESULT
     auto result = CudaPtr<int>::make_shared(numElements);
     
-    policy.setSize(data->size());
-    cudaLaunch(policy, unpackKernel,
-        data->get(), data->size(), result->get(), result->size());
+	// UNPACK STENCIL
+    this->_policy.setSize(data->size());
+    cudaLaunch(this->_policy, unpackKernel,
+        data->get()+1,
+        data->size()-1,
+        result->get(),
+        result->size()
+	);
 
-    return Stencil(result);
+    cudaDeviceSynchronize();
+
+    return result;
 }
 
 }/* namespace ddj */

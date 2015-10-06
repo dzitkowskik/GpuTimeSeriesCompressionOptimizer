@@ -12,7 +12,7 @@ namespace ddj {
 class SplitterTest : public testing::Test
 {
 protected:
-	SplitterTest() : size(10000)
+	SplitterTest() : size(10003)
     {
 		HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();

@@ -16,14 +16,20 @@ namespace ddj {
 class Stencil
 {
 public:
+	Stencil(SharedCudaPtr<char> data);
     Stencil(SharedCudaPtr<int> data) { _data = data; };
+    Stencil(const Stencil& other) : _data(other._data) {}
+    Stencil(Stencil&& other) noexcept : _data(std::move(other._data)) {}
     ~Stencil() {}
 
     SharedCudaPtr<int> operator->() const
     { return this->_data; }
 
+    SharedCudaPtr<int> operator*() const
+    { return this->_data; }
+
     SharedCudaPtr<char> pack();
-    static Stencil unpack(SharedCudaPtr<char> data, int numElements);
+    SharedCudaPtr<int> unpack(SharedCudaPtr<char> data);
 
 private:
     SharedCudaPtr<int> _data;
