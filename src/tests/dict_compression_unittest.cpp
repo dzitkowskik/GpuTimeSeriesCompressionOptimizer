@@ -109,4 +109,30 @@ TEST_P(DictCompressionTest, CompressDecompressMostFrequent_random_int)
         );
 }
 
+TEST_P(DictCompressionTest, ComressDecompress_random_int_noexception)
+{
+	DictEncoding encoding;
+	auto compressed = encoding.Encode(d_int_random_data);
+	auto decompressed = encoding.Decode(compressed);
+}
+
+TEST_P(DictCompressionTest, ComressDecompress_random_int_size)
+{
+	DictEncoding encoding;
+	auto compressed = encoding.Encode(d_int_random_data);
+	auto decompressed = encoding.Decode(compressed);
+
+	EXPECT_EQ(d_int_random_data->size(), decompressed->size());
+}
+
+TEST_P(DictCompressionTest, ComressDecompress_random_int_data)
+{
+	DictEncoding encoding;
+	auto data = d_int_random_data;
+	auto compressed = encoding.Encode(data);
+	auto decompressed = encoding.Decode(compressed);
+
+	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
+}
+
 } /* namespace ddj */

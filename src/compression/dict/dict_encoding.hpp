@@ -22,7 +22,7 @@ class DictEncoding
 public:
 	// TODO: Implement as templates
 	SharedCudaPtrVector<char> Encode(SharedCudaPtr<int> data);
-	SharedCudaPtr<char> Decode(SharedCudaPtrVector<char> data);
+	SharedCudaPtr<int> Decode(SharedCudaPtrVector<char> data);
 
 private:
 	SharedCudaPtr<int> GetMostFrequent(
