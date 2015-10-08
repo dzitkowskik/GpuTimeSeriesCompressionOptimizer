@@ -25,9 +25,6 @@ public:
 	SharedCudaPtr<int> Decode(SharedCudaPtrVector<char> data);
 
 private:
-	SharedCudaPtr<int> GetMostFrequent(
-		SharedCudaPtrPair<int, int> histogram, int freqCnt);
-
     SharedCudaPtr<int> GetMostFrequentStencil(
 		SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent);
 
@@ -37,8 +34,6 @@ private:
 	SharedCudaPtr<int> DecompressMostFrequent(SharedCudaPtr<char> data, int freqCnt, int outputSize);
 
 	friend class DictCompressionTest;
- 	FRIEND_TEST(DictCompressionTest, GetMostFrequent_fake_data);
-	FRIEND_TEST(DictCompressionTest, GetMostFrequent_random_int);
 	FRIEND_TEST(DictCompressionTest, CompressDecompressMostFrequent_random_int);
 
 private:

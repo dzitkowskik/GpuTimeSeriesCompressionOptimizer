@@ -18,6 +18,8 @@ class Histogram
 {
 public:
 	template<typename T> SharedCudaPtrPair<T, int> Calculate(SharedCudaPtr<T> data);
+	template<typename T> SharedCudaPtr<T> GetMostFrequent(SharedCudaPtr<T> data, int freqCnt);
+	template<typename T> SharedCudaPtr<T> GetMostFrequent(SharedCudaPtrPair<T, int> histogram, int freqCnt);
 
 private:
 	template<typename T> SharedCudaPtrPair<T, int> ThrustSparseHistogram(SharedCudaPtr<T> data);
@@ -25,12 +27,17 @@ private:
 	template<typename T> SharedCudaPtrPair<T, int> CudaHistogramIntegral(SharedCudaPtr<T> data);
 	template<typename T> SharedCudaPtrPair<T, int> CudaHistogram(SharedCudaPtr<T> data);
 
+	template<typename T> SharedCudaPtr<T> GetMostFrequentSparse(SharedCudaPtrPair<T, int>, int);
+
 private:
 	CudaArrayTransform _transform;
 	HelperCudaKernels _cudaKernels;
 
 	friend class HistogramTest;
  	FRIEND_TEST(HistogramTest, ThrustDenseHistogram_RandomIntegerArray);
+ 	FRIEND_TEST(HistogramTest, GetMostFrequent_fake_data);
+	FRIEND_TEST(HistogramTest, GetMostFrequent_random_int);
+
 };
 
 } /* namespace ddj */

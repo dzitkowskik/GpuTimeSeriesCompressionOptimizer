@@ -9,9 +9,72 @@
 #include <vector>
 #include <iostream>
 #include <boost/bind.hpp>
+#include <thrust/execution_policy.h>
+#include <thrust/sort.h>
 
 namespace ddj
 {
+
+SharedCudaPtrPair<int, int> fakeIntHistogram(int size)
+{
+    int mod = size / 10;
+    int big = size/3;
+    std::vector<int> h_fakeData;
+    for(int i = 0; i < size; i++)
+    {
+        if(i%mod == 0 || i%mod == 1)
+            h_fakeData.push_back(size);
+        else
+            h_fakeData.push_back(i%mod);
+    }
+    auto d_fakeData = CudaPtr<int>::make_shared(size);
+    d_fakeData->fillFromHost(h_fakeData.data(), size);
+    return Histogram().Calculate(d_fakeData);
+}
+
+template<typename T>
+bool CheckMostFrequent(
+    SharedCudaPtrPair<T,int> histogram,
+    SharedCudaPtr<T> mostFrequent,
+    int mostFreqCnt)
+{
+    auto h_histogramKeys = histogram.first->copyToHost();
+    auto h_histogramValues = histogram.second->copyToHost();
+    auto h_mostFrequent = mostFrequent->copyToHost();
+
+    // Sort in descending order using thrust on host using values as keys (CPU)
+    thrust::sort_by_key(
+        thrust::host,
+        h_histogramValues->data(),
+        h_histogramValues->data() + h_histogramKeys->size(),
+        h_histogramKeys->data(),
+        thrust::greater<int>());
+
+    for(int i = 0; i < mostFreqCnt; i++)
+        if(h_mostFrequent->at(i) != h_histogramKeys->at(i))
+            return false;
+
+    return true;
+}
+
+
+TEST_F(HistogramTest, GetMostFrequent_fake_data)
+{
+    int mostFreqCnt = 3;
+    auto fakedHistogram = fakeIntHistogram(size);
+    auto mostFrequent = Histogram().GetMostFrequent(fakedHistogram, mostFreqCnt);
+    int expected = size, actual;
+    CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_F(HistogramTest, GetMostFrequent_random_int)
+{
+    int mostFreqCnt = 4;
+    auto randomHistogram = Histogram().Calculate(d_int_random_data);
+    auto mostFrequent = Histogram().GetMostFrequent(randomHistogram, mostFreqCnt);
+    EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
+}
 
 TEST(SimpleCpuHistogramTest, AllOnes)
 {

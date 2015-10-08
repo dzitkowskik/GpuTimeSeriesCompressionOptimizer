@@ -4,30 +4,12 @@
 #include "util/histogram/histogram.hpp"
 #include "helpers/helper_cuda.cuh"
 
-#include <thrust/sort.h>
 #include <thrust/device_ptr.h>
-#include <thrust/copy.h>
+#include <thrust/count.h>
 
 #define MOST_FREQ_VALUES_CNT 4
 
 namespace ddj {
-
-SharedCudaPtr<int> DictEncoding::GetMostFrequent(SharedCudaPtrPair<int, int> histogram, int freqCnt)
-{
-    thrust::device_ptr<int> keys_ptr(histogram.first->get());
-    thrust::device_ptr<int> counts_ptr(histogram.second->get());
-    int N = histogram.first->size();
-
-    // sort to have greater counts first
-    thrust::sort_by_key(counts_ptr, counts_ptr + N, keys_ptr, thrust::greater<int>());
-
-    // get first freqCnt keys
-    auto result = CudaPtr<int>::make_shared(freqCnt);
-    thrust::device_ptr<int> result_ptr(result->get());
-    thrust::copy_n(keys_ptr, freqCnt, result_ptr);
-
-    return result;
-}
 
 __global__ void getMostFrequentStencilKernel(
     int* data, int size, int* mostFrequent, int freqCnt, int* output)
@@ -193,8 +175,7 @@ SharedCudaPtr<int> DictEncoding::DecompressMostFrequent(
 //  6. RETURN A VECTOR (STENCIL, MOST FREQUENT (COMPRESSED), OTHERS (UNCOMPRESSED))
 SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
 {
-    auto histogram = Histogram().Calculate<int>(data);
-    auto mostFrequent = GetMostFrequent(histogram, MOST_FREQ_VALUES_CNT);
+	auto mostFrequent = Histogram().GetMostFrequent(data, MOST_FREQ_VALUES_CNT);
     auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
     auto splittedData = this->_splitter.Split(data, mostFrequentStencil);
     auto packedMostFrequentStencil = Stencil(mostFrequentStencil).pack();
