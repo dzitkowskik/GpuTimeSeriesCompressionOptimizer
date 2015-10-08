@@ -26,7 +26,7 @@ public:
 
 public:
 	void SetFreqCnt(int freqCnt) { _freqCnt = freqCnt; }
-	unsigned int GetNumberOfResults() { return 1; }
+	unsigned int GetNumberOfResults() { return 2; }
 
 protected:
 	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data)
