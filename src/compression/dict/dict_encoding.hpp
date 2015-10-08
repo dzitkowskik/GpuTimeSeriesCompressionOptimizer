@@ -17,27 +17,32 @@ namespace ddj {
 
 class DictEncoding
 {
-	ExecutionPolicy _policy;
+public:
+	DictEncoding() : _freqCnt(4) {}
+	~DictEncoding() {}
+	DictEncoding(const DictEncoding&) = default;
+	DictEncoding(DictEncoding&&) = default;
 
 public:
-	// TODO: Implement as templates
-	SharedCudaPtrVector<char> Encode(SharedCudaPtr<int> data);
-	SharedCudaPtr<int> Decode(SharedCudaPtrVector<char> data);
+	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);
+	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtrVector<char> data);
 
 private:
-    SharedCudaPtr<int> GetMostFrequentStencil(
-		SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent);
+	template<typename T>
+    SharedCudaPtr<int> GetMostFrequentStencil(SharedCudaPtr<T> data, SharedCudaPtr<T> mostFrequent);
 
-    SharedCudaPtr<char> CompressMostFrequent(
-        SharedCudaPtr<int> data, SharedCudaPtr<int> mostFrequent);
+public:
+	void SetFreqCnt(int freqCnt) { _freqCnt = freqCnt; }
 
-	SharedCudaPtr<int> DecompressMostFrequent(SharedCudaPtr<char> data, int freqCnt, int outputSize);
-
-	friend class DictCompressionTest;
-	FRIEND_TEST(DictCompressionTest, CompressDecompressMostFrequent_random_int);
+private:
+	int _freqCnt;
 
 private:
 	Splitter _splitter;
+	ExecutionPolicy _policy;
+
+	friend class DictCompressionTest;
+	FRIEND_TEST(DictCompressionTest, CompressDecompressMostFrequent_random_int);
 };
 
 } /* namespace ddj */

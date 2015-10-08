@@ -92,10 +92,10 @@ SharedCudaPtrPair<T, int> Histogram::CudaHistogram(SharedCudaPtr<T> data)
 #define CUDA_HISTOGRAM_INTEGRAL_SPEC(X) \
 	template SharedCudaPtrPair<X, int> Histogram::CudaHistogramIntegral<X>(SharedCudaPtr<X>); \
 	template SharedCudaPtrPair<X, int> Histogram::CudaHistogram<X>(SharedCudaPtr<X>);
-FOR_EACH(CUDA_HISTOGRAM_INTEGRAL_SPEC, int, unsigned int, long int, long long int)
+FOR_EACH(CUDA_HISTOGRAM_INTEGRAL_SPEC, int, long long, unsigned int)
 
 #define CUDA_HISTOGRAM_FLOATING_POINT_SPEC(X) \
 	template SharedCudaPtrPair<X, int> Histogram::CudaHistogram<X>(SharedCudaPtr<X>);
-FOR_EACH(CUDA_HISTOGRAM_FLOATING_POINT_SPEC, float, double)
+FOR_EACH(CUDA_HISTOGRAM_FLOATING_POINT_SPEC, float)
 
 } /* namespace ddj */

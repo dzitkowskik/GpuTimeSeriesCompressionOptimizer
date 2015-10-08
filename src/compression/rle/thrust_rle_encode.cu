@@ -50,6 +50,6 @@ void* ThrustRleCompression::Encode(T* data, const int in_size, int& out_size)
 
 #define RLE_ENCODE_SPEC(X) \
     template void* ThrustRleCompression::Encode<X>(X* data, const int in_size, int& out_size);
-FOR_EACH(RLE_ENCODE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
+FOR_EACH(RLE_ENCODE_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

@@ -60,6 +60,6 @@ T* ThrustRleCompression::Decode(void* data, int in_size, int& out_size)
 
 #define SCALE_DECODE_SPEC(X) \
     template X* ThrustRleCompression::Decode<X>(void* data, int in_size, int& out_size);
-FOR_EACH(SCALE_DECODE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
+FOR_EACH(SCALE_DECODE_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

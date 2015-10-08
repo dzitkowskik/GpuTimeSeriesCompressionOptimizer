@@ -82,6 +82,6 @@ SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtrVector<char> input)
 #define SCALE_SPEC(X) \
 	template SharedCudaPtrVector<char> ScaleEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> ScaleEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(SCALE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
+FOR_EACH(SCALE_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

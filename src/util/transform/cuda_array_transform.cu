@@ -73,7 +73,7 @@ SharedCudaPtr<T> CudaArrayTransform::Transform(SharedCudaPtr<T> data, UnaryOpera
     template SharedCudaPtr<X> CudaArrayTransform::Transform<X, OneOperator<X>>(SharedCudaPtr<X>, OneOperator<X> op); \
     template SharedCudaPtr<X> CudaArrayTransform::Transform<X, NegateOperator<X>>(SharedCudaPtr<X>, NegateOperator<X> op); \
     template SharedCudaPtr<X> CudaArrayTransform::Transform<X, FillOperator<X>>(SharedCudaPtr<X>, FillOperator<X> op);
-FOR_EACH(TRANSFORM_SPEC, double, float, int, unsigned int, long, unsigned long, long long int, unsigned long long int)
+FOR_EACH(TRANSFORM_SPEC, float, int, long long, unsigned int)
 
 #define TRANSFORM_IN_PLACE_SPEC(X) \
 	template void CudaArrayTransform::TransformInPlace<X, OutsideOperator<X>>(SharedCudaPtr<X>, OutsideOperator<X> op); \
@@ -86,12 +86,12 @@ FOR_EACH(TRANSFORM_SPEC, double, float, int, unsigned int, long, unsigned long, 
     template void CudaArrayTransform::TransformInPlace<X, OneOperator<X>>(SharedCudaPtr<X>, OneOperator<X> op); \
     template void CudaArrayTransform::TransformInPlace<X, NegateOperator<X>>(SharedCudaPtr<X>, NegateOperator<X> op); \
     template void CudaArrayTransform::TransformInPlace<X, FillOperator<X>>(SharedCudaPtr<X>, FillOperator<X> op);
-FOR_EACH(TRANSFORM_IN_PLACE_SPEC, double, float, int, unsigned int, long, unsigned long, long long int, unsigned long long int)
+FOR_EACH(TRANSFORM_IN_PLACE_SPEC, float, int, long long, unsigned int)
 
 #define TRANS_MODULUS_SPEC(X) \
     template SharedCudaPtr<X> CudaArrayTransform::Transform<X, ModulusOperator<X>>(SharedCudaPtr<X>, ModulusOperator<X> op); \
     template void CudaArrayTransform::TransformInPlace<X, ModulusOperator<X>>(SharedCudaPtr<X>, ModulusOperator<X> op);
-FOR_EACH(TRANS_MODULUS_SPEC, int, unsigned int, long, unsigned long, long long int, unsigned long long int)
+FOR_EACH(TRANS_MODULUS_SPEC, int, long long, unsigned int)
 
 
 } /* namespace ddj */

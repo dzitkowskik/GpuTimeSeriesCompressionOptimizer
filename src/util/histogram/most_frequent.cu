@@ -25,6 +25,6 @@ SharedCudaPtr<T> Histogram::GetMostFrequentSparse(SharedCudaPtrPair<T, int> hist
 
 #define MOST_FREQ_SPARSE_SPEC(X) \
 	template SharedCudaPtr<X> Histogram::GetMostFrequentSparse<X>(SharedCudaPtrPair<X, int>, int);
-FOR_EACH(MOST_FREQ_SPARSE_SPEC, float, double, int, unsigned int, long int, long long int)
+FOR_EACH(MOST_FREQ_SPARSE_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

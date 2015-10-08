@@ -21,8 +21,7 @@ template<> SharedCudaPtr<int> Histogram::GetMostFrequent(SharedCudaPtr<int> data
 	return GetMostFrequentSparse(histogram, freqCnt);
 }
 
-template<> SharedCudaPtr<int> Histogram::GetMostFrequent(
-		SharedCudaPtrPair<int, int> histogram, int freqCnt)
+template<> SharedCudaPtr<int> Histogram::GetMostFrequent(SharedCudaPtrPair<int, int> histogram, int freqCnt)
 {
 	return GetMostFrequentSparse(histogram, freqCnt);
 }
@@ -44,5 +43,25 @@ template<> SharedCudaPtr<float> Histogram::GetMostFrequent(
 {
 	return GetMostFrequentSparse(histogram, freqCnt);
 }
+
+// REST
+template<typename T>
+SharedCudaPtr<T> Histogram::GetMostFrequent(SharedCudaPtr<T> data, int freqCnt)
+{
+	auto histogram = ThrustSparseHistogram(data);
+	return GetMostFrequentSparse(histogram, freqCnt);
+}
+
+template<typename T>
+SharedCudaPtr<T> Histogram::GetMostFrequent(SharedCudaPtrPair<T, int> histogram, int freqCnt)
+{
+	return GetMostFrequentSparse(histogram, freqCnt);
+}
+
+#define DELTA_ENCODING_SPEC(X) \
+	template SharedCudaPtr<X> Histogram::GetMostFrequent<X>(SharedCudaPtr<X>, int); \
+	template SharedCudaPtr<X> Histogram::GetMostFrequent<X>(SharedCudaPtrPair<X, int>, int);
+FOR_EACH(DELTA_ENCODING_SPEC, long long, unsigned int)
+
 
 } /* namespace ddj */

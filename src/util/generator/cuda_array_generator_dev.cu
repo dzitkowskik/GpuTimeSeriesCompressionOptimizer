@@ -55,6 +55,6 @@ CudaArrayGenerator::CreateConsecutiveNumbersArray(int size, T start, T step)
 #define CUDA_ARRAY_GENERATOR_SPEC(X) \
 	template SharedCudaPtr<X> CudaArrayGenerator::CreateConsecutiveNumbersArray<X>(int, X); \
 	template SharedCudaPtr<X> CudaArrayGenerator::CreateConsecutiveNumbersArray<X>(int, X, X);
-FOR_EACH(CUDA_ARRAY_GENERATOR_SPEC, double, float, int, unsigned int, long int, long long int)
+FOR_EACH(CUDA_ARRAY_GENERATOR_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

@@ -45,6 +45,6 @@ SharedCudaPtrPair<T, int> Histogram::ThrustDenseHistogram(SharedCudaPtr<T> data)
 
 #define THRUST_DENSE_HISTOGRAM_SPEC(X) \
 	template SharedCudaPtrPair<X, int> Histogram::ThrustDenseHistogram<X>(SharedCudaPtr<X>);
-FOR_EACH(THRUST_DENSE_HISTOGRAM_SPEC, float, double, int, unsigned int, long int, long long int)
+FOR_EACH(THRUST_DENSE_HISTOGRAM_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

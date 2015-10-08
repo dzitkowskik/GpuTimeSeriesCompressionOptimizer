@@ -54,4 +54,4 @@ template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
 }
 
 #define COMP_SPEC(X) template bool CompareDeviceArrays <X> (X* a, X* b, int size);
-FOR_EACH(COMP_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
+FOR_EACH(COMP_SPEC, float, int, long long, unsigned int)

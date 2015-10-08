@@ -179,7 +179,7 @@ SharedCudaPtr<T> Splitter::Merge(SharedCudaPtrTuple<T> data, SharedCudaPtr<int> 
 	template SharedCudaPtr<X> Splitter::CopyIf<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtr<X> Splitter::CopyIfNot<X>(SharedCudaPtr<X>, SharedCudaPtr<int>); \
 	template SharedCudaPtr<X> Splitter::Merge<X>(SharedCudaPtrTuple<X>, SharedCudaPtr<int>);
-FOR_EACH(SPLITTER_SPEC, float, int)
+FOR_EACH(SPLITTER_SPEC, float, int, long long, unsigned int)
 
 
 } /* namespace ddj */

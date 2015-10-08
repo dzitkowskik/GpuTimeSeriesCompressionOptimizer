@@ -80,6 +80,6 @@ bool EncodeDecodeUnittestHelper::TestContent2(
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<X> data)> encodeFunction,\
 			boost::function<SharedCudaPtr<X> (SharedCudaPtrVector<char> data)> decodeFunction,\
 			SharedCudaPtr<X> data);
-FOR_EACH(SCALE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
+FOR_EACH(SCALE_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

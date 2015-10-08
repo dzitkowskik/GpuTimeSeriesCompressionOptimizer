@@ -51,6 +51,6 @@ SharedCudaPtrPair<T, int> Histogram::ThrustSparseHistogram(SharedCudaPtr<T> data
 
 #define THRUST_SPARSE_HISTOGRAM_SPEC(X) \
 	template SharedCudaPtrPair<X, int> Histogram::ThrustSparseHistogram<X>(SharedCudaPtr<X>);
-FOR_EACH(THRUST_SPARSE_HISTOGRAM_SPEC, float, double, int, unsigned int, long int, long long int)
+FOR_EACH(THRUST_SPARSE_HISTOGRAM_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */
