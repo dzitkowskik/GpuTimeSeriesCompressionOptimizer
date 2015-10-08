@@ -12,6 +12,7 @@
 #include "compression/scale/scale_encoding.hpp"
 #include "compression/delta/delta_encoding.hpp"
 #include "compression/afl/afl_encoding.hpp"
+#include "compression/dict/dict_encoding.hpp"
 
 #include <thrust/device_ptr.h>
 #include <boost/bind.hpp>
@@ -141,6 +142,56 @@ TEST_P(AflCompressionTest, CompressionOfRandomInts_data)
 		boost::bind(&AflEncoding::Encode<int>, encoder, _1),
 		boost::bind(&AflEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
+	);
+}
+
+
+INSTANTIATE_TEST_CASE_P(
+	DictEncoding_Compression_Inst,
+	DictCompressionTest,
+    ::testing::Values(10, 1000, 10000));
+
+TEST_P(DictCompressionTest, CompressionOfRandomInts_size)
+{
+	DictEncoding encoder;
+    EXPECT_TRUE(
+    EncodeDecodeUnittestHelper::TestSize2<int>(
+		boost::bind(&DictEncoding::Encode<int>, encoder, _1),
+		boost::bind(&DictEncoding::Decode<int>, encoder, _1),
+		d_int_random_data)
+    );
+}
+
+TEST_P(DictCompressionTest, CompressionOfRandomInts_data)
+{
+	DictEncoding encoder;
+	EXPECT_TRUE(
+	EncodeDecodeUnittestHelper::TestContent2<int>(
+		boost::bind(&DictEncoding::Encode<int>, encoder, _1),
+		boost::bind(&DictEncoding::Decode<int>, encoder, _1),
+		d_int_random_data)
+	);
+}
+
+TEST_P(DictCompressionTest, CompressionOfRandomFloats_size)
+{
+	DictEncoding encoder;
+    EXPECT_TRUE(
+    EncodeDecodeUnittestHelper::TestSize2<float>(
+		boost::bind(&DictEncoding::Encode<float>, encoder, _1),
+		boost::bind(&DictEncoding::Decode<float>, encoder, _1),
+		d_float_random_data)
+    );
+}
+
+TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
+{
+	DictEncoding encoder;
+	EXPECT_TRUE(
+	EncodeDecodeUnittestHelper::TestContent2<float>(
+		boost::bind(&DictEncoding::Encode<float>, encoder, _1),
+		boost::bind(&DictEncoding::Decode<float>, encoder, _1),
+		d_float_random_data)
 	);
 }
 

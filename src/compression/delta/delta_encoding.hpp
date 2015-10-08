@@ -20,6 +20,7 @@ public:
 	DeltaEncoding(){}
 	~DeltaEncoding(){}
 	DeltaEncoding(const DeltaEncoding&) = default;
+	DeltaEncoding(DeltaEncoding&&) = default;
 
 public:
 	unsigned int GetNumberOfResults() { return 1; }

@@ -30,8 +30,8 @@ private:
 	ExecutionPolicy _policy;
 
 	friend class DictEncoding;
-	friend class DictCompressionTest;
-	FRIEND_TEST(DictCompressionTest, CompressDecompressMostFrequent_random_int);
+	friend class MostFrequentTest;
+	FRIEND_TEST(MostFrequentTest, CompressDecompressMostFrequent_random_int);
 };
 
 } /* namespace ddj */

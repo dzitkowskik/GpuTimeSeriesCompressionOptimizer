@@ -16,11 +16,10 @@
 
 namespace ddj {
 
-class DictCompressionTest : public testing::Test,
-    public ::testing::WithParamInterface<int>
+class StandardParamTestBase : public testing::Test, public ::testing::WithParamInterface<int>
 {
 protected:
-	DictCompressionTest() : size(10000)
+	StandardParamTestBase() : size(10000)
     {
 		HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
@@ -30,9 +29,11 @@ protected:
 	{
 		int n = size;
 		d_int_random_data = generator.GenerateRandomIntDeviceArray(n, 100, 1000);
+		d_float_random_data = generator.GenerateRandomFloatDeviceArray(n);
 	}
 
 	SharedCudaPtr<int> d_int_random_data;
+	SharedCudaPtr<float> d_float_random_data;
 	const int size;
 
 private:

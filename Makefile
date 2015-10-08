@@ -57,9 +57,6 @@ debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
 debug: export EXCLUDED_FILES := \
 	-not -iname 'main_tests.cpp' \
 	-not -iname 'main_benchmarks.cpp'
-debug: export EXCLUDED_DIRECTORIES := \
-	-not -path '*/tests/*' \
-	-not -path '*/benchmarks/*'
 debug: export BUILD_PATH := build/debug
 debug: export BIN_PATH := bin/debug
 

@@ -1,6 +1,15 @@
-#include "core/cuda_ptr.hpp"
-#include <gtest/gtest.h>
+#include "standard_param_unittest_base.hpp"
+#include "util/histogram/histogram.hpp"
+#include "helpers/helper_print.hpp"
+#include "helpers/helper_comparison.cuh"
+#include "compression/dict/dict_encoding.hpp"
+#include "compression/unique/unique_encoding.hpp"
+#include "util/splitter/splitter.hpp"
+
 #include <boost/pointer_cast.hpp>
+
+namespace ddj
+{
 
 TEST(OtherTests, SharedCudaPtr_ReinterpretCast)
 {
@@ -27,4 +36,28 @@ TEST(OtherTests, SharedCudaPtr_ReinterpretCast)
     // Compare vectors
     for(int i=0; i<expected->size(); i++)
         EXPECT_EQ((*expected)[i], (*actual)[i]);
+}
+
+class MostFrequentTest : public StandardParamTestBase {};
+
+TEST_F(MostFrequentTest, CompressDecompressMostFrequent_random_int)
+{
+    int mostFreqCnt = 4;
+    auto mostFrequent = Histogram().GetMostFrequent(d_int_random_data, mostFreqCnt);
+
+    auto stencil = DictEncoding().GetMostFrequentStencil(d_int_random_data, mostFrequent);
+    auto mostFrequentDataPart = std::get<0>(Splitter().Split(d_int_random_data, stencil));
+
+    auto encoded = UniqueEncoding().CompressUnique(mostFrequentDataPart, mostFrequent);
+    auto decoded = UniqueEncoding().template DecompressUnique<int>(encoded);
+
+    EXPECT_EQ(mostFrequentDataPart->size(), decoded->size());
+    EXPECT_TRUE(
+        CompareDeviceArrays(
+            mostFrequentDataPart->get(),
+            decoded->get(),
+            mostFrequentDataPart->size())
+        );
+}
+
 }

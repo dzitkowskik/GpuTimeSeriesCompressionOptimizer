@@ -22,6 +22,7 @@ public:
     ~CudaArrayGenerator();
 
 public:
+    // TODO: translate to templates
     SharedCudaPtr<float> GenerateRandomFloatDeviceArray(int size);
     SharedCudaPtr<int> GenerateRandomIntDeviceArray(int size);
     SharedCudaPtr<int> GenerateRandomIntDeviceArray(int size, int from, int to);
