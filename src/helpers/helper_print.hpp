@@ -5,6 +5,7 @@
 #define DDJ_HELPER_PRINT_H_
 
 #include <thrust/device_vector.h>
+#include <core/cuda_ptr.hpp>
 #include <iostream>
 
 class HelperPrint
@@ -15,7 +16,7 @@ public:
     {
         std::cout << name << std::endl;
         thrust::copy(data.begin(), data.end(),
-            std::ostream_iterator<float>(std::cout, ""));
+            std::ostream_iterator<float>(std::cout, " "));
         std::cout << std::endl;
     }
 
@@ -52,6 +53,19 @@ public:
     	thrust::device_ptr<T> actual_ptr(actual);
     	PrintDevicePtr<T>(expected_ptr, size, "Expected");
     	PrintDevicePtr<T>(actual_ptr, size, "Actual");
+    }
+
+    template<typename T>
+    static void PrintSharedCudaPtr(SharedCudaPtr<T> data, const std::string& name)
+    {
+        HelperPrint::PrintArray(data->get(), data->size(), name.c_str());
+    }
+
+    template<typename T, typename D>
+    static void PrintSharedCudaPtrPair(SharedCudaPtrPair<T,D> data, const std::string& name)
+    {
+        HelperPrint::PrintArray(data.first->get(), data.first->size(), (name + " FIRST").c_str());
+        HelperPrint::PrintArray(data.second->get(), data.second->size(), (name + " SECOND").c_str());
     }
 };
 

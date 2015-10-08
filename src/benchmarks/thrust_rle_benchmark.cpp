@@ -1,4 +1,4 @@
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include "compression/rle/thrust_rle.cuh"
 #include <benchmark/benchmark.h>
 #include <cuda_runtime_api.h>
@@ -7,14 +7,13 @@ namespace ddj {
 
 static void BM_Thrust_RLE_Encode(benchmark::State& state)
 {
-    HelperGenerator generator;
     ThrustRleCompression compression;
     int out_size;
 
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
+        auto data = CudaArrayGenerator().GenerateRandomFloatDeviceArray(state.range_x());
         state.ResumeTiming();
 
         // ENCODE
@@ -28,18 +27,17 @@ static void BM_Thrust_RLE_Encode(benchmark::State& state)
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(float));
 }
-BENCHMARK(BM_Thrust_RLE_Encode)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Thrust_RLE_Encode)->Arg(1<<15)->Arg(1<<20);
 
 static void BM_Thrust_RLE_Decode(benchmark::State& state)
 {
-    HelperGenerator generator;
     ThrustRleCompression compression;
     int out_size, out_size_decoded;
 
     while (state.KeepRunning())
     {
         state.PauseTiming();
-        auto data = generator.GenerateRandomFloatDeviceArray(state.range_x());
+        auto data = CudaArrayGenerator().GenerateRandomFloatDeviceArray(state.range_x());
         void* compr = compression.Encode(data->get(), state.range_x(), out_size);
         state.ResumeTiming();
 
@@ -55,6 +53,6 @@ static void BM_Thrust_RLE_Decode(benchmark::State& state)
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(float));
 }
-BENCHMARK(BM_Thrust_RLE_Decode)->Arg(1<<10)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Thrust_RLE_Decode)->Arg(1<<15)->Arg(1<<20);
 
 } /* namespace ddj */

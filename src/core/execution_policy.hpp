@@ -26,7 +26,7 @@ protected:
 public:
     void setSize(const size_t size) { this->_size = size; }
     size_t getSize() { return this->_size; }
-    
+
     virtual dim3 getGrid()
     {
         dim3 grid( (this->_size + DEFAULT_CUDA_BLOCK_SIZE - 1) / DEFAULT_CUDA_BLOCK_SIZE );

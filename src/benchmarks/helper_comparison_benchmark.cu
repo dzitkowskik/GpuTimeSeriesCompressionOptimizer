@@ -1,12 +1,12 @@
 #include "helpers/helper_comparison.cuh"
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include <benchmark/benchmark.h>
 
 namespace ddj {
 
-static void BM_CompareDeviceArrays(benchmark::State& state)
+static void BM_HelperComparison_CompareDeviceArrays(benchmark::State& state)
 {
-    HelperGenerator generator;
+    CudaArrayGenerator generator;
 
     while (state.KeepRunning())
     {
@@ -22,6 +22,6 @@ static void BM_CompareDeviceArrays(benchmark::State& state)
     state.SetItemsProcessed(it_processed);
     state.SetBytesProcessed(it_processed * sizeof(float));
 }
-BENCHMARK(BM_CompareDeviceArrays)->Arg(1<<20);
+BENCHMARK(BM_HelperComparison_CompareDeviceArrays)->Arg(1<<20);
 
 } /* namespace ddj */

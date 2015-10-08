@@ -1,19 +1,17 @@
 /*
- * delta_encoding.cu
+ *  delta_encoding.cu
  *
  *  Created on: 18-04-2015
  *      Author: Karol Dzitkowski
  */
 
-#include "delta_encoding.cuh"
+#include "delta_encoding.hpp"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_cuda.cuh"
+
 #include <cuda_runtime_api.h>
 #include <thrust/device_ptr.h>
 #include <thrust/scan.h>
-
-#define DELTA_ENCODING_GPU_BLOCK_SIZE 64
-#define DELTA_DECODING_GPU_BLOCK_SIZE 64
 
 namespace ddj {
 
@@ -28,37 +26,64 @@ __global__ void deltaEncodeKernel(T* data, int size, T* result)
 }
 
 template<typename T>
-SharedCudaPtr<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
+SharedCudaPtrVector<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 {
-	auto result = CudaPtr<char>::make_shared(data->size()*sizeof(T));
+	// MAKE DELTA ENCODING
+	auto result_data = CudaPtr<char>::make_shared((data->size() - 1) * sizeof(T));
+	this->_policy.setSize(data->size());
+	cudaLaunch(this->_policy, deltaEncodeKernel<T>,
+		data->get(),
+		data->size(),
+		(T*)(result_data->get())
+	);
 
-	this->policy.setSize(data->size());
-	cudaLaunch(this->policy, deltaEncodeKernel<T>,
-		data->get(), data->size(), (T*)(result->get()+sizeof(T)));
+	// SAVE FIRST VALUE TO METADATA
+	auto result_metadata = CudaPtr<char>::make_shared(sizeof(T));
+	CUDA_CALL( cudaMemcpy(result_metadata->get(), data->get(), sizeof(T), cudaMemcpyDeviceToDevice) );
 
-	CUDA_CALL( cudaMemcpy(result->get(), data->get(), sizeof(T), cudaMemcpyDeviceToDevice) );
 	cudaDeviceSynchronize();
 
-	return result;
+	return SharedCudaPtrVector<char> {result_metadata, result_data};
 }
 
 template<typename T>
-SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtr<char> data)
+__global__ void addValueKernel(T* data, const int size, T* value)
 {
-	int size = data->size()/sizeof(T);
+	unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
+	if(idx >= size) return;
+	data[idx] += *value;
+}
+
+template<typename T>
+SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtrVector<char> input)
+{
+	auto metadata = input[0];
+	auto data = input[1];
+
+	int size = data->size()/sizeof(T) + 1;
 	auto result = CudaPtr<T>::make_shared(size);
 
+	// Calculate deltas
 	thrust::device_ptr<T> data_ptr((T*)data->get());
 	thrust::device_ptr<T> result_ptr(result->get());
-	thrust::inclusive_scan(data_ptr, data_ptr+size, result_ptr);
+	thrust::inclusive_scan(data_ptr, data_ptr+(size-1), result_ptr+1);
+	result_ptr[0] = 0;
+
+	// Add first value all elements
+	this->_policy.setSize(size);
+	cudaLaunch(this->_policy, addValueKernel<T>,
+		result->get(),
+		size,
+		(T*)metadata->get()
+	);
 
 	return result;
 }
 
-#define SCALE_SPEC(X) \
-	template SharedCudaPtr<char> DeltaEncoding::Encode<X>(SharedCudaPtr<X> data); \
-	template SharedCudaPtr<X> DeltaEncoding::Decode<X>(SharedCudaPtr<char> data);
-FOR_EACH(SCALE_SPEC, double, float, int, long, long long, unsigned int, unsigned long, unsigned long long)
+#define DELTA_ENCODING_SPEC(X) \
+	template SharedCudaPtrVector<char> DeltaEncoding::Encode<X>(SharedCudaPtr<X> data); \
+	template SharedCudaPtr<X> DeltaEncoding::Decode<X>(SharedCudaPtrVector<char> data);
+FOR_EACH(DELTA_ENCODING_SPEC, float, int, long long, unsigned int)
 
 
 } /* namespace ddj */

@@ -3,7 +3,7 @@
 
 #include "helpers/helper_macros.h"
 #include "helpers/helper_comparison.cuh"
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include "helpers/helper_device.hpp"
 
 #include <gtest/gtest.h>
@@ -36,7 +36,7 @@ protected:
     SharedCudaPtr<float> d_random_data_2;
 
 private:
-    HelperGenerator generator;
+    CudaArrayGenerator generator;
 };
 
 } /* namespace ddj */

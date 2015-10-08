@@ -4,7 +4,7 @@
 #include "compression/rle/thrust_rle.cuh"
 #include "helpers/helper_device.hpp"
 #include "helpers/helper_macros.h"
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
@@ -35,7 +35,7 @@ protected:
     ThrustRleCompression compression;
 
 private:
-    HelperGenerator generator;
+    CudaArrayGenerator generator;
 };
 
 } /* namespace ddj */

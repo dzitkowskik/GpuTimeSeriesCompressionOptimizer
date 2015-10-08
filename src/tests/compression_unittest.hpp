@@ -10,7 +10,7 @@
 
 #include "helpers/helper_device.hpp"
 #include "helpers/helper_macros.h"
-#include "helpers/helper_generator.hpp"
+#include "util/generator/cuda_array_generator.hpp"
 #include "helpers/helper_print.hpp"
 #include <thrust/device_vector.h>
 #include "core/cuda_ptr.hpp"
@@ -44,11 +44,13 @@ public:
 	SharedCudaPtr<int> d_int_random_data;
 
 private:
-	HelperGenerator generator;
+	CudaArrayGenerator generator;
 };
 
 class ScaleCompressionTest : public CompressionTest {};
 class DeltaCompressionTest : public CompressionTest {};
+class AflCompressionTest : public CompressionTest {};
+class DictCompressionTest : public CompressionTest {};
 
 } /* namespace ddj */
 #endif /* DDJ_DELTA_UNITTEST_H_ */
