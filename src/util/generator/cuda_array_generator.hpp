@@ -29,6 +29,7 @@ public:
     SharedCudaPtr<int> GenerateRandomStencil(int size);
 
     template<typename T> SharedCudaPtr<T> CreateConsecutiveNumbersArray(int size, T start);
+    template<typename T> SharedCudaPtr<T> CreateConsecutiveNumbersArray(int size, T start, T step);
 
 private:
     curandGenerator_t _gen;

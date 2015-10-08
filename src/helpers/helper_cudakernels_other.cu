@@ -30,6 +30,6 @@ template<typename T> std::tuple<T,T> HelperCudaKernels::MinMax(SharedCudaPtr<T> 
 
 #define CUDA_KERNELS_OTHER_SPEC(X) \
 	template std::tuple<X,X> HelperCudaKernels::MinMax<X>(SharedCudaPtr<X> data);
-FOR_EACH(CUDA_KERNELS_OTHER_SPEC, float, int, long int, long long int)
+FOR_EACH(CUDA_KERNELS_OTHER_SPEC, double, float, int, unsigned int, long int, long long int)
 
 } /* namespace ddj */

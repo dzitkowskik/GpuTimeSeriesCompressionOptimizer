@@ -11,6 +11,14 @@ __global__ void createConsecutiveNumbersArrayKernel(T* data, int size, T start)
 	data[idx] = start + idx;
 }
 
+template<typename T>
+__global__ void createConsecutiveNumbersArrayWithStepKernel(T* data, int size, T start, T step)
+{
+    unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	if (idx >= size) return;
+	data[idx] = start + (idx * step);
+}
+
 template<typename T> SharedCudaPtr<T>
 CudaArrayGenerator::CreateConsecutiveNumbersArray(int size, T start)
 {
@@ -27,8 +35,26 @@ CudaArrayGenerator::CreateConsecutiveNumbersArray(int size, T start)
     return result;
 }
 
+template<typename T> SharedCudaPtr<T>
+CudaArrayGenerator::CreateConsecutiveNumbersArray(int size, T start, T step)
+{
+    auto result = CudaPtr<T>::make_shared(size);
+
+    this->_policy.setSize(size);
+    cudaLaunch(this->_policy, createConsecutiveNumbersArrayWithStepKernel<T>,
+        result->get(),
+        size,
+        start,
+        step
+    );
+
+    cudaDeviceSynchronize();
+    return result;
+}
+
 #define CUDA_ARRAY_GENERATOR_SPEC(X) \
-	template SharedCudaPtr<X> CudaArrayGenerator::CreateConsecutiveNumbersArray<X>(int, X);
-FOR_EACH(CUDA_ARRAY_GENERATOR_SPEC, double, float, int, long int, long long int)
+	template SharedCudaPtr<X> CudaArrayGenerator::CreateConsecutiveNumbersArray<X>(int, X); \
+	template SharedCudaPtr<X> CudaArrayGenerator::CreateConsecutiveNumbersArray<X>(int, X, X);
+FOR_EACH(CUDA_ARRAY_GENERATOR_SPEC, double, float, int, unsigned int, long int, long long int)
 
 } /* namespace ddj */

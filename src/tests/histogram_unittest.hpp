@@ -11,8 +11,7 @@
 #include "helpers/helper_device.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
-#include "util/histogram/histogram_base.hpp"
-
+#include <boost/function.hpp>
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -40,7 +39,8 @@ protected:
 	const int size;
 
 protected:
-	void RandomIntegerArrayTestCase(HistogramBase& histogram);
+	template<typename T>
+	void CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> result);
 
 private:
 	CudaArrayGenerator generator;

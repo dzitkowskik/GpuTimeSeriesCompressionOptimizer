@@ -2,13 +2,13 @@
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_macros.h"
 #include "core/cuda_ptr.hpp"
-#include "util/histogram/thrust_dense_histogram.hpp"
-#include "util/histogram/thrust_sparse_histogram.hpp"
-#include "util/histogram/simple_cpu_histogram.hpp"
-#include "util/histogram/cuda_histogram.hpp"
+#include "util/other/simple_cpu_histogram.hpp"
+#include "util/histogram/histogram.hpp"
+
 #include <cuda_runtime_api.h>
 #include <vector>
 #include <iostream>
+#include <boost/bind.hpp>
 
 namespace ddj
 {
@@ -83,42 +83,30 @@ void PrintHostHistogram(std::map<T, int> histogram, std::string name)
     std::cout << std::endl;
 }
 
-void HistogramTest::RandomIntegerArrayTestCase(HistogramBase& histogram)
+template<typename T>
+void HistogramTest::CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> result)
 {
-    SimpleCpuHistogram cpu_histogram;
+	int size = data->size();
+	SimpleCpuHistogram cpu_histogram;
 	int* h_data = new int[size];
-	CUDA_CALL( cudaMemcpy(h_data, d_int_random_data->get(), size*sizeof(int), CPY_DTH) );
+	CUDA_CALL( cudaMemcpy(h_data, data->get(), size*sizeof(int), CPY_DTH) );
 	auto h_data_vector = std::vector<int>(h_data, h_data+size);
 	auto h_expected = cpu_histogram.Histogram(h_data_vector);
-	auto d_actual = histogram.IntegerHistogram(d_int_random_data);
+	auto d_actual = result;
 	ASSERT_TRUE(d_actual.first != NULL);
 	ASSERT_TRUE(d_actual.second != NULL);
 	auto h_actual = TransformToHostMap(d_actual);
 	EXPECT_EQ( h_expected.size(), h_actual.size() );
 	EXPECT_TRUE( CompareHistograms(h_expected, h_actual) );
-
-//    PrintHostHistogram(h_expected, "Expected");
-//    PrintHostHistogram(h_actual, "Actual");
-
+	//    PrintHostHistogram(h_expected, "Expected");
+	//    PrintHostHistogram(h_actual, "Actual");
 	delete [] h_data;
 }
 
 TEST_F(HistogramTest, ThrustDenseHistogram_RandomIntegerArray)
 {
-	auto histogram = ThrustDenseHistogram();
-	RandomIntegerArrayTestCase(histogram);
-}
-
-TEST_F(HistogramTest, ThrustSparseHistogram_RandomIntegerArray)
-{
-	auto histogram = ThrustSparseHistogram();
-	RandomIntegerArrayTestCase(histogram);
-}
-
-TEST_F(HistogramTest, CudaHistogram_RandomIntegerArray)
-{
-	auto histogram = CudaHistogram();
-	RandomIntegerArrayTestCase(histogram);
+	auto result = Histogram().ThrustDenseHistogram(d_int_random_data);
+	CheckHistogramResult<int>(d_int_random_data, result);
 }
 
 } /* namespace ddj */

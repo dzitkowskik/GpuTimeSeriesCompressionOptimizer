@@ -1,8 +1,7 @@
 #include "dict_encoding.hpp"
 #include "core/cuda_macros.cuh"
 #include "util/stencil/stencil.hpp"
-#include "util/histogram/cuda_histogram.hpp"
-#include "util/histogram/cuda_histogram.hpp"
+#include "util/histogram/histogram.hpp"
 #include "helpers/helper_cuda.cuh"
 
 #include <thrust/sort.h>
@@ -194,7 +193,7 @@ SharedCudaPtr<int> DictEncoding::DecompressMostFrequent(
 //  6. RETURN A VECTOR (STENCIL, MOST FREQUENT (COMPRESSED), OTHERS (UNCOMPRESSED))
 SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<int> data)
 {
-    auto histogram = CudaHistogram().IntegerHistogram(data);
+    auto histogram = Histogram().Calculate<int>(data);
     auto mostFrequent = GetMostFrequent(histogram, MOST_FREQ_VALUES_CNT);
     auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
     auto splittedData = this->_splitter.Split(data, mostFrequentStencil);

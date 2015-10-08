@@ -1,5 +1,5 @@
 #include "dict_compression_unittest.hpp"
-#include "util/histogram/cuda_histogram.hpp"
+#include "util/histogram/histogram.hpp"
 #include "helpers/helper_print.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "compression/dict/dict_encoding.hpp"
@@ -25,8 +25,7 @@ SharedCudaPtrPair<int, int> fakeHistogram(int size)
     }
     auto d_fakeData = CudaPtr<int>::make_shared(size);
     d_fakeData->fillFromHost(h_fakeData.data(), size);
-    CudaHistogram histogram;
-    return histogram.IntegerHistogram(d_fakeData);
+    return Histogram().Calculate(d_fakeData);
 }
 
 bool CheckMostFrequent(
@@ -73,8 +72,7 @@ TEST_P(DictCompressionTest, GetMostFrequent_random_int)
 {
 	DictEncoding dictEncoding;
     int mostFreqCnt = GetParam();
-    CudaHistogram histogram;
-    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
+    auto randomHistogram = Histogram().Calculate(d_int_random_data);
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
     EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
 }
@@ -82,11 +80,10 @@ TEST_P(DictCompressionTest, GetMostFrequent_random_int)
 TEST_P(DictCompressionTest, CompressDecompressMostFrequent_random_int)
 {
     DictEncoding dictEncoding;
-    CudaHistogram histogram;
     Splitter splitter;
 
     int mostFreqCnt = GetParam();
-    auto randomHistogram = histogram.IntegerHistogram(d_int_random_data);
+    auto randomHistogram = Histogram().Calculate(d_int_random_data);
     auto mostFrequent = dictEncoding.GetMostFrequent(randomHistogram, mostFreqCnt);
 
     auto stencil = dictEncoding.GetMostFrequentStencil(d_int_random_data, mostFrequent);
