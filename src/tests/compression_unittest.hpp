@@ -51,6 +51,7 @@ class ScaleCompressionTest : public CompressionTest {};
 class DeltaCompressionTest : public CompressionTest {};
 class AflCompressionTest : public CompressionTest {};
 class DictCompressionTest : public CompressionTest {};
+class RleCompressionTest : public CompressionTest {};
 
 } /* namespace ddj */
 #endif /* DDJ_DELTA_UNITTEST_H_ */
