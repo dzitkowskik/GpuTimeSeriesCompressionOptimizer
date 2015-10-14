@@ -8,9 +8,23 @@
 #include "compression/unique/unique_encoding.hpp"
 #include "core/cuda_macros.cuh"
 #include "helpers/helper_cuda.cuh"
+#include <thrust/device_ptr.h>
+#include <thrust/sort.h>
+#include <thrust/unique.h>
 
 namespace ddj {
 
+template<typename T>
+SharedCudaPtr<T> UniqueEncoding::FindUnique(SharedCudaPtr<T> data)
+{
+    thrust::device_ptr<T> dataPtr(data->get());
+    thrust::sort(dataPtr, dataPtr+data->size());
+    auto end = thrust::unique(dataPtr, dataPtr + data->size());
+    int size = end - dataPtr;
+    auto result = CudaPtr<T>::make_shared(size);
+    result->fill(dataPtr.get(), size);
+    return result;
+}
 
 template<typename T>
 __global__ void _compressUniqueKernel(
@@ -41,7 +55,6 @@ __global__ void _compressUniqueKernel(
     }
     output[idx] = result;
 }
-
 
 // UNIQUE COMPRESSION ALGORITHM
 //
@@ -79,6 +92,7 @@ SharedCudaPtr<char> UniqueEncoding::CompressUnique(SharedCudaPtr<T> data, Shared
         unique->size(),
         (unsigned int*)(result->get()+headerSize),
         outputSize);
+    cudaDeviceSynchronize();
 
     // ATTACH HEADER
     CUDA_CALL( cudaMemcpy(result->get(), &uniqueSize, sizeof(size_t), CPY_HTD) );
@@ -89,6 +103,45 @@ SharedCudaPtr<char> UniqueEncoding::CompressUnique(SharedCudaPtr<T> data, Shared
     return result;
 }
 
+template<typename T>
+SharedCudaPtrVector<char> UniqueEncoding::Encode(SharedCudaPtr<T> data)
+{
+    auto unique = FindUnique(data);
+
+    // CALCULATE SIZES
+	int uniqueSize = unique->size();                        // how many distinct items to encode
+	int dataSize = data->size();							// size of data to compress
+    int bitsNeeded = ALT_BITLEN(uniqueSize-1);              // min bits needed to encode
+    int outputItemBitSize = 8 * sizeof(unsigned int);      	// how many bits are in output unit
+    int dataPerOutputCnt = outputItemBitSize / bitsNeeded;  // how many items will be encoded in single unit
+    int outputSize = (dataSize + dataPerOutputCnt - 1) / dataPerOutputCnt;  // output units cnt
+    int outputSizeInBytes = outputSize * sizeof(unsigned int);
+
+    // COMPRESS UNIQUE
+    auto resultData = CudaPtr<char>::make_shared(outputSizeInBytes);
+    this->_policy.setSize(outputSize);
+    cudaLaunch(this->_policy, _compressUniqueKernel<T>,
+        data->get(),
+        data->size(),
+        bitsNeeded,
+        dataPerOutputCnt,
+        unique->get(),
+        unique->size(),
+        (unsigned int*)resultData->get(),
+        outputSize);
+    cudaDeviceSynchronize();
+
+    size_t metadataSize = unique->size() * sizeof(T) + 2*sizeof(size_t);
+    auto resultMetadata = CudaPtr<char>::make_shared(metadataSize);
+    size_t sizes[2] {unique->size(), data->size()};
+    CUDA_CALL( cudaMemcpy(resultMetadata->get(), sizes, 2*sizeof(size_t), CPY_HTD) );
+    CUDA_CALL( cudaMemcpy(
+        resultMetadata->get()+2*sizeof(size_t),
+        unique->get(),
+        unique->size()*sizeof(T),
+        CPY_DTD) );
+    return SharedCudaPtrVector<char> {resultMetadata, resultData};
+}
 
 template<typename T>
 __global__ void _decompressUniqueKernel(
@@ -96,6 +149,7 @@ __global__ void _decompressUniqueKernel(
     T* unique,
     const int size,
     T* output,
+    const int outputSize,
     const int bitsNeeded,
     const int dataPerUnitCnt
     )
@@ -106,10 +160,11 @@ __global__ void _decompressUniqueKernel(
     {
         int index = ReadNbitIntValFromWord(bitsNeeded, i, data[idx]);
         T value = unique[index];
-        output[idx * dataPerUnitCnt + i] = value;
+        int outputIndex = idx * dataPerUnitCnt + i;
+        if(outputIndex < outputSize)
+            output[outputIndex] = value;
     }
 }
-
 
 // MOST FREQUENT DECOMPRESSION ALGORITHM
 //
@@ -151,6 +206,40 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
         (T*)(data->get()+2*sizeof(size_t)),
         unitCnt,
         result->get(),
+        result->size(),
+        bitsNeeded,
+        dataPerUnitCnt);
+
+    cudaDeviceSynchronize();
+    return result;
+}
+
+template<typename T>
+SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
+{
+    auto metadata = input[0];
+    auto data = input[1];
+    size_t sizes[2];
+    CUDA_CALL( cudaMemcpy(sizes, metadata->get(), 2*sizeof(size_t), CPY_DTH) );
+    size_t uniqueSize = sizes[0];
+    size_t outputSize = sizes[1];
+
+    // CALCULATE SIZES
+    int bitsNeeded = ALT_BITLEN(uniqueSize-1);          // min bit cnt to encode unique values
+    int unitSize = sizeof(unsigned int);                    // single unit size in bytes
+    int unitBitSize = 8 * sizeof(unsigned int);             // single unit size in bits
+    int dataPerUnitCnt = unitBitSize / bitsNeeded;          // how many items are in one unit
+    int unitCnt =  data->size() / unitSize;                 // how many units are in data
+
+    // DECOMPRESS DATA USING UNIQUE VALUES
+    auto result = CudaPtr<T>::make_shared(outputSize);
+    this->_policy.setSize(unitCnt);
+    cudaLaunch(this->_policy, _decompressUniqueKernel<T>,
+        (unsigned int*)data->get(),
+        (T*)(metadata->get()+2*sizeof(size_t)),
+        unitCnt,
+        result->get(),
+        result->size(),
         bitsNeeded,
         dataPerUnitCnt);
 
@@ -161,7 +250,9 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
 
 #define UNIQUE_ENCODING_SPEC(X) \
 	template SharedCudaPtr<char> UniqueEncoding::CompressUnique<X>(SharedCudaPtr<X>, SharedCudaPtr<X>); \
-	template SharedCudaPtr<X> UniqueEncoding::DecompressUnique<X>(SharedCudaPtr<char>);
+	template SharedCudaPtr<X> UniqueEncoding::DecompressUnique<X>(SharedCudaPtr<char>); \
+    template SharedCudaPtrVector<char> UniqueEncoding::Encode<X>(SharedCudaPtr<X>); \
+    template SharedCudaPtr<X> UniqueEncoding::Decode<X>(SharedCudaPtrVector<char>);
 FOR_EACH(UNIQUE_ENCODING_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

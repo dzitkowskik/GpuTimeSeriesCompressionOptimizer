@@ -32,7 +32,7 @@ SharedCudaPtrPair<T, int> Histogram::CudaHistogramIntegral(SharedCudaPtr<T> data
 	static_assert(std::is_integral<T>::value, "CudaHistogramIntegral allows only integral types");
 
     auto minMax = this->_cudaKernels.MinMax<T>(data);
-    int distance = std::abs(std::get<1>(minMax) - std::get<0>(minMax)) + 1;
+    int distance = std::get<1>(minMax) - std::get<0>(minMax) + 1;
 
     auto counts = CudaPtr<int>::make_shared(distance);
     this->_transform.TransformInPlace(counts, ZeroOperator<int>());
@@ -72,7 +72,7 @@ template<typename T>
 SharedCudaPtrPair<T, int> Histogram::CudaHistogram(SharedCudaPtr<T> data)
 {
     auto minMax = this->_cudaKernels.MinMax<T>(data);
-    auto distance = std::abs(std::get<1>(minMax) - std::get<0>(minMax));
+    auto distance = std::get<1>(minMax) - std::get<0>(minMax);
 
     auto counts = CudaPtr<int>::make_shared(data->size());
     this->_transform.TransformInPlace(counts, ZeroOperator<int>());
