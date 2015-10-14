@@ -14,12 +14,17 @@
 #include "compression/afl/afl_encoding.hpp"
 #include "compression/dict/dict_encoding.hpp"
 #include "compression/rle/rle_encoding.hpp"
+#include "compression/unique/unique_encoding.hpp"
 
 #include <thrust/device_ptr.h>
 #include <boost/bind.hpp>
 
 namespace ddj
 {
+
+/////////////////////////
+// SCALE COMPRESSION ////
+/////////////////////////
 
 INSTANTIATE_TEST_CASE_P(
     ScaleEncoding_Compression_Inst,
@@ -70,6 +75,10 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+/////////////////////////
+// DELTA COMPRESSION ////
+/////////////////////////
+
 INSTANTIATE_TEST_CASE_P(
 	DeltaEncoding_Compression_Inst,
 	DeltaCompressionTest,
@@ -119,6 +128,10 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+////////////////////////////////
+// FIXED LENGTH COMPRESSION ////
+////////////////////////////////
+
 INSTANTIATE_TEST_CASE_P(
 	AflEncoding_Compression_Inst,
 	AflCompressionTest,
@@ -146,6 +159,9 @@ TEST_P(AflCompressionTest, CompressionOfRandomInts_data)
 	);
 }
 
+///////////////////////////////
+// DICTIONARY COMPRESSION /////
+///////////////////////////////
 
 INSTANTIATE_TEST_CASE_P(
 	DictEncoding_Compression_Inst,
@@ -196,6 +212,9 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+////////////////////////////////
+// RUN-LENGTH COMPRESSION //////
+////////////////////////////////
 
 INSTANTIATE_TEST_CASE_P(
 	RleEncoding_Compression_Inst,
@@ -242,6 +261,59 @@ TEST_P(RleCompressionTest, CompressionOfRandomFloats_data)
 	EncodeDecodeUnittestHelper::TestContent2<float>(
 		boost::bind(&RleEncoding::Encode<float>, encoder, _1),
 		boost::bind(&RleEncoding::Decode<float>, encoder, _1),
+		d_float_random_data)
+	);
+}
+
+////////////////////////////
+// UNIQUE COMPRESSION //////
+////////////////////////////
+
+INSTANTIATE_TEST_CASE_P(
+	UniqueEncoding_Compression_Inst,
+	UniqueCompressionTest,
+    ::testing::Values(10, 1000, 10000));
+
+TEST_P(UniqueCompressionTest, CompressionOfRandomInts_size)
+{
+	UniqueEncoding encoder;
+    EXPECT_TRUE(
+    EncodeDecodeUnittestHelper::TestSize2<int>(
+		boost::bind(&UniqueEncoding::Encode<int>, encoder, _1),
+		boost::bind(&UniqueEncoding::Decode<int>, encoder, _1),
+		d_int_random_data)
+    );
+}
+
+TEST_P(UniqueCompressionTest, CompressionOfRandomInts_data)
+{
+	UniqueEncoding encoder;
+	EXPECT_TRUE(
+	EncodeDecodeUnittestHelper::TestContent2<int>(
+		boost::bind(&UniqueEncoding::Encode<int>, encoder, _1),
+		boost::bind(&UniqueEncoding::Decode<int>, encoder, _1),
+		d_int_random_data)
+	);
+}
+
+TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_size)
+{
+	UniqueEncoding encoder;
+    EXPECT_TRUE(
+    EncodeDecodeUnittestHelper::TestSize2<float>(
+		boost::bind(&UniqueEncoding::Encode<float>, encoder, _1),
+		boost::bind(&UniqueEncoding::Decode<float>, encoder, _1),
+		d_float_random_data)
+    );
+}
+
+TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_data)
+{
+	UniqueEncoding encoder;
+	EXPECT_TRUE(
+	EncodeDecodeUnittestHelper::TestContent2<float>(
+		boost::bind(&UniqueEncoding::Encode<float>, encoder, _1),
+		boost::bind(&UniqueEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
 	);
 }
