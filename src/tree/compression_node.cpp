@@ -100,33 +100,34 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 	auto encoding = _encodingFactory.Get(_encodingType);
 	auto encodingResult = encoding->Encode(data, _dataType);
 
-	if(_isLeaf) return encodingResult;
-
-	// ELSE
 	int i = 0;
 	auto encodingMetadata = encodingResult[i++];
 	auto metadata = PrepareMetadata(encodingMetadata);
 	SharedCudaPtrVector<char> result = {metadata};
-	for(auto& child : _children)
-	{
-		auto childResult = child->Compress(encodingResult[i++]);
-		result.insert(result.end(), childResult.begin(), childResult.end());
-	}
+
+	if(_isLeaf) result.push_back(encodingResult[i++]);
+	else
+		for(auto& child : _children)
+		{
+			auto childResult = child->Compress(encodingResult[i++]);
+			result.insert(result.end(), childResult.begin(), childResult.end());
+		}
+
 	return result;
 }
 
 SharedCudaPtr<char> CompressionNode::Decompress()
 {
-	if(_isLeaf) return _data;
-
-	// ELSE
 	auto encoding = _encodingFactory.Get(_encodingType);
 	SharedCudaPtrVector<char> data { _metadata };
-	for(auto& child : _children)
-	{
-		auto childResult = child->Decompress();
-		data.push_back(childResult);
-	}
+
+	if(_isLeaf) data.push_back(_data);
+	else
+		for(auto& child : _children)
+		{
+			auto childResult = child->Decompress();
+			data.push_back(childResult);
+		}
 
 	return encoding->Decode(data, _dataType);
 }

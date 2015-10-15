@@ -36,12 +36,8 @@ void initialize_logger()
   PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("logger.prop"));
 }
 
-int main(int argc, char* argv[])
+void test_dict_encoding()
 {
-	ddj::Config::GetInstance()->InitOptions(argc, argv, "config.ini");
-	initialize_logger();
-
-	// START THE PROGRAM HERE
 	CudaArrayGenerator generator;
 	auto d_int_random_data = generator.GenerateRandomIntDeviceArray(10000, 100, 1000);
 	DictEncoding encoder;
@@ -51,6 +47,14 @@ int main(int argc, char* argv[])
 	d_int_random_data);
 	if (result) printf("\n\nOK\n\n");
 	else printf("\n\nFAIL\n\n");
+}
+
+int main(int argc, char* argv[])
+{
+	ddj::Config::GetInstance()->InitOptions(argc, argv, "config.ini");
+	initialize_logger();
+
+	// START THE PROGRAM HERE
 
 	//  return wait_to_terminate();
 	return 0;

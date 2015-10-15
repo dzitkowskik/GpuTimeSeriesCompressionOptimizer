@@ -30,7 +30,6 @@ public:
 	CompressionNode(EncodingType encodingType, DataType dataType);
 	~CompressionNode();
 	CompressionNode(const CompressionNode& other);
-//	CompressionNode(CompressionNode&& other) = default;
 
 public:
     SharedCudaPtrVector<char> Compress(SharedCudaPtr<char> data);

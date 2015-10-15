@@ -13,10 +13,10 @@ namespace ddj {
 enum class EncodingType {
     delta,
     // afl,
-    // scale,
-    // rle,
-    // dict,
-    // split,
+    scale,
+    rle,
+    dict,
+//    unique,
     none,
     length
 };

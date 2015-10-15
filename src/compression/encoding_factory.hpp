@@ -12,6 +12,11 @@
 #include "encoding_type.hpp"
 #include "data_type.hpp"
 #include "compression/delta/delta_encoding.hpp"
+#include "compression/none/none_encoding.hpp"
+#include "compression/scale/scale_encoding.hpp"
+#include "compression/rle/rle_encoding.hpp"
+#include "compression/dict/dict_encoding.hpp"
+//#include "compression/unique/unique_encoding.hpp"
 #include "core/not_implemented_exception.hpp"
 
 #include <boost/shared_ptr.hpp>
@@ -28,6 +33,16 @@ public:
         {
 			case EncodingType::delta:
                 return boost::make_shared<DeltaEncoding>();
+			case EncodingType::none:
+				return boost::make_shared<NoneEncoding>();
+			case EncodingType::scale:
+				return boost::make_shared<ScaleEncoding>();
+			case EncodingType::rle:
+				return boost::make_shared<RleEncoding>();
+			case EncodingType::dict:
+				return boost::make_shared<DictEncoding>();
+//			case EncodingType::unique:
+//				return boost::make_shared<UniqueEncoding>();
 			default:
 				throw NotImplementedException("Encoding of this type not implemented");
         }

@@ -1,12 +1,12 @@
 /*
- * delta_unittest.hpp
+ *  compression_tree_unittest.hpp
  *
- *  Created on: 22-04-2015
+ *  Created on: 15/10/2015
  *      Author: Karol Dzitkowski
  */
 
-#ifndef DDJ_COMPRESSION_UNITTEST_HPP_
-#define DDJ_COMPRESSION_UNITTEST_HPP_
+#ifndef DDJ_COMPRESSION_TREE_UNITTEST_HPP_
+#define DDJ_COMPRESSION_TREE_UNITTEST_HPP_
 
 #include "helpers/helper_device.hpp"
 #include "util/generator/cuda_array_generator.hpp"
@@ -16,15 +16,16 @@
 namespace ddj
 {
 
-class CompressionTest : public testing::Test,
-    public ::testing::WithParamInterface<int>
+class CompressionTreeTest : public testing::Test,
+	public ::testing::WithParamInterface<int>
 {
 public:
-	CompressionTest()
+	CompressionTreeTest()
 	{
-        HelperDevice hc;
+		HelperDevice hc;
 		hc.SetCudaDeviceWithMaxFreeMem();
 	}
+	virtual ~CompressionTreeTest() {}
 
 	virtual void SetUp()
 	{
@@ -40,11 +41,5 @@ private:
 	CudaArrayGenerator generator;
 };
 
-class ScaleCompressionTest : public CompressionTest {};
-class DeltaCompressionTest : public CompressionTest {};
-class AflCompressionTest : public CompressionTest {};
-class DictCompressionTest : public CompressionTest {};
-class RleCompressionTest : public CompressionTest {};
-
 } /* namespace ddj */
-#endif /* DDJ_COMPRESSION_UNITTEST_HPP_ */
+#endif /* DDJ_COMPRESSION_TREE_UNITTEST_HPP_ */

@@ -83,7 +83,8 @@ SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, si
 {
 	// READ METADATA HEADER
 	EncodingMetadataHeader header;
-	CUDA_CALL( cudaMemcpy(&header, compressed_data->get()+offset, sizeof(EncodingMetadataHeader), CPY_DTH) );
+	size_t metadataHeaderSize = sizeof(EncodingMetadataHeader);
+	CUDA_CALL( cudaMemcpy(&header, compressed_data->get()+offset, metadataHeaderSize, CPY_DTH) );
 	offset += sizeof(EncodingMetadataHeader);
 
 	// CREATE NODE
@@ -91,7 +92,7 @@ SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, si
 	SharedCompressionNodePtr node(new CompressionNode(encType, (DataType)header.DataType));
 
 	// READ METADATA AND UPDATE OFFSET + SAVE TO NODE
-	SharedCudaPtr<char> metadata;
+	auto metadata = CudaPtr<char>::make_shared();
 	metadata->fill(compressed_data->get()+offset, header.MetadataLength);
 	offset += header.MetadataLength;
 	node->SetMetadata(metadata);
@@ -100,8 +101,8 @@ SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, si
 	{
 		// READ DATA AND UPDATE OFFSET
 		size_t data_size;
-		CUDA_CALL( cudaMemcpy(&data_size, metadata->get(), 4, CPY_DTH) );
-		SharedCudaPtr<char> data;
+		CUDA_CALL( cudaMemcpy(&data_size, metadata->get(), sizeof(size_t), CPY_DTH) );
+		auto data = CudaPtr<char>::make_shared();
 		data->fill(compressed_data->get()+offset, data_size);
 		offset += data_size;
 		node->SetData(data);

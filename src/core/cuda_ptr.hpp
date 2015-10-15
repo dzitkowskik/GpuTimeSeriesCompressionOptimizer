@@ -86,8 +86,8 @@ public:
 
 	SharedCudaPtr<T> copy()
 	{
-		SharedCudaPtr<T> result;
-		result.fill(_pointer, _size);
+		auto result = make_shared();
+		result->fill(_pointer, _size);
 		return result;
 	}
 
