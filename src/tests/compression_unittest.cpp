@@ -9,12 +9,14 @@
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_print.hpp"
 #include "encode_decode_unittest_helper.hpp"
+#include "core/operators.cuh"
 #include "compression/scale/scale_encoding.hpp"
 #include "compression/delta/delta_encoding.hpp"
 #include "compression/afl/afl_encoding.hpp"
 #include "compression/dict/dict_encoding.hpp"
 #include "compression/rle/rle_encoding.hpp"
 #include "compression/unique/unique_encoding.hpp"
+#include "compression/patch/patch_encoding.hpp"
 
 #include <thrust/device_ptr.h>
 #include <boost/bind.hpp>
@@ -318,5 +320,61 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+////////////////////////////
+// PATCH COMPRESSION  //////
+////////////////////////////
+
+INSTANTIATE_TEST_CASE_P(
+	PatchEncoding_Compression_Inst,
+	PatchCompressionTest,
+    ::testing::Values(10, 1000, 10000));
+
+TEST_P(PatchCompressionTest, CompressionOfRandomInts_size)
+{
+	OutsideOperator<int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int>> encoder(op);
+    EXPECT_TRUE(
+    EncodeDecodeUnittestHelper::TestSize2<int>(
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<int>, encoder, _1),
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<int>, encoder, _1),
+		d_int_random_data)
+    );
+}
+
+TEST_P(PatchCompressionTest, CompressionOfRandomInts_data)
+{
+	OutsideOperator<int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int>> encoder(op);
+	EXPECT_TRUE(
+	EncodeDecodeUnittestHelper::TestContent2<int>(
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<int>, encoder, _1),
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<int>, encoder, _1),
+		d_int_random_data)
+	);
+}
+
+TEST_P(PatchCompressionTest, CompressionOfRandomFloats_size)
+{
+	OutsideOperator<int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int>> encoder(op);
+    EXPECT_TRUE(
+    EncodeDecodeUnittestHelper::TestSize2<float>(
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<float>, encoder, _1),
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<float>, encoder, _1),
+		d_float_random_data)
+    );
+}
+
+TEST_P(PatchCompressionTest, CompressionOfRandomFloats_data)
+{
+	OutsideOperator<int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int>> encoder(op);
+	EXPECT_TRUE(
+	EncodeDecodeUnittestHelper::TestContent2<float>(
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<float>, encoder, _1),
+		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<float>, encoder, _1),
+		d_float_random_data)
+	);
+}
 
 } /* namespace ddj */

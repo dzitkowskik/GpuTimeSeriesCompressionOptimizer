@@ -46,6 +46,7 @@ class AflCompressionTest : public CompressionTest {};
 class DictCompressionTest : public CompressionTest {};
 class RleCompressionTest : public CompressionTest {};
 class UniqueCompressionTest : public CompressionTest {};
+class PatchCompressionTest : public CompressionTest {};
 
 } /* namespace ddj */
 #endif /* DDJ_COMPRESSION_UNITTEST_HPP_ */
