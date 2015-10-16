@@ -6,7 +6,6 @@
  */
 
 #include "tests/compression_tree_unittest.hpp"
-#include "tree/compression_tree.hpp"
 #include "helpers/helper_comparison.cuh"
 #include <boost/make_shared.hpp>
 
@@ -25,14 +24,9 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_NoException)
 	tree.Compress(MoveSharedCudaPtr<int, char>(d_int_random_data->copy()));
 }
 
-TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
+void CompressionTreeTest::TreeCompressionTest_Compress_Decompress(CompressionTree& compressionTree)
 {
-	CompressionTree compressionTree;
-	auto node = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
-	auto leafNode = boost::make_shared<CompressionNode>(EncodingType::none, DataType::d_int);
-	node->AddChild(leafNode);
-	ASSERT_TRUE( compressionTree.AddNode(node, 0) );
-	auto dataCopy = d_int_random_data->copy();
+    auto dataCopy = d_int_random_data->copy();
 	auto compressed = compressionTree.Compress(MoveSharedCudaPtr<int, char>(dataCopy));
 
 	CompressionTree decompressionTree;
@@ -45,6 +39,16 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
 }
 
+TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
+{
+	CompressionTree compressionTree;
+	auto node = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
+	auto leafNode = boost::make_shared<CompressionNode>(EncodingType::none, DataType::d_int);
+	node->AddChild(leafNode);
+	ASSERT_TRUE( compressionTree.AddNode(node, 0) );
+	TreeCompressionTest_Compress_Decompress(compressionTree);
+}
+
 TEST_P(CompressionTreeTest, SimpleTwoNodeTree_DeltaAndScale_Int_Compress_Decompress)
 {
 	CompressionTree compressionTree;
@@ -54,17 +58,30 @@ TEST_P(CompressionTreeTest, SimpleTwoNodeTree_DeltaAndScale_Int_Compress_Decompr
 	secondNode->AddChild(leafNode);
 	node->AddChild(secondNode);
 	ASSERT_TRUE( compressionTree.AddNode(node, 0) );
-	auto dataCopy = d_int_random_data->copy();
-	auto compressed = compressionTree.Compress(MoveSharedCudaPtr<int, char>(dataCopy));
+	TreeCompressionTest_Compress_Decompress(compressionTree);
+}
 
-	CompressionTree decompressionTree;
-	auto decompressed = decompressionTree.Decompress(compressed);
-
-	auto expected = d_int_random_data;
-	auto actual = MoveSharedCudaPtr<char, int>(decompressed);
-
-	ASSERT_EQ(expected->size(), actual->size());
-	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+//     DICT
+//    /    \
+// SCALE   DELTA
+//   |
+// DELTA
+TEST_P(CompressionTreeTest, ComplexTree_Dict_Compress_Decompress)
+{
+    CompressionTree compressionTree;
+    auto root = boost::make_shared<CompressionNode>(EncodingType::dict, DataType::d_int);
+	auto right = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
+	auto left = boost::make_shared<CompressionNode>(EncodingType::scale, DataType::d_int);
+    auto leftChild = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
+	auto noneLeft = boost::make_shared<CompressionNode>(EncodingType::none, DataType::d_int);
+    auto noneRight = boost::make_shared<CompressionNode>(EncodingType::none, DataType::d_int);
+    leftChild->AddChild(noneLeft);
+    left->AddChild(leftChild);
+    root->AddChild(left);
+    right->AddChild(noneRight);
+    root->AddChild(right);
+	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
+	TreeCompressionTest_Compress_Decompress(compressionTree);
 }
 
 } /* namespace ddj */

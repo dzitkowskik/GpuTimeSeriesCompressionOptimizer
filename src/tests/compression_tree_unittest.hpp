@@ -11,6 +11,7 @@
 #include "helpers/helper_device.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
+#include "tree/compression_tree.hpp"
 #include <gtest/gtest.h>
 
 namespace ddj
@@ -36,6 +37,9 @@ public:
 
 	SharedCudaPtr<float> d_float_random_data;
 	SharedCudaPtr<int> d_int_random_data;
+
+public:
+	void TreeCompressionTest_Compress_Decompress(CompressionTree& compressionTree);
 
 private:
 	CudaArrayGenerator generator;
