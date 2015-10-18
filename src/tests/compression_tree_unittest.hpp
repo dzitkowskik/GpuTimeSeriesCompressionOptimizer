@@ -32,7 +32,7 @@ public:
 	{
 		int n = GetParam();
 		d_float_random_data = generator.GenerateRandomFloatDeviceArray(n);
-		d_int_random_data = generator.GenerateRandomIntDeviceArray(n);
+		d_int_random_data = generator.GenerateRandomIntDeviceArray(n, 100, 10000);
 	}
 
 	SharedCudaPtr<float> d_float_random_data;

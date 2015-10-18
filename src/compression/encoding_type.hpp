@@ -16,7 +16,8 @@ enum class EncodingType {
     scale,
     rle,
     dict,
-//    unique,
+    unique,
+    patch,
     none,
     length
 };
