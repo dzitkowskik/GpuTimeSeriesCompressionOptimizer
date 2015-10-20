@@ -26,6 +26,7 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_NoException)
 
 void CompressionTreeTest::TreeCompressionTest_Compress_Decompress(CompressionTree& compressionTree)
 {
+
     auto dataCopy = d_int_random_data->copy();
 	auto compressed = compressionTree.Compress(MoveSharedCudaPtr<int, char>(dataCopy));
 
@@ -37,6 +38,9 @@ void CompressionTreeTest::TreeCompressionTest_Compress_Decompress(CompressionTre
 
 	ASSERT_EQ(expected->size(), actual->size());
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+
+//	printf("Uncompressed size = %d\n", d_int_random_data->size()*sizeof(int));
+//	printf("Compressed size = %d\n", compressed->size());
 }
 
 TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
