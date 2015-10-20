@@ -34,6 +34,19 @@ else
 	GENCODE_FLAGS   := $(GENCODE_SM35)
 endif
 
+INCLUDES := -I"src"
+DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
+WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
+
+MODULES := data
+MODULE_LIBS := $(MODULES:%=-l%)
+MODULE_LIB_DIRS := $(MODULES:%=-L"modules/%/lib")
+MODULE_INCLUDES := $(MODULES:%=-I"modules/%/include")
+
+LIBS := $(LIBS) $(MODULE_LIBS)
+LIB_DIRS := $(LIB_DIRS) $(MODULE_LIB_DIRS)
+INCLUDES := $(INCLUDES) $(MODULE_INCLUDES)
+
 # Macros for timing compilation
 TIME_FILE = $(dir $@).$(notdir $@)_time
 START_TIME = $(DATE) '+%s' > $(TIME_FILE)
@@ -48,10 +61,6 @@ export CMD_PREFIX := @
 ifeq ($(V),true)
 	CMD_PREFIX :=
 endif
-
-INCLUDES := -I"src"
-DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
-WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
 debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
 debug: export EXCLUDED_FILES := \
@@ -97,8 +106,20 @@ DEP := $(OBJS:.o=.d)
 
 ################################################################################
 
+.PHONY: modules
+modules: data_module
+	@echo "All modules built!"
+
+.PHONY: data_module
+data_module:
+	@echo "Beginning module DATA build"
+	@$(START_TIME)
+	@$(MAKE) -C "modules/data" --no-print-directory
+	@echo "Total build time: "
+	@$(END_TIME)
+
 .PHONY: release
-release: dirs
+release: dirs modules
 	@echo "Beginning release build"
 	@$(START_TIME)
 	@$(MAKE) all --no-print-directory
@@ -107,7 +128,7 @@ release: dirs
 
 # Debug build for gdb debugging
 .PHONY: debug
-debug: dirs
+debug: dirs modules
 	@echo "Beginning debug build"
 	@$(START_TIME)
 	@$(MAKE) all --no-print-directory
@@ -116,7 +137,7 @@ debug: dirs
 
 # Test build for gtests
 .PHONY: test
-test: dirs
+test: dirs modules
 	@echo "Beginning test build"
 	@$(START_TIME)
 	@$(MAKE) all --no-print-directory
@@ -125,7 +146,7 @@ test: dirs
 
 # Benchmark build for google benchmark
 .PHONY: benchmark
-benchmark: dirs
+benchmark: dirs modules
 	@echo "Beginning benchmark build"
 	@$(START_TIME)
 	@$(MAKE) all --no-print-directory
