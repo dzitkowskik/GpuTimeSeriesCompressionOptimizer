@@ -1,0 +1,3 @@
+[submodule "src/data"]
+	path = src/data
+	url = https://github.com/dzitkowskik/time-series-data-manager.git
