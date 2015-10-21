@@ -114,6 +114,7 @@ modules: data_module
 data_module:
 	@echo "Beginning module DATA build"
 	@$(START_TIME)
+	@cmake -Bmodules/data -Hmodules/data
 	@$(MAKE) -C "modules/data" --no-print-directory
 	@echo "Total build time: "
 	@$(END_TIME)
