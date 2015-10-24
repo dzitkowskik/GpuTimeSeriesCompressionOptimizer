@@ -1,35 +1,34 @@
 #include "util/generator/cuda_array_generator.hpp"
-#include "compression/patch/patched_data.hpp"
+#include "compression/patch/patch_encoding.hpp"
 #include "core/operators.cuh"
-#include "helpers/helper_print.hpp"
+#include "templates.hpp"
+
 #include <benchmark/benchmark.h>
 #include <cuda_runtime_api.h>
 
 namespace ddj
 {
 
-static void BM_Patch_ConsecutiveNumbers_Low_High(benchmark::State& state)
+static void BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Encode(benchmark::State& state)
 {
     int n = state.range_x();
-    auto d_data = CudaArrayGenerator().GenerateConsecutiveIntDeviceArray(n);
+    auto data = MoveSharedCudaPtr<int, char>(
+    		CudaArrayGenerator().GenerateConsecutiveIntDeviceArray(n));
     OutsideOperator<int> op{n/3, 2*n/3};
-
-    while (state.KeepRunning())
-    {
-        state.PauseTiming();
-        PatchedData<int, OutsideOperator<int>> patch(op);
-        state.ResumeTiming();
-
-        patch.Init(d_data);
-    }
-
-    long long int it_processed = state.iterations() * state.range_x();
-    state.SetItemsProcessed(it_processed);
-    state.SetBytesProcessed(it_processed * sizeof(int));
-
+    PatchEncoding<OutsideOperator<int>> encoding(op);
+    Benchmark_Encoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK(BM_Patch_ConsecutiveNumbers_Low_High)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK(BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Encode)->Arg(1<<15)->Arg(1<<20);
 
-
+static void BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Decode(benchmark::State& state)
+{
+    int n = state.range_x();
+    auto data = MoveSharedCudaPtr<int, char>(
+    		CudaArrayGenerator().GenerateConsecutiveIntDeviceArray(n));
+    OutsideOperator<int> op{n/3, 2*n/3};
+    PatchEncoding<OutsideOperator<int>> encoding(op);
+    Benchmark_Decoding(encoding, data, DataType::d_int, state);
+}
+BENCHMARK(BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Decode)->Arg(1<<15)->Arg(1<<20);
 
 } /* namespace ddj */
