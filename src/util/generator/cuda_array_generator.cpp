@@ -1,6 +1,5 @@
 #include "util/generator/cuda_array_generator.hpp"
 #include "helpers/helper_macros.h"
-#include "helpers/helper_cudakernels.cuh"
 #include "core/cuda_ptr.hpp"
 #include "core/operators.cuh"
 

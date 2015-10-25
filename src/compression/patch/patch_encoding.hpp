@@ -9,7 +9,6 @@
 #define DDJ_PATCHED_DATA_HPP_
 
 #include "core/cuda_ptr.hpp"
-#include "helpers/helper_cudakernels.cuh"
 #include "core/execution_policy.hpp"
 #include "util/splitter/splitter.hpp"
 #include "compression/encoding.hpp"

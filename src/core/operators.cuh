@@ -120,4 +120,31 @@ struct FillOperator
 	T operator()(const T &x) { return value; }
 };
 
+// value 1.214123
+// 0.214123 == 0    0
+// 0.14123 == 0     1
+// 0.4123 == 0      2
+// 0.123 == 0       3
+// 0.23 == 0        4
+// 0.3 == 0         5
+// 0.0 == 0         6 <- ANSWER
+template<typename T>
+struct DecimalPlacesOperator
+{
+	__host__ __device__
+	char operator()(const T& value)
+	{
+	    const char bitSize = sizeof(T) * 8;
+
+	    for(char i=0; i < bitSize; i++)
+	    {
+	        value -= (long long)value;
+	        if(value == 0) return i;
+	        value *= 10;
+	    }
+
+	    return bitSize;
+	}
+};
+
 #endif /* OPERATORS_CUH_ */
