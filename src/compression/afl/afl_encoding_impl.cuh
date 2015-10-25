@@ -119,7 +119,7 @@ __device__  __host__ void afl_compress_base_gpu(
             v1_pos += v1_len;
         }
     }
-    if (pos_data >= length  && pos_data < length + CWARP_SIZE)
+    if (pos_data >= length  && pos_data < length + CWARP_SIZE && pos < length)
     {
         compressed_data[pos] = value;
     }
@@ -138,7 +138,7 @@ __device__ __host__ void afl_decompress_base_gpu(
     unsigned int v1_pos = 0, v1_len;
     T v1, ret;
 
-    if (pos_decomp > length ) // Decompress not more elements then length
+    if (pos_decomp > length || pos > length) // Decompress not more elements then length
         return;
     v1 = compressed_data[pos];
     for (unsigned int i = 0; i < CWORD_SIZE(T) && pos_decomp < length; ++i)
@@ -148,10 +148,12 @@ __device__ __host__ void afl_decompress_base_gpu(
             ret = GETNPBITS(v1, v1_len, v1_pos);
 
             pos += CWARP_SIZE;
-            v1 = compressed_data[pos];
-
-            v1_pos = bit_length - v1_len;
-            ret = ret | ((GETNBITS(v1, v1_pos))<< v1_len);
+            if(pos < length)
+			{
+				v1 = compressed_data[pos];
+				v1_pos = bit_length - v1_len;
+				ret = ret | ((GETNBITS(v1, v1_pos))<< v1_len);
+            }
         } else {
             v1_len = bit_length;
             ret = GETNPBITS(v1, v1_len, v1_pos);

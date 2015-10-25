@@ -18,6 +18,7 @@ class CudaArrayStatistics
 {
 public:
     template<typename T> std::tuple<T,T> MinMax(SharedCudaPtr<T> data);
+    template<typename T> char MinBitCnt(SharedCudaPtr<T> data);
 
 private:
     ExecutionPolicy _policy;

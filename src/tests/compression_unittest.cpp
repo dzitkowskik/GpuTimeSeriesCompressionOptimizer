@@ -37,7 +37,7 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomInts_size)
 {
     ScaleEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<int>(
+    EncodeDecodeUnittestHelper::TestSize<int>(
 		boost::bind(&ScaleEncoding::Encode<int>, encoder, _1),
 		boost::bind(&ScaleEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -48,7 +48,7 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomInts_data)
 {
 	ScaleEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<int>(
+	EncodeDecodeUnittestHelper::TestContent<int>(
 		boost::bind(&ScaleEncoding::Encode<int>, encoder, _1),
 		boost::bind(&ScaleEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -59,7 +59,7 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomFloats_size)
 {
     ScaleEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<float>(
+    EncodeDecodeUnittestHelper::TestSize<float>(
 		boost::bind(&ScaleEncoding::Encode<float>, encoder, _1),
 		boost::bind(&ScaleEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -70,7 +70,7 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomFloats_data)
 {
 	ScaleEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<float>(
+	EncodeDecodeUnittestHelper::TestContent<float>(
 		boost::bind(&ScaleEncoding::Encode<float>, encoder, _1),
 		boost::bind(&ScaleEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -90,7 +90,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomInts_size)
 {
 	DeltaEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<int>(
+    EncodeDecodeUnittestHelper::TestSize<int>(
 		boost::bind(&DeltaEncoding::Encode<int>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -101,7 +101,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomInts_data)
 {
 	DeltaEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<int>(
+	EncodeDecodeUnittestHelper::TestContent<int>(
 		boost::bind(&DeltaEncoding::Encode<int>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -112,7 +112,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_size)
 {
 	DeltaEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<float>(
+    EncodeDecodeUnittestHelper::TestSize<float>(
 		boost::bind(&DeltaEncoding::Encode<float>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -123,7 +123,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_data)
 {
 	DeltaEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<float>(
+	EncodeDecodeUnittestHelper::TestContent<float>(
 		boost::bind(&DeltaEncoding::Encode<float>, encoder, _1),
 		boost::bind(&DeltaEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -137,7 +137,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_data)
 INSTANTIATE_TEST_CASE_P(
 	AflEncoding_Compression_Inst,
 	AflCompressionTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(1<<20));
 
 TEST_P(AflCompressionTest, CompressionOfRandomInts_size)
 {
@@ -174,7 +174,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomInts_size)
 {
 	DictEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<int>(
+    EncodeDecodeUnittestHelper::TestSize<int>(
 		boost::bind(&DictEncoding::Encode<int>, encoder, _1),
 		boost::bind(&DictEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -185,7 +185,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomInts_data)
 {
 	DictEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<int>(
+	EncodeDecodeUnittestHelper::TestContent<int>(
 		boost::bind(&DictEncoding::Encode<int>, encoder, _1),
 		boost::bind(&DictEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -196,7 +196,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_size)
 {
 	DictEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<float>(
+    EncodeDecodeUnittestHelper::TestSize<float>(
 		boost::bind(&DictEncoding::Encode<float>, encoder, _1),
 		boost::bind(&DictEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -207,7 +207,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
 {
 	DictEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<float>(
+	EncodeDecodeUnittestHelper::TestContent<float>(
 		boost::bind(&DictEncoding::Encode<float>, encoder, _1),
 		boost::bind(&DictEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -221,13 +221,13 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
 INSTANTIATE_TEST_CASE_P(
 	RleEncoding_Compression_Inst,
 	RleCompressionTest,
-    ::testing::Values(10, 1000, 10000, 1<<15, 1<<20));
+    ::testing::Values(10, 1000, 10000));
 
 TEST_P(RleCompressionTest, CompressionOfRandomInts_size)
 {
 	RleEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<int>(
+    EncodeDecodeUnittestHelper::TestSize<int>(
 		boost::bind(&RleEncoding::Encode<int>, encoder, _1),
 		boost::bind(&RleEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -238,7 +238,7 @@ TEST_P(RleCompressionTest, CompressionOfRandomInts_data)
 {
 	RleEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<int>(
+	EncodeDecodeUnittestHelper::TestContent<int>(
 		boost::bind(&RleEncoding::Encode<int>, encoder, _1),
 		boost::bind(&RleEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -249,7 +249,7 @@ TEST_P(RleCompressionTest, CompressionOfRandomFloats_size)
 {
 	RleEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<float>(
+    EncodeDecodeUnittestHelper::TestSize<float>(
 		boost::bind(&RleEncoding::Encode<float>, encoder, _1),
 		boost::bind(&RleEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -260,7 +260,7 @@ TEST_P(RleCompressionTest, CompressionOfRandomFloats_data)
 {
 	RleEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<float>(
+	EncodeDecodeUnittestHelper::TestContent<float>(
 		boost::bind(&RleEncoding::Encode<float>, encoder, _1),
 		boost::bind(&RleEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -280,7 +280,7 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomInts_size)
 {
 	UniqueEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<int>(
+    EncodeDecodeUnittestHelper::TestSize<int>(
 		boost::bind(&UniqueEncoding::Encode<int>, encoder, _1),
 		boost::bind(&UniqueEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -291,7 +291,7 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomInts_data)
 {
 	UniqueEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<int>(
+	EncodeDecodeUnittestHelper::TestContent<int>(
 		boost::bind(&UniqueEncoding::Encode<int>, encoder, _1),
 		boost::bind(&UniqueEncoding::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -302,7 +302,7 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_size)
 {
 	UniqueEncoding encoder;
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<float>(
+    EncodeDecodeUnittestHelper::TestSize<float>(
 		boost::bind(&UniqueEncoding::Encode<float>, encoder, _1),
 		boost::bind(&UniqueEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -313,7 +313,7 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_data)
 {
 	UniqueEncoding encoder;
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<float>(
+	EncodeDecodeUnittestHelper::TestContent<float>(
 		boost::bind(&UniqueEncoding::Encode<float>, encoder, _1),
 		boost::bind(&UniqueEncoding::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -334,7 +334,7 @@ TEST_P(PatchCompressionTest, CompressionOfRandomInts_size)
 	OutsideOperator<int> op{501, 5000};
 	PatchEncoding<OutsideOperator<int>> encoder(op);
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<int>(
+    EncodeDecodeUnittestHelper::TestSize<int>(
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<int>, encoder, _1),
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -346,7 +346,7 @@ TEST_P(PatchCompressionTest, CompressionOfRandomInts_data)
 	OutsideOperator<int> op{501, 5000};
 	PatchEncoding<OutsideOperator<int>> encoder(op);
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<int>(
+	EncodeDecodeUnittestHelper::TestContent<int>(
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<int>, encoder, _1),
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<int>, encoder, _1),
 		d_int_random_data)
@@ -358,7 +358,7 @@ TEST_P(PatchCompressionTest, CompressionOfRandomFloats_size)
 	OutsideOperator<int> op{501, 5000};
 	PatchEncoding<OutsideOperator<int>> encoder(op);
     EXPECT_TRUE(
-    EncodeDecodeUnittestHelper::TestSize2<float>(
+    EncodeDecodeUnittestHelper::TestSize<float>(
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<float>, encoder, _1),
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<float>, encoder, _1),
 		d_float_random_data)
@@ -370,7 +370,7 @@ TEST_P(PatchCompressionTest, CompressionOfRandomFloats_data)
 	OutsideOperator<int> op{501, 5000};
 	PatchEncoding<OutsideOperator<int>> encoder(op);
 	EXPECT_TRUE(
-	EncodeDecodeUnittestHelper::TestContent2<float>(
+	EncodeDecodeUnittestHelper::TestContent<float>(
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<float>, encoder, _1),
 		boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<float>, encoder, _1),
 		d_float_random_data)

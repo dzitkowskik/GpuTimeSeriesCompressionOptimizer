@@ -1,45 +1,78 @@
-#include "afl_encoding.hpp"
-#include "afl_encoding_impl.cuh"
+#include "compression/afl/afl_encoding.hpp"
+#include "compression/afl/afl_encoding_impl.cuh"
 #include "util/statistics/cuda_array_statistics.hpp"
-#include <thrust/device_vector.h>
 
 namespace ddj
 {
 
-template<typename T>
-int AflEncoding::getMinBitCnt(SharedCudaPtr<T> data)
-{
-	auto minMax = CudaArrayStatistics().MinMax(data);
-	int result = 32;
-	if (std::get<0>(minMax) >= 0)
-		result = ALT_BITLEN(std::get<1>(minMax));
-	return result;
-}
-
 template<>
-SharedCudaPtr<char> AflEncoding::Encode(SharedCudaPtr<int> data)
+SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<int> data)
 {
-	int minBit = getMinBitCnt<int>(data);
-	int compressed_data_size = (minBit * data->size() + 7) / 8; // in bytes
-	auto result = CudaPtr<char>::make_shared(compressed_data_size + sizeof(int));
+	// Get minimal bit count needed to encode data
+	char minBit = CudaArrayStatistics().MinBitCnt<int>(data);
+	int elemBitSize = 8*sizeof(int);
+	int comprElemCnt = (minBit * data->size() + elemBitSize - 1) / elemBitSize;
+	int comprDataSize = comprElemCnt * sizeof(int);
+	char rest = (comprDataSize*8) - (data->size()*minBit);
+
+	auto result = CudaPtr<char>::make_shared(comprDataSize);
+	auto metadata = CudaPtr<char>::make_shared(2*sizeof(char));
+
+	char host_metadata[2];
+	host_metadata[0] = minBit;
+	host_metadata[1] = rest;
+
 	run_afl_compress_gpu<int, 32>(
-		minBit, data->get(), (int*)(result->get()+sizeof(int)), data->size());
-	CUDA_CALL( cudaMemcpy(result->get(), &minBit, sizeof(int), CPY_HTD) );
+		minBit, data->get(), (int*)result->get(), data->size());
+
+	metadata->fillFromHost(host_metadata, 2*sizeof(char));
+
+	cudaDeviceSynchronize();
+	return SharedCudaPtrVector<char> {metadata, result};
+}
+
+template<>
+SharedCudaPtr<int> AflEncoding::Decode(SharedCudaPtrVector<char> input)
+{
+	auto metadata = input[0]->copyToHost();
+	auto data = input[1];
+
+	// Get min bit and rest
+	int minBit = (*metadata)[0];
+	int rest = (*metadata)[1];
+
+	// Calculate length
+	int comprElemCnt = data->size()/sizeof(int);
+	int comprBits = data->size() * 8 - rest;
+	int length = comprBits / minBit;
+
+	auto result = CudaPtr<int>::make_shared(length);
+	run_afl_decompress_gpu<int, 32>(minBit, (int*)data->get(), result->get(), length);
+
 	cudaDeviceSynchronize();
 	return result;
 }
 
-template<>
-SharedCudaPtr<int> AflEncoding::Decode(SharedCudaPtr<char> data)
+SharedCudaPtrVector<char> AflEncoding::EncodeInt(SharedCudaPtr<int> data)
 {
-	thrust::device_ptr<int> data_ptr((int*)data->get());
-	int minBit = data_ptr[0];
-	int length = (data->size() - sizeof(int)) * 8 / minBit;
-	auto result = CudaPtr<int>::make_shared(length);
-	run_afl_decompress_gpu<int, 32>(
-		minBit, (int*)(data->get()+sizeof(int)), result->get(), length);
-	cudaDeviceSynchronize();
-	return result;
+	return this->Encode<int>(data);
+}
+
+SharedCudaPtr<int> AflEncoding::DecodeInt(SharedCudaPtrVector<char> data)
+{
+	return this->Decode<int>(data);
+}
+
+SharedCudaPtrVector<char> AflEncoding::EncodeFloat(SharedCudaPtr<float> data)
+{
+	throw NotImplementedException("Afl encoding for this data type is not implemented");
+//		return this->Encode<float>(data);
+}
+
+SharedCudaPtr<float> AflEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
+{
+	throw NotImplementedException("Afl decoding for this data type is not implemented");
+//		return this->Decode<float>(data);
 }
 
 } /* namespace ddj */
