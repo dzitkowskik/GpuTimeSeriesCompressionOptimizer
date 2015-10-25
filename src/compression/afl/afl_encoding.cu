@@ -1,6 +1,6 @@
 #include "afl_encoding.hpp"
 #include "afl_encoding_impl.cuh"
-#include "helpers/helper_cudakernels.cuh"
+#include "util/statistics/cuda_array_statistics.hpp"
 #include <thrust/device_vector.h>
 
 namespace ddj
@@ -9,7 +9,7 @@ namespace ddj
 template<typename T>
 int AflEncoding::getMinBitCnt(SharedCudaPtr<T> data)
 {
-	auto minMax = this->_cudaKernels.MinMax(data);
+	auto minMax = CudaArrayStatistics().MinMax(data);
 	int result = 32;
 	if (std::get<0>(minMax) >= 0)
 		result = ALT_BITLEN(std::get<1>(minMax));

@@ -2,6 +2,7 @@
 #include "util/histogram/cuda_histogram_impl.cuh"
 #include "core/operators.cuh"
 #include "util/generator/cuda_array_generator.hpp"
+#include "util/statistics/cuda_array_statistics.hpp"
 #include <cmath>
 
 namespace ddj {
@@ -31,7 +32,7 @@ SharedCudaPtrPair<T, int> Histogram::CudaHistogramIntegral(SharedCudaPtr<T> data
 {
 	static_assert(std::is_integral<T>::value, "CudaHistogramIntegral allows only integral types");
 
-    auto minMax = this->_cudaKernels.MinMax<T>(data);
+    auto minMax = CudaArrayStatistics().MinMax<T>(data);
     int distance = std::get<1>(minMax) - std::get<0>(minMax) + 1;
 
     auto counts = CudaPtr<int>::make_shared(distance);
@@ -71,7 +72,7 @@ struct HistSumFun
 template<typename T>
 SharedCudaPtrPair<T, int> Histogram::CudaHistogram(SharedCudaPtr<T> data)
 {
-    auto minMax = this->_cudaKernels.MinMax<T>(data);
+    auto minMax = CudaArrayStatistics().MinMax<T>(data);
     auto distance = std::get<1>(minMax) - std::get<0>(minMax);
 
     auto counts = CudaPtr<int>::make_shared(data->size());

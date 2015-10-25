@@ -9,7 +9,6 @@
 #define DDJ_HISTOGRAM_HPP_
 
 #include "util/transform/cuda_array_transform.hpp"
-#include "helpers/helper_cudakernels.cuh"
 #include <gtest/gtest.h>
 
 namespace ddj {
@@ -31,7 +30,6 @@ private:
 
 private:
 	CudaArrayTransform _transform;
-	HelperCudaKernels _cudaKernels;
 
 	friend class HistogramTest;
  	FRIEND_TEST(HistogramTest, ThrustDenseHistogram_RandomIntegerArray);

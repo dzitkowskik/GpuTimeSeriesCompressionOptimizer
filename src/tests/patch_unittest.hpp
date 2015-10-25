@@ -11,7 +11,6 @@
 #include "helpers/helper_device.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
-#include "helpers/helper_cudakernels.cuh"
 
 #include <gtest/gtest.h>
 
