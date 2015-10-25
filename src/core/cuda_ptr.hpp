@@ -145,18 +145,19 @@ SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data)
 
 	// TODO: Make special class for streams and managing streams
 	// TODO: Do data copying with more than one stream
-	cudaStream_t stream;
-	CUDA_CALL( cudaStreamCreate(&stream) );
+//	cudaStream_t stream;
+//	CUDA_CALL( cudaStreamCreate(&stream) );
 
 	size_t offset = 0;
 	for(auto& part : data)
 	{
-		cudaMemcpyAsync(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD, stream);
+//		cudaMemcpyAsync(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD, stream);
+		cudaMemcpy(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD);
 		offset += part->size();
 	}
 
-	cudaStreamSynchronize(stream);
-	CUDA_CALL( cudaStreamDestroy(stream) );
+//	cudaStreamSynchronize(stream);
+//	CUDA_CALL( cudaStreamDestroy(stream) );
 
 	return result;
 }

@@ -8,6 +8,7 @@
 #ifndef DDJ_BENCHMARK_TEMPLATES_HPP_
 #define DDJ_BENCHMARK_TEMPLATES_HPP_
 
+#include <stdio.h>
 #include "util/generator/cuda_array_generator.hpp"
 #include <benchmark/benchmark.h>
 
@@ -121,6 +122,56 @@ static void Random_Int_Decode_Template(benchmark::State& state)
     state.SetBytesProcessed(it_processed * sizeof(int));
 }
 
+static void Benchmark_Encoding(
+		Encoding& encoding,
+		SharedCudaPtr<char> data,
+		DataType type,
+		benchmark::State& state)
+{
+	CudaArrayGenerator generator;
+
+	while (state.KeepRunning())
+	{
+		// ENCODE
+		auto compr = encoding.Encode(data, type);
+
+		state.PauseTiming();
+		compr.clear();
+		state.ResumeTiming();
+	}
+
+	long long int it_processed = state.iterations() * state.range_x();
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(float));
+}
+
+static void Benchmark_Decoding(
+		Encoding& encoding,
+		SharedCudaPtr<char> data,
+		DataType type,
+		benchmark::State& state)
+{
+	CudaArrayGenerator generator;
+
+	while (state.KeepRunning())
+	{
+		state.PauseTiming();
+		SharedCudaPtr<char> data_copy = data->copy();
+		auto compr = encoding.Encode(data_copy, type);
+		state.ResumeTiming();
+
+		// DECODE
+		auto decompr = encoding.Decode(compr, type);
+
+		state.PauseTiming();
+		compr.clear();
+		decompr.reset();
+		state.ResumeTiming();
+	}
+	long long int it_processed = state.iterations() * state.range_x();
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(float));
+}
 
 } /* namespace ddj */
 #endif /* DDJ_BENCHMARK_TEMPLATES_HPP_ */

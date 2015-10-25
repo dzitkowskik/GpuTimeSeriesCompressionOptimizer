@@ -221,7 +221,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
 INSTANTIATE_TEST_CASE_P(
 	RleEncoding_Compression_Inst,
 	RleCompressionTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(10, 1000, 10000, 1<<15, 1<<20));
 
 TEST_P(RleCompressionTest, CompressionOfRandomInts_size)
 {
