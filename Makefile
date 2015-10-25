@@ -87,7 +87,7 @@ test: export EXCLUDED_DIRECTORIES := -not -path '*/benchmarks/*'
 test: export BUILD_PATH := build/test
 test: export BIN_PATH := bin/test
 
-benchmark: export CODE_FLAGS := -O3
+benchmark: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG#-O3
 benchmark: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -iname 'main_tests.cpp'

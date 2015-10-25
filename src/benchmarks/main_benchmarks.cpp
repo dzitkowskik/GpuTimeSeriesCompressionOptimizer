@@ -1,5 +1,4 @@
 #include <benchmark/benchmark.h>
-#include "core/config.hpp"
 
 const char** getBenchmarkFilter(char** argv)
 {
@@ -14,13 +13,9 @@ int main(int argc, char** argv)
 {
     int new_argc = 2;
     const char** new_argv = getBenchmarkFilter(argv);
-
-//    ddj::Config::GetInstance()->InitOptions(argc, argv, "benchmarks/benchmarks_config.ini");
     ::benchmark::Initialize(&new_argc, const_cast<const char**>(new_argv));
-
     // ::benchmark::Initialize(&argc, const_cast<const char**>(argv));
     ::benchmark::RunSpecifiedBenchmarks();
-
     delete [] new_argv;
     return 0;
 }
