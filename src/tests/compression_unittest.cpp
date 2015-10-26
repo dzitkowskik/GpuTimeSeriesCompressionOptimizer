@@ -137,7 +137,7 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_data)
 INSTANTIATE_TEST_CASE_P(
 	AflEncoding_Compression_Inst,
 	AflCompressionTest,
-    ::testing::Values(1<<20));
+    ::testing::Values(10, 1000, 10000));
 
 TEST_P(AflCompressionTest, CompressionOfRandomInts_size)
 {

@@ -33,6 +33,7 @@ private:
 
 	friend class HistogramTest;
  	FRIEND_TEST(HistogramTest, ThrustDenseHistogram_RandomIntegerArray);
+	FRIEND_TEST(HistogramTest, ThrustDenseHistogram_RealData_Time_Int);
  	FRIEND_TEST(HistogramTest, GetMostFrequent_fake_data);
 	FRIEND_TEST(HistogramTest, GetMostFrequent_random_int);
 

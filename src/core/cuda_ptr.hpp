@@ -39,13 +39,12 @@ class CudaPtr : private boost::noncopyable
 {
 public:
 	CudaPtr() : _pointer(NULL), _size(0){}
-	CudaPtr(T* ptr) : _pointer(ptr), _size(0){}
 	CudaPtr(size_t size) : _pointer(NULL), _size(size)
 	{
 		if(_size > 0)
 			CUDA_CHECK_RETURN( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
 	}
-	CudaPtr(T* ptr, size_t size) : _pointer(ptr), _size(size){}
+	CudaPtr(T* pointer, size_t size) : _pointer(pointer), _size(size) {}
 
 	~CudaPtr()
 	{ CUDA_CHECK_RETURN( cudaFree(_pointer) ); }
@@ -76,7 +75,7 @@ public:
 			);
 	}
 
-	void fillFromHost(T* ptr, size_t size)
+	void fillFromHost(const T* ptr, size_t size)
 	{
 		if(_size < size) reset(size);
 		CUDA_CHECK_RETURN(
@@ -118,10 +117,8 @@ public:
 	{ return SharedCudaPtr<T>(new CudaPtr()); }
 	static SharedCudaPtr<T> make_shared(size_t size)
 	{ return SharedCudaPtr<T>(new CudaPtr(size)); }
-	static SharedCudaPtr<T> make_shared(T* ptr)
-	{ return SharedCudaPtr<T>(new CudaPtr(ptr)); }
-	static SharedCudaPtr<T> make_shared(T* ptr, size_t size)
-	{ return SharedCudaPtr<T>(new CudaPtr(ptr, size)); }
+	static SharedCudaPtr<T> make_shared(T* data, size_t size)
+	{ return SharedCudaPtr<T>(new CudaPtr(data, size)); }
 
 private:
 	T* _pointer;
@@ -145,19 +142,18 @@ SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data)
 
 	// TODO: Make special class for streams and managing streams
 	// TODO: Do data copying with more than one stream
-//	cudaStream_t stream;
-//	CUDA_CALL( cudaStreamCreate(&stream) );
+	cudaStream_t stream;
+	CUDA_CALL( cudaStreamCreate(&stream) );
 
 	size_t offset = 0;
 	for(auto& part : data)
 	{
-//		cudaMemcpyAsync(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD, stream);
-		cudaMemcpy(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD);
+		cudaMemcpyAsync(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD, stream);
 		offset += part->size();
 	}
 
-//	cudaStreamSynchronize(stream);
-//	CUDA_CALL( cudaStreamDestroy(stream) );
+	cudaStreamSynchronize(stream);
+	CUDA_CALL( cudaStreamDestroy(stream) );
 
 	return result;
 }

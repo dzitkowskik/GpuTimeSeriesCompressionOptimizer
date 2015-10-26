@@ -1,9 +1,9 @@
-#include "histogram_unittest.hpp"
+#include "unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_macros.h"
 #include "core/cuda_ptr.hpp"
 #include "util/other/simple_cpu_histogram.hpp"
-#include "util/histogram/histogram.hpp"
+#include "core/config.hpp"
 
 #include <cuda_runtime_api.h>
 #include <vector>
@@ -15,22 +15,8 @@
 namespace ddj
 {
 
-SharedCudaPtrPair<int, int> fakeIntHistogram(int size)
-{
-    int mod = size / 10;
-    int big = size/3;
-    std::vector<int> h_fakeData;
-    for(int i = 0; i < size; i++)
-    {
-        if(i%mod == 0 || i%mod == 1)
-            h_fakeData.push_back(size);
-        else
-            h_fakeData.push_back(i%mod);
-    }
-    auto d_fakeData = CudaPtr<int>::make_shared(size);
-    d_fakeData->fillFromHost(h_fakeData.data(), size);
-    return Histogram().Calculate(d_fakeData);
-}
+class HistogramTest : public UnittestBase {};
+
 
 template<typename T>
 bool CheckMostFrequent(
@@ -57,13 +43,12 @@ bool CheckMostFrequent(
     return true;
 }
 
-
 TEST_F(HistogramTest, GetMostFrequent_fake_data)
 {
     int mostFreqCnt = 3;
-    auto fakedHistogram = fakeIntHistogram(size);
+    auto fakedHistogram = GetFakeIntHistogram();
     auto mostFrequent = Histogram().GetMostFrequent(fakedHistogram, mostFreqCnt);
-    int expected = size, actual;
+    int expected = GetSize(), actual;
     CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
     EXPECT_EQ(expected, actual);
 }
@@ -71,7 +56,7 @@ TEST_F(HistogramTest, GetMostFrequent_fake_data)
 TEST_F(HistogramTest, GetMostFrequent_random_int)
 {
     int mostFreqCnt = 4;
-    auto randomHistogram = Histogram().Calculate(d_int_random_data);
+    auto randomHistogram = Histogram().Calculate(GetIntRandomData());
     auto mostFrequent = Histogram().GetMostFrequent(randomHistogram, mostFreqCnt);
     EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
 }
@@ -147,7 +132,7 @@ void PrintHostHistogram(std::map<T, int> histogram, std::string name)
 }
 
 template<typename T>
-void HistogramTest::CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> result)
+void CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> result)
 {
 	int size = data->size();
 	SimpleCpuHistogram cpu_histogram;
@@ -168,8 +153,24 @@ void HistogramTest::CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPai
 
 TEST_F(HistogramTest, ThrustDenseHistogram_RandomIntegerArray)
 {
-	auto result = Histogram().ThrustDenseHistogram(d_int_random_data);
-	CheckHistogramResult<int>(d_int_random_data, result);
+	auto randomData = GetIntRandomData();
+	auto result = Histogram().ThrustDenseHistogram(randomData);
+	CheckHistogramResult<int>(randomData, result);
+}
+
+
+TEST_F(HistogramTest, ThrustDenseHistogram_RealData_Time_Int)
+{
+	auto realData = GetTsIntDataFromTestFile();
+	auto result = Histogram().ThrustDenseHistogram(realData);
+	CheckHistogramResult<int>(realData, result);
+}
+
+TEST_F(HistogramTest, CalculateHistogram_RealData_Time_Int)
+{
+	auto realData = GetTsIntDataFromTestFile();
+	auto result = Histogram().Calculate(realData);
+	CheckHistogramResult<int>(realData, result);
 }
 
 } /* namespace ddj */
