@@ -1,4 +1,4 @@
-#include "tests/patch_unittest.hpp"
+#include "patch_unittest.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "compression/patch/patch_encoding.hpp"
 #include "core/operators.cuh"

@@ -22,6 +22,7 @@ class UnittestBase : public testing::Test
 {
 protected:
 	UnittestBase() : _size(10000) {}
+	virtual ~UnittestBase(){}
 
 	virtual void SetUp()
 	{

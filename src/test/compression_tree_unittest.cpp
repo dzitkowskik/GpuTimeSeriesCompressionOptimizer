@@ -5,7 +5,7 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "tests/compression_tree_unittest.hpp"
+#include "compression_tree_unittest.hpp"
 #include "helpers/helper_comparison.cuh"
 #include <boost/make_shared.hpp>
 

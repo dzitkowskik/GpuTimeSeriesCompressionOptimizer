@@ -64,40 +64,34 @@ endif
 
 debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
 debug: export EXCLUDED_FILES := \
-	-not -iname 'main_tests.cpp' \
-	-not -iname 'main_benchmarks.cpp'
+	-not -name '*_unittest*' \
+	-not -name '*_benchmark*'
 debug: export BUILD_PATH := build/debug
 debug: export BIN_PATH := bin/debug
 
 release: export CODE_FLAGS := -O3
 release: export EXCLUDED_FILES := \
-	-not -iname 'main_tests.cpp' \
-	-not -iname 'main_benchmarks.cpp'
-release: export EXCLUDED_DIRECTORIES := \
-	-not -path '*/tests/*' \
-	-not -path '*/benchmarks/*'
+	-not -name '*_unittest*' \
+	-not -name '*_benchmark*'
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
 test: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
-	-not -iname 'main_benchmarks.cpp'
-test: export EXCLUDED_DIRECTORIES := -not -path '*/benchmarks/*'
+	-not -name '*_benchmark*'
 test: export BUILD_PATH := build/test
 test: export BIN_PATH := bin/test
 
 benchmark: export CODE_FLAGS := -O3
 benchmark: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
-	-not -iname 'main_tests.cpp'
-benchmark: export EXCLUDED_DIRECTORIES := -not -path '*/tests/*'
+	-not -name '*_unittest*'
 benchmark: export BUILD_PATH := build/benchmark
 benchmark: export BIN_PATH := bin/benchmark
 
 SRC_FILES := $(shell find $(SRC_PATH)/ -name '*.$(SRC_EXT)' \
-	$(EXCLUDED_FILES) $(EXCLUDED_DIRECTORIES) \
-	-o -name '*.$(SRC_CUDA_EXT)' $(EXCLUDED_DIRECTORIES) \
+	$(EXCLUDED_FILES) -o -name '*.$(SRC_CUDA_EXT)' $(EXCLUDED_FILES) \
 	| sort -k 1nr | cut -f2-)
 
 OBJS := $(SRC_FILES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)

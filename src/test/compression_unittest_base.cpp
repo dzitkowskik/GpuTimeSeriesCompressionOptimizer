@@ -5,16 +5,18 @@
  *      Author: Karol Dzitkowski
  */
 
-#include "encode_decode_unittest_helper.hpp"
+#include "compression_unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_macros.h"
 #include "helpers/helper_print.hpp"
+
+#include <boost/function.hpp>
 
 namespace ddj
 {
 
 template<typename T>
-bool EncodeDecodeUnittestHelper::TestSize(
+bool CompressionUnittestBase::TestSize(
 		boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<T> data)> encodeFunction,
 		boost::function<SharedCudaPtr<T> (SharedCudaPtrVector<char> data)> decodeFunction,
 		SharedCudaPtr<T> data)
@@ -25,7 +27,7 @@ bool EncodeDecodeUnittestHelper::TestSize(
 }
 
 template<typename T>
-bool EncodeDecodeUnittestHelper::TestContent(
+bool CompressionUnittestBase::TestContent(
 		boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<T> data)> encodeFunction,
 		boost::function<SharedCudaPtr<T> (SharedCudaPtrVector<char> data)> decodeFunction,
 		SharedCudaPtr<T> data)
@@ -38,15 +40,15 @@ bool EncodeDecodeUnittestHelper::TestContent(
 	return CompareDeviceArrays(data->get(), decodedData->get(), data->size());
 }
 
-#define SCALE_SPEC(X) \
-	template bool EncodeDecodeUnittestHelper::TestSize<X>(							\
+#define COMPRESSION_UNITTEST_BASE_SPEC(X) \
+	template bool CompressionUnittestBase::TestSize<X>(							\
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<X> data)>,		\
 			boost::function<SharedCudaPtr<X> (SharedCudaPtrVector<char> data)>,		\
 			SharedCudaPtr<X> data); 												\
-	template bool EncodeDecodeUnittestHelper::TestContent<X>(						\
+	template bool CompressionUnittestBase::TestContent<X>(						\
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<X> data)>, 	\
 			boost::function<SharedCudaPtr<X> (SharedCudaPtrVector<char> data)>, 	\
 			SharedCudaPtr<X> data);
-FOR_EACH(SCALE_SPEC, float, int, long long, unsigned int)
+FOR_EACH(COMPRESSION_UNITTEST_BASE_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

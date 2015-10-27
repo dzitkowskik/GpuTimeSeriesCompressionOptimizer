@@ -1,4 +1,4 @@
-#include "standard_param_unittest_base.hpp"
+#include "unittest_base.hpp"
 #include "util/histogram/histogram.hpp"
 #include "helpers/helper_print.hpp"
 #include "helpers/helper_comparison.cuh"
@@ -38,15 +38,16 @@ TEST(OtherTests, SharedCudaPtr_ReinterpretCast)
         EXPECT_EQ((*expected)[i], (*actual)[i]);
 }
 
-class MostFrequentTest : public StandardParamTestBase {};
+class MostFrequentTest : public UnittestBase {};
 
 TEST_F(MostFrequentTest, CompressDecompressMostFrequent_random_int)
 {
+	auto randomData = GetIntRandomData();
     int mostFreqCnt = 4;
-    auto mostFrequent = Histogram().GetMostFrequent(d_int_random_data, mostFreqCnt);
+    auto mostFrequent = Histogram().GetMostFrequent(randomData, mostFreqCnt);
 
-    auto stencil = DictEncoding().GetMostFrequentStencil(d_int_random_data, mostFrequent);
-    auto mostFrequentDataPart = std::get<0>(Splitter().Split(d_int_random_data, stencil));
+    auto stencil = DictEncoding().GetMostFrequentStencil(randomData, mostFrequent);
+    auto mostFrequentDataPart = std::get<0>(Splitter().Split(randomData, stencil));
 
     auto encoded = UniqueEncoding().CompressUnique(mostFrequentDataPart, mostFrequent);
     auto decoded = UniqueEncoding().template DecompressUnique<int>(encoded);

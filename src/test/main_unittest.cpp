@@ -16,7 +16,7 @@ void initialize_logger()
 
 int main(int argc, char* argv[])
 {
-    ddj::Config::GetInstance()->InitOptions(argc, argv, "src/tests/config_tests.ini");
+    ddj::Config::GetInstance()->InitOptions(argc, argv, "src/test/config.ini");
     ::testing::InitGoogleTest(&argc, argv);
     ::testing::FLAGS_gtest_repeat = 1;
 

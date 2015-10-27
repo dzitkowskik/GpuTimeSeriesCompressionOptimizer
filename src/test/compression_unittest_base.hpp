@@ -1,21 +1,20 @@
 /*
- * encode_decode_unittest_helper.hpp
+ *  compression_unittest_base.hpp
  *
- *  Created on: 07-05-2015
+ *  Created on: 22-04-2015
  *      Author: Karol Dzitkowski
  */
 
-#ifndef ENCODE_DECODE_UNITTEST_HELPER_H_
-#define ENCODE_DECODE_UNITTEST_HELPER_H_
+#ifndef DDJ_COMPRESSION_UNITTEST_BASE_HPP_
+#define DDJ_COMPRESSION_UNITTEST_BASE_HPP_
 
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include "core/cuda_ptr.hpp"
+#include "unittest_base.hpp"
 
 namespace ddj
 {
 
-class EncodeDecodeUnittestHelper
+class CompressionUnittestBase : public UnittestBase,
+    public ::testing::WithParamInterface<int>
 {
 public:
 	template<typename T>
@@ -32,4 +31,4 @@ public:
 };
 
 } /* namespace ddj */
-#endif /* ENCODE_DECODE_UNITTEST_HELPER_H_ */
+#endif /* DDJ_COMPRESSION_UNITTEST_HPP_ */
