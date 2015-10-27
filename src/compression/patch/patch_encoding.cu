@@ -7,7 +7,7 @@
 
 #include "compression/patch/patch_encoding.hpp"
 #include "helpers/helper_cuda.cuh"
-#include "helpers/helper_macros.h"
+#include "core/macros.h"
 #include "core/operators.cuh"
 #include "util/stencil/stencil.hpp"
 

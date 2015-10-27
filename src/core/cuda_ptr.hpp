@@ -13,9 +13,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include "helpers/helper_macros.h"
 #include <vector>
 #include <utility>
+
+#include "core/macros.h"
 
 template<class T> class CudaPtr;
 
@@ -130,7 +131,6 @@ SharedCudaPtr<TO> MoveSharedCudaPtr(SharedCudaPtr<FROM> data)
 {
 	return SharedCudaPtr<TO>(data->template move<TO>());
 }
-
 
 template<typename T>
 SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data)

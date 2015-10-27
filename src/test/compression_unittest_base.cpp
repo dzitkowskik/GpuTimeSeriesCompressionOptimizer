@@ -7,8 +7,7 @@
 
 #include "compression_unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
-#include "helpers/helper_macros.h"
-#include "helpers/helper_print.hpp"
+#include "core/macros.h"
 
 #include <boost/function.hpp>
 
@@ -34,9 +33,6 @@ bool CompressionUnittestBase::TestContent(
 {
 	auto encodedData = encodeFunction(data);
 	auto decodedData = decodeFunction(encodedData);
-
-//	HelperPrint::PrintTestArrays<T>(data->get(), decodedData->get(), data->size());
-
 	return CompareDeviceArrays(data->get(), decodedData->get(), data->size());
 }
 

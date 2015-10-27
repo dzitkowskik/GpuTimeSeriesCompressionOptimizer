@@ -1,9 +1,9 @@
-#include "unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
-#include "helpers/helper_macros.h"
+#include "core/macros.h"
 #include "core/cuda_ptr.hpp"
 #include "util/other/simple_cpu_histogram.hpp"
 #include "core/config.hpp"
+#include "unittest_base.hpp"
 
 #include <cuda_runtime_api.h>
 #include <vector>

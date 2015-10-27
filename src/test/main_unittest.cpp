@@ -7,6 +7,8 @@
 // find src/ -name '*.cpp' -not -name '*_unittest*' -not -name '*_benchmark*'
 // -o -name '*.cu' -not -name '*_unittest*' -not -name '*_benchmark*' | sort -k 1nr | cut -f2-
 
+//--gtest_filter=AflEncoding_Compression_Inst/AflCompressionTest.CompressionOfRandomInts_size/0
+
 void initialize_logger()
 {
   log4cplus::initialize();

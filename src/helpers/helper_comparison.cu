@@ -1,6 +1,6 @@
 #include "helper_comparison.cuh"
 #include "core/cuda_macros.cuh"
-#include "helper_macros.h"
+#include "core/macros.h"
 #include <boost/type_traits/is_same.hpp>
 
 #define MAX_FLOAT_DIFF 0.00001f

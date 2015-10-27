@@ -3,7 +3,7 @@
  */
 
 #include "helper_device.hpp"
-#include "helper_macros.h"
+#include "core/macros.h"
 
 namespace ddj {
 

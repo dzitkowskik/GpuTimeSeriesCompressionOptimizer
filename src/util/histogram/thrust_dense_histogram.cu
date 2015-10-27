@@ -1,4 +1,6 @@
 #include "util/histogram/histogram.hpp"
+#include "core/macros.h"
+
 #include <thrust/device_vector.h>
 #include <thrust/sort.h>
 #include <thrust/copy.h>

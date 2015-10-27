@@ -6,7 +6,7 @@
  */
 
 #include "scale_encoding.hpp"
-#include "helpers/helper_macros.h"
+#include "core/macros.h"
 #include "core/cuda_macros.cuh"
 #include "helpers/helper_cuda.cuh"
 

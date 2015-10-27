@@ -18,17 +18,24 @@
 
 namespace ddj {
 
-class UnittestBase : public testing::Test
+class UnittestBase : public ::testing::Test
 {
-protected:
-	UnittestBase() : _size(10000) {}
-	virtual ~UnittestBase(){}
-
-	virtual void SetUp()
+public:
+	static void SetUpTestCase()
 	{
 		HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
 	}
+
+protected:
+
+	virtual void SetUp()
+	{
+		printf("SetUp\n");
+		_size = 100;
+	}
+
+	virtual void TearDown(){}
 
 	SharedCudaPtr<int> GetIntRandomData()
 	{ return _generator.GenerateRandomIntDeviceArray(_size, 100, 1000); }
@@ -73,9 +80,8 @@ protected:
 
 	int GetSize() { return _size; }
 
-private:
 	CudaArrayGenerator _generator;
-	const int _size;
+	int _size;
 };
 
 } /* namespace ddj */

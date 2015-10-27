@@ -5,7 +5,6 @@
 #ifndef DDJ_HELPER_COMPARISON_H_
 #define DDJ_HELPER_COMPARISON_H_
 
-#include "helper_macros.h"
 #include <thrust/device_vector.h>
 #include <thrust/scan.h>
 

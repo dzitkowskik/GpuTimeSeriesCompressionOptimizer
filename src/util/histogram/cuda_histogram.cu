@@ -3,6 +3,7 @@
 #include "core/operators.cuh"
 #include "util/generator/cuda_array_generator.hpp"
 #include "util/statistics/cuda_array_statistics.hpp"
+#include "core/macros.h"
 #include <cmath>
 
 namespace ddj {

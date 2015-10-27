@@ -13,8 +13,7 @@
 namespace ddj
 {
 
-class CompressionUnittestBase : public UnittestBase,
-    public ::testing::WithParamInterface<int>
+class CompressionUnittestBase : public UnittestBase, public ::testing::WithParamInterface<int>
 {
 public:
 	template<typename T>

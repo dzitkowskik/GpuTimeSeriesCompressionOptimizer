@@ -8,6 +8,7 @@
 #include "util/other/prefix_sum.cuh"
 #include "util/splitter/splitter.hpp"
 #include "helpers/helper_cuda.cuh"
+#include "core/macros.h"
 
 #include <thrust/device_vector.h>
 #include <thrust/fill.h>

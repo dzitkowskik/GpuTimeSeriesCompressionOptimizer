@@ -8,6 +8,7 @@
 #include "util/transform/cuda_array_transform.hpp"
 #include "core/operators.cuh"
 #include "helpers/helper_cuda.cuh"
+#include "core/macros.h"
 
 #include <thrust/device_ptr.h>
 #include <thrust/extrema.h>

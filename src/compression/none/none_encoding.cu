@@ -6,7 +6,7 @@
  */
 
 #include "compression/none/none_encoding.hpp"
-#include "helpers/helper_macros.h"
+#include "core/macros.h"
 
 namespace ddj {
 

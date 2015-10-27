@@ -1,6 +1,6 @@
 #include "splitter_unittest.hpp"
 #include "helpers/helper_comparison.cuh"
-#include "helpers/helper_macros.h"
+#include "core/macros.h"
 #include "core/cuda_ptr.hpp"
 #include "util/splitter/splitter.hpp"
 

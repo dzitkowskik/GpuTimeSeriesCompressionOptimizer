@@ -7,7 +7,7 @@
 
 #include "compression/rle/rle_encoding.hpp"
 #include "helpers/helper_print.hpp"
-#include "helpers/helper_macros.h"
+#include "core/macros.h"
 
 #include <thrust/device_vector.h>
 #include <thrust/iterator/constant_iterator.h>

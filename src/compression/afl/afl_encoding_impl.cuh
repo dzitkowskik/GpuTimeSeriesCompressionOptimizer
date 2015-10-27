@@ -2,7 +2,7 @@
 #define DDJ_AFL_ENCODING_IMPL_CUH_
 
 #include "core/cuda_macros.cuh"
-#include "helpers/helper_macros.h"
+#include "core/macros.h"
 #include <stdio.h>
 
 // CWARP_SIZE is given in template to allow the compiler to optimize it (i.e. possible values are 32 or 1)
