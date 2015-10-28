@@ -25,7 +25,7 @@ public:
     {
         std::cout << name << std::endl;
         thrust::copy(data, data+size,
-            std::ostream_iterator<float>(std::cout, " "));
+            std::ostream_iterator<T>(std::cout, " "));
         std::cout << std::endl;
     }
 

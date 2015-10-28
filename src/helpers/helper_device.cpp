@@ -11,9 +11,11 @@ int HelperDevice::CudaGetDevicesCount()
 {
 	int count = 0;
 	cudaError_t error = cudaGetDeviceCount(&count);
-	if(cudaSuccess != error)
+	if(cudaSuccess == error)
 		return count;
-	else return -1;
+	// ELSE
+	CUDA_CALL(error);
+	return 0;
 }
 
 bool HelperDevice::CudaCheckDeviceForRequirements(int n)
@@ -67,7 +69,6 @@ int HelperDevice::SetCudaDeviceWithMaxFreeMem()
 	{
 		cudaSetDevice(i);
 		GetMemoryCount(&free, &total);
-		printf("Free memory = %d\n", free);
 		if(free > max_free)
 		{
 			max_free = free;

@@ -1,10 +1,12 @@
 #include "helpers/helper_comparison.cuh"
 #include "core/macros.h"
 #include "core/cuda_ptr.hpp"
-#include "util/other/simple_cpu_histogram.hpp"
+#include "util/other/cpu_histogram.hpp"
 #include "util/histogram/histogram.hpp"
 #include "core/config.hpp"
-#include "unittest_base.hpp"
+#include "test/unittest_base.hpp"
+#include "compression/delta/delta_encoding.hpp"
+#include "helpers/helper_print.hpp"
 
 #include <cuda_runtime_api.h>
 #include <vector>
@@ -48,7 +50,7 @@ TEST_F(HistogramTest, GetMostFrequent_fake_data)
 {
     int mostFreqCnt = 3;
     auto fakeData = GetFakeIntDataForHistogram();
-    auto fakedHistogram = Histogram().Calculate(fakeData);
+    auto fakedHistogram = Histogram().CalculateSparse(fakeData);
     auto mostFrequent = Histogram().GetMostFrequent(fakedHistogram, mostFreqCnt);
     int expected = GetSize(), actual;
     CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
@@ -58,15 +60,15 @@ TEST_F(HistogramTest, GetMostFrequent_fake_data)
 TEST_F(HistogramTest, GetMostFrequent_random_int)
 {
     int mostFreqCnt = 4;
-    auto randomHistogram = Histogram().Calculate(GetIntRandomData());
+    auto randomHistogram = Histogram().CalculateDense(GetIntRandomData());
     auto mostFrequent = Histogram().GetMostFrequent(randomHistogram, mostFreqCnt);
     EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
 }
 
-TEST(SimpleCpuHistogramTest, AllOnes)
+TEST(CpuHistogramTest, Sparse_AllOnes)
 {
     int N = 1000;
-    SimpleCpuHistogram histogram;
+    CpuHistogramSparse histogram;
     std::vector<int> data(N);
     for(int i = 0; i < N; i++) data[i] = i;
     std::vector<int> expected(N);
@@ -76,11 +78,38 @@ TEST(SimpleCpuHistogramTest, AllOnes)
     for(int i = 0; i < N; i++) EXPECT_EQ(expected[i], actual[i]);
 }
 
-TEST(SimpleCpuHistogramTest, RepeatedNumbers_Modulo)
+TEST(CpuHistogramTest, Dense_AllOnes)
+{
+    int N = 1000;
+    CpuHistogramDense histogram;
+    std::vector<int> data(N);
+    for(int i = 0; i < N; i++) data[i] = i;
+    std::vector<int> expected(N);
+    for(int i = 0; i < N; i++) expected[i] = 1;
+    auto actual = histogram.Histogram(data);
+    ASSERT_EQ(expected.size(), actual.size());
+    for(int i = 0; i < N; i++) EXPECT_EQ(expected[i], actual[i]);
+}
+
+TEST(CpuHistogramTest, Sparse_RepeatedNumbers_Modulo)
 {
     int N = 1000;
     int M = 10;
-    SimpleCpuHistogram histogram;
+    CpuHistogramSparse histogram;
+    std::vector<int> data(N);
+    for(int i = 0; i < N; i++) data[i] = i%M;
+    std::vector<int> expected(M);
+    for(int i = 0; i < M; i++) expected[i] = N/M;
+    auto actual = histogram.Histogram(data);
+    ASSERT_EQ(expected.size(), actual.size());
+    for(int i = 0; i < M; i++) EXPECT_EQ(expected[i], actual[i]);
+}
+
+TEST(CpuHistogramTest, Dense_RepeatedNumbers_Modulo)
+{
+    int N = 1000;
+    int M = 10;
+    CpuHistogramDense histogram;
     std::vector<int> data(N);
     for(int i = 0; i < N; i++) data[i] = i%M;
     std::vector<int> expected(M);
@@ -133,16 +162,16 @@ void PrintHostHistogram(std::map<T, int> histogram, std::string name)
     std::cout << std::endl;
 }
 
-template<typename T>
+template<typename T, class CPU_HIST>
 void CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> result)
 {
 	int size = data->size();
-	SimpleCpuHistogram cpu_histogram;
+	CPU_HIST cpuHistogram;
 
-	int* h_data = new int[size];
-	CUDA_CALL( cudaMemcpy(h_data, data->get(), size*sizeof(int), CPY_DTH) );
-	auto h_data_vector = std::vector<int>(h_data, h_data+size);
-	auto h_expected = cpu_histogram.Histogram(h_data_vector);
+	T* h_data = new T[size];
+	CUDA_CALL( cudaMemcpy(h_data, data->get(), size*sizeof(T), CPY_DTH) );
+	auto h_data_vector = std::vector<T>(h_data, h_data+size);
+	auto h_expected = cpuHistogram.Histogram(h_data_vector);
 	auto d_actual = result;
 	ASSERT_TRUE(d_actual.first != NULL);
 	ASSERT_TRUE(d_actual.second != NULL);
@@ -151,8 +180,8 @@ void CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> resul
 	EXPECT_EQ( h_expected.size(), h_actual.size() );
 	EXPECT_TRUE( CompareHistograms(h_expected, h_actual) );
 
-	    PrintHostHistogram(h_expected, "Expected");
-	    PrintHostHistogram(h_actual, "Actual");
+//	    PrintHostHistogram(h_expected, "Expected");
+//	    PrintHostHistogram(h_actual, "Actual");
 
 	delete [] h_data;
 }
@@ -161,22 +190,28 @@ TEST_F(HistogramTest, ThrustSparseHistogram_RandomIntegerArray)
 {
 	auto randomData = GetIntRandomData();
 	auto result = Histogram().ThrustSparseHistogram(randomData);
-	CheckHistogramResult<int>(randomData, result);
+	CheckHistogramResult<int, CpuHistogramSparse>(randomData, result);
 }
 
 
-TEST_F(HistogramTest, ThrustDenseHistogram_RealData_Time_Int)
+TEST_F(HistogramTest, ThrustSparseHistogram_RealData_Delta_Time)
 {
 	auto realData = GetTsIntDataFromTestFile();
-	auto result = Histogram().ThrustDenseHistogram(realData);
-	CheckHistogramResult<int>(realData, result);
+	auto deltaEncoded = DeltaEncoding().Encode(realData);
+	auto realDataDelta = MoveSharedCudaPtr<char, time_t>(deltaEncoded[1]);
+
+	auto result = Histogram().ThrustSparseHistogram(realDataDelta);
+	CheckHistogramResult<time_t, CpuHistogramSparse>(realDataDelta, result);
 }
 
-TEST_F(HistogramTest, CalculateHistogram_RealData_Time_Int)
+TEST_F(HistogramTest, CalculateHistogram_RealData_Delta_Time)
 {
 	auto realData = GetTsIntDataFromTestFile();
-	auto result = Histogram().Calculate(realData);
-	CheckHistogramResult<int>(realData, result);
+	auto deltaEncoded = DeltaEncoding().Encode(realData);
+	auto realDataDelta = MoveSharedCudaPtr<char, time_t>(deltaEncoded[1]);
+	auto result = Histogram().CalculateDense(realDataDelta);
+
+	CheckHistogramResult<time_t, CpuHistogramDense>(realDataDelta, result);
 }
 
 } /* namespace ddj */

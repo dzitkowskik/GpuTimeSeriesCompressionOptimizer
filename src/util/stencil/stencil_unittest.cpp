@@ -1,20 +1,22 @@
-#include "stencil_unittest.hpp"
+#include "test/unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
-#include "util/stencil/stencil.hpp"
 #include "helpers/helper_print.hpp"
+#include "stencil.hpp"
 
 namespace ddj {
 
+class StencilTest : public UnittestBase {};
+
 TEST_F(StencilTest, Stencil_random_pack_size)
 {
-    Stencil stencil(d_random_stencil_data);
+    Stencil stencil(GetRandomStencilData());
     auto packed = stencil.pack();
     EXPECT_TRUE(packed->size() < stencil->size());
 }
 
 TEST_F(StencilTest, Stencil_random_pack_unpack_size)
 {
-    Stencil stencil(d_random_stencil_data);
+    Stencil stencil(GetRandomStencilData());
     auto packed = stencil.pack();
     auto unpacked = stencil.unpack(packed);
     EXPECT_EQ(stencil->size(), unpacked->size());
@@ -22,7 +24,7 @@ TEST_F(StencilTest, Stencil_random_pack_unpack_size)
 
 TEST_F(StencilTest, Stencil_random_pack_unpack_data)
 {
-    Stencil stencil(d_random_stencil_data);
+    Stencil stencil(GetRandomStencilData());
     auto packed = stencil.pack();
     auto unpacked = stencil.unpack(packed);
     auto result = CompareDeviceArrays(stencil->get(), unpacked->get(), stencil->size());

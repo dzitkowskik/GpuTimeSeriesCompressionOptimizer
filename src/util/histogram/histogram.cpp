@@ -6,13 +6,34 @@
  */
 
 #include <util/histogram/histogram.hpp>
+#include "util/statistics/cuda_array_statistics.hpp"
+
 
 namespace ddj {
 
 // INT
-template<> SharedCudaPtrPair<int, int> Histogram::Calculate<int>(SharedCudaPtr<int> data)
+template<> SharedCudaPtrPair<int, int> Histogram::CalculateDense<int>(SharedCudaPtr<int> data)
 {
-	return CudaHistogramIntegral(data);
+    auto minMax = CudaArrayStatistics().MinMax<int>(data);
+    if(std::get<1>(minMax) - std::get<0>(minMax) < 1000)
+    	return CudaHistogramIntegral(data, std::get<0>(minMax), std::get<1>(minMax));
+    else
+    	return ThrustDenseHistogram(data);
+}
+
+template<> SharedCudaPtrPair<int, int> Histogram::CalculateSparse<int>(SharedCudaPtr<int> data)
+{
+    return ThrustSparseHistogram(data);
+}
+
+// LONG
+template<> SharedCudaPtrPair<long, int> Histogram::CalculateDense<long>(SharedCudaPtr<long> data)
+{
+    auto minMax = CudaArrayStatistics().MinMax<long>(data);
+    if(std::get<1>(minMax) - std::get<0>(minMax) < 1000)
+    	return CudaHistogramIntegral(data, std::get<0>(minMax), std::get<1>(minMax));
+    else
+    	return ThrustDenseHistogram(data);
 }
 
 template<> SharedCudaPtr<int> Histogram::GetMostFrequent(SharedCudaPtr<int> data, int freqCnt)
@@ -24,12 +45,6 @@ template<> SharedCudaPtr<int> Histogram::GetMostFrequent(SharedCudaPtr<int> data
 template<> SharedCudaPtr<int> Histogram::GetMostFrequent(SharedCudaPtrPair<int, int> histogram, int freqCnt)
 {
 	return GetMostFrequentSparse(histogram, freqCnt);
-}
-
-// FLOAT
-template<> SharedCudaPtrPair<float, int> Histogram::Calculate<float>(SharedCudaPtr<float> data)
-{
-	return ThrustSparseHistogram(data);
 }
 
 template<> SharedCudaPtr<float> Histogram::GetMostFrequent(SharedCudaPtr<float> data, int freqCnt)

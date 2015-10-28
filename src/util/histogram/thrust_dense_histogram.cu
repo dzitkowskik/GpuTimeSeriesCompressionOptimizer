@@ -26,6 +26,7 @@ SharedCudaPtrPair<T, int> Histogram::ThrustDenseHistogram(SharedCudaPtr<T> data)
     auto output_counts = CudaPtr<int>::make_shared(num_bins);
     thrust::device_ptr<T> output_keys_ptr(output_keys->get());
     thrust::device_ptr<int> output_counts_ptr(output_counts->get());
+    thrust::device_vector<int> output_counts_vec(num_bins);
 
     // find the end of each bin of values (cumulative histogram)
     thrust::counting_iterator<T> search_begin(input_keys_dvec.front());
@@ -33,20 +34,21 @@ SharedCudaPtrPair<T, int> Histogram::ThrustDenseHistogram(SharedCudaPtr<T> data)
     					input_keys_dvec.end(),
 						search_begin,
 						search_begin + num_bins,
-						output_counts_ptr);
+						output_counts_vec.begin());
 
     // compute the histogram by taking differences of the cumulative histogram
-    thrust::adjacent_difference(output_counts_ptr, output_counts_ptr+num_bins, output_counts_ptr);
+    thrust::adjacent_difference(output_counts_vec.begin(), output_counts_vec.end(), output_counts_vec.begin());
 
     // keys are sequence from input keys min to max
     thrust::counting_iterator<T> keys_begin(input_keys_dvec.front());
     thrust::copy(keys_begin, keys_begin+num_bins, output_keys_ptr);
+    thrust::copy(output_counts_vec.begin(), output_counts_vec.end(), output_counts_ptr);
 
     return SharedCudaPtrPair<T, int>(output_keys, output_counts);
 }
 
 #define THRUST_DENSE_HISTOGRAM_SPEC(X) \
 	template SharedCudaPtrPair<X, int> Histogram::ThrustDenseHistogram<X>(SharedCudaPtr<X>);
-FOR_EACH(THRUST_DENSE_HISTOGRAM_SPEC, float, int, long long, unsigned int)
+FOR_EACH(THRUST_DENSE_HISTOGRAM_SPEC, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

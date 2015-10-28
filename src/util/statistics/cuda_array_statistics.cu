@@ -36,6 +36,6 @@ char CudaArrayStatistics::MinBitCnt(SharedCudaPtr<T> data)
 #define CUDA_ARRAY_STATISTICS_SPEC(X) \
 	template std::tuple<X,X> CudaArrayStatistics::MinMax<X>(SharedCudaPtr<X>); \
 	template char CudaArrayStatistics::MinBitCnt<X>(SharedCudaPtr<X>);
-FOR_EACH(CUDA_ARRAY_STATISTICS_SPEC, float, int, long long, unsigned int)
+FOR_EACH(CUDA_ARRAY_STATISTICS_SPEC, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

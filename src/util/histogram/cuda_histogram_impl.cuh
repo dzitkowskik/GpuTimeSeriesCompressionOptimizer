@@ -3535,15 +3535,19 @@ static inline
 bool smallBinLimit(int nOut, OUTPUTTYPE zero, cudaDeviceProp* props, int cuda_arch)
 {
   int shlimit = props->sharedMemPerBlock - 300;
-
+  int tst = 0;
   int typeSize = sizeof(OUTPUTTYPE);
 
   if (histotype == histogram_atomic_inc)
-      if ((((4 * nOut) << 5) + (cuda_arch < 200 ? nOut * 16 : 0)) < shlimit)
+  {
+	  tst = ((4 * nOut) << 5) + (cuda_arch < 200 ? nOut * 16 : 0);
+      if (tst < shlimit && tst > 0)
           return true;
-
-  if (((4 * nOut * typeSize) << 5) < shlimit)
+  }
+  tst = (4 * nOut * typeSize) << 5;
+  if (tst < shlimit && tst > 0)
       return true;
+
   return false;
 }
 

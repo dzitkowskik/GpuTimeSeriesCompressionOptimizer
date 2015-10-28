@@ -1,13 +1,15 @@
-#include "splitter_unittest.hpp"
+#include "test/unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "core/macros.h"
 #include "core/cuda_ptr.hpp"
-#include "util/splitter/splitter.hpp"
+#include "splitter.hpp"
 
 #include <cuda_runtime_api.h>
 
 namespace ddj
 {
+
+class SplitterTest : public UnittestBase {};
 
 TEST_F(SplitterTest, Split_zero_size)
 {
@@ -25,7 +27,9 @@ TEST_F(SplitterTest, Split_zero_size)
 TEST_F(SplitterTest, Split_yes_empty)
 {
     Splitter splitter;
-	auto data = d_int_random_data;
+	auto data = GetIntRandomData();
+	auto size = GetSize();
+
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)
@@ -35,13 +39,15 @@ TEST_F(SplitterTest, Split_yes_empty)
 
     EXPECT_EQ(0, get<0>(result)->size());
     EXPECT_EQ(size, get<1>(result)->size());
-    EXPECT_TRUE( CompareDeviceArrays(d_int_random_data->get(), get<1>(result)->get(), size) );
+    EXPECT_TRUE( CompareDeviceArrays(data->get(), get<1>(result)->get(), size) );
 }
 
 TEST_F(SplitterTest, Split_no_empty)
 {
     Splitter splitter;
-	auto data = d_int_random_data;
+	auto data = GetIntRandomData();
+	auto size = GetSize();
+
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)
@@ -51,13 +57,15 @@ TEST_F(SplitterTest, Split_no_empty)
 
     EXPECT_EQ(size, get<0>(result)->size());
     EXPECT_EQ(0, get<1>(result)->size());
-    EXPECT_TRUE( CompareDeviceArrays(d_int_random_data->get(), get<0>(result)->get(), size) );
+    EXPECT_TRUE( CompareDeviceArrays(data->get(), get<0>(result)->get(), size) );
 }
 
 TEST_F(SplitterTest, Split_manual_simple_int)
 {
     Splitter splitter;
-	auto data = d_int_random_data;
+	auto data = GetIntRandomData();
+	auto size = GetSize();
+
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)
@@ -68,11 +76,11 @@ TEST_F(SplitterTest, Split_manual_simple_int)
 	EXPECT_EQ(size/2, get<0>(result)->size());
 	EXPECT_EQ(size/2, get<1>(result)->size());
 	EXPECT_TRUE( CompareDeviceArrays(
-			d_int_random_data->get(),
+			data->get(),
 			get<0>(result)->get(),
 			size/2) );
 	EXPECT_TRUE( CompareDeviceArrays(
-			d_int_random_data->get()+(size/2),
+			data->get()+(size/2),
 			get<1>(result)->get(),
 			size/2) );
 }
@@ -80,7 +88,9 @@ TEST_F(SplitterTest, Split_manual_simple_int)
 TEST_F(SplitterTest, Split_manual_complex_float)
 {
     Splitter splitter;
-	auto data = d_float_random_data;
+	auto data = GetFloatRandomData();
+	auto size = GetSize();
+
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)
@@ -96,19 +106,19 @@ TEST_F(SplitterTest, Split_manual_complex_float)
 	EXPECT_EQ(size/2, get<0>(result)->size());
 	EXPECT_EQ(size/2, get<1>(result)->size());
 	EXPECT_TRUE( CompareDeviceArrays(
-			d_float_random_data->get(),
+			data->get(),
 			get<1>(result)->get(),
 			size/4) );
 	EXPECT_TRUE( CompareDeviceArrays(
-			d_float_random_data->get()+(size/4),
+			data->get()+(size/4),
 			get<0>(result)->get(),
 			size/4) );
 	EXPECT_TRUE( CompareDeviceArrays(
-			d_float_random_data->get()+(size/2),
+			data->get()+(size/2),
 			get<1>(result)->get()+(size/4),
 			size/4) );
 	EXPECT_TRUE( CompareDeviceArrays(
-			d_float_random_data->get()+(3*size/4),
+			data->get()+(3*size/4),
 			get<0>(result)->get()+(size/4),
 			size/4) );
 }
@@ -116,7 +126,9 @@ TEST_F(SplitterTest, Split_manual_complex_float)
 TEST_F(SplitterTest, Merge_manual_complex_int)
 {
     Splitter splitter;
-	auto data = d_int_random_data;
+	auto data = GetIntRandomData();
+	auto size = GetSize();
+
 	int h_stencil[size];
 	auto d_stencil = CudaPtr<int>::make_shared(size);
 	for(int i=0; i<size; i++)

@@ -13,6 +13,16 @@ INSTANTIATE_TEST_CASE_P(
 	PatchCompressionTest,
     ::testing::Values(10, 1000, 10000));
 
+TEST_F(PatchCompressionTest, Patch_encode_size)
+{
+    OutsideOperator<int> op{501, 5000};
+    PatchEncoding<OutsideOperator<int>> patch(op);
+    auto result = patch.Encode(GetIntConsecutiveData());
+
+    EXPECT_EQ(4500*sizeof(int), result[1]->size());
+    EXPECT_EQ(5500*sizeof(int), result[2]->size());
+}
+
 TEST_P(PatchCompressionTest, CompressionOfRandomInts_size)
 {
 	OutsideOperator<int> op{501, 5000};

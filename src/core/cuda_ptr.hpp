@@ -43,12 +43,12 @@ public:
 	CudaPtr(size_t size) : _pointer(NULL), _size(size)
 	{
 		if(_size > 0)
-			CUDA_CHECK_RETURN( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
+			CUDA_CALL( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
 	}
 	CudaPtr(T* pointer, size_t size) : _pointer(pointer), _size(size) {}
 
 	~CudaPtr()
-	{ CUDA_CHECK_RETURN( cudaFree(_pointer) ); }
+	{ if(_pointer != nullptr) CUDA_ASSERT_RETURN( cudaFree(_pointer) ); }
 
 public:
 	T* get() { return _pointer; }
@@ -57,13 +57,13 @@ public:
 	void reset(size_t size)
 	{
 		_size = size;
-		CUDA_CHECK_RETURN( cudaFree(_pointer) );
-		CUDA_CHECK_RETURN( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
+		CUDA_ASSERT_RETURN( cudaFree(_pointer) );
+		CUDA_ASSERT_RETURN( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
 	}
 
 	void reset(T* ptr, size_t size = 0)
 	{
-		CUDA_CHECK_RETURN( cudaFree(_pointer) );
+		CUDA_ASSERT_RETURN( cudaFree(_pointer) );
 		_pointer = ptr;
 		_size = size;
 	}
@@ -71,7 +71,7 @@ public:
 	void fill(T* ptr, size_t size)
 	{
 		if(_size < size) reset(size);
-		CUDA_CHECK_RETURN(
+		CUDA_ASSERT_RETURN(
 			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyDeviceToDevice)
 			);
 	}
@@ -79,7 +79,7 @@ public:
 	void fillFromHost(const T* ptr, size_t size)
 	{
 		if(_size < size) reset(size);
-		CUDA_CHECK_RETURN(
+		CUDA_ASSERT_RETURN(
 			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyHostToDevice)
 			);
 	}
@@ -94,7 +94,7 @@ public:
 	boost::shared_ptr<std::vector<T>> copyToHost()
 	{
 		boost::shared_ptr<std::vector<T>> result(new std::vector<T>(_size));
-		CUDA_CHECK_RETURN(
+		CUDA_ASSERT_RETURN(
 			cudaMemcpy( result->data(), this->get(), this->size()*sizeof(T), CPY_DTH )
 			);
 		return result;

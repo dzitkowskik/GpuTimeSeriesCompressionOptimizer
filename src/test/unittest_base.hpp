@@ -20,66 +20,22 @@ namespace ddj {
 class UnittestBase : public ::testing::Test
 {
 public:
-	static void SetUpTestCase()
-	{
-//		printf("SetUpTestCase()\n");
-		HelperDevice hc;
-        hc.SetCudaDeviceWithMaxFreeMem();
-	}
+	static void SetUpTestCase();
+	static void TearDownTestCase();
 
 protected:
+	virtual void SetUp();
+	virtual void TearDown();
 
-	virtual void SetUp()
-	{
-//		printf("SetUp\n");
-		_size = 100;
-	}
+	SharedCudaPtr<int> GetIntRandomData();
+	SharedCudaPtr<int> GetIntConsecutiveData();
+	SharedCudaPtr<float> GetFloatRandomData();
+	SharedCudaPtr<time_t> GetTsIntDataFromTestFile();
+	SharedCudaPtr<int> GetRandomStencilData();
+	SharedCudaPtr<int> GetFakeIntDataForHistogram();
+	int GetSize();
 
-	virtual void TearDown(){}
-
-	SharedCudaPtr<int> GetIntRandomData()
-	{ return _generator.GenerateRandomIntDeviceArray(_size, 100, 1000); }
-
-	SharedCudaPtr<int> GetIntConsecutiveData()
-	{ return _generator.GenerateConsecutiveIntDeviceArray(_size); }
-
-	SharedCudaPtr<float> GetFloatRandomData()
-	{ return _generator.GenerateRandomFloatDeviceArray(_size); }
-
-	SharedCudaPtr<int> GetTsIntDataFromTestFile()
-	{
-		auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
-		File file(dataFilePath);
-		TSFileDefinition fileDefinition;
-		auto tsVector = TimeSeries<float, int>::ReadManyFromFile(file, fileDefinition);
-		auto intData = tsVector[0].GetTime();
-		auto size = tsVector[0].GetSize();
-
-		auto result = CudaPtr<int>::make_shared();
-		result->fillFromHost(intData, size);
-
-		return result;
-	}
-
-	SharedCudaPtr<int> GetFakeIntDataForHistogram()
-	{
-	    int mod = _size / 10;
-	    int big = _size/3;
-	    std::vector<int> h_fakeData;
-	    for(int i = 0; i < _size; i++)
-	    {
-	        if(i%mod == 0 || i%mod == 1)
-	            h_fakeData.push_back(_size);
-	        else
-	            h_fakeData.push_back(i%mod);
-	    }
-	    auto fakeData = CudaPtr<int>::make_shared(_size);
-	    fakeData->fillFromHost(h_fakeData.data(), _size);
-	    return fakeData;
-	}
-
-	int GetSize() { return _size; }
-
+protected:
 	CudaArrayGenerator _generator;
 	int _size;
 };
