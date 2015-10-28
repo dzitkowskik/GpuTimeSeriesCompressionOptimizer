@@ -12,7 +12,6 @@
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
 #include "time_series.h"
-#include "util/histogram/histogram.hpp"
 
 #include <gtest/gtest.h>
 
@@ -23,6 +22,7 @@ class UnittestBase : public ::testing::Test
 public:
 	static void SetUpTestCase()
 	{
+//		printf("SetUpTestCase()\n");
 		HelperDevice hc;
         hc.SetCudaDeviceWithMaxFreeMem();
 	}
@@ -31,7 +31,7 @@ protected:
 
 	virtual void SetUp()
 	{
-		printf("SetUp\n");
+//		printf("SetUp\n");
 		_size = 100;
 	}
 
@@ -61,7 +61,7 @@ protected:
 		return result;
 	}
 
-	SharedCudaPtrPair<int, int> GetFakeIntHistogram()
+	SharedCudaPtr<int> GetFakeIntDataForHistogram()
 	{
 	    int mod = _size / 10;
 	    int big = _size/3;
@@ -73,9 +73,9 @@ protected:
 	        else
 	            h_fakeData.push_back(i%mod);
 	    }
-	    auto d_fakeData = CudaPtr<int>::make_shared(_size);
-	    d_fakeData->fillFromHost(h_fakeData.data(), _size);
-	    return Histogram().Calculate(d_fakeData);
+	    auto fakeData = CudaPtr<int>::make_shared(_size);
+	    fakeData->fillFromHost(h_fakeData.data(), _size);
+	    return fakeData;
 	}
 
 	int GetSize() { return _size; }

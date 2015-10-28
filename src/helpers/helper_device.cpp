@@ -67,6 +67,7 @@ int HelperDevice::SetCudaDeviceWithMaxFreeMem()
 	{
 		cudaSetDevice(i);
 		GetMemoryCount(&free, &total);
+		printf("Free memory = %d\n", free);
 		if(free > max_free)
 		{
 			max_free = free;

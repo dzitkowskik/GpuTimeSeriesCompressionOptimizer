@@ -2,6 +2,7 @@
 #include "core/macros.h"
 #include "core/cuda_ptr.hpp"
 #include "util/other/simple_cpu_histogram.hpp"
+#include "util/histogram/histogram.hpp"
 #include "core/config.hpp"
 #include "unittest_base.hpp"
 
@@ -46,7 +47,8 @@ bool CheckMostFrequent(
 TEST_F(HistogramTest, GetMostFrequent_fake_data)
 {
     int mostFreqCnt = 3;
-    auto fakedHistogram = GetFakeIntHistogram();
+    auto fakeData = GetFakeIntDataForHistogram();
+    auto fakedHistogram = Histogram().Calculate(fakeData);
     auto mostFrequent = Histogram().GetMostFrequent(fakedHistogram, mostFreqCnt);
     int expected = GetSize(), actual;
     CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
@@ -136,6 +138,7 @@ void CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> resul
 {
 	int size = data->size();
 	SimpleCpuHistogram cpu_histogram;
+
 	int* h_data = new int[size];
 	CUDA_CALL( cudaMemcpy(h_data, data->get(), size*sizeof(int), CPY_DTH) );
 	auto h_data_vector = std::vector<int>(h_data, h_data+size);
@@ -144,17 +147,20 @@ void CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> resul
 	ASSERT_TRUE(d_actual.first != NULL);
 	ASSERT_TRUE(d_actual.second != NULL);
 	auto h_actual = TransformToHostMap(d_actual);
+
 	EXPECT_EQ( h_expected.size(), h_actual.size() );
 	EXPECT_TRUE( CompareHistograms(h_expected, h_actual) );
-	//    PrintHostHistogram(h_expected, "Expected");
-	//    PrintHostHistogram(h_actual, "Actual");
+
+	    PrintHostHistogram(h_expected, "Expected");
+	    PrintHostHistogram(h_actual, "Actual");
+
 	delete [] h_data;
 }
 
-TEST_F(HistogramTest, ThrustDenseHistogram_RandomIntegerArray)
+TEST_F(HistogramTest, ThrustSparseHistogram_RandomIntegerArray)
 {
 	auto randomData = GetIntRandomData();
-	auto result = Histogram().ThrustDenseHistogram(randomData);
+	auto result = Histogram().ThrustSparseHistogram(randomData);
 	CheckHistogramResult<int>(randomData, result);
 }
 
