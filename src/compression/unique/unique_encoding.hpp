@@ -13,6 +13,13 @@
 #include "compression/encoding.hpp"
 #include <gtest/gtest.h>
 
+#include "core/not_implemented_exception.hpp"
+#include "compression/encoding_factory.hpp"
+#include "compression/data_type.hpp"
+#include "compression/encoding_type.hpp"
+
+#include <boost/make_shared.hpp>
+
 namespace ddj {
 
 class UniqueEncoding : public Encoding
@@ -62,6 +69,28 @@ private:
 	friend class DictEncoding;
 	friend class MostFrequentTest;
 	FRIEND_TEST(MostFrequentTest, CompressDecompressMostFrequent_random_int);
+};
+
+class UniqueEncodingFactory : public EncodingFactory
+{
+public:
+	UniqueEncodingFactory(DataType dt)
+		: EncodingFactory(dt, EncodingType::unique)
+	{}
+	~UniqueEncodingFactory(){}
+	UniqueEncodingFactory(const UniqueEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::unique)
+	{}
+
+	boost::shared_ptr<Encoding> Get()
+	{
+		return boost::make_shared<UniqueEncoding>();
+	}
+
+	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
+	{
+		return Get();
+	}
 };
 
 } /* namespace ddj */

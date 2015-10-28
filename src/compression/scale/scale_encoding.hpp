@@ -12,6 +12,13 @@
 #include "compression/encoding.hpp"
 #include "core/execution_policy.hpp"
 
+#include "core/not_implemented_exception.hpp"
+#include "compression/encoding_factory.hpp"
+#include "compression/data_type.hpp"
+#include "compression/encoding_type.hpp"
+
+#include <boost/make_shared.hpp>
+
 namespace ddj {
 
 class ScaleEncoding : public Encoding
@@ -51,6 +58,28 @@ public:
 
 private:
 	ExecutionPolicy _policy;
+};
+
+class ScaleEncodingFactory : public EncodingFactory
+{
+public:
+	ScaleEncodingFactory(DataType dt)
+		: EncodingFactory(dt, EncodingType::scale)
+	{}
+	~ScaleEncodingFactory(){}
+	ScaleEncodingFactory(const ScaleEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::scale)
+	{}
+
+	boost::shared_ptr<Encoding> Get()
+	{
+		return boost::make_shared<ScaleEncoding>();
+	}
+
+	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
+	{
+		return Get();
+	}
 };
 
 } /* namespace ddj */

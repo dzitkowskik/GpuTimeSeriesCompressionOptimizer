@@ -12,9 +12,12 @@
 
 namespace ddj {
 
-CompressionNode::CompressionNode(EncodingType encodingType, DataType dataType)
-	: _nodeNo(0), _parentNo(0), _isLeaf(true), _encodingType(encodingType), _dataType(dataType)
-{}
+CompressionNode::CompressionNode(SharedEncodingFactoryPtr factory)
+	: _nodeNo(0), _parentNo(0), _isLeaf(true), _encodingFactory(factory)
+{
+	_encodingType = factory->encodingType;
+	_dataType = factory->dataType;
+}
 
 CompressionNode::~CompressionNode(){}
 
@@ -97,7 +100,7 @@ SharedCudaPtr<char> CompressionNode::PrepareMetadata(SharedCudaPtr<char> encodin
 
 SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 {
-	auto encoding = _encodingFactory.Get(_encodingType);
+	auto encoding = _encodingFactory->Get(data);
 	auto encodingResult = encoding->Encode(data, _dataType);
 
 	int i = 0;
@@ -118,7 +121,7 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 
 SharedCudaPtr<char> CompressionNode::Decompress()
 {
-	auto encoding = _encodingFactory.Get(_encodingType);
+	auto encoding = _encodingFactory->Get();
 	SharedCudaPtrVector<char> data { _metadata };
 
 	if(_isLeaf) data.push_back(_data);

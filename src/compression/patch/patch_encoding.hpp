@@ -10,11 +10,18 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
+#include "core/not_implemented_exception.hpp"
+#include "core/operators.cuh"
 #include "util/splitter/splitter.hpp"
+#include "compression/data_type.hpp"
+#include "compression/encoding_type.hpp"
+#include "compression/patch/patch_type.hpp"
 #include "compression/encoding.hpp"
+#include "compression/encoding_factory.hpp"
 
 #include <tuple>
 #include <boost/noncopyable.hpp>
+#include <boost/make_shared.hpp>
 
 namespace ddj {
 
@@ -45,6 +52,47 @@ private:
 	UnaryOperator _op;
     ExecutionPolicy _policy;
     Splitter _splitter;
+};
+
+template<typename T>
+class PatchEncodingFactory : public EncodingFactory
+{
+public:
+	PatchType patchType;
+
+	T min;
+	T max;
+	T factor;
+
+	PatchEncodingFactory(DataType dt, PatchType pt)
+		: EncodingFactory(dt, EncodingType::patch), patchType(pt)
+	{}
+	~PatchEncodingFactory(){}
+	PatchEncodingFactory(const PatchEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::patch), patchType(other.patchType)
+	{}
+
+	boost::shared_ptr<Encoding> Get()
+	{
+		OutsideOperator<T> op;
+		return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(op);
+	}
+
+	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
+	{
+		OutsideOperator<T> op;
+		T dist = max - min;
+
+		switch(patchType)
+		{
+			case PatchType::outside:
+				op.low = min + factor * dist;
+				op.high = max - factor * dist;
+				return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(op);
+			default:
+				throw NotImplementedException("Encoding of this type not implemented");
+		}
+	}
 };
 
 } /* namespace ddj */

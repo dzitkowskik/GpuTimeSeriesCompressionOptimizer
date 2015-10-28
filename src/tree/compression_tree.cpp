@@ -10,6 +10,14 @@
 #include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
 
+#include "compression/delta/delta_encoding.hpp"
+#include "compression/dict/dict_encoding.hpp"
+#include "compression/none/none_encoding.hpp"
+#include "compression/patch/patch_encoding.hpp"
+#include "compression/rle/rle_encoding.hpp"
+#include "compression/scale/scale_encoding.hpp"
+#include "compression/unique/unique_encoding.hpp"
+
 namespace ddj {
 
 CompressionTree::CompressionTree() : _nextNo(0) {}
@@ -79,6 +87,39 @@ SharedCudaPtr<char> CompressionTree::Compress(SharedCudaPtr<char> data)
     return Concatenate(compressionResults);
 }
 
+boost::shared_ptr<EncodingFactory> GetDefaultEncodingFactory(EncodingType encodingType, DataType dataType)
+{
+	switch(encodingType)
+	{
+		case EncodingType::delta:
+			return boost::make_shared<DeltaEncodingFactory>(dataType);
+		case EncodingType::dict:
+			return boost::make_shared<DictEncodingFactory>(dataType);
+		case EncodingType::none:
+			return boost::make_shared<NoneEncodingFactory>(dataType);
+		case EncodingType::patch:
+			switch(dataType)
+			{
+				case DataType::d_int:
+					return boost::make_shared<PatchEncodingFactory<int>>(dataType, PatchType::outside);
+				case DataType::d_float:
+					return boost::make_shared<PatchEncodingFactory<float>>(dataType, PatchType::outside);
+				default:
+					throw NotImplementedException("Encoding of this type not implemented");
+			}
+			break;
+		case EncodingType::scale:
+			return boost::make_shared<ScaleEncodingFactory>(dataType);
+		case EncodingType::rle:
+			return boost::make_shared<RleEncodingFactory>(dataType);
+		case EncodingType::unique:
+			return boost::make_shared<UniqueEncodingFactory>(dataType);
+		default:
+			throw NotImplementedException("Encoding of this type not implemented");
+	}
+}
+
+
 SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, size_t& offset)
 {
 	// READ METADATA HEADER
@@ -89,7 +130,8 @@ SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, si
 
 	// CREATE NODE
 	EncodingType encType = (EncodingType)header.EncodingType;
-	SharedCompressionNodePtr node(new CompressionNode(encType, (DataType)header.DataType));
+	auto defaultEncodingFactory = GetDefaultEncodingFactory(encType, (DataType)header.DataType);
+	SharedCompressionNodePtr node(new CompressionNode(defaultEncodingFactory));
 
 	// READ METADATA AND UPDATE OFFSET + SAVE TO NODE
 	auto metadata = CudaPtr<char>::make_shared();
@@ -109,8 +151,7 @@ SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, si
 	}
 	else //	RUN RECURSIVELY TO CHILD NODES
 	{
-		EncodingFactory factory;
-		auto encoding = factory.Get(encType);
+		auto encoding = defaultEncodingFactory->Get();
 		int noChildren = encoding->GetNumberOfResults();
 		for(int i = 0; i < noChildren; i++)
 		{

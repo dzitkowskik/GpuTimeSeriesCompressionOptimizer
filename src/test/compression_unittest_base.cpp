@@ -37,11 +37,11 @@ bool CompressionUnittestBase::TestContent(
 }
 
 #define COMPRESSION_UNITTEST_BASE_SPEC(X) \
-	template bool CompressionUnittestBase::TestSize<X>(							\
+	template bool CompressionUnittestBase::TestSize<X>(								\
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<X> data)>,		\
 			boost::function<SharedCudaPtr<X> (SharedCudaPtrVector<char> data)>,		\
 			SharedCudaPtr<X> data); 												\
-	template bool CompressionUnittestBase::TestContent<X>(						\
+	template bool CompressionUnittestBase::TestContent<X>(							\
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<X> data)>, 	\
 			boost::function<SharedCudaPtr<X> (SharedCudaPtrVector<char> data)>, 	\
 			SharedCudaPtr<X> data);

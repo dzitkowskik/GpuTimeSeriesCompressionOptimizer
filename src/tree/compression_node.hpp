@@ -21,13 +21,14 @@ namespace ddj {
 class CompressionNode;
 
 using uint = unsigned int;
+using SharedEncodingFactoryPtr = boost::shared_ptr<EncodingFactory>;
 using SharedCompressionNodePtr = boost::shared_ptr<CompressionNode>;
 using SharedCompressionNodePtrVector = std::vector<SharedCompressionNodePtr>;
 
 class CompressionNode
 {
 public:
-	CompressionNode(EncodingType encodingType, DataType dataType);
+	CompressionNode(SharedEncodingFactoryPtr encodingFactory);
 	~CompressionNode();
 	CompressionNode(const CompressionNode& other);
 
@@ -56,10 +57,10 @@ private:
     SharedCudaPtr<char> PrepareMetadata(SharedCudaPtr<char> encodingMetadata);
 
 private:
+    SharedEncodingFactoryPtr _encodingFactory;
     SharedCompressionNodePtrVector _children;
     EncodingType _encodingType;
     DataType _dataType;
-    EncodingFactory _encodingFactory;
 
     SharedCudaPtr<char> _data;
     SharedCudaPtr<char> _metadata;

@@ -12,6 +12,13 @@
 #include "core/execution_policy.hpp"
 #include "compression/encoding.hpp"
 
+#include "core/not_implemented_exception.hpp"
+#include "compression/encoding_factory.hpp"
+#include "compression/data_type.hpp"
+#include "compression/encoding_type.hpp"
+
+#include <boost/make_shared.hpp>
+
 namespace ddj {
 
 // TODO: Try version with returning 2 results (one for lengths and other for data)
@@ -53,6 +60,28 @@ public:
 
 private:
 	ExecutionPolicy _policy;
+};
+
+class RleEncodingFactory : public EncodingFactory
+{
+public:
+	RleEncodingFactory(DataType dt)
+		: EncodingFactory(dt, EncodingType::rle)
+	{}
+	~RleEncodingFactory(){}
+	RleEncodingFactory(const RleEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::rle)
+	{}
+
+	boost::shared_ptr<Encoding> Get()
+	{
+		return boost::make_shared<RleEncoding>();
+	}
+
+	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
+	{
+		return Get();
+	}
 };
 
 } /* namespace ddj */

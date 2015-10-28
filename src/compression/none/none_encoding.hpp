@@ -12,6 +12,13 @@
 #include "compression/encoding.hpp"
 #include "core/execution_policy.hpp"
 
+#include "core/not_implemented_exception.hpp"
+#include "compression/encoding_factory.hpp"
+#include "compression/data_type.hpp"
+#include "compression/encoding_type.hpp"
+
+#include <boost/make_shared.hpp>
+
 namespace ddj
 {
 
@@ -53,6 +60,28 @@ public:
 
 private:
 	ExecutionPolicy _policy;
+};
+
+class NoneEncodingFactory : public EncodingFactory
+{
+public:
+	NoneEncodingFactory(DataType dt)
+		: EncodingFactory(dt, EncodingType::none)
+	{}
+	~NoneEncodingFactory(){}
+	NoneEncodingFactory(const NoneEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::none)
+	{}
+
+	boost::shared_ptr<Encoding> Get()
+	{
+		return boost::make_shared<NoneEncoding>();
+	}
+
+	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
+	{
+		return Get();
+	}
 };
 
 } /* namespace ddj */
