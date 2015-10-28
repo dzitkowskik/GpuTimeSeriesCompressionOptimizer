@@ -93,26 +93,26 @@ TEST_P(CompressionTreeTest, ComplexTree_Dict_Compress_Decompress)
 //      DICT   DELTA
 //     /   \
 //  DELTA SCALE
-//TEST_P(CompressionTreeTest, ComplexTree_Patch_Compress_Decompress)
-//{
-//	CompressionTree compressionTree;
-//	auto root = boost::make_shared<CompressionNode>(EncodingType::patch, DataType::d_int);
-//	auto right = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
-//	auto left = boost::make_shared<CompressionNode>(EncodingType::dict, DataType::d_int);
-//	auto leftChildLeft = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
-//	auto leftChildRight = boost::make_shared<CompressionNode>(EncodingType::scale, DataType::d_int);
-//	auto leaf = boost::make_shared<CompressionNode>(EncodingType::none, DataType::d_int);
-//
-//	leftChildLeft->AddChild(leaf);
-//	leftChildRight->AddChild(leaf);
-//	right->AddChild(leaf);
-//	left->AddChild(leftChildLeft);
-//	left->AddChild(leftChildRight);
-//	root->AddChild(left);
-//	root->AddChild(right);
-//
-//	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
-//	TreeCompressionTest_Compress_Decompress(compressionTree);
-//}
+TEST_P(CompressionTreeTest, ComplexTree_Patch_Compress_Decompress)
+{
+	CompressionTree compressionTree;
+	auto root = boost::make_shared<CompressionNode>(EncodingType::patch, DataType::d_int);
+	auto right = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
+	auto left = boost::make_shared<CompressionNode>(EncodingType::dict, DataType::d_int);
+	auto leftChildLeft = boost::make_shared<CompressionNode>(EncodingType::delta, DataType::d_int);
+	auto leftChildRight = boost::make_shared<CompressionNode>(EncodingType::scale, DataType::d_int);
+	auto leaf = boost::make_shared<CompressionNode>(EncodingType::none, DataType::d_int);
+
+	leftChildLeft->AddChild(leaf);
+	leftChildRight->AddChild(leaf);
+	right->AddChild(leaf);
+	left->AddChild(leftChildLeft);
+	left->AddChild(leftChildRight);
+	root->AddChild(left);
+	root->AddChild(right);
+
+	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
+	TreeCompressionTest_Compress_Decompress(compressionTree);
+}
 
 } /* namespace ddj */
