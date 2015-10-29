@@ -5,6 +5,7 @@
 #include "compression/dict/dict_encoding.hpp"
 #include "compression/unique/unique_encoding.hpp"
 #include "util/splitter/splitter.hpp"
+#include "util/statistics/cuda_array_statistics.hpp"
 
 #include <boost/pointer_cast.hpp>
 
@@ -36,6 +37,70 @@ TEST(OtherTests, SharedCudaPtr_ReinterpretCast)
     // Compare vectors
     for(int i=0; i<expected->size(); i++)
         EXPECT_EQ((*expected)[i], (*actual)[i]);
+}
+
+TEST(OtherTests, GetFloatPrecision_Integer_Small)
+{
+	float number = 123.0f;
+	int expected = 0;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
+}
+
+TEST(OtherTests, GetFloatPrecision_Integer_Big)
+{
+	float number = 123123123123;
+	int expected = 0;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
+}
+
+TEST(OtherTests, GetFloatPrecision_IntegerNegative)
+{
+	float number = -123123123;
+	int expected = 0;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
+}
+
+TEST(OtherTests, GetFloatPrecision_Float_Small_1)
+{
+	float number = 123.1;
+	int expected = 1;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
+}
+
+TEST(OtherTests, GetFloatPrecision_Float_Small_2)
+{
+	float number = 123.34;
+	int expected = 2;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
+}
+
+TEST(OtherTests, GetFloatPrecision_Float_Small_7)
+{
+	float number = 13.3412312;
+	int expected = 6;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
+}
+
+TEST(OtherTests, GetFloatPrecision_Float_Big_4)
+{
+	float number = 1231201.2312;
+	int expected = 1;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
+}
+
+TEST(OtherTests, GetFloatPrecision_Float_Big_8)
+{
+	float number = 12312311.33412312;
+	int expected = 0;
+	int actual = _getFloatPrecision(number);
+	EXPECT_EQ(expected, actual);
 }
 
 class MostFrequentTest : public UnittestBase {};

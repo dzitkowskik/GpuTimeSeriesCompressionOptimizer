@@ -132,9 +132,9 @@ template<typename T>
 struct DecimalPlacesOperator
 {
 	__host__ __device__
-	char operator()(const T& value)
+	T operator()(const T& value)
 	{
-	    const char bitSize = sizeof(T) * 8;
+	    const T bitSize = sizeof(T) * 8;
 
 	    for(char i=0; i < bitSize; i++)
 	    {
@@ -146,5 +146,6 @@ struct DecimalPlacesOperator
 	    return bitSize;
 	}
 };
+
 
 #endif /* OPERATORS_CUH_ */

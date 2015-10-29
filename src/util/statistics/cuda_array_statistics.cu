@@ -8,9 +8,11 @@
 #include "util/statistics/cuda_array_statistics.hpp"
 #include "core/cuda_macros.cuh"
 #include "core/macros.h"
+#include "helpers/helper_cuda.cuh"
 
 #include <thrust/device_ptr.h>
 #include <thrust/extrema.h>
+#include <math_functions.h>
 
 namespace ddj {
 
@@ -31,6 +33,53 @@ char CudaArrayStatistics::MinBitCnt(SharedCudaPtr<T> data)
 	if (std::get<0>(minMax) >= 0)
 		result = ALT_BITLEN(std::get<1>(minMax));
 	return result;
+}
+
+//__host__ __device__ int _getFloatPrecision(float number)
+//{
+//	int i = 0;
+//	long int e = 1;
+//	for(; i < 20; i++, e *= 10)
+//	{
+//		long long int a = (double)number * e;
+//		float tst = (double)a / e;
+//		if(tst == number) return i;
+//	}
+//	return i;
+//}
+
+
+//function precision(a) {
+//  var e = 1;
+//  while (Math.round(a * e) / e !== a) e *= 10;
+//  return Math.log(e) / Math.LN10;
+//}
+__host__ __device__ int _getFloatPrecision(float number)
+{
+	long int e = 1;
+	while(round(number*e)/e != number) e*=10;
+	return logf(e) / logf(10);
+}
+
+__global__ void _precisionKernelFloat(float* input, size_t size, int* output)
+{
+	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	if (idx >= size) return;
+	output[idx] = _getFloatPrecision(input[idx]);
+}
+
+int CudaArrayStatistics::Precision(SharedCudaPtr<float> data)
+{
+	auto precisions = CudaPtr<int>::make_shared(data->size());
+
+	this->_policy.setSize(data->size());
+	cudaLaunch(this->_policy, _precisionKernelFloat,
+			data->get(),
+			data->size(),
+			precisions->get());
+
+	auto minMax = this->MinMax(precisions);
+	return std::get<1>(minMax);
 }
 
 #define CUDA_ARRAY_STATISTICS_SPEC(X) \

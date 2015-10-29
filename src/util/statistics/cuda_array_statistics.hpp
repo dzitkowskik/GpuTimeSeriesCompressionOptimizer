@@ -14,11 +14,14 @@
 namespace ddj
 {
 
+__host__ __device__ int _getFloatPrecision(float number);
+
 class CudaArrayStatistics
 {
 public:
     template<typename T> std::tuple<T,T> MinMax(SharedCudaPtr<T> data);
     template<typename T> char MinBitCnt(SharedCudaPtr<T> data);
+    int Precision(SharedCudaPtr<float> data);
 
 private:
     ExecutionPolicy _policy;
