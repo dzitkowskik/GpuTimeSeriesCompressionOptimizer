@@ -43,8 +43,8 @@ namespace ddj
 	SharedCudaPtr<int> CudaArrayGenerator::GenerateRandomStencil(int n)
 	{
 		auto result = this->GenerateRandomIntDeviceArray(n);
-		this->_transform.TransformInPlace(result, AbsoluteOperator<int>());
-		this->_transform.TransformInPlace(result, ModulusOperator<int> {2});
+		this->_transform.TransformInPlace(result, AbsoluteOperator<int, int>());
+		this->_transform.TransformInPlace(result, ModulusOperator<int, int> {2});
 		return result;
 	}
 
@@ -53,9 +53,9 @@ namespace ddj
 		int distance = std::abs(to - from);
 		auto result = CudaPtr<int>::make_shared(n);
 		CURAND_CALL(curandGenerate(this->_gen, (unsigned int*)result->get(), n));
-		this->_transform.TransformInPlace(result, AbsoluteOperator<int>());
-		this->_transform.TransformInPlace(result, ModulusOperator<int> {distance});
-		this->_transform.TransformInPlace(result, AdditionOperator<int> {from});
+		this->_transform.TransformInPlace(result, AbsoluteOperator<int, int>());
+		this->_transform.TransformInPlace(result, ModulusOperator<int, int> {distance});
+		this->_transform.TransformInPlace(result, AdditionOperator<int, int> {from});
 		return result;
 	}
 

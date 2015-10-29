@@ -15,8 +15,8 @@ INSTANTIATE_TEST_CASE_P(
 
 TEST_F(PatchCompressionTest, Patch_encode_size)
 {
-    OutsideOperator<int> op{501, 5000};
-    PatchEncoding<OutsideOperator<int>> patch(op);
+    OutsideOperator<int, int> op{501, 5000};
+    PatchEncoding<OutsideOperator<int, int>> patch(op);
     auto result = patch.Encode(GetIntConsecutiveData());
 
     EXPECT_EQ(4500*sizeof(int), result[1]->size());
@@ -25,48 +25,48 @@ TEST_F(PatchCompressionTest, Patch_encode_size)
 
 TEST_P(PatchCompressionTest, CompressionOfRandomInts_size)
 {
-	OutsideOperator<int> op{501, 5000};
-	PatchEncoding<OutsideOperator<int>> encoder(op);
+	OutsideOperator<int, int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int, int>> encoder(op);
     EXPECT_TRUE(
 		TestSize<int>(
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<int>, encoder, _1),
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<int>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Encode<int>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Decode<int>, encoder, _1),
 			GetIntRandomData())
     );
 }
 
 TEST_P(PatchCompressionTest, CompressionOfRandomInts_data)
 {
-	OutsideOperator<int> op{501, 5000};
-	PatchEncoding<OutsideOperator<int>> encoder(op);
+	OutsideOperator<int, int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int, int>> encoder(op);
 	EXPECT_TRUE(
 		TestContent<int>(
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<int>, encoder, _1),
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<int>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Encode<int>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Decode<int>, encoder, _1),
 			GetIntRandomData())
 	);
 }
 
 TEST_P(PatchCompressionTest, CompressionOfRandomFloats_size)
 {
-	OutsideOperator<int> op{501, 5000};
-	PatchEncoding<OutsideOperator<int>> encoder(op);
+	OutsideOperator<int, int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int, int>> encoder(op);
     EXPECT_TRUE(
 		TestSize<float>(
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<float>, encoder, _1),
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<float>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Encode<float>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Decode<float>, encoder, _1),
 			GetFloatRandomData())
     );
 }
 
 TEST_P(PatchCompressionTest, CompressionOfRandomFloats_data)
 {
-	OutsideOperator<int> op{501, 5000};
-	PatchEncoding<OutsideOperator<int>> encoder(op);
+	OutsideOperator<int, int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int, int>> encoder(op);
 	EXPECT_TRUE(
 		TestContent<float>(
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<float>, encoder, _1),
-			boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<float>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Encode<float>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int, int>>::Decode<float>, encoder, _1),
 			GetFloatRandomData())
 	);
 }

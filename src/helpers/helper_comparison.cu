@@ -16,7 +16,10 @@ __host__ __device__ bool _floatsEqual(float a, float b, int maxulps)
 	if (aint < 0) aint = 0x80000000 - aint;
 	if (bint < 0) bint = 0x80000000 - bint;
 	// compare.
-	return abs(aint - bint) <= maxulps;
+	bool tst = abs(aint - bint) <= maxulps;
+	if(tst)
+		return true;
+	return false;
 }
 
 __global__ void _compareFloatsKernel(float* a, float* b, int size, bool* out)

@@ -10,6 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
+#include "core/operators.cuh"
 
 namespace ddj
 {
@@ -20,8 +21,11 @@ public:
     template<typename T, typename UnaryOperator>
     void TransformInPlace(SharedCudaPtr<T> data, UnaryOperator op);
 
-    template<typename T, typename UnaryOperator>
-    SharedCudaPtr<T> Transform(SharedCudaPtr<T> data, UnaryOperator op);
+    template<typename InputType, typename OutputType, typename UnaryOperator>
+    SharedCudaPtr<OutputType> Transform(SharedCudaPtr<InputType> data, UnaryOperator op);
+
+    template<typename InputType, typename OutputType>
+    SharedCudaPtr<OutputType> Cast(SharedCudaPtr<InputType> data);
 
 private:
     ExecutionPolicy _policy;

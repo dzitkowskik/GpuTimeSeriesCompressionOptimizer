@@ -74,13 +74,13 @@ public:
 
 	boost::shared_ptr<Encoding> Get()
 	{
-		OutsideOperator<T> op;
-		return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(op);
+		OutsideOperator<T,T> op;
+		return boost::make_shared<PatchEncoding<OutsideOperator<T,T>>>(op);
 	}
 
 	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
 	{
-		OutsideOperator<T> op;
+		OutsideOperator<T,T> op;
 		T dist = max - min;
 
 		switch(patchType)
@@ -88,7 +88,7 @@ public:
 			case PatchType::outside:
 				op.low = min + factor * dist;
 				op.high = max - factor * dist;
-				return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(op);
+				return boost::make_shared<PatchEncoding<OutsideOperator<T,T>>>(op);
 			default:
 				throw NotImplementedException("Encoding of this type not implemented");
 		}

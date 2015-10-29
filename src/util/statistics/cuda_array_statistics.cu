@@ -35,25 +35,7 @@ char CudaArrayStatistics::MinBitCnt(SharedCudaPtr<T> data)
 	return result;
 }
 
-//__host__ __device__ int _getFloatPrecision(float number)
-//{
-//	int i = 0;
-//	long int e = 1;
-//	for(; i < 20; i++, e *= 10)
-//	{
-//		long long int a = (double)number * e;
-//		float tst = (double)a / e;
-//		if(tst == number) return i;
-//	}
-//	return i;
-//}
 
-
-//function precision(a) {
-//  var e = 1;
-//  while (Math.round(a * e) / e !== a) e *= 10;
-//  return Math.log(e) / Math.LN10;
-//}
 __host__ __device__ int _getFloatPrecision(float number)
 {
 	long int e = 1;

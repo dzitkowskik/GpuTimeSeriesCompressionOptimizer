@@ -30,6 +30,7 @@ protected:
 	SharedCudaPtr<int> GetIntRandomData();
 	SharedCudaPtr<int> GetIntConsecutiveData();
 	SharedCudaPtr<float> GetFloatRandomData();
+	SharedCudaPtr<float> GetFloatRandomDataWithMaxPrecision(int maxPrecision);
 	SharedCudaPtr<time_t> GetTsIntDataFromTestFile();
 	SharedCudaPtr<int> GetRandomStencilData();
 	SharedCudaPtr<int> GetFakeIntDataForHistogram();

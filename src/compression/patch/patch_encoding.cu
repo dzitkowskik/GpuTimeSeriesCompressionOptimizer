@@ -93,12 +93,12 @@ SharedCudaPtr<float> PatchEncoding<UnaryOperator>::DecodeFloat(SharedCudaPtrVect
 
 
 #define PATCH_ENCODING_SPEC(X) \
-	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X>>::Encode<X>(SharedCudaPtr<X> data); \
-	template SharedCudaPtr<X> PatchEncoding<OutsideOperator<X>>::Decode<X>(SharedCudaPtrVector<char> data); \
-	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X>>::EncodeInt(SharedCudaPtr<int> data); \
-	template SharedCudaPtr<int> PatchEncoding<OutsideOperator<X>>::DecodeInt(SharedCudaPtrVector<char> data); \
-	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X>>::EncodeFloat(SharedCudaPtr<float>); \
-	template SharedCudaPtr<float> PatchEncoding<OutsideOperator<X>>::DecodeFloat(SharedCudaPtrVector<char>);
+	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X,X>>::Encode<X>(SharedCudaPtr<X> data); \
+	template SharedCudaPtr<X> PatchEncoding<OutsideOperator<X,X>>::Decode<X>(SharedCudaPtrVector<char> data); \
+	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X,X>>::EncodeInt(SharedCudaPtr<int> data); \
+	template SharedCudaPtr<int> PatchEncoding<OutsideOperator<X,X>>::DecodeInt(SharedCudaPtrVector<char> data); \
+	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X,X>>::EncodeFloat(SharedCudaPtr<float>); \
+	template SharedCudaPtr<float> PatchEncoding<OutsideOperator<X,X>>::DecodeFloat(SharedCudaPtrVector<char>);
 FOR_EACH(PATCH_ENCODING_SPEC, float, int, long long, unsigned int)
 
 } /* namespace ddj */

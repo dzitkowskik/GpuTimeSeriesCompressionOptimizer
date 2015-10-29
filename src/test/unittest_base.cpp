@@ -68,5 +68,9 @@ SharedCudaPtr<int> UnittestBase::GetFakeIntDataForHistogram()
 
 int UnittestBase::GetSize() { return _size; }
 
+SharedCudaPtr<float> UnittestBase::GetFloatRandomDataWithMaxPrecision(int maxPrecision)
+{
+	return _generator.CreateRandomFloatsWithMaxPrecision(_size, maxPrecision);
+}
 
 } /* namespace ddj */

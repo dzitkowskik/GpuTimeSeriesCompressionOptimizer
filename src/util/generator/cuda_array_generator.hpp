@@ -32,6 +32,8 @@ public:
     template<typename T> SharedCudaPtr<T> CreateConsecutiveNumbersArray(int size, T start);
     template<typename T> SharedCudaPtr<T> CreateConsecutiveNumbersArray(int size, T start, T step);
 
+    SharedCudaPtr<float> CreateRandomFloatsWithMaxPrecision(int size, int maxPrecision);
+
 private:
     curandGenerator_t _gen;
     CudaArrayTransform _transform;

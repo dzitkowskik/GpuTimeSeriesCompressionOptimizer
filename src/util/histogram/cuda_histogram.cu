@@ -33,7 +33,7 @@ SharedCudaPtrPair<T, int> Histogram::CudaHistogramIntegral(SharedCudaPtr<T> data
 	static_assert(std::is_integral<T>::value, "CudaHistogramIntegral allows only integral types");
     int distance = max - min + 1;
     auto counts = CudaPtr<int>::make_shared(distance);
-    this->_transform.TransformInPlace(counts, ZeroOperator<int>());
+    this->_transform.TransformInPlace(counts, ZeroOperator<int, int>());
 
     HistIntegralForm<T> xform { min };
     HistIntegralSumFun sum;
@@ -71,7 +71,7 @@ SharedCudaPtrPair<T, int> Histogram::CudaHistogramBuckets(SharedCudaPtr<T> data,
 {
     auto distance = max - min;
     auto counts = CudaPtr<int>::make_shared(data->size());
-    this->_transform.TransformInPlace(counts, ZeroOperator<int>());
+    this->_transform.TransformInPlace(counts, ZeroOperator<int, int>());
     T step = distance / data->size();
     T invStep = data->size() / distance;
 

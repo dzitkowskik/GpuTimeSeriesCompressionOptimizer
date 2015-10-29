@@ -8,144 +8,117 @@
 #ifndef OPERATORS_CUH_
 #define OPERATORS_CUH_
 
-// TODO: Rename to UNARY_OPERATORS
+namespace ddj {
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct OutsideOperator
 {
-	T low;
-	T high;
+	InputType low;
+	InputType high;
 
 	__host__ __device__
-	bool operator()(const T &value) const
+	OutputType operator()(const InputType &value) const
 	{
 		if(value > high || value < low) return false;
 		else return true;
 	}
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct InsideOperator
 {
-	T low;
-	T high;
+	InputType low;
+	InputType high;
 
 	__host__ __device__
-	bool operator()(const T &value) const
+	OutputType operator()(const InputType &value) const
 	{
 		if(value > high || value < low) return true;
 		else return false;
 	}
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct ModulusOperator
 {
-    T mod;
+	InputType mod;
 
     __host__ __device__
-    T operator()(const T &x) { return x % mod; }
+    OutputType operator()(const InputType &x) { return x % mod; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct AdditionOperator
 {
-	T value;
+	InputType value;
 
 	__host__ __device__
-	T operator()(const T &x) { return x + value; }
+	OutputType operator()(const InputType &x) { return x + value; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct SubtractionOperator
 {
-	T value;
+	InputType value;
 
 	__host__ __device__
-	T operator()(const T &x) { return x - value; }
+	OutputType operator()(const InputType &x) { return x - value; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct MultiplicationOperator
 {
-	T value;
+	InputType value;
 
 	__host__ __device__
-	T operator()(const T &x) { return x * value; }
+	OutputType operator()(const InputType &x) { return x * value; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct DivisionOperator
 {
-	T value;
+	InputType value;
 
 	__host__ __device__
-	T operator()(const T &x) { return x / value; }
+	OutputType operator()(const InputType &x) { return (OutputType)x / value; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct AbsoluteOperator
 {
 	__host__ __device__
-	T operator()(const T &x) { return x > 0 ? x : -x; }
+	OutputType operator()(const InputType &x) { return x > 0 ? x : -x; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct ZeroOperator
 {
 	__host__ __device__
-	T operator()(const T &x) { return 0; }
+	OutputType operator()(const InputType &x) { return 0; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct OneOperator
 {
 	__host__ __device__
-	T operator()(const T &x) { return 1; }
+	OutputType operator()(const InputType &x) { return 1; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct NegateOperator
 {
 	__host__ __device__
-	T operator()(const T &x) { return !x; }
+	OutputType operator()(const InputType &x) { return !x; }
 };
 
-template<typename T>
+template<typename InputType, typename OutputType>
 struct FillOperator
 {
-	T value;
+	InputType value;
 
 	__host__ __device__
-	T operator()(const T &x) { return value; }
+	OutputType operator()(const InputType &x) { return value; }
 };
 
-// value 1.214123
-// 0.214123 == 0    0
-// 0.14123 == 0     1
-// 0.4123 == 0      2
-// 0.123 == 0       3
-// 0.23 == 0        4
-// 0.3 == 0         5
-// 0.0 == 0         6 <- ANSWER
-template<typename T>
-struct DecimalPlacesOperator
-{
-	__host__ __device__
-	T operator()(const T& value)
-	{
-	    const T bitSize = sizeof(T) * 8;
-
-	    for(char i=0; i < bitSize; i++)
-	    {
-	        value -= (long long)value;
-	        if(value == 0) return i;
-	        value *= 10;
-	    }
-
-	    return bitSize;
-	}
-};
-
-
+} /* namespace ddj */
 #endif /* OPERATORS_CUH_ */
