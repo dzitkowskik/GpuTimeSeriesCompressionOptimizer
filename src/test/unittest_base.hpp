@@ -27,7 +27,7 @@ protected:
 	virtual void SetUp();
 	virtual void TearDown();
 
-	SharedCudaPtr<int> GetIntRandomData();
+	SharedCudaPtr<int> GetIntRandomData(int from = 100, int to = 1000);
 	SharedCudaPtr<int> GetIntConsecutiveData();
 	SharedCudaPtr<float> GetFloatRandomData();
 	SharedCudaPtr<float> GetFloatRandomDataWithMaxPrecision(int maxPrecision);

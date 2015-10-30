@@ -27,6 +27,11 @@ public:
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<T>)> encodeFunction,
 			boost::function<SharedCudaPtr<T> (SharedCudaPtrVector<char>)> decodeFunction,
 			SharedCudaPtr<T> data);
+protected:
+	void SetUp()
+	{
+		_size = GetParam();
+	}
 };
 
 } /* namespace ddj */

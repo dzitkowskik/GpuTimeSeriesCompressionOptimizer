@@ -17,7 +17,7 @@ class Stencil
 {
 public:
 	Stencil() {}
-	Stencil(SharedCudaPtr<char> data);
+	Stencil(SharedCudaPtr<char> data, int shift = 0);
     Stencil(SharedCudaPtr<int> data) { _data = data; };
     Stencil(const Stencil& other) : _data(other._data) {}
     Stencil(Stencil&& other) noexcept : _data(std::move(other._data)) {}
@@ -30,7 +30,7 @@ public:
     { return this->_data; }
 
     SharedCudaPtr<char> pack();
-    SharedCudaPtr<int> unpack(SharedCudaPtr<char> data);
+    SharedCudaPtr<int> unpack(SharedCudaPtr<char> data, int shift = 0);
 
 private:
     SharedCudaPtr<int> _data;

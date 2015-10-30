@@ -5,9 +5,9 @@
 
 namespace ddj {
 
-Stencil::Stencil(SharedCudaPtr<char> data)
+Stencil::Stencil(SharedCudaPtr<char> data, int shift)
 {
-	this->_data = unpack(data);
+	this->_data = unpack(data, shift);
 }
 
 __global__ void packKernel(int* data, int dataSize, char* output, int outputSize)
@@ -66,22 +66,25 @@ SharedCudaPtr<char> Stencil::pack()
     return result;
 }
 
-SharedCudaPtr<int> Stencil::unpack(SharedCudaPtr<char> data)
+SharedCudaPtr<int> Stencil::unpack(SharedCudaPtr<char> data, int shift)
 {
+	char* dataPtr = data->get() + shift;
+	size_t size = data->size() - shift;
+
 	// GET NUMBER OF ELEMENTS
 	char rest;
-	CUDA_CALL( cudaMemcpy(&rest, data->get(), 1, CPY_DTH) );
-	int numElements = (data->size()-1)*8;
+	CUDA_CALL( cudaMemcpy(&rest, dataPtr, 1, CPY_DTH) );
+	int numElements = (size-1)*8;
 	if(rest) numElements -= 8 - rest;
 
 	// PREAPARE MEMORY FOR RESULT
     auto result = CudaPtr<int>::make_shared(numElements);
     
 	// UNPACK STENCIL
-    this->_policy.setSize(data->size());
+    this->_policy.setSize(size);
     cudaLaunch(this->_policy, unpackKernel,
-        data->get()+1,
-        data->size()-1,
+        dataPtr+1,
+        size-1,
         result->get(),
         result->size()
 	);

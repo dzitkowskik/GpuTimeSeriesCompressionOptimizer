@@ -20,6 +20,7 @@ enum class EncodingType {
     patch,
     none,
     floatToInt,
+    constData,
     length
 };
 

@@ -20,8 +20,8 @@ void UnittestBase::SetUp()
 
 void UnittestBase::TearDown(){}
 
-SharedCudaPtr<int> UnittestBase::GetIntRandomData()
-{ return _generator.GenerateRandomIntDeviceArray(_size, 100, 1000); }
+SharedCudaPtr<int> UnittestBase::GetIntRandomData(int from, int to)
+{ return _generator.GenerateRandomIntDeviceArray(_size, from, to); }
 
 SharedCudaPtr<int> UnittestBase::GetIntConsecutiveData()
 { return _generator.GenerateConsecutiveIntDeviceArray(_size); }

@@ -7,13 +7,14 @@
 namespace ddj {
 
 class PatchCompressionTest : public CompressionUnittestBase {};
+class PatchTest : public UnittestBase {};
 
 INSTANTIATE_TEST_CASE_P(
 	PatchEncoding_Compression_Inst,
 	PatchCompressionTest,
     ::testing::Values(10, 1000, 10000));
 
-TEST_F(PatchCompressionTest, Patch_encode_size)
+TEST_F(PatchTest, Patch_encode_size)
 {
     OutsideOperator<int, int> op{501, 5000};
     PatchEncoding<OutsideOperator<int, int>> patch(op);
