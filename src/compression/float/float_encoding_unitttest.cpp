@@ -42,4 +42,15 @@ TEST_P(FloatCompressionTest, CompressionOfRandomFloats_WithMaxPrecision_3_data)
 	);
 }
 
+TEST_P(FloatCompressionTest, CompressionOf_Float_FromFile)
+{
+	FloatEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&FloatEncoding::Encode<float>, encoder, _1),
+			boost::bind(&FloatEncoding::Decode<float>, encoder, _1),
+			GetTsFloatDataFromTestFile())
+	);
+}
+
 } /* namespace ddj */
