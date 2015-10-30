@@ -8,6 +8,7 @@
 // -o -name '*.cu' -not -name '*_unittest*' -not -name '*_benchmark*' | sort -k 1nr | cut -f2-
 
 //--gtest_filter=AflEncoding_Compression_Inst/AflCompressionTest.CompressionOfRandomInts_size/0
+//--gtest_repeat=10
 
 void initialize_logger()
 {
@@ -20,7 +21,7 @@ int main(int argc, char* argv[])
 {
     ddj::Config::GetInstance()->InitOptions(argc, argv, "src/test/config.ini");
     ::testing::InitGoogleTest(&argc, argv);
-    ::testing::FLAGS_gtest_repeat = 1;
+    ::testing::FLAGS_gtest_repeat = 2;
 
     auto value = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
     printf("%s\n", value.c_str());

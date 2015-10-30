@@ -56,5 +56,27 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+TEST_P(DictCompressionTest, CompressionOf_Long_FromFile)
+{
+	DictEncoding encoder;
+    EXPECT_TRUE(
+		TestSize<time_t>(
+			boost::bind(&DictEncoding::Encode<time_t>, encoder, _1),
+			boost::bind(&DictEncoding::Decode<time_t>, encoder, _1),
+			GetTsIntDataFromTestFile())
+    );
+}
+
+TEST_P(DictCompressionTest, CompressionOf_Float_FromFile)
+{
+	DictEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&DictEncoding::Encode<float>, encoder, _1),
+			boost::bind(&DictEncoding::Decode<float>, encoder, _1),
+			GetTsFloatDataFromTestFile())
+	);
+}
+
 
 } /* namespace ddj */

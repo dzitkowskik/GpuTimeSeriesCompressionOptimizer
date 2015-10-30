@@ -77,7 +77,7 @@ SharedCudaPtr<char> UniqueEncoding::CompressUnique(SharedCudaPtr<T> data, Shared
     int dataPerOutputCnt = outputItemBitSize / bitsNeeded;  // how many items will be encoded in single unit
     int outputSize = (dataSize + dataPerOutputCnt - 1) / dataPerOutputCnt;  // output units cnt
     int outputSizeInBytes = outputSize * sizeof(unsigned int);
-    int uniqueSizeInBytes = unique->size() * sizeof(int);	// size in bytes of unique array
+    int uniqueSizeInBytes = unique->size() * sizeof(T);	// size in bytes of unique array
     int headerSize = uniqueSizeInBytes + 2 * sizeof(size_t);// size of data header
 
     // COMPRESS UNIQUE
@@ -186,7 +186,7 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
 
 	// GETE UNIQUE VALUES DATA
 	auto unique = CudaPtr<T>::make_shared(uniqueCnt);
-	T* uniqueDataPtr = (T*)(data->get()+sizeof(size_t));
+	T* uniqueDataPtr = (T*)(data->get()+2*sizeof(size_t));
 	unique->fill(uniqueDataPtr, uniqueCnt);
 
 	// CALCULATE SIZES
@@ -253,6 +253,6 @@ SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
 	template SharedCudaPtr<X> UniqueEncoding::DecompressUnique<X>(SharedCudaPtr<char>); \
     template SharedCudaPtrVector<char> UniqueEncoding::Encode<X>(SharedCudaPtr<X>); \
     template SharedCudaPtr<X> UniqueEncoding::Decode<X>(SharedCudaPtrVector<char>);
-FOR_EACH(UNIQUE_ENCODING_SPEC, float, int, long long, unsigned int)
+FOR_EACH(UNIQUE_ENCODING_SPEC, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */
