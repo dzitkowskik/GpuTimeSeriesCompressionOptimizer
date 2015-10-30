@@ -120,5 +120,43 @@ struct FillOperator
 	OutputType operator()(const InputType &x) { return value; }
 };
 
+template<typename InputType, typename OutputType>
+struct SetPrecisionOperator
+{
+	int precision;
+
+	__host__ __device__
+	OutputType operator()(const InputType &x)
+	{
+		int mul = pow(10, precision);
+		long long int tmp = round(x * mul);
+		return (OutputType)tmp / mul;
+	}
+};
+
+template<typename InputType, typename OutputType>
+struct FloatingPointToIntegerOperator
+{
+	int precision;
+
+	__host__ __device__
+	OutputType operator()(const InputType &x)
+	{
+		return lrint(x * pow(10, precision));
+	}
+};
+
+template<typename InputType, typename OutputType>
+struct IntegerToFloatingPointOperator
+{
+	int precision;
+
+	__host__ __device__
+	OutputType operator()(const InputType &x)
+	{
+		return (OutputType)x / pow(10, precision);
+	}
+};
+
 } /* namespace ddj */
 #endif /* OPERATORS_CUH_ */

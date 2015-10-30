@@ -116,6 +116,7 @@ FOR_EACH(TRANS_MODULUS_SPEC, int, long, long long, unsigned int)
 	    template SharedCudaPtr<int> CudaArrayTransform::Transform<X, int, NegateOperator		<X, int>>(SharedCudaPtr<X>, NegateOperator			<X, int> op); \
 	    template SharedCudaPtr<int> CudaArrayTransform::Transform<X, int, FillOperator			<X, int>>(SharedCudaPtr<X>, FillOperator			<X, int> op); \
 	    template SharedCudaPtr<int> CudaArrayTransform::Transform<X, int, DivisionOperator		<X, int>>(SharedCudaPtr<X>, DivisionOperator		<X, int> op); \
+	    template SharedCudaPtr<int> CudaArrayTransform::Transform<X, int, FloatingPointToIntegerOperator		<X, int>>(SharedCudaPtr<X>, FloatingPointToIntegerOperator		<X, int> op); \
 	    \
 	    template SharedCudaPtr<float> CudaArrayTransform::Transform<X, float, OutsideOperator		<X, float>>(SharedCudaPtr<X>, OutsideOperator			<X, float> op); \
 	    template SharedCudaPtr<float> CudaArrayTransform::Transform<X, float, InsideOperator		<X, float>>(SharedCudaPtr<X>, InsideOperator			<X, float> op); \
@@ -128,7 +129,8 @@ FOR_EACH(TRANS_MODULUS_SPEC, int, long, long long, unsigned int)
 	    template SharedCudaPtr<float> CudaArrayTransform::Transform<X, float, NegateOperator		<X, float>>(SharedCudaPtr<X>, NegateOperator			<X, float> op); \
 	    template SharedCudaPtr<float> CudaArrayTransform::Transform<X, float, FillOperator			<X, float>>(SharedCudaPtr<X>, FillOperator				<X, float> op); \
 	    template SharedCudaPtr<float> CudaArrayTransform::Transform<X, float, DivisionOperator		<X, float>>(SharedCudaPtr<X>, DivisionOperator			<X, float> op); \
-	   	\
+	    template SharedCudaPtr<float> CudaArrayTransform::Transform<X, float, IntegerToFloatingPointOperator		<X, float>>(SharedCudaPtr<X>, IntegerToFloatingPointOperator		<X, float> op); \
+		\
 	   	template SharedCudaPtr<double> CudaArrayTransform::Transform<X, double, OutsideOperator			<X, double>>(SharedCudaPtr<X>, OutsideOperator			<X, double> op); \
 	    template SharedCudaPtr<double> CudaArrayTransform::Transform<X, double, InsideOperator			<X, double>>(SharedCudaPtr<X>, InsideOperator			<X, double> op); \
 	    template SharedCudaPtr<double> CudaArrayTransform::Transform<X, double, AdditionOperator		<X, double>>(SharedCudaPtr<X>, AdditionOperator			<X, double> op); \
