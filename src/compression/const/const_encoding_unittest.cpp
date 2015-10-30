@@ -64,4 +64,26 @@ TEST_P(ConstCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+TEST_P(ConstCompressionTest, CompressionOf_Int_FromFile)
+{
+	ConstEncoding encoder;
+    EXPECT_TRUE(
+    	TestContent<time_t>(
+			boost::bind(&ConstEncoding::Encode<time_t>, encoder, _1),
+			boost::bind(&ConstEncoding::Decode<time_t>, encoder, _1),
+			GetTsIntDataFromTestFile())
+    );
+}
+
+TEST_P(ConstCompressionTest, CompressionOf_Float_FromFile)
+{
+	ConstEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&ConstEncoding::Encode<float>, encoder, _1),
+			boost::bind(&ConstEncoding::Decode<float>, encoder, _1),
+			GetTsFloatDataFromTestFile())
+	);
+}
+
 } /* namespace ddj */

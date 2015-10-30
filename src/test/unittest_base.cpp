@@ -34,7 +34,9 @@ SharedCudaPtr<time_t> UnittestBase::GetTsIntDataFromTestFile()
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
 	TSFileDefinition fileDefinition;
-	auto tsVector = TimeSeries<float>::ReadManyFromFile(file, fileDefinition);
+	TimeSeries<float> ts;
+		ts.SetReadMaxRows(_size);
+	auto tsVector = ts.ReadManyFromFile(file, fileDefinition);
 	auto intData = tsVector[0].GetTime();
 	auto size = tsVector[0].GetSize();
 
@@ -64,6 +66,23 @@ SharedCudaPtr<int> UnittestBase::GetFakeIntDataForHistogram()
 	auto fakeData = CudaPtr<int>::make_shared(_size);
 	fakeData->fillFromHost(h_fakeData.data(), _size);
 	return fakeData;
+}
+
+SharedCudaPtr<float> UnittestBase::GetTsFloatDataFromTestFile()
+{
+	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
+	File file(dataFilePath);
+	TSFileDefinition fileDefinition;
+	TimeSeries<float> ts;
+	ts.SetReadMaxRows(_size);
+	auto tsVector = ts.ReadManyFromFile(file, fileDefinition);
+	auto floatData = tsVector[0].GetData();
+	auto size = tsVector[0].GetSize();
+
+	auto result = CudaPtr<float>::make_shared();
+	result->fillFromHost(floatData, size);
+
+	return result;
 }
 
 int UnittestBase::GetSize() { return _size; }

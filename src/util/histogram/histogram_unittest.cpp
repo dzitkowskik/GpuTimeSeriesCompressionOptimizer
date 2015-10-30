@@ -193,8 +193,6 @@ TEST_F(HistogramTest, ThrustSparseHistogram_RandomIntegerArray)
 	CheckHistogramResult<int, CpuHistogramSparse>(randomData, result);
 }
 
-#if GTEST_ALSO_RUN_DISABLED_TESTS
-
 TEST_F(HistogramTest, ThrustSparseHistogram_RealData_Delta_Time)
 {
 	auto realData = GetTsIntDataFromTestFile();
@@ -214,7 +212,5 @@ TEST_F(HistogramTest, CalculateHistogram_RealData_Delta_Time)
 
 	CheckHistogramResult<time_t, CpuHistogramDense>(realDataDelta, result);
 }
-
-#endif
 
 } /* namespace ddj */

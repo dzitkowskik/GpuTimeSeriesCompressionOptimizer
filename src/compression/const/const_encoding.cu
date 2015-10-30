@@ -98,6 +98,6 @@ SharedCudaPtr<T> ConstEncoding::Decode(SharedCudaPtrVector<char> input)
 #define CONST_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> ConstEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> ConstEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(CONST_ENCODING_SPEC, float, int, long long, unsigned int)
+FOR_EACH(CONST_ENCODING_SPEC, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */
