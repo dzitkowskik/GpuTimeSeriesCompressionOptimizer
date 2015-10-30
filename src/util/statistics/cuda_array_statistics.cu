@@ -43,19 +43,21 @@ __host__ __device__ int _getFloatPrecision(float number)
 	return logf(e) / logf(10);
 }
 
-__global__ void _precisionKernelFloat(float* input, size_t size, int* output)
+template<typename T>
+__global__ void _precisionKernelFloat(T* input, size_t size, int* output)
 {
 	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	if (idx >= size) return;
 	output[idx] = _getFloatPrecision(input[idx]);
 }
 
-int CudaArrayStatistics::Precision(SharedCudaPtr<float> data)
+template<typename T>
+int CudaArrayStatistics::Precision(SharedCudaPtr<T> data)
 {
 	auto precisions = CudaPtr<int>::make_shared(data->size());
 
 	this->_policy.setSize(data->size());
-	cudaLaunch(this->_policy, _precisionKernelFloat,
+	cudaLaunch(this->_policy, _precisionKernelFloat<T>,
 			data->get(),
 			data->size(),
 			precisions->get());
@@ -66,7 +68,8 @@ int CudaArrayStatistics::Precision(SharedCudaPtr<float> data)
 
 #define CUDA_ARRAY_STATISTICS_SPEC(X) \
 	template std::tuple<X,X> CudaArrayStatistics::MinMax<X>(SharedCudaPtr<X>); \
-	template char CudaArrayStatistics::MinBitCnt<X>(SharedCudaPtr<X>);
+	template char CudaArrayStatistics::MinBitCnt<X>(SharedCudaPtr<X>); \
+	template int CudaArrayStatistics::Precision<X>(SharedCudaPtr<X>);
 FOR_EACH(CUDA_ARRAY_STATISTICS_SPEC, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

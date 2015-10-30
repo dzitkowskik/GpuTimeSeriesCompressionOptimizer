@@ -19,6 +19,7 @@ enum class EncodingType {
     unique,
     patch,
     none,
+    floatToInt,
     length
 };
 

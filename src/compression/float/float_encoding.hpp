@@ -1,12 +1,12 @@
 /*
- * scale_encoding.cuh
+ *  float_encoding.hpp
  *
- *  Created on: 24-04-2015
+ *  Created on: 30 paź 2015
  *      Author: Karol Dzitkowski
  */
 
-#ifndef DDJ_SCALE_ENCODING_HPP_
-#define DDJ_SCALE_ENCODING_HPP_
+#ifndef DDJ_FLOAT_ENCODING_HPP_
+#define DDJ_FLOAT_ENCODING_HPP_
 
 #include "compression/encoding.hpp"
 #include "compression/encoding_factory.hpp"
@@ -16,14 +16,15 @@
 
 #include <boost/make_shared.hpp>
 
-namespace ddj {
+namespace ddj
+{
 
-class ScaleEncoding : public Encoding
+class FloatEncoding : public Encoding
 {
 public:
-	ScaleEncoding(){}
-	~ScaleEncoding(){}
-	ScaleEncoding(const ScaleEncoding&) = default;
+	FloatEncoding(){}
+	virtual ~FloatEncoding(){}
+	FloatEncoding(const FloatEncoding&) = default;
 
 public:
 	unsigned int GetNumberOfResults() { return 1; }
@@ -57,20 +58,20 @@ private:
 	ExecutionPolicy _policy;
 };
 
-class ScaleEncodingFactory : public EncodingFactory
+class FloatEncodingFactory : public EncodingFactory
 {
 public:
-	ScaleEncodingFactory(DataType dt)
-		: EncodingFactory(dt, EncodingType::scale)
+	FloatEncodingFactory(DataType dt)
+		: EncodingFactory(dt, EncodingType::floatToInt)
 	{}
-	~ScaleEncodingFactory(){}
-	ScaleEncodingFactory(const ScaleEncodingFactory& other)
-		: EncodingFactory(other.dataType, EncodingType::scale)
+	~FloatEncodingFactory(){}
+	FloatEncodingFactory(const FloatEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::floatToInt)
 	{}
 
 	boost::shared_ptr<Encoding> Get()
 	{
-		return boost::make_shared<ScaleEncoding>();
+		return boost::make_shared<FloatEncoding>();
 	}
 
 	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
@@ -80,4 +81,5 @@ public:
 };
 
 } /* namespace ddj */
-#endif /* DDJ_SCALE_ENCODING_HPP_ */
+
+#endif /* DDJ_FLOAT_ENCODING_HPP_ */
