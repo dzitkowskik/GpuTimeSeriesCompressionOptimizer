@@ -49,6 +49,10 @@ public:
 
 	virtual unsigned int GetNumberOfResults() = 0;
 
+	// TODO: make abstract
+	virtual size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type) { return 0; }
+	virtual size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type) { return 0; }
+
 protected:
 	// INT
 	virtual SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data) = 0;

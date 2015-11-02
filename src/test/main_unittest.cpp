@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 {
     ddj::Config::GetInstance()->InitOptions(argc, argv, "src/test/config.ini");
     ::testing::InitGoogleTest(&argc, argv);
-    ::testing::FLAGS_gtest_repeat = 2;
+    ::testing::FLAGS_gtest_repeat = 1;
 
     auto value = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
     printf("%s\n", value.c_str());

@@ -1,6 +1,7 @@
 #include "dict_encoding.hpp"
 #include "core/cuda_macros.cuh"
 #include "helpers/helper_cuda.cuh"
+#include "helpers/helper_print.hpp"
 #include "util/stencil/stencil.hpp"
 #include "util/histogram/histogram.hpp"
 #include "compression/unique/unique_encoding.hpp"

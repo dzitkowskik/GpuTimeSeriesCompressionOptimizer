@@ -50,6 +50,14 @@ public:
 	~CudaPtr()
 	{ if(_pointer != nullptr) CUDA_ASSERT_RETURN( cudaFree(_pointer) ); }
 
+	template<typename S>
+	operator CudaPtr<S>*()
+	{
+		auto out = static_cast<CudaPtr<S>*>(this);
+		out->_size = this->_size * sizeof(T) / sizeof(S);
+		return out;
+	}
+
 public:
 	T* get() { return _pointer; }
 	size_t size() { return _size; }

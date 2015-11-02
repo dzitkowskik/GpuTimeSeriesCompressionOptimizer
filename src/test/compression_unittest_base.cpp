@@ -8,6 +8,7 @@
 #include "compression_unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "core/macros.h"
+#include "helpers/helper_print.hpp"
 
 #include <boost/function.hpp>
 
@@ -33,6 +34,10 @@ bool CompressionUnittestBase::TestContent(
 {
 	auto encodedData = encodeFunction(data);
 	auto decodedData = decodeFunction(encodedData);
+
+//	HelperPrint::PrintSharedCudaPtr(data, "data");
+//	HelperPrint::PrintSharedCudaPtr(decodedData, "decodedData");
+
 	return CompareDeviceArrays(data->get(), decodedData->get(), data->size());
 }
 

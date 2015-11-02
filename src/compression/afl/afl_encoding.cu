@@ -5,6 +5,35 @@
 namespace ddj
 {
 
+size_t AflEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
+{
+	SharedCudaPtr<int> intData;
+	SharedCudaPtr<float> floatData;
+	char minBit;
+	int size;
+
+	switch(type)
+	{
+		case DataType::d_int:
+			intData = boost::reinterpret_pointer_cast<CudaPtr<int>>(data);
+			minBit = CudaArrayStatistics().MinBitCnt<int>(intData);
+			size = intData->size();
+			break;
+		case DataType::d_float:
+			floatData = boost::reinterpret_pointer_cast<CudaPtr<float>>(data);
+			minBit = CudaArrayStatistics().MinBitCnt<float>(floatData);
+			size = floatData->size();
+			break;
+		default:
+			throw NotImplementedException("No getCompressedType method for that type!");
+	}
+
+	int elemBitSize = 8*sizeof(int);
+	int comprElemCnt = (minBit * size + elemBitSize - 1) / elemBitSize;
+	int comprDataSize = comprElemCnt * sizeof(int);
+	return comprDataSize;
+}
+
 template<>
 SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<int> data)
 {

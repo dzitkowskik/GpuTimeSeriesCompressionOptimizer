@@ -60,7 +60,7 @@ TEST_P(DictCompressionTest, CompressionOf_Long_FromFile)
 {
 	DictEncoding encoder;
     EXPECT_TRUE(
-		TestSize<time_t>(
+		TestContent<time_t>(
 			boost::bind(&DictEncoding::Encode<time_t>, encoder, _1),
 			boost::bind(&DictEncoding::Decode<time_t>, encoder, _1),
 			GetTsIntDataFromTestFile())

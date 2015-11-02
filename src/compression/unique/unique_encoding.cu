@@ -195,7 +195,7 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
     int unitBitSize = 8 * sizeof(unsigned int);             // single unit size in bits
     int dataPerUnitCnt = unitBitSize / bitsNeeded;          // how many items are in one unit
     int unitCnt =  data->size() / unitSize;                 // how many units are in data
-    int uniqueSizeInBytes = uniqueCnt * sizeof(int);    	// size in bytes of unique array
+    int uniqueSizeInBytes = uniqueCnt * sizeof(T);    	// size in bytes of unique array
     int headerSize = uniqueSizeInBytes + 2 * sizeof(size_t);// size of data header
 
     // DECOMPRESS DATA USING UNIQUE VALUES

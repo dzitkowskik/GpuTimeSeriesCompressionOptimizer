@@ -1,5 +1,7 @@
 #include "test/compression_unittest_base.hpp"
 #include "afl_encoding.hpp"
+#include "util/statistics/cuda_array_statistics.hpp"
+
 #include <gtest/gtest.h>
 #include <boost/bind.hpp>
 
@@ -54,6 +56,17 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_ConsecutiveInts_data)
 			boost::bind(&AflEncoding::Decode<int>, encoder, _1),
 			GetIntConsecutiveData())
 	);
+}
+
+TEST_P(AflCompressionTest, Afl_GetCompressedSize_int)
+{
+	AflEncoding encoder;
+	auto randomIntData = GetIntConsecutiveData();
+	SharedCudaPtr<char> charData = boost::reinterpret_pointer_cast<CudaPtr<char>>(randomIntData);
+	size_t actual = encoder.GetCompressedSize(charData, DataType::d_int);
+	auto minBit = CudaArrayStatistics().MinBitCnt<int>(randomIntData);
+	size_t expected = ceil((double)(randomIntData->size() * minBit) / 32.0) * 4;
+	EXPECT_EQ(expected, actual);
 }
 
 } /* namespace ddj */
