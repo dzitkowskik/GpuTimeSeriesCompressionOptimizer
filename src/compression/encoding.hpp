@@ -26,9 +26,9 @@ public:
 		switch(type)
 		{
 			case DataType::d_int:
-				return EncodeInt(MoveSharedCudaPtr<char, int>(data));
+				return EncodeInt(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
 			case DataType::d_float:
-				return EncodeFloat(MoveSharedCudaPtr<char, float>(data));
+				return EncodeFloat(boost::reinterpret_pointer_cast<CudaPtr<float>>(data));
 			default:
 				throw std::runtime_error("Encoding not implemented for this type");
 		}
@@ -39,9 +39,9 @@ public:
 		switch(type)
 		{
 			case DataType::d_int:
-				return MoveSharedCudaPtr<int, char>(DecodeInt(data));
+				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeInt(data));
 			case DataType::d_float:
-				return MoveSharedCudaPtr<float, char>(DecodeFloat(data));
+				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeFloat(data));
 			default:
 				throw std::runtime_error("Decoding not implemented for this type");
 		}

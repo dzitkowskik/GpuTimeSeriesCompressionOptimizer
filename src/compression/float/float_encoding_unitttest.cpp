@@ -13,14 +13,14 @@
 namespace ddj
 {
 
-class FloatCompressionTest : public CompressionUnittestBase {};
+class FloatEncodingTest : public CompressionUnittestBase {};
 
 INSTANTIATE_TEST_CASE_P(
     FloatEncoding_Compression_Inst,
-    FloatCompressionTest,
+    FloatEncodingTest,
     ::testing::Values(10, 1000, 10000));
 
-TEST_P(FloatCompressionTest, CompressionOfRandomFloats_WithMaxPrecision_3_size)
+TEST_P(FloatEncodingTest, CompressionOfRandomFloats_WithMaxPrecision_3_size)
 {
     FloatEncoding encoder;
     EXPECT_TRUE(
@@ -31,7 +31,7 @@ TEST_P(FloatCompressionTest, CompressionOfRandomFloats_WithMaxPrecision_3_size)
     );
 }
 
-TEST_P(FloatCompressionTest, CompressionOfRandomFloats_WithMaxPrecision_3_data)
+TEST_P(FloatEncodingTest, CompressionOfRandomFloats_WithMaxPrecision_3_data)
 {
 	FloatEncoding encoder;
 	EXPECT_TRUE(
@@ -42,7 +42,7 @@ TEST_P(FloatCompressionTest, CompressionOfRandomFloats_WithMaxPrecision_3_data)
 	);
 }
 
-TEST_P(FloatCompressionTest, CompressionOf_Float_FromFile)
+TEST_P(FloatEncodingTest, CompressionOf_Float_FromFile)
 {
 	FloatEncoding encoder;
 	EXPECT_TRUE(
@@ -51,6 +51,11 @@ TEST_P(FloatCompressionTest, CompressionOf_Float_FromFile)
 			boost::bind(&FloatEncoding::Decode<float>, encoder, _1),
 			GetTsFloatDataFromTestFile())
 	);
+}
+
+TEST_P(FloatEncodingTest, GetMetadataSize_Consecutive_Int)
+{
+	TestGetMetadataSize<FloatEncoding, int>(GetIntConsecutiveData());
 }
 
 } /* namespace ddj */

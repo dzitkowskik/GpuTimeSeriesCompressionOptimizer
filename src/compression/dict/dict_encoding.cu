@@ -5,6 +5,7 @@
 #include "util/stencil/stencil.hpp"
 #include "util/histogram/histogram.hpp"
 #include "compression/unique/unique_encoding.hpp"
+#include "util/other/cuda_array_reduce.cuh"
 
 #include <thrust/device_ptr.h>
 #include <thrust/count.h>
@@ -93,6 +94,33 @@ SharedCudaPtr<T> DictEncoding::Decode(SharedCudaPtrVector<char> input)
 
 	// MERGE DATA
 	return this->_splitter.Merge<T>(std::make_tuple(mostFrequent, other), *stencil);
+}
+
+size_t DictEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
+{
+	switch(type)
+	{
+		case DataType::d_int:
+			return GetCompressedSize(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
+		case DataType::d_float:
+			return GetCompressedSize(boost::reinterpret_pointer_cast<CudaPtr<float>>(data));
+		default:
+			throw NotImplementedException("No DictEncoding::GetCompressedSize implementation for that type");
+	}
+}
+
+template<typename T>
+size_t DictEncoding::GetCompressedSize(SharedCudaPtr<T> data)
+{
+	auto mostFrequent = Histogram().GetMostFrequent(data, this->_freqCnt);
+	auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
+	size_t mostFrequentCompressedSize = 2*sizeof(size_t) + this->_freqCnt*sizeof(T);
+	int dataPerOutputCnt = 8 * sizeof(unsigned int) / ALT_BITLEN(this->_freqCnt - 1);
+	int outputSize = (data->size() + dataPerOutputCnt - 1) / dataPerOutputCnt;
+	mostFrequentCompressedSize += outputSize * sizeof(unsigned int);
+	int othersCnt = data->size() - reduce_thrust(mostFrequentStencil, thrust::plus<int>());
+	size_t otherDataSize = othersCnt * sizeof(T);
+	return mostFrequentCompressedSize + otherDataSize;
 }
 
 #define DICT_ENCODING_SPEC(X) \

@@ -29,6 +29,17 @@ public:
 public:
 	unsigned int GetNumberOfResults() { return 1; }
 
+	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
+	{
+		return sizeof(int);
+	}
+
+	size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type)
+	{
+		// TODO: For 8 bytes types result size is data->size() / 2;
+		return data->size();
+	}
+
 protected:
 	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data)
 	{

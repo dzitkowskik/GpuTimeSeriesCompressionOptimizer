@@ -9,6 +9,7 @@
 #define DDJ_COMPRESSION_UNITTEST_BASE_HPP_
 
 #include "unittest_base.hpp"
+#include "compression/encoding.hpp"
 
 namespace ddj
 {
@@ -27,6 +28,18 @@ public:
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<T>)> encodeFunction,
 			boost::function<SharedCudaPtr<T> (SharedCudaPtrVector<char>)> decodeFunction,
 			SharedCudaPtr<T> data);
+
+	template<class EncodingClass, typename T>
+	static bool TestGetMetadataSize(SharedCudaPtr<T> data)
+	{
+		boost::shared_ptr<Encoding> encoder = boost::make_shared<EncodingClass>();
+		auto testData = MoveSharedCudaPtr<T, char>(data);
+		auto encoded = encoder->Encode(testData->copy(), GetDataType<T>());
+		auto expected = encoded[0]->size();
+		auto actual = encoder->GetMetadataSize(testData, GetDataType<T>());
+		EXPECT_EQ(expected, actual);
+	}
+
 protected:
 	void SetUp()
 	{

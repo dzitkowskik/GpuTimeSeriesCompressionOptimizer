@@ -5,14 +5,14 @@
 
 namespace ddj {
 
-class DictCompressionTest : public CompressionUnittestBase {};
+class DictEncodingTest : public CompressionUnittestBase {};
 
 INSTANTIATE_TEST_CASE_P(
 	DictEncoding_Compression_Inst,
-	DictCompressionTest,
+	DictEncodingTest,
     ::testing::Values(10, 1000, 10000));
 
-TEST_P(DictCompressionTest, CompressionOfRandomInts_size)
+TEST_P(DictEncodingTest, CompressionOfRandomInts_size)
 {
 	DictEncoding encoder;
     EXPECT_TRUE(
@@ -23,7 +23,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomInts_size)
     );
 }
 
-TEST_P(DictCompressionTest, CompressionOfRandomInts_data)
+TEST_P(DictEncodingTest, CompressionOfRandomInts_data)
 {
 	DictEncoding encoder;
 	EXPECT_TRUE(
@@ -34,7 +34,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomInts_data)
 	);
 }
 
-TEST_P(DictCompressionTest, CompressionOfRandomFloats_size)
+TEST_P(DictEncodingTest, CompressionOfRandomFloats_size)
 {
 	DictEncoding encoder;
     EXPECT_TRUE(
@@ -45,7 +45,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_size)
     );
 }
 
-TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
+TEST_P(DictEncodingTest, CompressionOfRandomFloats_data)
 {
 	DictEncoding encoder;
 	EXPECT_TRUE(
@@ -56,7 +56,7 @@ TEST_P(DictCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
-TEST_P(DictCompressionTest, CompressionOf_Long_FromFile)
+TEST_P(DictEncodingTest, CompressionOf_Long_FromFile)
 {
 	DictEncoding encoder;
     EXPECT_TRUE(
@@ -67,7 +67,7 @@ TEST_P(DictCompressionTest, CompressionOf_Long_FromFile)
     );
 }
 
-TEST_P(DictCompressionTest, CompressionOf_Float_FromFile)
+TEST_P(DictEncodingTest, CompressionOf_Float_FromFile)
 {
 	DictEncoding encoder;
 	EXPECT_TRUE(
@@ -78,5 +78,9 @@ TEST_P(DictCompressionTest, CompressionOf_Float_FromFile)
 	);
 }
 
+TEST_P(DictEncodingTest, GetMetadataSize_Consecutive_Int)
+{
+	TestGetMetadataSize<DictEncoding, int>(GetIntConsecutiveData());
+}
 
 } /* namespace ddj */

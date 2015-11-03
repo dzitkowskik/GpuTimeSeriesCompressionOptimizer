@@ -7,12 +7,28 @@
 
 #include "compression/unique/unique_encoding.hpp"
 #include "core/cuda_macros.cuh"
+#include "core/not_implemented_exception.hpp"
 #include "helpers/helper_cuda.cuh"
 #include <thrust/device_ptr.h>
 #include <thrust/sort.h>
 #include <thrust/unique.h>
 
 namespace ddj {
+
+SharedCudaPtr<char> UniqueEncoding::FindUnique(SharedCudaPtr<char> data, DataType type)
+{
+	switch(type)
+	{
+		case DataType::d_int:
+			return boost::reinterpret_pointer_cast<CudaPtr<char>>(
+					FindUnique(boost::reinterpret_pointer_cast<CudaPtr<int>>(data)));
+		case DataType::d_float:
+			return boost::reinterpret_pointer_cast<CudaPtr<char>>(
+					FindUnique(boost::reinterpret_pointer_cast<CudaPtr<float>>(data)));
+		default:
+			throw NotImplementedException("No UniqueEncoding::FindUnique implementation for that type");
+	}
+}
 
 template<typename T>
 SharedCudaPtr<T> UniqueEncoding::FindUnique(SharedCudaPtr<T> data)
@@ -245,6 +261,26 @@ SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
 
     cudaDeviceSynchronize();
     return result;
+}
+
+size_t UniqueEncoding::GetMetadataSize(SharedCudaPtr<char> data, DataType type)
+{
+	auto unique = FindUnique(data, type);
+	return 2*sizeof(size_t) + unique->size();
+}
+
+size_t UniqueEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
+{
+	auto unique = FindUnique(data, type);
+	int typeSize = GetDataTypeSize(type); 					// size of used type
+	int uniqueSize = unique->size() / typeSize; 			// how many distinct items to encode
+	int dataSize = data->size() / typeSize; 				// no elements to compress
+	int bitsNeeded = ALT_BITLEN(uniqueSize-1); 				// min bits needed to encode
+	int outputItemBitSize = 8 * sizeof(unsigned int);      	// how many bits are in output unit
+	int dataPerOutputCnt = outputItemBitSize / bitsNeeded;  // how many items will be encoded in single unit
+	int outputSize = (dataSize + dataPerOutputCnt - 1) / dataPerOutputCnt;  // output units cnt
+	int outputSizeInBytes = outputSize * sizeof(unsigned int);	// output size after compression
+	return outputSizeInBytes;
 }
 
 

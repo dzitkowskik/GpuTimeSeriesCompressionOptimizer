@@ -5,14 +5,14 @@
 
 namespace ddj {
 
-class UniqueCompressionTest : public CompressionUnittestBase {};
+class UniqueEncodingTest : public CompressionUnittestBase {};
 
 INSTANTIATE_TEST_CASE_P(
 	UniqueEncoding_Compression_Inst,
-	UniqueCompressionTest,
+	UniqueEncodingTest,
     ::testing::Values(10, 1000, 10000));
 
-TEST_P(UniqueCompressionTest, CompressionOfRandomInts_size)
+TEST_P(UniqueEncodingTest, CompressionOfRandomInts_size)
 {
 	UniqueEncoding encoder;
     EXPECT_TRUE(
@@ -23,7 +23,7 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomInts_size)
     );
 }
 
-TEST_P(UniqueCompressionTest, CompressionOfRandomInts_data)
+TEST_P(UniqueEncodingTest, CompressionOfRandomInts_data)
 {
 	UniqueEncoding encoder;
 	EXPECT_TRUE(
@@ -34,7 +34,7 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomInts_data)
 	);
 }
 
-TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_size)
+TEST_P(UniqueEncodingTest, CompressionOfRandomFloats_size)
 {
 	UniqueEncoding encoder;
     EXPECT_TRUE(
@@ -45,7 +45,7 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_size)
     );
 }
 
-TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_data)
+TEST_P(UniqueEncodingTest, CompressionOfRandomFloats_data)
 {
 	UniqueEncoding encoder;
 	EXPECT_TRUE(
@@ -56,5 +56,9 @@ TEST_P(UniqueCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+TEST_P(UniqueEncodingTest, GetMetadataSize_Consecutive_Int)
+{
+	TestGetMetadataSize<UniqueEncoding, int>(GetIntConsecutiveData());
+}
 
 } /* namespace ddj */

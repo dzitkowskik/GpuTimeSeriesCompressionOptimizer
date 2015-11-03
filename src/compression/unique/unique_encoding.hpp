@@ -33,6 +33,9 @@ public:
 public:
 	unsigned int GetNumberOfResults() { return 1; }
 
+	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type);
+	size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type);
+
 protected:
 	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data)
 	{
@@ -60,6 +63,8 @@ public:
 
 private:
 	template<typename T> SharedCudaPtr<T> FindUnique(SharedCudaPtr<T> data);
+	SharedCudaPtr<char> FindUnique(SharedCudaPtr<char> data, DataType type);
+
 	template<typename T> SharedCudaPtr<char> CompressUnique(SharedCudaPtr<T> data, SharedCudaPtr<T> unique);
 	template<typename T> SharedCudaPtr<T> DecompressUnique(SharedCudaPtr<char> data);
 

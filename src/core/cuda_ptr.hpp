@@ -40,70 +40,64 @@ class CudaPtr : private boost::noncopyable
 {
 public:
 	CudaPtr() : _pointer(NULL), _size(0){}
-	CudaPtr(size_t size) : _pointer(NULL), _size(size)
+	CudaPtr(size_t size) : _pointer(NULL), _size(size*sizeof(T))
 	{
 		if(_size > 0)
-			CUDA_CALL( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
+			CUDA_CALL( cudaMalloc((void**)&_pointer, _size) );
 	}
-	CudaPtr(T* pointer, size_t size) : _pointer(pointer), _size(size) {}
+	CudaPtr(T* pointer, size_t size) : _pointer(pointer), _size(size*sizeof(T)) {}
 
 	~CudaPtr()
 	{ if(_pointer != nullptr) CUDA_ASSERT_RETURN( cudaFree(_pointer) ); }
 
-	template<typename S>
-	operator CudaPtr<S>*()
-	{
-		auto out = static_cast<CudaPtr<S>*>(this);
-		out->_size = this->_size * sizeof(T) / sizeof(S);
-		return out;
-	}
-
 public:
 	T* get() { return _pointer; }
-	size_t size() { return _size; }
+	size_t size() { return _size/sizeof(T); }
 
 	void reset(size_t size)
 	{
-		_size = size;
+		if(this->size() == size) return;
+		_size = size*sizeof(T);
 		CUDA_ASSERT_RETURN( cudaFree(_pointer) );
-		CUDA_ASSERT_RETURN( cudaMalloc((void**)&_pointer, _size*sizeof(T)) );
+		CUDA_ASSERT_RETURN( cudaMalloc((void**)&_pointer, _size) );
 	}
 
 	void reset(T* ptr, size_t size = 0)
 	{
 		CUDA_ASSERT_RETURN( cudaFree(_pointer) );
 		_pointer = ptr;
-		_size = size;
+		_size = size*sizeof(T);
 	}
 
 	void fill(T* ptr, size_t size)
 	{
-		if(_size < size) reset(size);
+		reset(size);
 		CUDA_ASSERT_RETURN(
-			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyDeviceToDevice)
+			cudaMemcpy(_pointer, ptr, _size, cudaMemcpyDeviceToDevice)
 			);
 	}
 
 	void fillFromHost(const T* ptr, size_t size)
 	{
-		if(_size < size) reset(size);
+		reset(size);
 		CUDA_ASSERT_RETURN(
-			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyHostToDevice)
+			cudaMemcpy(_pointer, ptr, _size, cudaMemcpyHostToDevice)
 			);
 	}
 
 	SharedCudaPtr<T> copy()
 	{
-		auto result = make_shared();
-		result->fill(_pointer, _size);
+		auto count = this->size();
+		auto result = make_shared(count);
+		result->fill(_pointer, count);
 		return result;
 	}
 
 	boost::shared_ptr<std::vector<T>> copyToHost()
 	{
-		boost::shared_ptr<std::vector<T>> result(new std::vector<T>(_size));
+		boost::shared_ptr<std::vector<T>> result(new std::vector<T>(size()));
 		CUDA_ASSERT_RETURN(
-			cudaMemcpy( result->data(), this->get(), this->size()*sizeof(T), CPY_DTH )
+			cudaMemcpy( result->data(), _pointer, _size, CPY_DTH )
 			);
 		return result;
 	}
@@ -114,7 +108,7 @@ public:
 private:
 	template<typename S> CudaPtr<S>* move()
 	{
-		size_t new_size = _size * sizeof(T) / sizeof(S);
+		size_t new_size = _size / sizeof(S);
 		auto result = new CudaPtr<S>((S*)(this->_pointer), new_size);
 		this->_pointer = 0;
 		this->_size = 0;

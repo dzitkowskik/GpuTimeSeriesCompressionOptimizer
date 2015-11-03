@@ -10,9 +10,9 @@
 
 #include "compression/encoding.hpp"
 #include "compression/encoding_factory.hpp"
-
 #include "core/execution_policy.hpp"
 #include "core/not_implemented_exception.hpp"
+#include "util/stencil/stencil.hpp"
 
 #include <boost/make_shared.hpp>
 
@@ -28,6 +28,14 @@ public:
 
 public:
 	unsigned int GetNumberOfResults() { return 1; }
+
+	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
+	{
+		int elemCnt = data->size() / GetDataTypeSize(type);
+		return (elemCnt + 7) / 8 + GetDataTypeSize(type) + 1;
+	}
+
+	size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type);
 
 protected:
 	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data)
@@ -53,6 +61,10 @@ protected:
 public:
 	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);
 	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtrVector<char> data);
+
+private:
+	template<typename T> size_t GetCompressedSize(SharedCudaPtr<T> data);
+	template<typename T> Stencil GetConstStencil(SharedCudaPtr<T> data, T constValue);
 
 private:
 	ExecutionPolicy _policy;

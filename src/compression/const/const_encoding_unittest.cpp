@@ -13,14 +13,14 @@
 namespace ddj
 {
 
-class ConstCompressionTest : public CompressionUnittestBase {};
+class ConstEncodingTest : public CompressionUnittestBase {};
 
 INSTANTIATE_TEST_CASE_P(
     ConstEncoding_Compression_Inst,
-    ConstCompressionTest,
+    ConstEncodingTest,
     ::testing::Values(10, 1000, 10000));
 
-TEST_P(ConstCompressionTest, CompressionOfRandomInts_size)
+TEST_P(ConstEncodingTest, CompressionOfRandomInts_size)
 {
     ConstEncoding encoder;
     EXPECT_TRUE(
@@ -31,7 +31,7 @@ TEST_P(ConstCompressionTest, CompressionOfRandomInts_size)
     );
 }
 
-TEST_P(ConstCompressionTest, CompressionOfRandomInts_data)
+TEST_P(ConstEncodingTest, CompressionOfRandomInts_data)
 {
 	ConstEncoding encoder;
 	EXPECT_TRUE(
@@ -42,7 +42,7 @@ TEST_P(ConstCompressionTest, CompressionOfRandomInts_data)
 	);
 }
 
-TEST_P(ConstCompressionTest, CompressionOfRandomFloats_size)
+TEST_P(ConstEncodingTest, CompressionOfRandomFloats_size)
 {
 	ConstEncoding encoder;
     EXPECT_TRUE(
@@ -53,7 +53,7 @@ TEST_P(ConstCompressionTest, CompressionOfRandomFloats_size)
     );
 }
 
-TEST_P(ConstCompressionTest, CompressionOfRandomFloats_data)
+TEST_P(ConstEncodingTest, CompressionOfRandomFloats_data)
 {
 	ConstEncoding encoder;
 	EXPECT_TRUE(
@@ -64,7 +64,7 @@ TEST_P(ConstCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
-TEST_P(ConstCompressionTest, CompressionOf_Int_FromFile)
+TEST_P(ConstEncodingTest, CompressionOf_Int_FromFile)
 {
 	ConstEncoding encoder;
     EXPECT_TRUE(
@@ -75,7 +75,7 @@ TEST_P(ConstCompressionTest, CompressionOf_Int_FromFile)
     );
 }
 
-TEST_P(ConstCompressionTest, CompressionOf_Float_FromFile)
+TEST_P(ConstEncodingTest, CompressionOf_Float_FromFile)
 {
 	ConstEncoding encoder;
 	EXPECT_TRUE(
@@ -84,6 +84,11 @@ TEST_P(ConstCompressionTest, CompressionOf_Float_FromFile)
 			boost::bind(&ConstEncoding::Decode<float>, encoder, _1),
 			GetTsFloatDataFromTestFile())
 	);
+}
+
+TEST_P(ConstEncodingTest, GetMetadataSize_Consecutive_Int)
+{
+	TestGetMetadataSize<ConstEncoding, int>(GetIntConsecutiveData());
 }
 
 } /* namespace ddj */

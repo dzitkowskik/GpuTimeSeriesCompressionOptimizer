@@ -35,6 +35,14 @@ public:
 	void SetFreqCnt(int freqCnt) { _freqCnt = freqCnt; }
 	unsigned int GetNumberOfResults() { return 2; }
 
+	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
+	{
+		int elemCnt = data->size() / GetDataTypeSize(type);
+		return (elemCnt + 7) / 8 + 1;
+	}
+
+	size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type);
+
 protected:
 	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data)
 	{
@@ -59,6 +67,9 @@ protected:
 private:
 	template<typename T>
     SharedCudaPtr<int> GetMostFrequentStencil(SharedCudaPtr<T> data, SharedCudaPtr<T> mostFrequent);
+
+	template<typename T>
+	size_t GetCompressedSize(SharedCudaPtr<T> data);
 
 // TODO: Should be also private
 public:

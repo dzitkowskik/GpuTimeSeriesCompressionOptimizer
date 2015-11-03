@@ -5,8 +5,8 @@
  *      Author: Karol Dzitkowski
  */
 
- #ifndef DDJ_DATA_TYPE_HPP_
- #define DDJ_DATA_TYPE_HPP_
+#ifndef DDJ_DATA_TYPE_HPP_
+#define DDJ_DATA_TYPE_HPP_
 
 #include "core/not_implemented_exception.hpp"
 
@@ -25,6 +25,10 @@ inline size_t GetDataTypeSize(DataType type)
 		default: throw NotImplementedException("This type is not implemented");
 	}
 }
+
+template<typename T> inline DataType GetDataType();
+template<> inline DataType GetDataType<int>() { return DataType::d_int; }
+template<> inline DataType GetDataType<float>() { return DataType::d_float; }
 
 } /* namespace ddj */
 #endif /* DDJ_DATA_TYPE_HPP_ */

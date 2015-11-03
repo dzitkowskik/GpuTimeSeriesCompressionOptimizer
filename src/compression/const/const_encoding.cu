@@ -8,8 +8,8 @@
 #include "const_encoding.hpp"
 #include "util/histogram/histogram.hpp"
 #include "util/splitter/splitter.hpp"
-#include "util/stencil/stencil.hpp"
 #include "util/other/prefix_sum.cuh"
+#include "util/other/cuda_array_reduce.cuh"
 #include "helpers/helper_cuda.cuh"
 
 namespace ddj
@@ -24,11 +24,8 @@ __global__ void _constEncodeStencilKernel(T* data, size_t size, int* stencil, T 
 }
 
 template<typename T>
-SharedCudaPtrVector<char> ConstEncoding::Encode(SharedCudaPtr<T> data)
+Stencil ConstEncoding::GetConstStencil(SharedCudaPtr<T> data, T constValue)
 {
-	auto mostFrequent = Histogram().GetMostFrequent(data, 1);
-	T constValue;
-	CUDA_CALL( cudaMemcpy(&constValue, mostFrequent->get(), sizeof(T), CPY_DTH) );
 	Stencil stencil(CudaPtr<int>::make_shared(data->size()));
 
 	this->_policy.setSize(data->size());
@@ -38,6 +35,18 @@ SharedCudaPtrVector<char> ConstEncoding::Encode(SharedCudaPtr<T> data)
 			stencil->get(),
 			constValue);
 	cudaDeviceSynchronize();
+
+	return stencil;
+}
+
+template<typename T>
+SharedCudaPtrVector<char> ConstEncoding::Encode(SharedCudaPtr<T> data)
+{
+	auto mostFrequent = Histogram().GetMostFrequent(data, 1);
+	T constValue;
+	CUDA_CALL( cudaMemcpy(&constValue, mostFrequent->get(), sizeof(T), CPY_DTH) );
+
+	auto stencil = GetConstStencil(data, constValue);
 
 	auto resultData = MoveSharedCudaPtr<T, char>(Splitter().CopyIf(data, *stencil));
 	auto packedStencil = stencil.pack();
@@ -93,6 +102,29 @@ SharedCudaPtr<T> ConstEncoding::Decode(SharedCudaPtrVector<char> input)
 	cudaDeviceSynchronize();
 
 	return result;
+}
+
+size_t ConstEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
+{
+	switch(type)
+	{
+		case DataType::d_int:
+			return GetCompressedSize(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
+		case DataType::d_float:
+			return GetCompressedSize(boost::reinterpret_pointer_cast<CudaPtr<float>>(data));
+		default:
+			throw NotImplementedException("No DictEncoding::GetCompressedSize implementation for that type");
+	}
+}
+
+template<typename T> size_t ConstEncoding::GetCompressedSize(SharedCudaPtr<T> data)
+{
+	auto mostFrequent = Histogram().GetMostFrequent(data, 1);
+	T constValue;
+	CUDA_CALL( cudaMemcpy(&constValue, mostFrequent->get(), sizeof(T), CPY_DTH) );
+	auto stencil = GetConstStencil(data, constValue);
+	auto notConstCnt = reduce_thrust(*stencil, thrust::plus<int>());
+	return notConstCnt * sizeof(T);
 }
 
 #define CONST_ENCODING_SPEC(X) \
