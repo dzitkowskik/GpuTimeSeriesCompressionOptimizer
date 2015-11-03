@@ -61,4 +61,9 @@ TEST_P(UniqueEncodingTest, GetMetadataSize_Consecutive_Int)
 	TestGetMetadataSize<UniqueEncoding, int>(GetIntConsecutiveData());
 }
 
+TEST_P(UniqueEncodingTest, GetCompressedSize_Consecutive_Int)
+{
+	TestGetCompressedSize<UniqueEncoding, int>(GetIntConsecutiveData());
+}
+
 } /* namespace ddj */

@@ -116,7 +116,7 @@ size_t DictEncoding::GetCompressedSize(SharedCudaPtr<T> data)
 	auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
 	size_t mostFrequentCompressedSize = 2*sizeof(size_t) + this->_freqCnt*sizeof(T);
 	int dataPerOutputCnt = 8 * sizeof(unsigned int) / ALT_BITLEN(this->_freqCnt - 1);
-	int outputSize = (data->size() + dataPerOutputCnt - 1) / dataPerOutputCnt;
+	int outputSize = (mostFrequent->size() + dataPerOutputCnt - 1) / dataPerOutputCnt;
 	mostFrequentCompressedSize += outputSize * sizeof(unsigned int);
 	int othersCnt = data->size() - reduce_thrust(mostFrequentStencil, thrust::plus<int>());
 	size_t otherDataSize = othersCnt * sizeof(T);

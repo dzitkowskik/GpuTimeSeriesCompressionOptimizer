@@ -58,4 +58,9 @@ TEST_P(FloatEncodingTest, GetMetadataSize_Consecutive_Int)
 	TestGetMetadataSize<FloatEncoding, int>(GetIntConsecutiveData());
 }
 
+TEST_P(FloatEncodingTest, GetCompressedSize_Consecutive_Int)
+{
+	TestGetCompressedSize<FloatEncoding, int>(GetIntConsecutiveData());
+}
+
 } /* namespace ddj */

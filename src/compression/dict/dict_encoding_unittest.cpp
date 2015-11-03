@@ -83,4 +83,9 @@ TEST_P(DictEncodingTest, GetMetadataSize_Consecutive_Int)
 	TestGetMetadataSize<DictEncoding, int>(GetIntConsecutiveData());
 }
 
+TEST_P(DictEncodingTest, GetCompressedSize_Consecutive_Int)
+{
+	TestGetCompressedSize<DictEncoding, int>(GetIntConsecutiveData());
+}
+
 } /* namespace ddj */

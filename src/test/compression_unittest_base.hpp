@@ -30,13 +30,26 @@ public:
 			SharedCudaPtr<T> data);
 
 	template<class EncodingClass, typename T>
-	static bool TestGetMetadataSize(SharedCudaPtr<T> data)
+	static void TestGetMetadataSize(SharedCudaPtr<T> data)
 	{
 		boost::shared_ptr<Encoding> encoder = boost::make_shared<EncodingClass>();
 		auto testData = MoveSharedCudaPtr<T, char>(data);
-		auto encoded = encoder->Encode(testData->copy(), GetDataType<T>());
+		auto encoded = encoder->Encode(testData, GetDataType<T>());
 		auto expected = encoded[0]->size();
 		auto actual = encoder->GetMetadataSize(testData, GetDataType<T>());
+		EXPECT_EQ(expected, actual);
+	}
+
+	template<class EncodingClass, typename T>
+	static void TestGetCompressedSize(SharedCudaPtr<T> data)
+	{
+		boost::shared_ptr<Encoding> encoder = boost::make_shared<EncodingClass>();
+		auto testData = MoveSharedCudaPtr<T, char>(data);
+		auto encoded = encoder->Encode(testData, GetDataType<T>());
+		size_t expected = 0;
+		for(int i=1; i <= encoder->GetNumberOfResults(); i++)
+			expected += encoded[i]->size();
+		auto actual = encoder->GetCompressedSize(testData, GetDataType<T>());
 		EXPECT_EQ(expected, actual);
 	}
 
