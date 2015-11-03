@@ -1,42 +1,14 @@
 /*
- * operators.cuh
+ *  transform_operators.hpp
  *
  *  Created on: 04-06-2015
  *      Author: Karol Dzitkowski
  */
 
-#ifndef OPERATORS_CUH_
-#define OPERATORS_CUH_
+#ifndef DDJ_TRANSFORM_OPERATORS_HPP_
+#define DDJ_TRANSFORM_OPERATORS_HPP_
 
 namespace ddj {
-
-template<typename InputType, typename OutputType>
-struct OutsideOperator
-{
-	InputType low;
-	InputType high;
-
-	__host__ __device__
-	OutputType operator()(const InputType &value) const
-	{
-		if(value > high || value < low) return false;
-		else return true;
-	}
-};
-
-template<typename InputType, typename OutputType>
-struct InsideOperator
-{
-	InputType low;
-	InputType high;
-
-	__host__ __device__
-	OutputType operator()(const InputType &value) const
-	{
-		if(value > high || value < low) return true;
-		else return false;
-	}
-};
 
 template<typename InputType, typename OutputType>
 struct ModulusOperator
@@ -159,4 +131,4 @@ struct IntegerToFloatingPointOperator
 };
 
 } /* namespace ddj */
-#endif /* OPERATORS_CUH_ */
+#endif /* DDJ_TRANSFORM_OPERATORS_HPP_ */

@@ -1,7 +1,6 @@
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/macros.h"
 #include "core/cuda_ptr.hpp"
-#include "core/operators.cuh"
 
 #include <cmath>
 #include <time.h>

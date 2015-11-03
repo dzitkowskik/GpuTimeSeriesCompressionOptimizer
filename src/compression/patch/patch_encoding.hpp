@@ -11,7 +11,7 @@
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
 #include "core/not_implemented_exception.hpp"
-#include "core/operators.cuh"
+#include "util/stencil/stencil_operators.hpp"
 #include "util/splitter/splitter.hpp"
 #include "compression/data_type.hpp"
 #include "compression/encoding_type.hpp"
@@ -74,13 +74,13 @@ public:
 
 	boost::shared_ptr<Encoding> Get()
 	{
-		OutsideOperator<T,T> op;
-		return boost::make_shared<PatchEncoding<OutsideOperator<T,T>>>(op);
+		OutsideOperator<T> op;
+		return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(op);
 	}
 
 	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
 	{
-		OutsideOperator<T,T> op;
+		OutsideOperator<T> op;
 		T dist = max - min;
 
 		switch(patchType)
@@ -88,7 +88,7 @@ public:
 			case PatchType::outside:
 				op.low = min + factor * dist;
 				op.high = max - factor * dist;
-				return boost::make_shared<PatchEncoding<OutsideOperator<T,T>>>(op);
+				return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(op);
 			default:
 				throw NotImplementedException("Encoding of this type not implemented");
 		}

@@ -1,6 +1,5 @@
 #include "util/histogram/histogram.hpp"
 #include "util/histogram/cuda_histogram_impl.cuh"
-#include "core/operators.cuh"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/macros.h"
 #include <cmath>

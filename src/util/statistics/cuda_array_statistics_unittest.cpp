@@ -8,7 +8,6 @@
 #include "cuda_array_statistics.hpp"
 #include "util/transform/cuda_array_transform.hpp"
 #include "test/unittest_base.hpp"
-#include "core/operators.cuh"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_print.hpp"
 

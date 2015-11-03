@@ -2,6 +2,7 @@
 #include "helpers/helper_cuda.cuh"
 #include "core/cuda_macros.cuh"
 #include "core/macros.h"
+#include "stencil_operators.hpp"
 
 namespace ddj {
 
@@ -93,5 +94,40 @@ SharedCudaPtr<int> Stencil::unpack(SharedCudaPtr<char> data, int shift)
 
     return result;
 }
+
+template<typename T, typename Predicate>
+__global__ void _createStencilKernel(T* data, size_t size, int* output, Predicate pred)
+{
+	unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
+	if(idx >= size) return;
+	output[idx] = pred(data[idx]);
+}
+
+template<typename T, typename Predicate>
+Stencil Stencil::Create(SharedCudaPtr<T> data, Predicate pred)
+{
+	Stencil stencil(CudaPtr<int>::make_shared(data->size()));
+	ExecutionPolicy policy;
+	policy.setSize(data->size());
+	cudaLaunch(policy, _createStencilKernel<T, Predicate>,
+			data->get(),
+			data->size(),
+			stencil->get(),
+			pred);
+	cudaDeviceSynchronize();
+
+	return stencil;
+}
+
+#define STENCIL_SPEC(X) \
+	template Stencil Stencil::Create<X, EqualOperator<X>>(SharedCudaPtr<X> data, EqualOperator<X> pred); \
+	template Stencil Stencil::Create<X, NotEqualOperator<X>>(SharedCudaPtr<X> data, NotEqualOperator<X> pred); \
+	template Stencil Stencil::Create<X, InsideOperator<X>>(SharedCudaPtr<X> data, InsideOperator<X> pred); \
+	template Stencil Stencil::Create<X, OutsideOperator<float>>(SharedCudaPtr<X> data, OutsideOperator<float> pred); \
+	template Stencil Stencil::Create<X, OutsideOperator<int>>(SharedCudaPtr<X> data, OutsideOperator<int> pred); \
+	template Stencil Stencil::Create<X, OutsideOperator<long>>(SharedCudaPtr<X> data, OutsideOperator<long> pred); \
+	template Stencil Stencil::Create<X, OutsideOperator<long long>>(SharedCudaPtr<X> data, OutsideOperator<long long> pred); \
+	template Stencil Stencil::Create<X, OutsideOperator<unsigned int>>(SharedCudaPtr<X> data, OutsideOperator<unsigned int> pred);
+FOR_EACH(STENCIL_SPEC, float, int, long, long long, unsigned int)
 
 }/* namespace ddj */

@@ -10,7 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
-#include "core/operators.cuh"
+#include "transform_operators.hpp"
 
 namespace ddj
 {

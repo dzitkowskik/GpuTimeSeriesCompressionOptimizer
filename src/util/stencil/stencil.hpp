@@ -10,6 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
+#include "stencil_operators.hpp"
 
 namespace ddj {
 
@@ -31,6 +32,9 @@ public:
 
     SharedCudaPtr<char> pack();
     SharedCudaPtr<int> unpack(SharedCudaPtr<char> data, int shift = 0);
+
+    template<typename T, typename Predicate>
+    static Stencil Create(SharedCudaPtr<T> data, Predicate pred);
 
 private:
     SharedCudaPtr<int> _data;
