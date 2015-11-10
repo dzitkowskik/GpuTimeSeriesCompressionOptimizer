@@ -36,6 +36,28 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomInts_data)
 	);
 }
 
+TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomFloats_size)
+{
+	AflEncoding encoder;
+    EXPECT_TRUE(
+		TestSize<float>(
+			boost::bind(&AflEncoding::Encode<float>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<float>, encoder, _1),
+			GetFloatRandomData())
+    );
+}
+
+TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomFloats_data)
+{
+	AflEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&AflEncoding::Encode<float>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<float>, encoder, _1),
+			GetFloatRandomData())
+	);
+}
+
 TEST_P(AflCompressionTest, Afl_Encode_Decode_ConsecutiveInts_size)
 {
 	AflEncoding encoder;

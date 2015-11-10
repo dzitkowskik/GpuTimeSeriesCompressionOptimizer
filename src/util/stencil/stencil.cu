@@ -123,6 +123,8 @@ Stencil Stencil::Create(SharedCudaPtr<T> data, Predicate pred)
 	template Stencil Stencil::Create<X, EqualOperator<X>>(SharedCudaPtr<X> data, EqualOperator<X> pred); \
 	template Stencil Stencil::Create<X, NotEqualOperator<X>>(SharedCudaPtr<X> data, NotEqualOperator<X> pred); \
 	template Stencil Stencil::Create<X, InsideOperator<X>>(SharedCudaPtr<X> data, InsideOperator<X> pred); \
+	template Stencil Stencil::Create<X, LowerOperator<X>>(SharedCudaPtr<X> data, LowerOperator<X> pred); \
+	\
 	template Stencil Stencil::Create<X, OutsideOperator<float>>(SharedCudaPtr<X> data, OutsideOperator<float> pred); \
 	template Stencil Stencil::Create<X, OutsideOperator<int>>(SharedCudaPtr<X> data, OutsideOperator<int> pred); \
 	template Stencil Stencil::Create<X, OutsideOperator<long>>(SharedCudaPtr<X> data, OutsideOperator<long> pred); \

@@ -98,12 +98,13 @@ __device__  __host__ void afl_compress_base_gpu(
     unsigned int v1_pos=0, v1_len;
     unsigned long pos=comp_data_id, pos_data=data_id;
 
-    for (unsigned int i = 0; i < CWORD_SIZE(T) && pos_data < length; ++i)
+    for (unsigned int i = 0; (i < CWORD_SIZE(T)) && (pos_data < length); ++i)
     {
         v1 = data[pos_data];
         pos_data += CWARP_SIZE;
 
-        if (v1_pos >= CWORD_SIZE(T) - bit_length){
+        if (v1_pos >= CWORD_SIZE(T) - bit_length)
+        {
             v1_len = CWORD_SIZE(T) - v1_pos;
             value = value | (GETNBITS(v1, v1_len) << v1_pos);
 
@@ -113,7 +114,9 @@ __device__  __host__ void afl_compress_base_gpu(
             value = GETNPBITS(v1, v1_pos, v1_len);
 
             pos += CWARP_SIZE;
-        } else {
+        }
+        else
+        {
             v1_len = bit_length;
             value = value | (GETNBITS(v1, v1_len) << v1_pos);
             v1_pos += v1_len;
@@ -141,9 +144,10 @@ __device__ __host__ void afl_decompress_base_gpu(
     if (pos_decomp > length || pos > length) // Decompress not more elements then length
         return;
     v1 = compressed_data[pos];
-    for (unsigned int i = 0; i < CWORD_SIZE(T) && pos_decomp < length; ++i)
+    for (unsigned int i = 0; (i < CWORD_SIZE(T)) && (pos_decomp < length); ++i)
     {
-        if (v1_pos >= CWORD_SIZE(T) - bit_length){
+        if (v1_pos >= CWORD_SIZE(T) - bit_length)
+        {
             v1_len = CWORD_SIZE(T) - v1_pos;
             ret = GETNPBITS(v1, v1_len, v1_pos);
 
@@ -154,7 +158,9 @@ __device__ __host__ void afl_decompress_base_gpu(
 				v1_pos = bit_length - v1_len;
 				ret = ret | ((GETNBITS(v1, v1_pos))<< v1_len);
             }
-        } else {
+        }
+        else
+        {
             v1_len = bit_length;
             ret = GETNPBITS(v1, v1_len, v1_pos);
             v1_pos += v1_len;

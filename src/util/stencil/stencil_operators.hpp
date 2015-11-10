@@ -62,5 +62,29 @@ struct NotEqualOperator
 	}
 };
 
+template<typename T>
+struct LowerOperator
+{
+	T value;
+
+	__host__ __device__
+	bool operator()(const T &input) const
+	{
+		return input < value;
+	}
+};
+
+template<typename T>
+struct GreaterOperator
+{
+	T value;
+
+	__host__ __device__
+	bool operator()(const T &input) const
+	{
+		return input > value;
+	}
+};
+
 } /* namespace ddj */
 #endif /* DDJ_STENCIL_OPERATORS_HPP_ */

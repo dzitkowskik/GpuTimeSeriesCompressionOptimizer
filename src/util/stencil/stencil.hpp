@@ -24,6 +24,15 @@ public:
     Stencil(Stencil&& other) noexcept : _data(std::move(other._data)) {}
     ~Stencil() {}
 
+    Stencil& operator=(const Stencil& other)
+    {
+        if(&other != this)
+        {
+            _data = *other;
+        }
+        return * this;
+    }
+
     SharedCudaPtr<int> operator->() const
     { return this->_data; }
 

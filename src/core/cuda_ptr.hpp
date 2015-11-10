@@ -56,7 +56,7 @@ public:
 
 	void reset(size_t size)
 	{
-		if(this->size() == size) return;
+		if(this->size() >= size) return;
 		_size = size*sizeof(T);
 		CUDA_ASSERT_RETURN( cudaFree(_pointer) );
 		CUDA_ASSERT_RETURN( cudaMalloc((void**)&_pointer, _size) );
@@ -132,6 +132,12 @@ template<typename FROM, typename TO>
 SharedCudaPtr<TO> MoveSharedCudaPtr(SharedCudaPtr<FROM> data)
 {
 	return SharedCudaPtr<TO>(data->template move<TO>());
+}
+
+template<typename FROM, typename TO>
+SharedCudaPtr<TO> CastSharedCudaPtr(SharedCudaPtr<FROM> data)
+{
+	return boost::reinterpret_pointer_cast<CudaPtr<TO>>(data);
 }
 
 template<typename T>
