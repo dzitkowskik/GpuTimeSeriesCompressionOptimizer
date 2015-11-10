@@ -46,7 +46,6 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_NoException)
 
 void CompressionTreeTest::TreeCompressionTest_Compress_Decompress(CompressionTree& compressionTree)
 {
-
 	auto randomData = GetIntRandomData();
     auto dataCopy = randomData->copy();
 	auto compressed = compressionTree.Compress(MoveSharedCudaPtr<int, char>(dataCopy));
@@ -114,31 +113,33 @@ TEST_P(CompressionTreeTest, ComplexTree_Dict_Compress_Decompress)
 //      DICT   DELTA
 //     /   \
 //  DELTA SCALE
-//TEST_P(CompressionTreeTest, ComplexTree_Patch_Compress_Decompress)
-//{
-//	CompressionTree compressionTree;
-//	auto pef = new PatchEncodingFactory<int>(DataType::d_int, PatchType::outside);
-//	pef->min = 100;
-//	pef->max = 1000;
-//	pef->factor = 0.1;
-//	auto root = boost::make_shared<CompressionNode>(boost::shared_ptr<PatchEncodingFactory<int>>(pef));
-//	auto right = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
-//	auto left = boost::make_shared<CompressionNode>(boost::make_shared<DictEncodingFactory>(DataType::d_int));
-//	auto leftChildLeft = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
-//	auto leftChildRight = boost::make_shared<CompressionNode>(boost::make_shared<ScaleEncodingFactory>(DataType::d_int));
-//	auto leaf = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
-//
-//	leftChildLeft->AddChild(leaf);
-//	leftChildRight->AddChild(leaf);
-//	right->AddChild(leaf);
-//	left->AddChild(leftChildLeft);
-//	left->AddChild(leftChildRight);
-//	root->AddChild(left);
-//	root->AddChild(right);
-//
-//	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
-//	TreeCompressionTest_Compress_Decompress(compressionTree);
-//}
+TEST_P(CompressionTreeTest, ComplexTree_Patch_Compress_Decompress)
+{
+	CompressionTree compressionTree;
+	auto pef = new PatchEncodingFactory<int>(DataType::d_int, PatchType::outside);
+	pef->min = 100;
+	pef->max = 1000;
+	pef->factor = 0.1;
+	auto root = boost::make_shared<CompressionNode>(boost::shared_ptr<PatchEncodingFactory<int>>(pef));
+	auto right = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
+	auto left = boost::make_shared<CompressionNode>(boost::make_shared<DictEncodingFactory>(DataType::d_int));
+	auto leftChildLeft = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
+	auto leftChildRight = boost::make_shared<CompressionNode>(boost::make_shared<ScaleEncodingFactory>(DataType::d_int));
+	auto leaf1 = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
+	auto leaf2 = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
+	auto leaf3 = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
+
+	leftChildLeft->AddChild(leaf1);
+	leftChildRight->AddChild(leaf2);
+	right->AddChild(leaf3);
+	left->AddChild(leftChildLeft);
+	left->AddChild(leftChildRight);
+	root->AddChild(left);
+	root->AddChild(right);
+
+	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
+	TreeCompressionTest_Compress_Decompress(compressionTree);
+}
 //
 //--gtest_repeat=10 --gtest_filter=CompressionTree_Test_Inst/CompressionTreeTest.ComplexTree_Patch_Compress_Decompress/*
 //

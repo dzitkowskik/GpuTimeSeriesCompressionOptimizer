@@ -28,6 +28,9 @@ __global__ void deltaEncodeKernel(T* data, int size, T* result)
 template<typename T>
 SharedCudaPtrVector<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 	// MAKE DELTA ENCODING
 	auto result_data = CudaPtr<char>::make_shared((data->size() - 1) * sizeof(T));
 	this->_policy.setSize(data->size());
@@ -57,6 +60,8 @@ __global__ void addValueKernel(T* data, const int size, T* value)
 template<typename T>
 SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	if(input[1]->size() <= 0) return CudaPtr<T>::make_shared();
+
 	auto metadata = input[0];
 	auto data = input[1];
 
