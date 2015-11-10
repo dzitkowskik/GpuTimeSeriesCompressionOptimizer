@@ -12,7 +12,7 @@ namespace ddj {
 
 enum class EncodingType {
     delta,
-    // afl,
+    afl,
     scale,
     rle,
     dict,

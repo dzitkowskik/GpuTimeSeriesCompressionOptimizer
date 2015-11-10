@@ -9,6 +9,7 @@
 #define DDJ_AFL_ENCODING_HPP_
 
 #include "compression/encoding.hpp"
+#include "compression/encoding_factory.hpp"
 #include "core/execution_policy.hpp"
 
 namespace ddj
@@ -44,6 +45,28 @@ public:
 
 private:
 	ExecutionPolicy _policy;
+};
+
+class AflEncodingFactory : public EncodingFactory
+{
+public:
+	AflEncodingFactory(DataType dt)
+		: EncodingFactory(dt, EncodingType::afl)
+	{}
+	~AflEncodingFactory(){}
+	AflEncodingFactory(const AflEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::afl)
+	{}
+
+	boost::shared_ptr<Encoding> Get()
+	{
+		return boost::make_shared<AflEncoding>();
+	}
+
+	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
+	{
+		return Get();
+	}
 };
 
 } /* namespace ddj */

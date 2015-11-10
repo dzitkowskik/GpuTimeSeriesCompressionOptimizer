@@ -7,6 +7,7 @@
 
 #include "compression/patch/patch_encoding.hpp"
 #include "helpers/helper_cuda.cuh"
+#include "helpers/helper_print.hpp"
 #include "core/macros.h"
 #include "util/stencil/stencil.hpp"
 
@@ -20,6 +21,9 @@ template<typename UnaryOperator>
 template<typename T>
 SharedCudaPtrVector<char> PatchEncoding<UnaryOperator>::Encode(SharedCudaPtr<T> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
     int size = data->size();
 
     // Create stencil
@@ -41,6 +45,9 @@ template<typename UnaryOperator>
 template<typename T>
 SharedCudaPtr<T> PatchEncoding<UnaryOperator>::Decode(SharedCudaPtrVector<char> data)
 {
+	if(data[1]->size() <= 0 && data[2]->size() <= 0)
+		return CudaPtr<T>::make_shared();
+
 	auto stencilMetadata = data[0];
 	auto operatorTrue = MoveSharedCudaPtr<char, T>(data[1]);
 	auto operatorFalse = MoveSharedCudaPtr<char, T>(data[2]);
@@ -79,12 +86,20 @@ SharedCudaPtr<float> PatchEncoding<UnaryOperator>::DecodeFloat(SharedCudaPtrVect
 	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X>>::EncodeInt(SharedCudaPtr<int> data); \
 	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X>>::EncodeFloat(SharedCudaPtr<float> data); \
 	template SharedCudaPtr<int> PatchEncoding<OutsideOperator<X>>::DecodeInt(SharedCudaPtrVector<char> data); \
-	template SharedCudaPtr<float> PatchEncoding<OutsideOperator<X>>::DecodeFloat(SharedCudaPtrVector<char> data);
+	template SharedCudaPtr<float> PatchEncoding<OutsideOperator<X>>::DecodeFloat(SharedCudaPtrVector<char> data); \
+	\
+	template SharedCudaPtrVector<char> PatchEncoding<LowerOperator<X>>::EncodeInt(SharedCudaPtr<int> data); \
+	template SharedCudaPtrVector<char> PatchEncoding<LowerOperator<X>>::EncodeFloat(SharedCudaPtr<float> data); \
+	template SharedCudaPtr<int> PatchEncoding<LowerOperator<X>>::DecodeInt(SharedCudaPtrVector<char> data); \
+	template SharedCudaPtr<float> PatchEncoding<LowerOperator<X>>::DecodeFloat(SharedCudaPtrVector<char> data);
 FOR_EACH(PATCH_ENCODING_OPERATORS_SPEC, float, int, long long, unsigned int)
 
 #define PATCH_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> PatchEncoding<OutsideOperator<X>>::Encode<X>(SharedCudaPtr<X> data); \
-	template SharedCudaPtr<X> PatchEncoding<OutsideOperator<X>>::Decode<X>(SharedCudaPtrVector<char> data);
+	template SharedCudaPtr<X> PatchEncoding<OutsideOperator<X>>::Decode<X>(SharedCudaPtrVector<char> data); \
+	\
+	template SharedCudaPtrVector<char> PatchEncoding<LowerOperator<X>>::Encode<X>(SharedCudaPtr<X> data); \
+	template SharedCudaPtr<X> PatchEncoding<LowerOperator<X>>::Decode<X>(SharedCudaPtrVector<char> data);
 FOR_EACH(PATCH_ENCODING_SPEC, float, int, long long, unsigned int)
 
 

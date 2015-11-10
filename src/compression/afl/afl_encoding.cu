@@ -44,6 +44,7 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<int> data)
 {
 	// Get minimal bit count needed to encode data
 	char minBit = CudaArrayStatistics().MinBitCnt<int>(data);
+
 	int elemBitSize = 8*sizeof(int);
 	int comprElemCnt = (minBit * data->size() + elemBitSize - 1) / elemBitSize;
 	int comprDataSize = comprElemCnt * sizeof(int);
@@ -235,21 +236,30 @@ SharedCudaPtr<float> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 
 SharedCudaPtrVector<char> AflEncoding::EncodeInt(SharedCudaPtr<int> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 	return this->Encode<int>(data);
 }
 
 SharedCudaPtr<int> AflEncoding::DecodeInt(SharedCudaPtrVector<char> data)
 {
+	if(data[1]->size() <= 0)
+		return CudaPtr<int>::make_shared();
 	return this->Decode<int>(data);
 }
 
 SharedCudaPtrVector<char> AflEncoding::EncodeFloat(SharedCudaPtr<float> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
 	return this->Encode<float>(data);
 }
 
 SharedCudaPtr<float> AflEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
 {
+	if(data[1]->size() <= 0)
+		return CudaPtr<float>::make_shared();
 	return this->Decode<float>(data);
 }
 

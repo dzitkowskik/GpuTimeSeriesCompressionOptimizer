@@ -8,6 +8,7 @@
 #include "delta_encoding.hpp"
 #include "core/macros.h"
 #include "helpers/helper_cuda.cuh"
+#include "helpers/helper_print.hpp"
 
 #include <cuda_runtime_api.h>
 #include <thrust/device_ptr.h>

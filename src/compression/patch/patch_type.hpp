@@ -11,7 +11,8 @@
 namespace ddj {
 
 enum class PatchType {
-    outside
+    outside,
+    lower
 };
 
 } /* namespace ddj */

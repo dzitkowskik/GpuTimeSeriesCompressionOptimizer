@@ -62,7 +62,7 @@ ifeq ($(V),true)
 	CMD_PREFIX :=
 endif
 
-debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
+debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug
 debug: export EXCLUDED_FILES := \
 	-not -name '*_unittest*' \
 	-not -name '*_benchmark*'
@@ -76,7 +76,7 @@ release: export EXCLUDED_FILES := \
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
-test: export CODE_FLAGS := -G -g -O0 --debug --device-debug -DTHRUST_DEBUG
+test: export CODE_FLAGS := -G -g -O0 --debug --device-debug
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -name '*_benchmark*'

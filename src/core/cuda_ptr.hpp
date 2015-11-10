@@ -156,8 +156,11 @@ SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data)
 	size_t offset = 0;
 	for(auto& part : data)
 	{
-		cudaMemcpyAsync(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD, stream);
-		offset += part->size();
+		if(part->size() > 0)
+		{
+			cudaMemcpyAsync(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD, stream);
+			offset += part->size();
+		}
 	}
 
 	cudaStreamSynchronize(stream);

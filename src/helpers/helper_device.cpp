@@ -68,9 +68,8 @@ int HelperDevice::SetCudaDeviceWithMaxFreeMem()
 	for(int i=0; i<devCount; i++)
 	{
 		cudaSetDevice(i);
-//		cudaDeviceSynchronize();
-//		cudaThreadSynchronize();
 		GetMemoryCount(&free, &total);
+//		printf("Device %d has %d free memory\n", i, (int)free);
 		if(free > max_free)
 		{
 			max_free = free;
@@ -78,9 +77,6 @@ int HelperDevice::SetCudaDeviceWithMaxFreeMem()
 		}
 	}
 	cudaSetDevice(deviceId);
-//	cudaDeviceSynchronize();
-//	cudaThreadSynchronize();
-//	cudaDeviceReset();
 	return deviceId;
 }
 

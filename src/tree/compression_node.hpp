@@ -53,6 +53,12 @@ public:
     void SetMetadata(SharedCudaPtr<char> metadata);
     void SetData(SharedCudaPtr<char> data);
 
+    template<typename T> static
+    SharedCompressionNodePtr make_shared(DataType type)
+    {
+    	return boost::make_shared<CompressionNode>(boost::make_shared<T>(type));
+    }
+
 private:
     SharedCudaPtr<char> PrepareMetadata(SharedCudaPtr<char> encodingMetadata);
 

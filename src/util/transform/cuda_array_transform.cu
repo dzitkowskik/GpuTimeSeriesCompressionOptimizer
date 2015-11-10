@@ -85,6 +85,10 @@ SharedCudaPtr<OutputType> CudaArrayTransform::Cast(SharedCudaPtr<InputType> data
 	return result;
 }
 
+#define CAST_SPACE(X) \
+	template SharedCudaPtr<int> CudaArrayTransform::Cast<X, int>(SharedCudaPtr<X> data);
+FOR_EACH(CAST_SPACE, float, int, long, long long, unsigned int)
+
 #define TRANSFORM_IN_PLACE_SPEC(X) \
     template void CudaArrayTransform::TransformInPlace<X, AdditionOperator<X,X>>(SharedCudaPtr<X>, AdditionOperator<X,X> op); \
     template void CudaArrayTransform::TransformInPlace<X, SubtractionOperator<X,X>>(SharedCudaPtr<X>, SubtractionOperator<X,X> op); \

@@ -13,6 +13,7 @@
 #include "core/not_implemented_exception.hpp"
 #include "util/stencil/stencil_operators.hpp"
 #include "util/splitter/splitter.hpp"
+#include "util/statistics/cuda_array_statistics.hpp"
 #include "compression/data_type.hpp"
 #include "compression/encoding_type.hpp"
 #include "compression/patch/patch_type.hpp"
@@ -59,9 +60,6 @@ class PatchEncodingFactory : public EncodingFactory
 {
 public:
 	PatchType patchType;
-
-	T min;
-	T max;
 	T factor;
 
 	PatchEncodingFactory(DataType dt, PatchType pt)
@@ -80,17 +78,25 @@ public:
 
 	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
 	{
-		OutsideOperator<T> op;
+		auto minMax = CudaArrayStatistics().MinMax(CastSharedCudaPtr<char, T>(data));
+		T min = std::get<0>(minMax);
+		T max = std::get<1>(minMax);
+
 		T dist = max - min;
 
 		switch(patchType)
 		{
 			case PatchType::outside:
-				op.low = min + factor * dist;
-				op.high = max - factor * dist;
-				return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(op);
+				return boost::make_shared<PatchEncoding<OutsideOperator<T>>>(
+						OutsideOperator<T> {
+							min + factor * dist,
+							max - factor * dist});
+			case PatchType::lower:
+				return boost::make_shared<PatchEncoding<LowerOperator<T>>>(
+						LowerOperator<T> {
+							max - factor * dist});
 			default:
-				throw NotImplementedException("Encoding of this type not implemented");
+				throw NotImplementedException("Patch Encoding of this type not implemented");
 		}
 	}
 };
