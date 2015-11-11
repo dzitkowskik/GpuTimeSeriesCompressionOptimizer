@@ -1,5 +1,6 @@
 #include "test/compression_unittest_base.hpp"
 #include "unique_encoding.hpp"
+#include "helpers/helper_print.hpp"
 #include <gtest/gtest.h>
 #include <boost/bind.hpp>
 
@@ -34,6 +35,18 @@ TEST_P(UniqueEncodingTest, CompressionOfRandomInts_data)
 	);
 }
 
+TEST_P(UniqueEncodingTest, CompressionOfRandomBinaryValues_data)
+{
+	auto binaryValues = GetIntRandomData(0,2);
+	UniqueEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<int>(
+			boost::bind(&UniqueEncoding::Encode<int>, encoder, _1),
+			boost::bind(&UniqueEncoding::Decode<int>, encoder, _1),
+			binaryValues)
+	);
+}
+
 TEST_P(UniqueEncodingTest, CompressionOfRandomFloats_size)
 {
 	UniqueEncoding encoder;
@@ -54,6 +67,17 @@ TEST_P(UniqueEncodingTest, CompressionOfRandomFloats_data)
 			boost::bind(&UniqueEncoding::Decode<float>, encoder, _1),
 			GetFloatRandomData())
 	);
+}
+
+TEST_P(UniqueEncodingTest, CompressionOf_Long_FromFile)
+{
+	UniqueEncoding encoder;
+    EXPECT_TRUE(
+		TestContent<time_t>(
+			boost::bind(&UniqueEncoding::Encode<time_t>, encoder, _1),
+			boost::bind(&UniqueEncoding::Decode<time_t>, encoder, _1),
+			GetTsIntDataFromTestFile())
+    );
 }
 
 TEST_P(UniqueEncodingTest, GetMetadataSize_Consecutive_Int)

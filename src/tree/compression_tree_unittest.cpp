@@ -7,6 +7,7 @@
 
 #include "test/unittest_base.hpp"
 #include "helpers/helper_comparison.cuh"
+#include "helpers/helper_print.hpp"
 #include "tree/compression_tree.hpp"
 #include "tree/compression_node.hpp"
 #include <boost/make_shared.hpp>
@@ -164,16 +165,56 @@ TEST_P(CompressionTreeTest, ComplexTree_Delta_Scale_Patch_Afl_RealData_Time_Comp
 
 	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
 
-//	printf("Data size before compression = %d\n", data->size()*sizeof(int));
-
 	auto compressed = compressionTree.Compress(CastSharedCudaPtr<int, char>(data));
-
-//	printf("Data size after compression = %d\n", compressed->size()*sizeof(char));
-
 	CompressionTree decompressionTree;
 	auto decompressed = decompressionTree.Decompress(compressed);
 	auto expected = data;
 	auto actual = MoveSharedCudaPtr<char, int>(decompressed);
+
+	//	printf("size before compression = %d\n", data->size()*sizeof(int));
+	//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
+
+	ASSERT_EQ(expected->size(), actual->size());
+	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+}
+
+//		SCALE
+//		  |
+//		 RLE
+//		  |
+//		DELTA
+//		  |
+//		UNIQUE
+TEST_P(CompressionTreeTest, ComplexTree_Scale_Rle_Delta_Unique_RealData_Time_Compress_Decompress)
+{
+	CompressionTree compressionTree;
+	auto data = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromTestFile());
+	auto scale = boost::make_shared<CompressionNode>(boost::make_shared<ScaleEncodingFactory>(DataType::d_int));
+	auto delta = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
+	auto rle = boost::make_shared<CompressionNode>(boost::make_shared<RleEncodingFactory>(DataType::d_int));
+	auto unique = boost::make_shared<CompressionNode>(boost::make_shared<UniqueEncodingFactory>(DataType::d_int));
+	auto leaf = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
+
+	unique->AddChild(leaf);
+	delta->AddChild(unique);
+	rle->AddChild(delta);
+	scale->AddChild(delta);
+
+	ASSERT_TRUE( compressionTree.AddNode(scale, 0) );
+
+	auto compressed = compressionTree.Compress(CastSharedCudaPtr<int, char>(data));
+	CompressionTree decompressionTree;
+	auto decompressed = decompressionTree.Decompress(compressed);
+
+//	HelperPrint::PrintSharedCudaPtr(data, "data");
+//	HelperPrint::PrintSharedCudaPtr(CastSharedCudaPtr<char, int>(decompressed), "decompressed");
+
+	auto expected = data;
+	auto actual = MoveSharedCudaPtr<char, int>(decompressed);
+
+//	printf("size before compression = %d\n", data->size()*sizeof(int));
+//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
+
 	ASSERT_EQ(expected->size(), actual->size());
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
 }

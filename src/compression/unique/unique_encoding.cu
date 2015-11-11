@@ -9,7 +9,9 @@
 #include "core/cuda_macros.cuh"
 #include "core/not_implemented_exception.hpp"
 #include "helpers/helper_cuda.cuh"
+#include "helpers/helper_print.hpp"
 #include <thrust/device_ptr.h>
+#include <thrust/device_vector.h>
 #include <thrust/sort.h>
 #include <thrust/unique.h>
 
@@ -34,11 +36,12 @@ template<typename T>
 SharedCudaPtr<T> UniqueEncoding::FindUnique(SharedCudaPtr<T> data)
 {
     thrust::device_ptr<T> dataPtr(data->get());
-    thrust::sort(dataPtr, dataPtr+data->size());
-    auto end = thrust::unique(dataPtr, dataPtr + data->size());
-    int size = end - dataPtr;
+    thrust::device_vector<T> dataVector(dataPtr, dataPtr+data->size());
+    thrust::sort(dataVector.begin(), dataVector.end());
+    auto end = thrust::unique(dataVector.begin(), dataVector.end());
+    int size = end - dataVector.begin();
     auto result = CudaPtr<T>::make_shared(size);
-    result->fill(dataPtr.get(), size);
+    result->fill(dataVector.data().get(), size);
     return result;
 }
 
@@ -122,6 +125,11 @@ SharedCudaPtr<char> UniqueEncoding::CompressUnique(SharedCudaPtr<T> data, Shared
 template<typename T>
 SharedCudaPtrVector<char> UniqueEncoding::Encode(SharedCudaPtr<T> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
+//	HelperPrint::PrintSharedCudaPtr(data, "After Delta");
+
     auto unique = FindUnique(data);
 
     // CALCULATE SIZES
@@ -233,6 +241,9 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
 template<typename T>
 SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	if(input[1]->size() <= 0)
+		return CudaPtr<T>::make_shared();
+
     auto metadata = input[0];
     auto data = input[1];
     size_t sizes[2];
@@ -260,6 +271,9 @@ SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
         dataPerUnitCnt);
 
     cudaDeviceSynchronize();
+
+//    HelperPrint::PrintSharedCudaPtr(result, "decoded by unique");
+
     return result;
 }
 
