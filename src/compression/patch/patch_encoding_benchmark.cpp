@@ -1,6 +1,6 @@
 #include "util/generator/cuda_array_generator.hpp"
 #include "compression/patch/patch_encoding.hpp"
-#include "core/operators.cuh"
+#include "util/stencil/stencil.hpp"
 #include "benchmarks/encoding_benchmark_base.hpp"
 
 namespace ddj

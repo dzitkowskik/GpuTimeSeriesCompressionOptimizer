@@ -12,10 +12,11 @@
 #include "core/cuda_ptr.hpp"
 #include "compression/data_type.hpp"
 #include "compression/encoding.hpp"
+#include "benchmarks/benchmark_base.hpp"
 
 namespace ddj {
 
-class EncodingBenchmarkBase : public benchmark::Fixture
+class EncodingBenchmarkBase : public BenchmarkBase
 {
 public:
 	void Benchmark_Encoding(

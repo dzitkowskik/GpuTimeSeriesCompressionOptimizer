@@ -48,7 +48,10 @@ public:
 	CudaPtr(T* pointer, size_t size) : _pointer(pointer), _size(size*sizeof(T)) {}
 
 	~CudaPtr()
-	{ if(_pointer != nullptr) CUDA_ASSERT_RETURN( cudaFree(_pointer) ); }
+	{
+		if(_pointer != nullptr)
+			CUDA_ASSERT_RETURN( cudaFree(_pointer) );
+	}
 
 public:
 	T* get() { return _pointer; }

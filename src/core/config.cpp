@@ -46,6 +46,7 @@ namespace ddj
       po::options_description hidden("Hidden options");
       hidden.add_options()
       ("TEST_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing test time series data")
+      ("BENCHMARK_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing benchmark time series data")
       ;
 
       ifstream ifs(path.c_str());
