@@ -64,7 +64,7 @@ public:
 
 	PatchEncodingFactory(DataType dt, PatchType pt)
 		: EncodingFactory(dt, EncodingType::patch), patchType(pt)
-	{}
+	{ factor = 0.1; }
 	~PatchEncodingFactory(){}
 	PatchEncodingFactory(const PatchEncodingFactory& other)
 		: EncodingFactory(other.dataType, EncodingType::patch), patchType(other.patchType)

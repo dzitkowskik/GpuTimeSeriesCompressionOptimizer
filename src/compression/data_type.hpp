@@ -12,14 +12,16 @@
 
 namespace ddj {
 
-enum class DataType {
+enum class DataType
+{
     d_int,
     d_float
 };
 
 inline size_t GetDataTypeSize(DataType type)
 {
-	switch(type){
+	switch(type)
+	{
 		case DataType::d_int: return sizeof(int);
 		case DataType::d_float: return sizeof(float);
 		default: throw NotImplementedException("This type is not implemented");

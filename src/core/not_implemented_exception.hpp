@@ -8,9 +8,9 @@
 #ifndef DDJ_NOT_IMPLEMENTED_EXCEPTION_HPP_
 #define DDJ_NOT_IMPLEMENTED_EXCEPTION_HPP_
 
-namespace ddj {
-
 #include <stdexcept>
+
+namespace ddj {
 
 class NotImplementedException : public std::logic_error
 {

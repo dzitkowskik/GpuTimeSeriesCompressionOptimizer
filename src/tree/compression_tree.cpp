@@ -126,6 +126,7 @@ SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, si
 
 SharedCudaPtr<char> CompressionTree::Decompress(SharedCudaPtr<char> data)
 {
+	Reset();
 	size_t offset = 0;
 	auto root = DecompressNodes(data, offset);
 	AddNode(root, 0);
