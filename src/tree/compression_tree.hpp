@@ -32,6 +32,8 @@ public:
     bool RemoveNode(uint nodeNo);
     void Reset();
 
+    size_t GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type);
+
 private:
     uint GetNextNo();
     void ResetNodeNumbers();

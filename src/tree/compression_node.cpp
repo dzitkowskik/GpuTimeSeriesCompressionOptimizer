@@ -135,4 +135,33 @@ SharedCudaPtr<char> CompressionNode::Decompress()
 	return encoding->Decode(data, _dataType);
 }
 
+size_t CompressionNode::PredictCompressionSize(SharedCudaPtr<char> data, DataType type)
+{
+	auto encoding = _encodingFactory->Get(data);
+	size_t size = encoding->GetMetadataSize(data, type) + sizeof(EncodingMetadataHeader);
+	if(_isLeaf) return size + encoding->GetCompressedSize(data, type);
+	auto compressed = encoding->Encode(data, type);
+	compressed.erase(compressed.begin()); // remove metadata header
+	type = encoding->GetReturnType(type);
+	for(auto& child : _children)
+		size += child->PredictCompressionSize(Concatenate(compressed), type);
+	return size;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 } /* namespace ddj */

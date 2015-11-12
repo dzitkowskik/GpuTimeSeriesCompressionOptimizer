@@ -26,11 +26,7 @@ public:
 public:
 	unsigned int GetNumberOfResults() { return 1; }
 
-	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
-	{
-		return 2*sizeof(char);
-	}
-
+	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type);
 	size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type);
 
 protected:
@@ -38,6 +34,12 @@ protected:
 	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data);
 	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data);
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data);
+
+	template<typename T>
+	size_t GetCompressedSizeIntegral(SharedCudaPtr<T> data);
+
+	template<typename T>
+	size_t GetCompressedSizeFloatingPoint(SharedCudaPtr<T> data);
 
 public:
 	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);

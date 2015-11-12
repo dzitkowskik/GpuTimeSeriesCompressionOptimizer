@@ -10,35 +10,6 @@
 namespace ddj
 {
 
-size_t AflEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
-{
-	SharedCudaPtr<int> intData;
-	SharedCudaPtr<float> floatData;
-	char minBit;
-	int size;
-
-	switch(type)
-	{
-		case DataType::d_int:
-			intData = boost::reinterpret_pointer_cast<CudaPtr<int>>(data);
-			minBit = CudaArrayStatistics().MinBitCnt<int>(intData);
-			size = intData->size();
-			break;
-		case DataType::d_float:
-			floatData = boost::reinterpret_pointer_cast<CudaPtr<float>>(data);
-			minBit = CudaArrayStatistics().MinBitCnt<float>(floatData);
-			size = floatData->size();
-			break;
-		default:
-			throw NotImplementedException("No getCompressedType method for that type!");
-	}
-
-	int elemBitSize = 8*sizeof(int);
-	int comprElemCnt = (minBit * size + elemBitSize - 1) / elemBitSize;
-	int comprDataSize = comprElemCnt * sizeof(int);
-	return comprDataSize;
-}
-
 template<>
 SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<int> data)
 {
@@ -261,6 +232,68 @@ SharedCudaPtr<float> AflEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
 	if(data[1]->size() <= 0)
 		return CudaPtr<float>::make_shared();
 	return this->Decode<float>(data);
+}
+
+size_t AflEncoding::GetMetadataSize(SharedCudaPtr<char> data, DataType type)
+{
+	switch(type)
+	{
+		case DataType::d_int:
+			return 4*sizeof(char);
+		case DataType::d_float:
+			return sizeof(size_t) + 1;
+		default:
+			throw NotImplementedException("No DictEncoding::GetCompressedSize implementation for that type");
+	}
+}
+
+size_t AflEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
+{
+	switch(type)
+	{
+		case DataType::d_int:
+			return GetCompressedSizeIntegral(CastSharedCudaPtr<char, int>(data));
+		case DataType::d_float:
+			return GetCompressedSizeFloatingPoint(CastSharedCudaPtr<char, float>(data));
+		default:
+			throw NotImplementedException("No DictEncoding::GetCompressedSize implementation for that type");
+	}
+}
+
+template<typename T>
+size_t AflEncoding::GetCompressedSizeIntegral(SharedCudaPtr<T> data)
+{
+	char minBit = CudaArrayStatistics().MinBitCnt<int>(data);
+
+	int elemBitSize = 8*sizeof(int);
+	int comprElemCnt = (minBit * data->size() + elemBitSize - 1) / elemBitSize;
+	int comprDataSize = comprElemCnt * sizeof(int);
+
+	return comprDataSize;
+}
+
+template<typename T>
+size_t AflEncoding::GetCompressedSizeFloatingPoint(SharedCudaPtr<T> data)
+{
+	auto minMax = CudaArrayStatistics().MinMax(data);
+	auto signResult = CudaPtr<int>::make_shared(data->size());
+	auto exponentResult = CudaPtr<int>::make_shared(data->size());
+	auto mantissaResult = CudaPtr<int>::make_shared(data->size());
+
+	// Now we split every float number to three integers - sign, exponent and mantissa
+	this->_policy.setSize(data->size());
+	cudaLaunch(this->_policy, _splitFloatKernel,
+			data->get(),
+			data->size(),
+			mantissaResult->get(),
+			exponentResult->get(),
+			signResult->get());
+	cudaDeviceSynchronize();
+
+	size_t size = GetCompressedSizeIntegral(exponentResult) + GetCompressedSizeIntegral(mantissaResult);
+	size += GetMetadataSize(CastSharedCudaPtr<int, char>(exponentResult), DataType::d_int);
+	size += GetMetadataSize(CastSharedCudaPtr<int, char>(mantissaResult), DataType::d_int);
+	return size;
 }
 
 } /* namespace ddj */

@@ -59,6 +59,8 @@ public:
     	return boost::make_shared<CompressionNode>(boost::make_shared<T>(type));
     }
 
+    size_t PredictCompressionSize(SharedCudaPtr<char> data, DataType type);
+
 private:
     SharedCudaPtr<char> PrepareMetadata(SharedCudaPtr<char> encodingMetadata);
 

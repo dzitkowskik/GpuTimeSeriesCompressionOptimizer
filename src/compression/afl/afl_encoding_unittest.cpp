@@ -58,6 +58,17 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomFloats_data)
 	);
 }
 
+TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomFloatsWithMaxPrecision2_data)
+{
+	AflEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&AflEncoding::Encode<float>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<float>, encoder, _1),
+			GetFloatRandomDataWithMaxPrecision(2))
+	);
+}
+
 TEST_P(AflCompressionTest, Afl_Encode_Decode_ConsecutiveInts_size)
 {
 	AflEncoding encoder;
@@ -80,15 +91,24 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_ConsecutiveInts_data)
 	);
 }
 
-TEST_P(AflCompressionTest, Afl_GetCompressedSize_int)
+TEST_P(AflCompressionTest, GetMetadataSize_Consecutive_Int)
 {
-	AflEncoding encoder;
-	auto randomIntData = GetIntConsecutiveData();
-	SharedCudaPtr<char> charData = boost::reinterpret_pointer_cast<CudaPtr<char>>(randomIntData);
-	size_t actual = encoder.GetCompressedSize(charData, DataType::d_int);
-	auto minBit = CudaArrayStatistics().MinBitCnt<int>(randomIntData);
-	size_t expected = ceil((double)(randomIntData->size() * minBit) / 32.0) * 4;
-	EXPECT_EQ(expected, actual);
+	TestGetMetadataSize<AflEncoding, int>(GetIntConsecutiveData());
+}
+
+TEST_P(AflCompressionTest, GetCompressedSize_Consecutive_Int)
+{
+	TestGetCompressedSize<AflEncoding, int>(GetIntConsecutiveData());
+}
+
+TEST_P(AflCompressionTest, GetMetadataSize_RandomFloatsWithMaxPrecision2)
+{
+	TestGetMetadataSize<AflEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+}
+
+TEST_P(AflCompressionTest, GetCompressedSize_RandomFloatsWithMaxPrecision2)
+{
+	TestGetCompressedSize<AflEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
 }
 
 } /* namespace ddj */

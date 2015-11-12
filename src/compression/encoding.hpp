@@ -48,6 +48,7 @@ public:
 	}
 
 	virtual unsigned int GetNumberOfResults() = 0;
+	virtual DataType GetReturnType(DataType type) { return type; }
 
 	// TODO: make abstract
 	virtual size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type) { return 0; }

@@ -64,9 +64,11 @@ void CreateTree(CompressionTree& tree, Path& path, DataType type, int parentId, 
 	auto encFactory = DefaultEncodingFactory().Get(encType, type);
 	auto node = boost::make_shared<CompressionNode>(encFactory);
 	tree.AddNode(node, parentId);
-	if(encType == EncodingType::floatToInt) type = DataType::d_int;
 	if(encType == EncodingType::none) return;
-	auto childrenCnt = encFactory->Get()->GetNumberOfResults();
+
+	auto encoding = encFactory->Get();
+	type = encoding->GetReturnType(type);
+	auto childrenCnt = encoding->GetNumberOfResults();
 	for(int i = 1; i <= childrenCnt; i++)
 		CreateTree(tree, path, type, node->GetNo(), ++id);
 }

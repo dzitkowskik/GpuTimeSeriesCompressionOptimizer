@@ -133,4 +133,32 @@ SharedCudaPtr<char> CompressionTree::Decompress(SharedCudaPtr<char> data)
 	return _root->Decompress();
 }
 
+size_t CompressionTree::GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type)
+{
+	return _root->PredictCompressionSize(data, type);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 } /* namespace ddj */

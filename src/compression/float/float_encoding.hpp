@@ -28,6 +28,7 @@ public:
 
 public:
 	unsigned int GetNumberOfResults() { return 1; }
+	DataType GetReturnType(DataType type) { return DataType::d_int; }
 
 	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
 	{

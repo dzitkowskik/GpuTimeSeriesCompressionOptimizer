@@ -40,7 +40,7 @@ public:
 
 	size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type)
 	{
-		return data->size();
+		return data->size() - GetDataTypeSize(type);
 	}
 
 protected:

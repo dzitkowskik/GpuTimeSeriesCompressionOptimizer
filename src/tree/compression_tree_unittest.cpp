@@ -219,4 +219,29 @@ TEST_P(CompressionTreeTest, ComplexTree_Scale_Rle_Delta_Unique_RealData_Time_Com
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
 }
 
+//		DELTA
+//		  |
+//		 AFL
+TEST_P(CompressionTreeTest, SimpleTree_Delta_Afl_PredictSizeAfterCompression_RandomInt)
+{
+	CompressionTree compressionTree;
+	auto data = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromTestFile());
+	auto delta = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
+	auto afl = boost::make_shared<CompressionNode>(boost::make_shared<AflEncodingFactory>(DataType::d_int));
+	auto leaf = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
+
+	afl->AddChild(leaf);
+	delta->AddChild(afl);
+
+	ASSERT_TRUE( compressionTree.AddNode(delta, 0) );
+
+	auto compressed = compressionTree.Compress(CastSharedCudaPtr<int, char>(data));
+
+	auto expected = compressed->size();
+	auto actual = compressionTree.GetPredictedSizeAfterCompression(
+			CastSharedCudaPtr<int, char>(data), DataType::d_int);
+
+	EXPECT_EQ(expected, actual);
+}
+
 } /* namespace ddj */

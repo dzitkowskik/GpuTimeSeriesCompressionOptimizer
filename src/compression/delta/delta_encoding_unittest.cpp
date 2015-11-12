@@ -56,5 +56,25 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+TEST_P(DeltaCompressionTest, GetMetadataSize_Consecutive_Int)
+{
+	TestGetMetadataSize<DeltaEncoding, int>(GetIntConsecutiveData());
+}
+
+TEST_P(DeltaCompressionTest, GetCompressedSize_Consecutive_Int)
+{
+	TestGetCompressedSize<DeltaEncoding, int>(GetIntConsecutiveData());
+}
+
+TEST_P(DeltaCompressionTest, GetMetadataSize_RandomFloatsWithMaxPrecision2)
+{
+	TestGetMetadataSize<DeltaEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+}
+
+TEST_P(DeltaCompressionTest, GetCompressedSize_RandomFloatsWithMaxPrecision2)
+{
+	TestGetCompressedSize<DeltaEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+}
+
 
 } /* namespace ddj */
