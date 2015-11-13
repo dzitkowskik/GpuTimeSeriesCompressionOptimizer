@@ -94,20 +94,14 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_ConsecutiveInts_data)
 TEST_P(AflCompressionTest, GetMetadataSize_Consecutive_Int)
 {
 	TestGetMetadataSize<AflEncoding, int>(GetIntConsecutiveData());
+	TestGetMetadataSize<AflEncoding, int>(GetIntRandomData(10,100));
+	TestGetMetadataSize<AflEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
 }
 
 TEST_P(AflCompressionTest, GetCompressedSize_Consecutive_Int)
 {
 	TestGetCompressedSize<AflEncoding, int>(GetIntConsecutiveData());
-}
-
-TEST_P(AflCompressionTest, GetMetadataSize_RandomFloatsWithMaxPrecision2)
-{
-	TestGetMetadataSize<AflEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
-}
-
-TEST_P(AflCompressionTest, GetCompressedSize_RandomFloatsWithMaxPrecision2)
-{
+	TestGetCompressedSize<AflEncoding, int>(GetIntRandomData(10,100));
 	TestGetCompressedSize<AflEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
 }
 

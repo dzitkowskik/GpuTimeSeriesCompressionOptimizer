@@ -236,6 +236,7 @@ SharedCudaPtr<float> AflEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
 
 size_t AflEncoding::GetMetadataSize(SharedCudaPtr<char> data, DataType type)
 {
+	if(data->size() <= 0) return 0;
 	switch(type)
 	{
 		case DataType::d_int:
@@ -249,6 +250,7 @@ size_t AflEncoding::GetMetadataSize(SharedCudaPtr<char> data, DataType type)
 
 size_t AflEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
 {
+	if(data->size() <= 0) return 0;
 	switch(type)
 	{
 		case DataType::d_int:

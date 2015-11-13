@@ -279,12 +279,14 @@ SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
 
 size_t UniqueEncoding::GetMetadataSize(SharedCudaPtr<char> data, DataType type)
 {
+	if(data->size() <= 0) return 0;
 	auto unique = FindUnique(data, type);
 	return 2*sizeof(size_t) + unique->size();
 }
 
 size_t UniqueEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
 {
+	if(data->size() <= 0) return 0;
 	auto unique = FindUnique(data, type);
 	int typeSize = GetDataTypeSize(type); 					// size of used type
 	int uniqueSize = unique->size() / typeSize; 			// how many distinct items to encode

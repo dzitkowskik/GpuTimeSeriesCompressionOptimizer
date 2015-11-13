@@ -31,6 +31,7 @@ public:
 
 	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
 	{
+		if(data->size() <= 0) return 0;
 		int elemCnt = data->size() / GetDataTypeSize(type);
 		return (elemCnt + 7) / 8 + GetDataTypeSize(type) + 1;
 	}

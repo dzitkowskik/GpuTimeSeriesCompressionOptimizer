@@ -56,7 +56,7 @@ TEST_P(DictEncodingTest, CompressionOfRandomFloats_data)
 	);
 }
 
-TEST_P(DictEncodingTest, CompressionOf_Long_FromFile)
+TEST_P(DictEncodingTest, CompressionOf_Long_FromFile_data)
 {
 	DictEncoding encoder;
     EXPECT_TRUE(
@@ -67,7 +67,7 @@ TEST_P(DictEncodingTest, CompressionOf_Long_FromFile)
     );
 }
 
-TEST_P(DictEncodingTest, CompressionOf_Float_FromFile)
+TEST_P(DictEncodingTest, CompressionOf_Float_FromFile_data)
 {
 	DictEncoding encoder;
 	EXPECT_TRUE(
@@ -78,14 +78,30 @@ TEST_P(DictEncodingTest, CompressionOf_Float_FromFile)
 	);
 }
 
+TEST_P(DictEncodingTest, CompressionOf_RandomFloatsWithMaxPrecision2_data)
+{
+	DictEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&DictEncoding::Encode<float>, encoder, _1),
+			boost::bind(&DictEncoding::Decode<float>, encoder, _1),
+			GetFloatRandomDataWithMaxPrecision(2))
+	);
+}
+
 TEST_P(DictEncodingTest, GetMetadataSize_Consecutive_Int)
 {
 	TestGetMetadataSize<DictEncoding, int>(GetIntConsecutiveData());
+	TestGetMetadataSize<DictEncoding, int>(GetIntRandomData(10,100));
+	TestGetMetadataSize<DictEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+
 }
 
 TEST_P(DictEncodingTest, GetCompressedSize_Consecutive_Int)
 {
 	TestGetCompressedSize<DictEncoding, int>(GetIntConsecutiveData());
+	TestGetCompressedSize<DictEncoding, int>(GetIntRandomData(10,100));
+	TestGetCompressedSize<DictEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
 }
 
 } /* namespace ddj */

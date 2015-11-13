@@ -34,6 +34,8 @@ public:
 
     size_t GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type);
 
+    void Print();
+
 private:
     uint GetNextNo();
     void ResetNodeNumbers();

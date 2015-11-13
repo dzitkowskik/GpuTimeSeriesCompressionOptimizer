@@ -20,7 +20,7 @@ SharedCudaPtr<T> Histogram::GetMostFrequentSparse(SharedCudaPtrPair<T, int> hist
 	// get first freqCnt keys
 	auto result = CudaPtr<T>::make_shared(freqCnt);
 	thrust::device_ptr<T> result_ptr(result->get());
-	thrust::copy_n(keys_ptr, freqCnt, result_ptr);
+	thrust::copy_n(keys_ptr, freqCnt < N ? freqCnt : N, result_ptr);
 
 	return result;
 }

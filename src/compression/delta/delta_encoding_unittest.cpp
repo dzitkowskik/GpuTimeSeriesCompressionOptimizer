@@ -66,6 +66,16 @@ TEST_P(DeltaCompressionTest, GetCompressedSize_Consecutive_Int)
 	TestGetCompressedSize<DeltaEncoding, int>(GetIntConsecutiveData());
 }
 
+TEST_P(DeltaCompressionTest, GetMetadataSize_Random_Int)
+{
+	TestGetMetadataSize<DeltaEncoding, int>(GetIntRandomData(10,100));
+}
+
+TEST_P(DeltaCompressionTest, GetCompressedSize_Random_Int)
+{
+	TestGetCompressedSize<DeltaEncoding, int>(GetIntRandomData(10,100));
+}
+
 TEST_P(DeltaCompressionTest, GetMetadataSize_RandomFloatsWithMaxPrecision2)
 {
 	TestGetMetadataSize<DeltaEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));

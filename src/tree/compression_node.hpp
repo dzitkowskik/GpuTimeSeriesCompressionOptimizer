@@ -61,6 +61,8 @@ public:
 
     size_t PredictCompressionSize(SharedCudaPtr<char> data, DataType type);
 
+    void Print();
+
 private:
     SharedCudaPtr<char> PrepareMetadata(SharedCudaPtr<char> encodingMetadata);
 

@@ -9,6 +9,7 @@
 #include "compression/encoding_metadata_header.hpp"
 #include <algorithm>
 #include <vector>
+#include <iostream>
 
 namespace ddj {
 
@@ -112,7 +113,7 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 	else
 		for(auto& child : _children)
 		{
-			auto childResult = child->Compress(encodingResult[i++]);
+			auto childResult = child->Compress(encodingResult[i++]);	// FIX THAT LINE CAUSES ERROR
 			result.insert(result.end(), childResult.begin(), childResult.end());
 		}
 
@@ -141,15 +142,20 @@ size_t CompressionNode::PredictCompressionSize(SharedCudaPtr<char> data, DataTyp
 	size_t size = encoding->GetMetadataSize(data, type) + sizeof(EncodingMetadataHeader);
 	if(_isLeaf) return size + encoding->GetCompressedSize(data, type);
 	auto compressed = encoding->Encode(data, type);
-	compressed.erase(compressed.begin()); // remove metadata header
 	type = encoding->GetReturnType(type);
+	int i = 1;
 	for(auto& child : _children)
-		size += child->PredictCompressionSize(Concatenate(compressed), type);
+		size += child->PredictCompressionSize(compressed[i++], type);
 	return size;
 }
 
 
-
+void CompressionNode::Print()
+{
+	std::cout << GetEncodingTypeString(this->_encodingType) << ",";
+	for(auto& child : this->_children)
+		child->Print();
+}
 
 
 

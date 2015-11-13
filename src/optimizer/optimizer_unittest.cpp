@@ -22,7 +22,7 @@ TEST_F(OptimizerTest, PathGenerator_GeneratePaths)
 	EXPECT_GT(paths.size(), 0);
 }
 
-TEST_F(OptimizerTest, PathGenerator_GenerateTree)
+TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompression)
 {
 	auto paths = PathGenerator().GeneratePaths();
 
@@ -45,6 +45,22 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree)
 	}
 }
 
+TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompressedSizePrediction)
+{
+	auto paths = PathGenerator().GeneratePaths();
 
+	for(auto& path : paths)
+	{
+		auto tree = PathGenerator().GenerateTree(path, DataType::d_int);
+
+		auto data = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromTestFile());
+		auto compressedData = tree.Compress(CastSharedCudaPtr<int, char>(data));
+
+		auto expected = compressedData->size();
+		auto actual = tree.GetPredictedSizeAfterCompression(
+				CastSharedCudaPtr<int, char>(data), DataType::d_int);
+		EXPECT_EQ(expected, actual);
+	}
+}
 
 }

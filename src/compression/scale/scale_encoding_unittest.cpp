@@ -56,5 +56,16 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+TEST_P(ScaleCompressionTest, GetMetadataSize_Consecutive_Int)
+{
+	TestGetMetadataSize<ScaleEncoding, int>(GetIntConsecutiveData());
+	TestGetMetadataSize<ScaleEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+}
+
+TEST_P(ScaleCompressionTest, GetCompressedSize_Consecutive_Int)
+{
+	TestGetCompressedSize<ScaleEncoding, int>(GetIntConsecutiveData());
+	TestGetCompressedSize<ScaleEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+}
 
 } /* namespace ddj */

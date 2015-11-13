@@ -106,6 +106,7 @@ SharedCudaPtr<T> ConstEncoding::Decode(SharedCudaPtrVector<char> input)
 
 size_t ConstEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
 {
+	if(data->size() <= 0) return 0;
 	switch(type)
 	{
 		case DataType::d_int:

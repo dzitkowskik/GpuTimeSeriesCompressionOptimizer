@@ -51,7 +51,7 @@ PathList PathGenerator::GeneratePaths()
 		for(auto& b : secondStage)
 		{
 			Path temp = a;
-			temp.insert(temp.begin(), b.begin(), b.end());
+			temp.insert(temp.end(), b.begin(), b.end());
 			result.push_back(temp);
 		}
 

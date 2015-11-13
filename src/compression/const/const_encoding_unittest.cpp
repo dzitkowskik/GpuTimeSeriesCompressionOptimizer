@@ -89,11 +89,13 @@ TEST_P(ConstEncodingTest, CompressionOf_Float_FromFile)
 TEST_P(ConstEncodingTest, GetMetadataSize_Consecutive_Int)
 {
 	TestGetMetadataSize<ConstEncoding, int>(GetIntConsecutiveData());
+	TestGetMetadataSize<ConstEncoding, int>(GetIntRandomData(10,100));
 }
 
 TEST_P(ConstEncodingTest, GetCompressedSize_Consecutive_Int)
 {
 	TestGetCompressedSize<ConstEncoding, int>(GetIntConsecutiveData());
+	TestGetCompressedSize<ConstEncoding, int>(GetIntRandomData(10,100));
 }
 
 } /* namespace ddj */

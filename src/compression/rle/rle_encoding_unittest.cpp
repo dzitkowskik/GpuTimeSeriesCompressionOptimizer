@@ -56,5 +56,19 @@ TEST_P(RleCompressionTest, CompressionOfRandomFloats_data)
 	);
 }
 
+TEST_P(RleCompressionTest, GetMetadataSize)
+{
+	TestGetMetadataSize<RleEncoding, int>(GetIntConsecutiveData());
+	TestGetMetadataSize<RleEncoding, int>(GetIntRandomData(10,100));
+	TestGetMetadataSize<RleEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+}
+
+TEST_P(RleCompressionTest, GetCompressedSize)
+{
+	TestGetCompressedSize<RleEncoding, int>(GetIntConsecutiveData());
+	TestGetCompressedSize<RleEncoding, int>(GetIntRandomData(10,100));
+	TestGetCompressedSize<RleEncoding, float>(GetFloatRandomDataWithMaxPrecision(2));
+}
+
 
 } /* namespace ddj */

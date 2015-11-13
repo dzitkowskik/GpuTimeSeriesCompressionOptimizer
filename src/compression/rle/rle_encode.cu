@@ -48,6 +48,40 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
     return SharedCudaPtrVector<char> {metadata, result};
 }
 
+size_t RleEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)
+{
+	if(data->size() <= 0) return 0;
+	switch(type)
+	{
+		case DataType::d_int:
+			return GetCompressedSize(CastSharedCudaPtr<char, int>(data));
+		case DataType::d_float:
+			return GetCompressedSize(CastSharedCudaPtr<char, float>(data));
+		default:
+			throw NotImplementedException("No DictEncoding::GetCompressedSize implementation for that type");
+	}
+}
+
+template<typename T>
+size_t RleEncoding::GetCompressedSize(SharedCudaPtr<T> data)
+{
+	thrust::device_ptr<T> d_ptr(data->get());
+	thrust::device_vector<T> input(d_ptr, d_ptr + data->size());
+	thrust::device_vector<T> output(data->size());
+	thrust::device_vector<int>  lengths(data->size());
+
+	// compute run lengths
+	auto reduceResult = thrust::reduce_by_key(
+		input.begin(),
+		input.end(),
+		thrust::constant_iterator<int>(1),
+		output.begin(),
+		lengths.begin());
+	// get true output length
+	int len = reduceResult.first - output.begin();
+	return len * sizeof(int) + len * sizeof(T);
+}
+
 #define RLE_ENCODE_SPEC(X) \
     template SharedCudaPtrVector<char> RleEncoding::Encode<X>(SharedCudaPtr<X> data);
 FOR_EACH(RLE_ENCODE_SPEC, float, int, long long, unsigned int)
