@@ -7,6 +7,7 @@
 
 #include "test/unittest_base.hpp"
 #include "optimizer/path_generator.hpp"
+#include "optimizer/compression_optimizer.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_print.hpp"
 #include <gtest/gtest.h>
@@ -61,6 +62,24 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompressedSizePrediction)
 				CastSharedCudaPtr<int, char>(data), DataType::d_int);
 		EXPECT_EQ(expected, actual);
 	}
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_TimeDataFromFile)
+{
+	auto data =
+		CastSharedCudaPtr<int, char>(
+			CudaArrayTransform().Cast<time_t, int>(
+					GetTsIntDataFromTestFile()));
+
+	auto optimalTree = CompressionOptimizer().OptimizeTree(data, DataType::d_int);
+	auto compressed = optimalTree.Compress(data);
+	auto decompressed = optimalTree.Decompress(compressed);
+
+	printf("Size before compression: %d\n", data->size());
+	printf("Size after compression: %d\n", compressed->size());
+
+	EXPECT_LE( compressed->size(), data->size() );
+	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
 }
 
 }
