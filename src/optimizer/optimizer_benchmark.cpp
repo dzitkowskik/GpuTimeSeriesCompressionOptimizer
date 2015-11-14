@@ -19,12 +19,9 @@ class CompressionOptimizerBenchmark : public BenchmarkBase {};
 BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressionOptimizer_RandomInt)(benchmark::State& state)
 {
     auto data = CastSharedCudaPtr<int, char>(GetIntRandomData(state.range_x(), 10,1000));
-
     while (state.KeepRunning())
 	{
-    	printf("start\n");
 		CompressionOptimizer().OptimizeTree(data, DataType::d_int);
-		printf("end\n");
 	}
 
 	SetStatistics(state, DataType::d_int);
