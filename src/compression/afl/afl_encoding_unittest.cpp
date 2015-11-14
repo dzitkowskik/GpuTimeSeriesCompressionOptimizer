@@ -36,6 +36,17 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomInts_data)
 	);
 }
 
+TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomInts_bigData)
+{
+	AflEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<int>(
+			boost::bind(&AflEncoding::Encode<int>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<int>, encoder, _1),
+			CudaArrayGenerator().GenerateRandomIntDeviceArray(1<<20, 10, 1000))
+	);
+}
+
 TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomFloats_size)
 {
 	AflEncoding encoder;

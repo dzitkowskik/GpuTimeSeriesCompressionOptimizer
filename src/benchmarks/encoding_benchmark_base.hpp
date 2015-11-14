@@ -30,9 +30,6 @@ public:
 			SharedCudaPtr<char> data,
 			DataType type,
 			benchmark::State& state);
-
-private:
-	void SetStatistics(benchmark::State& state, DataType type);
 };
 
 

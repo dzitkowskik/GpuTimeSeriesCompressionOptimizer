@@ -1,7 +1,7 @@
 /*
- * optimizer_unittest.cpp
+ *  optimizer_unittest.cpp
  *
- *  Created on: 12 lis 2015
+ *  Created on: 12/11/2015
  *      Author: Karol Dzitkowski
  */
 
@@ -72,11 +72,34 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_TimeDataFromFile)
 					GetTsIntDataFromTestFile()));
 
 	auto optimalTree = CompressionOptimizer().OptimizeTree(data, DataType::d_int);
+	printf("Optimal tree: \n");
+	optimalTree.Print();
+
 	auto compressed = optimalTree.Compress(data);
 	auto decompressed = optimalTree.Decompress(compressed);
 
-	printf("Size before compression: %d\n", data->size());
-	printf("Size after compression: %d\n", compressed->size());
+	printf("Size before compression: %d\n", (int)data->size());
+	printf("Size after compression: %d\n", (int)compressed->size());
+
+	EXPECT_LE( compressed->size(), data->size() );
+	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
+{
+	auto data =
+		CastSharedCudaPtr<int, char>(
+			CudaArrayGenerator().GenerateRandomIntDeviceArray(1<<20, 10, 1000));
+
+	auto optimalTree = CompressionOptimizer().OptimizeTree(data, DataType::d_int);
+	printf("Optimal tree: \n");
+	optimalTree.Print();
+
+	auto compressed = optimalTree.Compress(data);
+	auto decompressed = optimalTree.Decompress(compressed);
+
+	printf("Size before compression: %d\n", (int)data->size());
+	printf("Size after compression: %d\n", (int)compressed->size());
 
 	EXPECT_LE( compressed->size(), data->size() );
 	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );

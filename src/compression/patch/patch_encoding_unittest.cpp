@@ -48,6 +48,18 @@ TEST_P(PatchCompressionTest, CompressionOfRandomInts_data)
 	);
 }
 
+TEST_P(PatchCompressionTest, CompressionOfRandomInts_bigData)
+{
+	OutsideOperator<int> op{501, 5000};
+	PatchEncoding<OutsideOperator<int>> encoder(op);
+	EXPECT_TRUE(
+		TestContent<int>(
+			boost::bind(&PatchEncoding<OutsideOperator<int>>::Encode<int>, encoder, _1),
+			boost::bind(&PatchEncoding<OutsideOperator<int>>::Decode<int>, encoder, _1),
+			CudaArrayGenerator().GenerateRandomIntDeviceArray(1<<20, 10, 1000))
+	);
+}
+
 TEST_P(PatchCompressionTest, CompressionOfRandomFloats_size)
 {
 	OutsideOperator<float> op{501.0f, 5000.0f};

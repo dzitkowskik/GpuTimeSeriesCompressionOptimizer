@@ -244,4 +244,43 @@ TEST_P(CompressionTreeTest, SimpleTree_Delta_Afl_PredictSizeAfterCompression_Ran
 	EXPECT_EQ(expected, actual);
 }
 
+//		PATCH
+//	   /     \
+//	 AFL     AFL
+//TEST_P(CompressionTreeTest, SimpleTree_Patch_Afl_RandomInt_BigSize)
+//{
+//	CompressionTree compressionTree;
+//	auto data =
+//			CastSharedCudaPtr<int, char>(
+//				CudaArrayGenerator().GenerateRandomIntDeviceArray(1<<20, 10, 1000));
+//
+//	auto patch = boost::make_shared<CompressionNode>(DefaultEncodingFactory().Get(EncodingType::patch, DataType::d_int));
+//	auto aflLeft = boost::make_shared<CompressionNode>(boost::make_shared<AflEncodingFactory>(DataType::d_int));
+//	auto aflRight = boost::make_shared<CompressionNode>(boost::make_shared<AflEncodingFactory>(DataType::d_int));
+//	auto leafLeft = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
+//	auto leafRight = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
+//
+//	aflLeft->AddChild(leafLeft);
+//	aflRight->AddChild(leafRight);
+//	patch->AddChild(aflLeft);
+//	patch->AddChild(aflRight);
+//	ASSERT_TRUE( compressionTree.AddNode(patch, 0) );
+//
+//	auto compressed = compressionTree.Compress(data);
+//	CompressionTree decompressionTree;
+//	auto decompressed = decompressionTree.Decompress(compressed);
+//	auto expected = CastSharedCudaPtr<char, int>(data);
+//	auto actual = MoveSharedCudaPtr<char, int>(decompressed);
+//
+//	//	printf("size before compression = %d\n", data->size()*sizeof(int));
+//	//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
+//
+////	HelperPrint::PrintSharedCudaPtr(expected, "expected");
+////	HelperPrint::PrintSharedCudaPtr(actual, "actual");
+//
+//
+//	ASSERT_EQ(expected->size(), actual->size());
+//	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+//}
+
 } /* namespace ddj */

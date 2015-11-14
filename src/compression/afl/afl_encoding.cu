@@ -1,5 +1,5 @@
 #include "compression/afl/afl_encoding.hpp"
-#include "compression/afl/afl_encoding_impl.cuh"
+#include "afl_gpu.cuh"
 #include "util/statistics/cuda_array_statistics.hpp"
 #include "util/transform/cuda_array_transform.hpp"
 #include "util/stencil/stencil.hpp"
@@ -24,14 +24,31 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<int> data)
 	auto result = CudaPtr<char>::make_shared(comprDataSize);
 	auto metadata = CudaPtr<char>::make_shared(4*sizeof(char));
 
-	char host_metadata[4];
+	char* host_metadata;
+	CUDA_CALL( cudaMallocHost(&host_metadata, 4) );
 	host_metadata[0] = minBit;
 	host_metadata[1] = rest;
 
+//	printf("run afl compress with size = %d and minBit = %d\n", data->size(), minBit);
 	run_afl_compress_gpu<int, 1>(
-		minBit, data->get(), (int*)result->get(), data->size());
+		minBit, data->get(), (int*)result->get(), data->size(), comprDataSize/sizeof(int));
 
+	cudaDeviceSynchronize();
+	cudaError_t err = cudaGetLastError();
+	if(err != cudaSuccess)
+	{
+		printf("cuda error\n");
+		printf("post-kernel err is %s.\n", cudaGetErrorString(err));
+	    exit(1);
+	}
+
+//	printf("s1\n");
+//	printf("hostMetadata = %d\n", *((int*)host_metadata));
 	metadata->fillFromHost(host_metadata, 4*sizeof(char));
+//	printf("s2\n");
+
+
+	CUDA_CALL( cudaFreeHost(host_metadata) );
 
 	cudaDeviceSynchronize();
 	return SharedCudaPtrVector<char> {metadata, result};
@@ -109,9 +126,18 @@ SharedCudaPtr<T> DecodeAfl(T* data, size_t size, int minBit, int rest)
 	int length = comprBits / minBit;
 
 	auto result = CudaPtr<int>::make_shared(length);
+//	printf("DECODE RUN KERNEL minBit = %d, length = %d\n", minBit, length);
 	run_afl_decompress_gpu<int, 1>(minBit, data, result->get(), length);
 
 	cudaDeviceSynchronize();
+
+	cudaError_t err = cudaGetLastError();
+	if(err != cudaSuccess)
+	{
+		printf("cuda error\n");
+		printf("post-kernel err is %s.\n", cudaGetErrorString(err));
+		exit(1);
+	}
 	return result;
 }
 
@@ -121,6 +147,7 @@ SharedCudaPtr<int> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 	auto metadata = input[0]->copyToHost();
 	auto data = input[1];
 
+//	printf("DECODE READ METADATA\n");
 	// Get min bit and rest
 	int minBit = (*metadata)[0];
 	int rest = (*metadata)[1];
@@ -217,11 +244,13 @@ SharedCudaPtr<int> AflEncoding::DecodeInt(SharedCudaPtrVector<char> data)
 {
 	if(data[1]->size() <= 0)
 		return CudaPtr<int>::make_shared();
+
 	return this->Decode<int>(data);
 }
 
 SharedCudaPtrVector<char> AflEncoding::EncodeFloat(SharedCudaPtr<float> data)
 {
+//	printf("AFL ENCODE FLOAT (%d)\n", data->size());
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
 	return this->Encode<float>(data);
@@ -229,6 +258,7 @@ SharedCudaPtrVector<char> AflEncoding::EncodeFloat(SharedCudaPtr<float> data)
 
 SharedCudaPtr<float> AflEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
 {
+//	printf("AFL DECODE FLOAT (%d)\n", data[1]->size());
 	if(data[1]->size() <= 0)
 		return CudaPtr<float>::make_shared();
 	return this->Decode<float>(data);

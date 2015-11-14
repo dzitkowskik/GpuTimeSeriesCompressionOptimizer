@@ -3,6 +3,8 @@
 
 // This should work independently from _CUDA_ARCH__ number
 
+#define CWORD_SIZE(T)(T) (sizeof(T) * 8)
+
 #define NBITSTOMASK(n) ((1<<(n)) - 1)
 #define LNBITSTOMASK(n) ((1L<<(n)) - 1)
 
@@ -11,9 +13,54 @@
 #define _unused(x) x __attribute__((unused))
 #define convert_struct(n, s)  struct sgn {signed int x:n;} __attribute__((unused)) s
 
+__inline__ __device__
+int warpAllReduceMax(int val) {
+
+    val = max(val, __shfl_xor(val,16));
+    val = max(val, __shfl_xor(val, 8));
+    val = max(val, __shfl_xor(val, 4));
+    val = max(val, __shfl_xor(val, 2));
+    val = max(val, __shfl_xor(val, 1));
+
+    /*int m = val;*/
+    /*for (int mask = warpSize/2; mask > 0; mask /= 2) {*/
+        /*m = __shfl_xor(val, mask);*/
+        /*val = m > val ? m : val;*/
+    /*}*/
+    return val;
+}
+
 //TODO: distinguish between signed/unsigned versions
 
 // This depend on _CUDA_ARCH__ number
+
+
+
+template <typename T>
+__device__ __host__ __forceinline__ T SETNPBITS( T *source, T value, const unsigned int num_bits, const unsigned int bit_start)
+{
+    T mask = NBITSTOMASK(num_bits);
+    *source &= ~(mask<<bit_start); // clear space in source
+    *source |= (value & mask) << bit_start; // set values
+    return *source;
+}
+
+__device__ __host__ __forceinline__ long SETNPBITS( long *source, long value, unsigned int num_bits, unsigned int bit_start)
+{
+    long mask = LNBITSTOMASK(num_bits);
+    *source &= ~(mask<<bit_start); // clear space in source
+    *source |= (value & mask) << bit_start; // set values
+    return *source;
+}
+
+__device__ __host__ __forceinline__ unsigned long SETNPBITS( unsigned long *source, unsigned long value, unsigned int num_bits, unsigned int bit_start)
+{
+    unsigned long mask = LNBITSTOMASK(num_bits);
+    *source &= ~(mask<<bit_start); // clear space in source
+    *source |= (value & mask) << bit_start; // set values
+    return *source;
+}
+
 __device__ __host__ __forceinline__ unsigned int GETNPBITS( int source, unsigned int num_bits, unsigned int bit_start)
 {
 #if __CUDA_ARCH__ > 200  // This improves performance
@@ -103,7 +150,43 @@ __device__ __host__ __forceinline__ unsigned int BITLEN(unsigned int word)
     while (word >>= 1)
       ret++;
 #endif
-   return ret+1;
+   return ret > 64 ? 0 : ret;
+}
+
+__device__ __host__ __forceinline__ unsigned int BITLEN(unsigned long word)
+{
+    unsigned int ret=0;
+#if __CUDA_ARCH__ > 200
+    asm volatile ("bfind.u64 %0, %1;" : "=r"(ret) : "l"(word));
+#else
+    while (word >>= 1)
+      ret++;
+#endif
+   return ret > 64 ? 0 : ret;
+}
+
+__device__ __host__ __forceinline__ unsigned int BITLEN(int word)
+{
+    unsigned int ret=0;
+#if __CUDA_ARCH__ > 200
+    asm volatile ("bfind.s32 %0, %1;" : "=r"(ret) : "r"(word));
+#else
+    while (word >>= 1)
+      ret++;
+#endif
+   return ret > 64 ? 0 : ret;
+}
+
+__device__ __host__ __forceinline__ unsigned int BITLEN(long word)
+{
+    unsigned int ret=0;
+#if __CUDA_ARCH__ > 200
+    asm volatile ("bfind.s64 %0, %1;" : "=r"(ret) : "l"(word));
+#else
+    while (word >>= 1)
+      ret++;
+#endif
+   return ret > 64 ? 0 : ret;
 }
 
 __host__ __device__

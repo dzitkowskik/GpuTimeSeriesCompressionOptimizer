@@ -34,6 +34,17 @@ TEST_P(DictEncodingTest, CompressionOfRandomInts_data)
 	);
 }
 
+TEST_P(DictEncodingTest, CompressionOfRandomInts_bigData)
+{
+	DictEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<int>(
+			boost::bind(&DictEncoding::Encode<int>, encoder, _1),
+			boost::bind(&DictEncoding::Decode<int>, encoder, _1),
+			CudaArrayGenerator().GenerateRandomIntDeviceArray(1<<20, 10, 1000))
+	);
+}
+
 TEST_P(DictEncodingTest, CompressionOfRandomFloats_size)
 {
 	DictEncoding encoder;

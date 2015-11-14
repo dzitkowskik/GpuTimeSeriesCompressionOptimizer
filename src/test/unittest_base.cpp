@@ -7,10 +7,12 @@ void UnittestBase::SetUpTestCase()
 	HelperDevice hc;
 	int devId = hc.SetCudaDeviceWithMaxFreeMem();
 	printf("TEST SET UP ON DEVICE %d\n", devId);
+	CUDA_CALL(cudaGetLastError());
 }
 
 void UnittestBase::TearDownTestCase()
 {
+	CUDA_CALL(cudaGetLastError());
 }
 
 void UnittestBase::SetUp()

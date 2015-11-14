@@ -53,11 +53,4 @@ void CompressionTreeBenchmarkBase::Benchmark_Tree_Decoding(
 	SetStatistics(state, type);
 }
 
-void CompressionTreeBenchmarkBase::SetStatistics(benchmark::State& state, DataType type)
-{
-	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x());
-	state.SetItemsProcessed(it_processed);
-	state.SetBytesProcessed(it_processed * GetDataTypeSize(type));
-}
-
 } /* namespace ddj */

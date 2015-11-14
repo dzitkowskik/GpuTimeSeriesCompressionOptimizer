@@ -1,8 +1,8 @@
 /*
- * path_generator.cpp
+ *  path_generator.cpp
  *
- *  Created on: 12 lis 2015
- *      Author: ghash
+ *  Created on: 12/11/2015
+ *      Author: Karol Dzitkowski
  */
 
 #include "compression/default_encoding_factory.hpp"

@@ -11,6 +11,7 @@
 #include "core/cuda_ptr.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "time_series.h"
+#include "compression/data_type.hpp"
 
 #include <benchmark/benchmark.h>
 
@@ -27,6 +28,8 @@ protected:
 	SharedCudaPtr<time_t> GetTsIntDataFromFile(int n);
 	SharedCudaPtr<float> GetTsFloatDataFromFile(int n);
 	SharedCudaPtr<int> GetFakeIntDataForHistogram(int n);
+
+	void SetStatistics(benchmark::State& state, DataType type);
 
 protected:
 	CudaArrayGenerator _generator;

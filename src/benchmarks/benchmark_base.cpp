@@ -76,4 +76,12 @@ SharedCudaPtr<float> BenchmarkBase::GetFloatRandomDataWithMaxPrecision(int n, in
 	return _generator.CreateRandomFloatsWithMaxPrecision(n, maxPrecision);
 }
 
+void BenchmarkBase::SetStatistics(benchmark::State& state, DataType type)
+{
+	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x());
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * GetDataTypeSize(type));
+}
+
+
 } /* namespace ddj */

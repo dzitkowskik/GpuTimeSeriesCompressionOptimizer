@@ -57,11 +57,4 @@ void EncodingBenchmarkBase::Benchmark_Decoding(
 	SetStatistics(state, type);
 }
 
-void EncodingBenchmarkBase::SetStatistics(benchmark::State& state, DataType type)
-{
-	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x());
-	state.SetItemsProcessed(it_processed);
-	state.SetBytesProcessed(it_processed * GetDataTypeSize(type));
-}
-
 } /* namespace ddj */

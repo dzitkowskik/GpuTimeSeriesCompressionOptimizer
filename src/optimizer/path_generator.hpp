@@ -1,8 +1,8 @@
 /*
- * path_generator.hpp
+ *  path_generator.hpp
  *
- *  Created on: 12 lis 2015
- *      Author: ghash
+ *  Created on: 12/11/2015
+ *      Author: Karol Dzitkowski
  */
 
 #ifndef PATH_GENERATOR_HPP_

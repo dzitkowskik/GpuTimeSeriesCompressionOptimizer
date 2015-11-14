@@ -38,6 +38,9 @@ SharedCudaPtrVector<char> PatchEncoding<UnaryOperator>::Encode(SharedCudaPtr<T> 
     // Return results as vector with compressed stencil as metadata
     auto operatorTrue = MoveSharedCudaPtr<T, char>(std::get<0>(splittedData));
     auto operatorFalse = MoveSharedCudaPtr<T, char>(std::get<1>(splittedData));
+
+//    printf("patch split %d | %d\n", operatorTrue->size(), operatorFalse->size());
+
     return SharedCudaPtrVector<char> {stencilPacked, operatorTrue, operatorFalse};
 }
 

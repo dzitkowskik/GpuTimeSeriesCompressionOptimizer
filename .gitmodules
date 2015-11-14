@@ -1,3 +1,6 @@
 [submodule "modules/data"]
 	path = modules/data
 	url = https://github.com/dzitkowskik/time-series-data-manager.git
+[submodule "modules/gpu_compression_lib"]
+	path = modules/gpu_compression_lib
+	url = https://github.com/dzitkowskik/gpu_compression_lib.git

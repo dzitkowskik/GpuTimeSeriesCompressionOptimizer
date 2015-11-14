@@ -1,8 +1,8 @@
 /*
- * compression_optimizer.cpp
+ *  compression_optimizer.cpp
  *
- *  Created on: 14 lis 2015
- *      Author: ghash
+ *  Created on: 14/11/2015
+ *      Author: Karol Dzitkowski
  */
 
 #include "optimizer/compression_optimizer.hpp"

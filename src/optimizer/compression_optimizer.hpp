@@ -1,8 +1,8 @@
 /*
- * compression_optimizer.hpp
+ *  compression_optimizer.hpp
  *
- *  Created on: 14 lis 2015
- *      Author: ghash
+ *  Created on: 14/11/2015
+ *      Author: Karol Dzitkowski
  */
 
 #ifndef COMPRESSION_OPTIMIZER_HPP_
