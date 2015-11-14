@@ -87,9 +87,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_TimeDataFromFile)
 
 TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
 {
-	auto data =
-		CastSharedCudaPtr<int, char>(
-			CudaArrayGenerator().GenerateRandomIntDeviceArray(1<<20, 10, 1000));
+	auto data = CastSharedCudaPtr<int, char>(GetIntRandomData());
 
 	auto optimalTree = CompressionOptimizer().OptimizeTree(data, DataType::d_int);
 	printf("Optimal tree: \n");

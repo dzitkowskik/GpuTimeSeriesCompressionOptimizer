@@ -51,8 +51,8 @@ public:
 	virtual DataType GetReturnType(DataType type) { return type; }
 
 	// TODO: make abstract
-	virtual size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type) { return 0; }
-	virtual size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type) { return 0; }
+	virtual size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type) = 0;
+	virtual size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type) = 0;
 
 protected:
 	// INT

@@ -15,7 +15,7 @@
 #include "compression/delta/delta_encoding.hpp"
 #include "compression/dict/dict_encoding.hpp"
 #include "compression/none/none_encoding.hpp"
-#include "compression/patch/patch_encoding.hpp"
+#include "compression/patch/patch_encoding_factory.hpp"
 #include "compression/rle/rle_encoding.hpp"
 #include "compression/scale/scale_encoding.hpp"
 #include "compression/unique/unique_encoding.hpp"
