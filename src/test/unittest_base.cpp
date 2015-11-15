@@ -35,11 +35,9 @@ SharedCudaPtr<time_t> UnittestBase::GetTsIntDataFromTestFile()
 {
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
-	TSFileDefinition fileDefinition;
-	TimeSeries<float> ts;
-		ts.SetReadMaxRows(_size);
-	auto tsVector = ts.ReadManyFromFile(file, fileDefinition);
-	auto intData = tsVector[0].GetTime();
+	CSVFileDefinition fileDefinition;
+	auto tsVector = TimeSeries<float>::ReadFromCSV(file, fileDefinition, _size);
+	auto intData = tsVector[0].GetTimeRaw();
 	auto size = tsVector[0].GetSize();
 
 	auto result = CudaPtr<time_t>::make_shared();
@@ -74,11 +72,9 @@ SharedCudaPtr<float> UnittestBase::GetTsFloatDataFromTestFile()
 {
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
-	TSFileDefinition fileDefinition;
-	TimeSeries<float> ts;
-	ts.SetReadMaxRows(_size);
-	auto tsVector = ts.ReadManyFromFile(file, fileDefinition);
-	auto floatData = tsVector[0].GetData();
+	CSVFileDefinition fileDefinition;
+	auto tsVector = TimeSeries<float>::ReadFromCSV(file, fileDefinition, _size);
+	auto floatData = tsVector[0].GetDataRaw();
 	auto size = tsVector[0].GetSize();
 
 	auto result = CudaPtr<float>::make_shared();
