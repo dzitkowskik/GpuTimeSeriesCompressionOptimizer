@@ -50,8 +50,8 @@ TEST_F(HistogramTest, GetMostFrequent_fake_data)
 {
     int mostFreqCnt = 3;
     auto fakeData = GetFakeIntDataForHistogram();
-    auto fakedHistogram = Histogram().CalculateSparse(fakeData);
-    auto mostFrequent = Histogram().GetMostFrequent(fakedHistogram, mostFreqCnt);
+    auto fakedDictionaryCounter = Histogram().GetDictionaryCounter(fakeData);
+    auto mostFrequent = Histogram().GetMostFrequent(fakedDictionaryCounter, mostFreqCnt);
     int expected = GetSize(), actual;
     CUDA_CALL( cudaMemcpy(&actual, mostFrequent->get(), sizeof(int), CPY_DTH) );
     EXPECT_EQ(expected, actual);
@@ -60,7 +60,7 @@ TEST_F(HistogramTest, GetMostFrequent_fake_data)
 TEST_F(HistogramTest, GetMostFrequent_random_int)
 {
     int mostFreqCnt = 4;
-    auto randomHistogram = Histogram().CalculateDense(GetIntRandomData());
+    auto randomHistogram = Histogram().GetDictionaryCounter(GetIntRandomData());
     auto mostFrequent = Histogram().GetMostFrequent(randomHistogram, mostFreqCnt);
     EXPECT_TRUE( CheckMostFrequent(randomHistogram, mostFrequent,  mostFreqCnt) );
 }
@@ -186,31 +186,51 @@ void CheckHistogramResult(SharedCudaPtr<T> data, SharedCudaPtrPair<T, int> resul
 	delete [] h_data;
 }
 
-TEST_F(HistogramTest, ThrustSparseHistogram_RandomIntegerArray)
+TEST_F(HistogramTest, GetDictionaryCounter_RandomIntegerArray)
 {
 	auto randomData = GetIntRandomData();
-	auto result = Histogram().ThrustSparseHistogram(randomData);
+	auto result = Histogram().GetDictionaryCounter(randomData);
 	CheckHistogramResult<int, CpuHistogramSparse>(randomData, result);
 }
 
-TEST_F(HistogramTest, ThrustSparseHistogram_RealData_Delta_Time)
+TEST_F(HistogramTest, GetDictionaryCounter_RealData_Delta_Time)
 {
 	auto realData = GetTsIntDataFromTestFile();
 	auto deltaEncoded = DeltaEncoding().Encode(realData);
 	auto realDataDelta = MoveSharedCudaPtr<char, time_t>(deltaEncoded[1]);
-
-	auto result = Histogram().ThrustSparseHistogram(realDataDelta);
+	auto result = Histogram().GetDictionaryCounter(realDataDelta);
 	CheckHistogramResult<time_t, CpuHistogramSparse>(realDataDelta, result);
 }
 
-TEST_F(HistogramTest, CalculateHistogram_RealData_Delta_Time)
+TEST_F(HistogramTest, GetDictionaryCounter_FakeData)
 {
-	auto realData = GetTsIntDataFromTestFile();
-	auto deltaEncoded = DeltaEncoding().Encode(realData);
-	auto realDataDelta = MoveSharedCudaPtr<char, time_t>(deltaEncoded[1]);
-	auto result = Histogram().CalculateDense(realDataDelta);
+	auto randomData = GetFakeIntDataForHistogram();
+	auto result = Histogram().GetDictionaryCounter(randomData);
+	CheckHistogramResult<int, CpuHistogramSparse>(randomData, result);
+}
 
-	CheckHistogramResult<time_t, CpuHistogramDense>(realDataDelta, result);
+
+TEST_F(HistogramTest, GetHistogream_FakeData)
+{
+	auto fakeData = GetFakeIntDataForHistogram();
+	int bucketCnt = GetSize()-1;
+	auto histogram = Histogram().GetHistogram(fakeData, bucketCnt);
+
+	int actual, expected = 10;
+	CUDA_CALL( cudaMemcpy(&actual, histogram->get(), sizeof(int), CPY_DTH) );
+	EXPECT_EQ(expected, actual);
+}
+
+TEST_F(HistogramTest, GetHistogream_RandomFloat_MaxPrecision2)
+{
+	auto fakeData = GetFloatRandomDataWithMaxPrecision(2);
+	int bucketCnt = 10;
+	auto histogram = Histogram().GetHistogram(fakeData, bucketCnt);
+//	HelperPrint::PrintSharedCudaPtr(fakeData, "fakeData");
+//	HelperPrint::PrintSharedCudaPtr(histogram, "histogram");
+	int actual;
+	CUDA_CALL( cudaMemcpy(&actual, histogram->get(), sizeof(int), CPY_DTH) );
+	EXPECT_GT(actual, 1000);
 }
 
 } /* namespace ddj */

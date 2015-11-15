@@ -7,12 +7,12 @@ void UnittestBase::SetUpTestCase()
 	HelperDevice hc;
 	int devId = hc.SetCudaDeviceWithMaxFreeMem();
 	printf("TEST SET UP ON DEVICE %d\n", devId);
-	CUDA_CALL(cudaGetLastError());
+	cudaGetLastError();
 }
 
 void UnittestBase::TearDownTestCase()
 {
-	CUDA_CALL(cudaGetLastError());
+	cudaGetLastError();
 }
 
 void UnittestBase::SetUp()
@@ -54,7 +54,6 @@ SharedCudaPtr<int> UnittestBase::GetRandomStencilData()
 SharedCudaPtr<int> UnittestBase::GetFakeIntDataForHistogram()
 {
 	int mod = _size / 10;
-	int big = _size/3;
 	std::vector<int> h_fakeData;
 	for(int i = 0; i < _size; i++)
 	{

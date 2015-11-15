@@ -16,29 +16,27 @@ namespace ddj {
 class Histogram
 {
 public:
-	template<typename T> SharedCudaPtrPair<T, int> CalculateSparse(SharedCudaPtr<T> data);
-	template<typename T> SharedCudaPtrPair<T, int> CalculateDense(SharedCudaPtr<T> data);
-	template<typename T> SharedCudaPtrPair<T, int> CalculateBuckets(SharedCudaPtr<T> data, int bucketCnt);
+	template<typename T> SharedCudaPtrPair<T, int> GetDictionaryCounter(SharedCudaPtr<T> data);
+	template<typename T> SharedCudaPtr<int> GetHistogram(SharedCudaPtr<T> data, int bucketCnt);
 	template<typename T> SharedCudaPtr<T> GetMostFrequent(SharedCudaPtr<T> data, int freqCnt);
 	template<typename T> SharedCudaPtr<T> GetMostFrequent(SharedCudaPtrPair<T, int> histogram, int freqCnt);
+
+public:
+	template<typename T> __host__ __device__ int GetBucket(T value, T min, T max, int bucketCnt)
+	{
+		auto distance = max - min;
+		T invStep = bucketCnt / distance;
+		return (int)(value - min) * invStep;
+	}
 
 private:
 	template<typename T> SharedCudaPtrPair<T, int> ThrustSparseHistogram(SharedCudaPtr<T> data);
 	template<typename T> SharedCudaPtrPair<T, int> ThrustDenseHistogram(SharedCudaPtr<T> data);
-	template<typename T> SharedCudaPtrPair<T, int> CudaHistogramIntegral(SharedCudaPtr<T> data, T min, T max);
-	template<typename T> SharedCudaPtrPair<T, int> CudaHistogramBuckets(SharedCudaPtr<T> data, T min, T max);
-
+	template<typename T> SharedCudaPtr<int> CudaHistogram(SharedCudaPtr<T> data, int bucketCnt);
 	template<typename T> SharedCudaPtr<T> GetMostFrequentSparse(SharedCudaPtrPair<T, int>, int);
 
 private:
 	CudaArrayTransform _transform;
-
-	friend class HistogramTest;
- 	FRIEND_TEST(HistogramTest, ThrustSparseHistogram_RandomIntegerArray);
-	FRIEND_TEST(HistogramTest, ThrustSparseHistogram_RealData_Delta_Time);
- 	FRIEND_TEST(HistogramTest, GetMostFrequent_fake_data);
-	FRIEND_TEST(HistogramTest, GetMostFrequent_random_int);
-
 };
 
 } /* namespace ddj */

@@ -1,59 +1,22 @@
 #include "util/histogram/histogram.hpp"
 #include "util/histogram/cuda_histogram_impl.cuh"
 #include "util/generator/cuda_array_generator.hpp"
+#include "util/statistics/cuda_array_statistics.hpp"
 #include "core/macros.h"
 #include <cmath>
 
 namespace ddj {
 
 template<typename T>
-struct HistIntegralForm
-{
-	T min;
-
-    __host__ __device__
-    void operator() (T* input, int i, int* res_idx, int* res, int nres) const
-    {
-        *res_idx++ = (int)(input[i] - min);
-        *res++ = 1;
-    }
-};
-
-struct HistIntegralSumFun
-{
-    __device__ __host__
-    int operator() (int res1, int res2) const
-    { return res1 + res2; }
-};
-
-template<typename T>
-SharedCudaPtrPair<T, int> Histogram::CudaHistogramIntegral(SharedCudaPtr<T> data, T min, T max)
-{
-	static_assert(std::is_integral<T>::value, "CudaHistogramIntegral allows only integral types");
-    int distance = max - min + 1;
-    auto counts = CudaPtr<int>::make_shared(distance);
-    this->_transform.TransformInPlace(counts, ZeroOperator<int, int>());
-
-    HistIntegralForm<T> xform { min };
-    HistIntegralSumFun sum;
-
-    callHistogramKernel<histogram_atomic_inc, 1>
-      (data->get(), xform, sum, 0, (int)data->size(), 0, counts->get(), distance, true);
-
-    auto keys = CudaArrayGenerator().CreateConsecutiveNumbersArray<T>(distance, min);
-    return SharedCudaPtrPair<T, int>(keys, counts);
-}
-
-template<typename T>
 struct HistForm
 {
 	T min;
-	T invStep;
+	double invStep;
 
     __host__ __device__
     void operator() (T* input, int i, int* res_idx, int* res, int nres) const
     {
-        *res_idx++ = (int)(input[i] - min) * invStep;
+        *res_idx++ = (input[i] - min) * invStep;
         *res++ = 1;
     }
 };
@@ -66,31 +29,36 @@ struct HistSumFun
 };
 
 template<typename T>
-SharedCudaPtrPair<T, int> Histogram::CudaHistogramBuckets(SharedCudaPtr<T> data, T min, T max)
+SharedCudaPtr<int> Histogram::CudaHistogram(SharedCudaPtr<T> data, int bucketCnt)
 {
+	auto minMax = CudaArrayStatistics().MinMax(data);
+	T min = std::get<0>(minMax);
+	T max = std::get<1>(minMax);
+
     auto distance = max - min;
-    auto counts = CudaPtr<int>::make_shared(data->size());
+    auto counts = CudaPtr<int>::make_shared(bucketCnt);
     this->_transform.TransformInPlace(counts, ZeroOperator<int, int>());
-    T step = distance / data->size();
-    T invStep = data->size() / distance;
+    auto invStep = (double)(bucketCnt-1) / distance;
 
     HistForm<T> xform { min, invStep };
     HistSumFun sum;
 
-    callHistogramKernel<histogram_generic, 1>
-      (data->get(), xform, sum, 0, (int)data->size(), 0, counts->get(), distance, true);
+    callHistogramKernel<histogram_generic, 1>(
+    		data->get(),
+    		xform,
+    		sum,
+    		0,
+    		(int)data->size(),
+    		0,
+    		counts->get(),
+    		bucketCnt,
+    		true);
 
-    auto keys = CudaArrayGenerator().CreateConsecutiveNumbersArray<T>(distance, min, step);
-    return SharedCudaPtrPair<T, int>(keys, counts);
+    return counts;
 }
 
-#define CUDA_HISTOGRAM_INTEGRAL_SPEC(X) \
-	template SharedCudaPtrPair<X, int> Histogram::CudaHistogramIntegral<X>(SharedCudaPtr<X>, X, X); \
-	template SharedCudaPtrPair<X, int> Histogram::CudaHistogramBuckets<X>(SharedCudaPtr<X>, X, X);
-FOR_EACH(CUDA_HISTOGRAM_INTEGRAL_SPEC, int, long, long long, unsigned int)
-
-#define CUDA_HISTOGRAM_FLOATING_POINT_SPEC(X) \
-	template SharedCudaPtrPair<X, int> Histogram::CudaHistogramBuckets<X>(SharedCudaPtr<X>, X, X);
-FOR_EACH(CUDA_HISTOGRAM_FLOATING_POINT_SPEC, float)
+#define CUDA_HISTOGRAM_SPEC(X) \
+	template SharedCudaPtr<int> Histogram::CudaHistogram<X>(SharedCudaPtr<X>, int);
+FOR_EACH(CUDA_HISTOGRAM_SPEC, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

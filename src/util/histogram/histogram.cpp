@@ -12,35 +12,23 @@
 namespace ddj {
 
 // INT
-template<> SharedCudaPtrPair<int, int> Histogram::CalculateDense<int>(SharedCudaPtr<int> data)
+template<typename T>
+SharedCudaPtr<int> Histogram::GetHistogram(SharedCudaPtr<T> data, int bucketCnt)
 {
-    auto minMax = CudaArrayStatistics().MinMax<int>(data);
-    if(std::get<1>(minMax) - std::get<0>(minMax) < 1000)
-    	return CudaHistogramIntegral(data, std::get<0>(minMax), std::get<1>(minMax));
-    else
-    	return ThrustDenseHistogram(data);
+    return CudaHistogram(data, bucketCnt);
 }
 
-template<> SharedCudaPtrPair<int, int> Histogram::CalculateSparse<int>(SharedCudaPtr<int> data)
+template<typename T>
+SharedCudaPtrPair<T, int> Histogram::GetDictionaryCounter(SharedCudaPtr<T> data)
 {
     return ThrustSparseHistogram(data);
-}
-
-// LONG
-template<> SharedCudaPtrPair<long, int> Histogram::CalculateDense<long>(SharedCudaPtr<long> data)
-{
-    auto minMax = CudaArrayStatistics().MinMax<long>(data);
-    if(std::get<1>(minMax) - std::get<0>(minMax) < 1000)
-    	return CudaHistogramIntegral(data, std::get<0>(minMax), std::get<1>(minMax));
-    else
-    	return ThrustDenseHistogram(data);
 }
 
 // REST
 template<typename T>
 SharedCudaPtr<T> Histogram::GetMostFrequent(SharedCudaPtr<T> data, int freqCnt)
 {
-	auto histogram = ThrustSparseHistogram(data);
+	auto histogram = GetDictionaryCounter(data);
 	return GetMostFrequentSparse(histogram, freqCnt);
 }
 
@@ -52,7 +40,9 @@ SharedCudaPtr<T> Histogram::GetMostFrequent(SharedCudaPtrPair<T, int> histogram,
 
 #define DELTA_ENCODING_SPEC(X) \
 	template SharedCudaPtr<X> Histogram::GetMostFrequent<X>(SharedCudaPtr<X>, int); \
-	template SharedCudaPtr<X> Histogram::GetMostFrequent<X>(SharedCudaPtrPair<X, int>, int);
+	template SharedCudaPtr<X> Histogram::GetMostFrequent<X>(SharedCudaPtrPair<X, int>, int); \
+	template SharedCudaPtr<int> Histogram::GetHistogram<X>(SharedCudaPtr<X>, int); \
+	template SharedCudaPtrPair<X, int> Histogram::GetDictionaryCounter<X>(SharedCudaPtr<X>);
 FOR_EACH(DELTA_ENCODING_SPEC, float, int, long, long long, unsigned int)
 
 
