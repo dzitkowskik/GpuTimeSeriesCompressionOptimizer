@@ -1,5 +1,5 @@
 #include "cuda_array_generator.hpp"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 #include "core/macros.h"
 
 namespace ddj {

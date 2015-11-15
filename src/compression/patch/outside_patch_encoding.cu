@@ -7,7 +7,7 @@
 
 #include "compression/patch/outside_patch_encoding.hpp"
 
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 #include "helpers/helper_print.hpp"
 #include "core/macros.h"
 #include "util/stencil/stencil.hpp"

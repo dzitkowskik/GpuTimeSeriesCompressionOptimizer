@@ -7,7 +7,7 @@
 
 #include "delta_encoding.hpp"
 #include "core/macros.h"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 #include "helpers/helper_print.hpp"
 
 #include <cuda_runtime_api.h>

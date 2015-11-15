@@ -7,7 +7,7 @@
 
 #include "util/transform/cuda_array_transform.hpp"
 #include "transform_operators.hpp"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 #include "core/macros.h"
 
 #include <thrust/device_ptr.h>

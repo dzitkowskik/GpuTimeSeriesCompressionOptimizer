@@ -8,7 +8,7 @@
 #include "util/statistics/cuda_array_statistics.hpp"
 #include "core/cuda_macros.cuh"
 #include "core/macros.h"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 
 #include <thrust/device_ptr.h>
 #include <thrust/extrema.h>

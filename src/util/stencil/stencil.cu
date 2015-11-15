@@ -1,5 +1,5 @@
 #include "stencil.hpp"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 #include "core/cuda_macros.cuh"
 #include "core/macros.h"
 #include "stencil_operators.hpp"

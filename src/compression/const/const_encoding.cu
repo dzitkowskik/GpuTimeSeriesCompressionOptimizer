@@ -10,7 +10,7 @@
 #include "util/splitter/splitter.hpp"
 #include "util/other/prefix_sum.cuh"
 #include "util/other/cuda_array_reduce.cuh"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 
 namespace ddj
 {

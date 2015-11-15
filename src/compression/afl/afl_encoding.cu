@@ -4,7 +4,7 @@
 #include "util/transform/cuda_array_transform.hpp"
 #include "util/stencil/stencil.hpp"
 #include "helpers/helper_float.hpp"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 #include "helpers/helper_print.hpp"
 
 namespace ddj

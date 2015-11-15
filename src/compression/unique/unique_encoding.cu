@@ -8,7 +8,7 @@
 #include "compression/unique/unique_encoding.hpp"
 #include "core/cuda_macros.cuh"
 #include "core/not_implemented_exception.hpp"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 #include "helpers/helper_print.hpp"
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>

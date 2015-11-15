@@ -8,7 +8,7 @@
 #include "scale_encoding.hpp"
 #include "core/macros.h"
 #include "core/cuda_macros.cuh"
-#include "helpers/helper_cuda.cuh"
+#include "core/cuda_launcher.cuh"
 
 #include <cuda_runtime_api.h>
 #include <thrust/extrema.h>
