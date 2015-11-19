@@ -27,6 +27,13 @@ namespace ddj
         return result;
     }
 
+	SharedCudaPtr<double> CudaArrayGenerator::GenerateRandomDoubleDeviceArray(int n)
+    {
+        auto result = CudaPtr<double>::make_shared(n);
+        CURAND_CALL(curandGenerateUniformDouble(this->_gen, result->get(), n));
+        return result;
+    }
+
 	SharedCudaPtr<int> CudaArrayGenerator::GenerateRandomIntDeviceArray(int n)
 	{
 		auto result = CudaPtr<int>::make_shared(n);

@@ -31,6 +31,15 @@ __global__ void _compareFloatsKernel(float* a, float* b, int size, bool* out)
 			abs(a[iElement] - b[iElement]) > MAX_FLOAT_DIFF;
 }
 
+__global__ void _compareDoublesKernel(double* a, double* b, int size, bool* out)
+{
+	unsigned int iElement = blockDim.x * blockIdx.x + threadIdx.x;
+	if (iElement >= size) return;
+	out[iElement] =
+			!_floatsEqual(a[iElement], b[iElement], 8) &&
+			abs(a[iElement] - b[iElement]) > MAX_FLOAT_DIFF;
+}
+
 template <typename T>
 __global__ void _compareElementsKernel(T* a, T*b, int size, bool* out)
 {
@@ -46,6 +55,8 @@ template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
     int blocks = (size + COMP_THREADS_PER_BLOCK - 1) / COMP_THREADS_PER_BLOCK;
     if(boost::is_same<T, float>::value)
     	_compareFloatsKernel<<<blocks, COMP_THREADS_PER_BLOCK>>>((float*)a, (float*)b, size, out);
+    else if(boost::is_same<T, double>::value)
+    	_compareDoublesKernel<<<blocks, COMP_THREADS_PER_BLOCK>>>((double*)a, (double*)b, size, out);
     else
     	_compareElementsKernel<<<blocks, COMP_THREADS_PER_BLOCK>>>(a, b, size, out);
     cudaDeviceSynchronize();
@@ -57,4 +68,4 @@ template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
 }
 
 #define COMP_SPEC(X) template bool CompareDeviceArrays <X> (X* a, X* b, int size);
-FOR_EACH(COMP_SPEC, char, float, int, long, long long, unsigned int)
+FOR_EACH(COMP_SPEC, char, double, float, int, long, long long, unsigned int)

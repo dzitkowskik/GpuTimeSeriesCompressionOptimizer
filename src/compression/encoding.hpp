@@ -29,6 +29,8 @@ public:
 				return EncodeInt(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
 			case DataType::d_float:
 				return EncodeFloat(boost::reinterpret_pointer_cast<CudaPtr<float>>(data));
+			case DataType::d_double:
+				return EncodeDouble(boost::reinterpret_pointer_cast<CudaPtr<double>>(data));
 			default:
 				throw std::runtime_error("Encoding not implemented for this type");
 		}
@@ -42,6 +44,8 @@ public:
 				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeInt(data));
 			case DataType::d_float:
 				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeFloat(data));
+			case DataType::d_double:
+				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeDouble(data));
 			default:
 				throw std::runtime_error("Decoding not implemented for this type");
 		}
@@ -62,6 +66,10 @@ protected:
 	// FLOAT
 	virtual SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data) = 0;
 	virtual SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data) = 0;
+
+	// DOUBLE
+	virtual SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data) = 0;
+	virtual SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data) = 0;
 };
 
 } /* namespace ddj */

@@ -62,6 +62,11 @@ protected:
 		return this->Decode<float>(data);
 	}
 
+	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data)
+	{ return SharedCudaPtrVector<char>(); }
+	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)
+	{ return SharedCudaPtr<double>(); }
+
 	template<typename T>
 	size_t GetCompressedSize(SharedCudaPtr<T> data);
 

@@ -31,6 +31,9 @@ SharedCudaPtr<int> UnittestBase::GetIntConsecutiveData()
 SharedCudaPtr<float> UnittestBase::GetFloatRandomData()
 { return _generator.GenerateRandomFloatDeviceArray(_size); }
 
+SharedCudaPtr<double> UnittestBase::GetDoubleRandomData()
+{ return _generator.GenerateRandomDoubleDeviceArray(_size); }
+
 SharedCudaPtr<time_t> UnittestBase::GetTsIntDataFromTestFile()
 {
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");

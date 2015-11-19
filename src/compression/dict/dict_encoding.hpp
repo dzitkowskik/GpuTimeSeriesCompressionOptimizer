@@ -64,6 +64,11 @@ protected:
 		return this->Decode<float>(data);
 	}
 
+	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data)
+	{ return SharedCudaPtrVector<char>(); }
+	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)
+	{ return SharedCudaPtr<double>(); }
+
 private:
 	template<typename T>
     SharedCudaPtr<int> GetMostFrequentStencil(SharedCudaPtr<T> data, SharedCudaPtr<T> mostFrequent);

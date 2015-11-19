@@ -1,5 +1,5 @@
 #include "util/generator/cuda_array_generator.hpp"
-#include "compression/patch/patch_encoding.hpp"
+#include "compression/patch/outside_patch_encoding.hpp"
 #include "util/stencil/stencil.hpp"
 #include "benchmarks/encoding_benchmark_base.hpp"
 
@@ -13,8 +13,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     int n = state.range_x();
     auto data = MoveSharedCudaPtr<int, char>(
     		CudaArrayGenerator().GenerateConsecutiveIntDeviceArray(n));
-    OutsideOperator<int> op{n/3, 2*n/3};
-    PatchEncoding<OutsideOperator<int>> encoding(op);
+    OutsidePatchEncoding encoding(0, n, 0.2);
     Benchmark_Encoding(encoding, data, DataType::d_int, state);
 }
 BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Encode)->Arg(1<<15)->Arg(1<<20);
@@ -24,8 +23,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     int n = state.range_x();
     auto data = MoveSharedCudaPtr<int, char>(
     		CudaArrayGenerator().GenerateConsecutiveIntDeviceArray(n));
-    OutsideOperator<int> op{n/3, 2*n/3};
-    PatchEncoding<OutsideOperator<int>> encoding(op);
+    OutsidePatchEncoding encoding(0, n, 0.2);
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
 BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Decode)->Arg(1<<15)->Arg(1<<20);
@@ -35,8 +33,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_E
     int n = state.range_x();
     auto data = MoveSharedCudaPtr<int, char>(
     		CudaArrayGenerator().GenerateRandomIntDeviceArray(n, 10, 1000));
-    OutsideOperator<int> op{20, 800};
-    PatchEncoding<OutsideOperator<int>> encoding(op);
+    OutsidePatchEncoding encoding(10, 1000);
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
 BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Encode)->Arg(1<<15)->Arg(1<<20);
@@ -46,8 +43,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_D
     int n = state.range_x();
     auto data = MoveSharedCudaPtr<int, char>(
     		CudaArrayGenerator().GenerateRandomIntDeviceArray(n, 10, 1000));
-    OutsideOperator<int> op{20, 800};
-    PatchEncoding<OutsideOperator<int>> encoding(op);
+    OutsidePatchEncoding encoding(10, 1000);
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
 BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Decode)->Arg(1<<15)->Arg(1<<20);
@@ -58,8 +54,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     int n = state.range_x();
     auto data = MoveSharedCudaPtr<float, char>(
     		CudaArrayGenerator().GenerateRandomFloatDeviceArray(n));
-    OutsideOperator<float> op{n/3.0f, 2.0f*n/3.0f};
-    PatchEncoding<OutsideOperator<float>> encoding(op);
+    OutsidePatchEncoding encoding(0, n, 0.25);
     Benchmark_Encoding(encoding, data, DataType::d_float, state);
 }
 BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Encode)->Arg(1<<15)->Arg(1<<20);
@@ -69,8 +64,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     int n = state.range_x();
     auto data = MoveSharedCudaPtr<float, char>(
     		CudaArrayGenerator().GenerateRandomFloatDeviceArray(n));
-    OutsideOperator<float> op{n/3.0f, 2.0f*n/3.0f};
-    PatchEncoding<OutsideOperator<float>> encoding(op);
+    OutsidePatchEncoding encoding(0, n, 0.25);
     Benchmark_Decoding(encoding, data, DataType::d_float, state);
 }
 BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Decode)->Arg(1<<15)->Arg(1<<20);

@@ -15,7 +15,8 @@ namespace ddj {
 enum class DataType
 {
     d_int,
-    d_float
+    d_float,
+    d_double
 };
 
 inline size_t GetDataTypeSize(DataType type)
@@ -24,6 +25,7 @@ inline size_t GetDataTypeSize(DataType type)
 	{
 		case DataType::d_int: return sizeof(int);
 		case DataType::d_float: return sizeof(float);
+		case DataType::d_double: return sizeof(double);
 		default: throw NotImplementedException("This type is not implemented");
 	}
 }
@@ -31,6 +33,7 @@ inline size_t GetDataTypeSize(DataType type)
 template<typename T> inline DataType GetDataType();
 template<> inline DataType GetDataType<int>() { return DataType::d_int; }
 template<> inline DataType GetDataType<float>() { return DataType::d_float; }
+template<> inline DataType GetDataType<double>() { return DataType::d_double; }
 
 } /* namespace ddj */
 #endif /* DDJ_DATA_TYPE_HPP_ */

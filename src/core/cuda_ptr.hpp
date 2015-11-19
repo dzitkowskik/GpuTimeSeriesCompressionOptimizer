@@ -76,7 +76,7 @@ public:
 	{
 		reset(size);
 		CUDA_ASSERT_RETURN(
-			cudaMemcpy(_pointer, ptr, _size, cudaMemcpyDeviceToDevice)
+			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyDeviceToDevice)
 			);
 	}
 
@@ -84,8 +84,15 @@ public:
 	{
 		reset(size);
 		CUDA_ASSERT_RETURN(
-			cudaMemcpy(_pointer, ptr, _size, cudaMemcpyHostToDevice)
+			cudaMemcpy(_pointer, ptr, size*sizeof(T), cudaMemcpyHostToDevice)
 			);
+	}
+
+	void set(int value)
+	{
+		CUDA_ASSERT_RETURN(
+				cudaMemset(_pointer, value, _size);
+				;)
 	}
 
 	SharedCudaPtr<T> copy()
@@ -93,6 +100,13 @@ public:
 		auto count = this->size();
 		auto result = make_shared(count);
 		result->fill(_pointer, count);
+		return result;
+	}
+
+	SharedCudaPtr<T> copy(size_t size)
+	{
+		auto result = make_shared(size);
+		result->fill(_pointer, size);
 		return result;
 	}
 
@@ -150,6 +164,8 @@ SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data)
 	for(auto& part : data)
 		totalSize += part->size();
 	auto result = CudaPtr<char>::make_shared(totalSize);
+
+	printf("totalSize = %d\n", totalSize);
 
 	// TODO: Make special class for streams and managing streams
 	// TODO: Do data copying with more than one stream

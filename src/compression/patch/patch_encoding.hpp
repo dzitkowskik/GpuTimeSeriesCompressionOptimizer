@@ -49,6 +49,8 @@ protected:
 	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data) = 0;
 	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data) = 0;
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data) = 0;
+	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data) = 0;
+	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data) = 0;
 
 protected:
     ExecutionPolicy _policy;

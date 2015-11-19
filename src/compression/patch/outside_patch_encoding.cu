@@ -58,8 +58,8 @@ SharedCudaPtr<T> OutsidePatchEncoding::Decode(SharedCudaPtrVector<char> data)
 		return CudaPtr<T>::make_shared();
 
 	auto stencilMetadata = data[0];
-	auto operatorTrue = MoveSharedCudaPtr<char, T>(data[1]);
-	auto operatorFalse = MoveSharedCudaPtr<char, T>(data[2]);
+	auto operatorTrue = CastSharedCudaPtr<char, T>(data[1]);
+	auto operatorFalse = CastSharedCudaPtr<char, T>(data[2]);
 
 	// Uncompress stencil
 	auto stencil = Stencil().unpack(stencilMetadata);

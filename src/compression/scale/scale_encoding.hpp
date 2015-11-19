@@ -61,6 +61,11 @@ protected:
 		return this->Decode<float>(data);
 	}
 
+	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data)
+	{ return SharedCudaPtrVector<char>(); }
+	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)
+	{ return SharedCudaPtr<double>(); }
+
 public:
 	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);
 	template<typename T> SharedCudaPtr<T> Decode(SharedCudaPtrVector<char> data);

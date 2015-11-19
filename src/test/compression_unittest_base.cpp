@@ -34,9 +34,11 @@ bool CompressionUnittestBase::TestContent(
 {
 	auto encodedData = encodeFunction(data);
 	auto decodedData = decodeFunction(encodedData);
-
+//
 //	HelperPrint::PrintSharedCudaPtr(data, "data");
 //	HelperPrint::PrintSharedCudaPtr(decodedData, "decodedData");
+//	printf("Size before compression: %d bytes\n", data->size()*sizeof(T));
+//	printf("Size after compression: %d bytes\n", Concatenate(encodedData)->size());
 
 	return CompareDeviceArrays(data->get(), decodedData->get(), data->size());
 }
@@ -50,6 +52,6 @@ bool CompressionUnittestBase::TestContent(
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<X> data)>, 	\
 			boost::function<SharedCudaPtr<X> (SharedCudaPtrVector<char> data)>, 	\
 			SharedCudaPtr<X> data);
-FOR_EACH(COMPRESSION_UNITTEST_BASE_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(COMPRESSION_UNITTEST_BASE_SPEC, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */
