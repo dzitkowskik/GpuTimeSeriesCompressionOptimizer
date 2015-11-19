@@ -144,33 +144,6 @@ SharedCudaPtr<TO> CastSharedCudaPtr(SharedCudaPtr<FROM> data)
 }
 
 template<typename T>
-SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data)
-{
-	size_t totalSize = 0;
-	for(auto& part : data)
-		totalSize += part->size();
-	auto result = CudaPtr<char>::make_shared(totalSize);
-
-	// TODO: Make special class for streams and managing streams
-	// TODO: Do data copying with more than one stream
-	cudaStream_t stream;
-	CUDA_CALL( cudaStreamCreate(&stream) );
-
-	size_t offset = 0;
-	for(auto& part : data)
-	{
-		if(part->size() > 0)
-		{
-			cudaMemcpyAsync(result->get()+offset, part->get(), part->size()*sizeof(T), CPY_DTD, stream);
-			offset += part->size();
-		}
-	}
-
-	cudaStreamSynchronize(stream);
-	CUDA_CALL( cudaStreamDestroy(stream) );
-
-	return result;
-}
-
+SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data);
 
 #endif /* CUDA_PTR_H_ */
