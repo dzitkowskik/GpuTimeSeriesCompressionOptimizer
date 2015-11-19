@@ -18,7 +18,7 @@
 namespace ddj
 {
 
-class BenchmarkBase : public benchmark::Fixture
+class BenchmarkBase : public ::benchmark::Fixture
 {
 protected:
 	SharedCudaPtr<int> GetIntRandomData(int n, int from = 100, int to = 1000);

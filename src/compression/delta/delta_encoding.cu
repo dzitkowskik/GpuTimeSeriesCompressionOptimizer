@@ -89,7 +89,7 @@ SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtrVector<char> input)
 #define DELTA_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> DeltaEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> DeltaEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(DELTA_ENCODING_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(DELTA_ENCODING_SPEC, char, float, int, long, long long, unsigned int)
 
 
 } /* namespace ddj */

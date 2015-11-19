@@ -5,7 +5,7 @@
  *      Author: ghash
  */
 
-#include <benchmarks/benchmark_base.hpp>
+#include "benchmarks/benchmark_base.hpp"
 #include "core/config.hpp"
 
 namespace ddj
