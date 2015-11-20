@@ -13,12 +13,7 @@ const char** getBenchmarkFilter(char** argv)
 int main(int argc, char** argv)
 {
 	ddj::Config::GetInstance()->InitOptions(argc, argv, "config.ini");
-
-    int new_argc = 2;
-    const char** new_argv = getBenchmarkFilter(argv);
-//    ::benchmark::Initialize(&new_argc, const_cast<const char**>(new_argv));
-     ::benchmark::Initialize(&argc, const_cast<const char**>(argv));
+    ::benchmark::Initialize(&argc, argv);
     ::benchmark::RunSpecifiedBenchmarks();
-    delete [] new_argv;
     return 0;
 }
