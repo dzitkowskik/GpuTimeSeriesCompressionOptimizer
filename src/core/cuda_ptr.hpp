@@ -8,6 +8,8 @@
 #ifndef CUDA_PTR_H_
 #define CUDA_PTR_H_
 
+#include "core/macros.h"
+
 #include <cuda_runtime_api.h>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
@@ -16,7 +18,6 @@
 #include <vector>
 #include <utility>
 
-#include "core/macros.h"
 
 template<class T> class CudaPtr;
 
@@ -156,9 +157,5 @@ SharedCudaPtr<TO> CastSharedCudaPtr(SharedCudaPtr<FROM> data)
 {
 	return boost::reinterpret_pointer_cast<CudaPtr<TO>>(data);
 }
-
-template<typename T>
-SharedCudaPtr<T> Concatenate(SharedCudaPtrVector<T> data);
-
 
 #endif /* CUDA_PTR_H_ */

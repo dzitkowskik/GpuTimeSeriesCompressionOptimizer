@@ -10,6 +10,7 @@
 #include "util/splitter/splitter.hpp"
 #include "util/other/prefix_sum.cuh"
 #include "util/other/cuda_array_reduce.cuh"
+#include "util/copy/cuda_array_copy.hpp"
 #include "core/cuda_launcher.cuh"
 
 namespace ddj
@@ -50,7 +51,7 @@ SharedCudaPtrVector<char> ConstEncoding::Encode(SharedCudaPtr<T> data)
 
 	auto resultData = MoveSharedCudaPtr<T, char>(Splitter().CopyIf(data, *stencil));
 	auto packedStencil = stencil.pack();
-	auto resultMetadata = Concatenate(
+	auto resultMetadata = CudaArrayCopy().Concatenate(
 		SharedCudaPtrVector<char> {
 			MoveSharedCudaPtr<T, char>(mostFrequent),
 			packedStencil

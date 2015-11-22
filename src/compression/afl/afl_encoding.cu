@@ -2,6 +2,7 @@
 #include "afl_gpu.cuh"
 #include "util/statistics/cuda_array_statistics.hpp"
 #include "util/transform/cuda_array_transform.hpp"
+#include "util/copy/cuda_array_copy.hpp"
 #include "util/stencil/stencil.hpp"
 #include "helpers/helper_float.hpp"
 #include "core/cuda_launcher.cuh"
@@ -106,10 +107,10 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<float> data)
 	if(sign == 0)
 	{
 		auto stencil = Stencil(signResult).pack();
-		metadata = Concatenate(SharedCudaPtrVector<char>{metadata, stencil});
+		metadata = CudaArrayCopy().Concatenate(SharedCudaPtrVector<char>{metadata, stencil});
 	}
 
-	return SharedCudaPtrVector<char>{ metadata, Concatenate(resultVector) };
+	return SharedCudaPtrVector<char>{ metadata, CudaArrayCopy().Concatenate(resultVector) };
 }
 
 template<typename T>

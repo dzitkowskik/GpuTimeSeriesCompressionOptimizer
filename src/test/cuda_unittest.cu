@@ -1,4 +1,5 @@
 #include "core/cuda_ptr.hpp"
+#include "util/copy/cuda_array_copy.hpp"
 #include "test/unittest_base.hpp"
 
 namespace ddj
@@ -14,7 +15,7 @@ TEST_F(CudaPtrTest, Concatenate_EqualSize_Vectors_Int_Size)
 	   randomIntDataVector.push_back( GetIntRandomData() );
 
     size_t expected = N * GetSize();
-    size_t actual = Concatenate(randomIntDataVector)->size();
+    size_t actual = CudaArrayCopy().Concatenate(randomIntDataVector)->size();
     EXPECT_EQ(expected, actual);
 }
 

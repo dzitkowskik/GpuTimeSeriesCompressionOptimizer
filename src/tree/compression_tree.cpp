@@ -7,10 +7,12 @@
 
 #include "tree/compression_tree.hpp"
 #include "compression/encoding_metadata_header.hpp"
+#include "compression/default_encoding_factory.hpp"
+#include "util/copy/cuda_array_copy.hpp"
+
 #include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
 
-#include "compression/default_encoding_factory.hpp"
 
 namespace ddj {
 
@@ -78,7 +80,7 @@ bool CompressionTree::RemoveNode(uint no)
 SharedCudaPtr<char> CompressionTree::Compress(SharedCudaPtr<char> data)
 {
     auto compressionResults = _root->Compress(data);
-    return Concatenate(compressionResults);
+    return CudaArrayCopy().Concatenate(compressionResults);
 }
 
 SharedCompressionNodePtr DecompressNodes(SharedCudaPtr<char> compressed_data, size_t& offset)
