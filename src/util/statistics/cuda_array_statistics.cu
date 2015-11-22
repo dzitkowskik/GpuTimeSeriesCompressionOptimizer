@@ -146,11 +146,10 @@ T CudaArrayStatistics::Mean(SharedCudaPtr<T> data)
 	return sum / data->size();
 }
 
-
 template<typename T>
-Statistics<T> CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<T> data)
+Statistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 {
-	Statistics<T> stats;
+	Statistics stats;
 	auto minMax = MinMax(data);
 	stats.min = std::get<0>(minMax);
 	stats.max = std::get<1>(minMax);
@@ -160,6 +159,22 @@ Statistics<T> CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<T> data)
 	stats.rlMetric = RlMetric(data);
 	stats.mean = Mean(data);
 	return stats;
+}
+
+// TODO: Make this a common template in header file and use everywhere
+Statistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data, DataType type)
+{
+	switch(type)
+	{
+		case DataType::d_int:
+			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
+		case DataType::d_float:
+			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<float>>(data));
+		case DataType::d_double:
+			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<double>>(data));
+		default:
+			throw NotImplementedException("No CudaArrayStatistics::GenerateStatistics implementation for that type");
+	}
 }
 
 #define CUDA_ARRAY_STATISTICS_SPEC(X) \
@@ -172,8 +187,7 @@ Statistics<T> CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<T> data)
     template float CudaArrayStatistics::RlMetric<X,4>(SharedCudaPtr<X>); \
     template float CudaArrayStatistics::RlMetric<X,5>(SharedCudaPtr<X>); \
     template float CudaArrayStatistics::RlMetric<X,6>(SharedCudaPtr<X>); \
-    template X CudaArrayStatistics::Mean<X>(SharedCudaPtr<X> data); \
-    template Statistics<X> CudaArrayStatistics::GenerateStatistics<X>(SharedCudaPtr<X>);
+    template X CudaArrayStatistics::Mean<X>(SharedCudaPtr<X> data);
 FOR_EACH(CUDA_ARRAY_STATISTICS_SPEC, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

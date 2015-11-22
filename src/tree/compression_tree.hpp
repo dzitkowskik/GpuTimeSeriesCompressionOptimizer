@@ -17,6 +17,7 @@ class CompressionTree
 {
 public:
 	CompressionTree();
+	CompressionTree(EncodingType et, DataType dt);
 	~CompressionTree();
 	CompressionTree(const CompressionTree& other);
 
@@ -35,6 +36,8 @@ public:
     size_t GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type);
 
     void Print();
+
+    std::vector<CompressionTree> CrossTree(std::vector<CompressionTree> subtrees);
 
 private:
     uint GetNextNo();

@@ -10,22 +10,22 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
+#include "compression/data_type.hpp"
 
 namespace ddj
 {
 
 __host__ __device__ int _getFloatPrecision(float number);
 
-template<typename T>
 struct Statistics
 {
-	T min;
-	T max;
+	double min;
+	double max;
 	char minBitCnt;
 	int precision;
 	bool sorted;
 	float rlMetric;
-	T mean;
+	double mean;
 };
 
 class CudaArrayStatistics
@@ -38,7 +38,10 @@ public:
     template<typename T, int N=3> float RlMetric(SharedCudaPtr<T> data);
     template<typename T> T Mean(SharedCudaPtr<T> data);
 
-    template<typename T> Statistics<T> GenerateStatistics(SharedCudaPtr<T> data);
+    Statistics GenerateStatistics(SharedCudaPtr<char> data, DataType type);
+
+private:
+    template<typename T> Statistics getStatistics(SharedCudaPtr<T> data);
 
 private:
     ExecutionPolicy _policy;

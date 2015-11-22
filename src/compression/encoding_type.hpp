@@ -25,6 +25,7 @@ enum class EncodingType {
     none,
     floatToInt,
     constData,
+    gfc,
     length
 };
 
@@ -42,6 +43,7 @@ inline std::string GetEncodingTypeString(EncodingType type)
 		case EncodingType::rle: return "rle";
 		case EncodingType::scale: return "scale";
 		case EncodingType::unique: return "unique";
+		case EncodingType::gfc: return "gfc";
 		default: throw NotImplementedException("This encoding type is not implemented");
 	}
 }

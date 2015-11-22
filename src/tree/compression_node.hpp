@@ -15,6 +15,7 @@
 #include "compression/encoding_type.hpp"
 #include "compression/data_type.hpp"
 #include "compression/encoding_factory.hpp"
+#include "compression/default_encoding_factory.hpp"
 
 namespace ddj {
 
@@ -53,15 +54,15 @@ public:
     void SetMetadata(SharedCudaPtr<char> metadata);
     void SetData(SharedCudaPtr<char> data);
 
-    template<typename T> static
-    SharedCompressionNodePtr make_shared(DataType type)
-    {
-    	return boost::make_shared<CompressionNode>(boost::make_shared<T>(type));
-    }
-
     size_t PredictCompressionSize(SharedCudaPtr<char> data, DataType type);
 
     void Print();
+
+public:
+    static SharedCompressionNodePtr make_shared(EncodingType et, DataType dt)
+    {
+    	return boost::make_shared<CompressionNode>(DefaultEncodingFactory().Get(et, dt));
+    }
 
 private:
     SharedCudaPtr<char> PrepareMetadata(SharedCudaPtr<char> encodingMetadata);

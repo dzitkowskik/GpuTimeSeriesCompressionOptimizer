@@ -188,7 +188,9 @@ TEST_F(CudaArrayStatisticsTest, Mean_Consecutive_Int)
 
 TEST_F(CudaArrayStatisticsTest, GenerateStatistics_noexception_Double_RandomData)
 {
-	CudaArrayStatistics().GenerateStatistics(GetDoubleRandomData());
+	CudaArrayStatistics().GenerateStatistics(
+			CastSharedCudaPtr<double, char>(GetDoubleRandomData()),
+			DataType::d_double);
 }
 
 } /* namespace ddj */

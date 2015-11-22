@@ -14,8 +14,8 @@
 #include <boost/bind.hpp>
 
 
-namespace ddj {
 
+namespace ddj {
 CompressionTree::CompressionTree() : _nextNo(0) {}
 CompressionTree::~CompressionTree(){}
 CompressionTree::CompressionTree(const CompressionTree& other)
@@ -146,8 +146,22 @@ void CompressionTree::Print()
 	std::cout << std::endl;
 }
 
+std::vector<CompressionTree> CompressionTree::CrossTree(std::vector<CompressionTree> subtrees)
+{
+	std::vector<CompressionTree> result;
+	for(auto& subtree : subtrees)
+	{
+		auto treeCopy = *this;
+		treeCopy.AddNode(subtree.FindNode(0), 0);
+		result.push_back(treeCopy);
+	}
+	return result;
+}
 
-
+CompressionTree::CompressionTree(EncodingType et, DataType dt)
+{
+	this->AddNode(CompressionNode::make_shared(et, dt), 0);
+}
 
 
 

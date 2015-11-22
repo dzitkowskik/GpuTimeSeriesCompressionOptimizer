@@ -11,6 +11,7 @@
 #include "compression/encoding_type.hpp"
 #include "compression/data_type.hpp"
 #include "tree/compression_tree.hpp"
+#include "util/statistics/cuda_array_statistics.hpp"
 
 #include <vector>
 #include <list>
@@ -26,6 +27,16 @@ class PathGenerator
 public:
 	PathList GeneratePaths();
 	CompressionTree GenerateTree(Path path, DataType type);
+	Path GetContinuations(EncodingType et, DataType dt, Statistics stats);
+	std::vector<CompressionTree> CrossTrees(
+			std::vector<CompressionTree> parents,
+			std::vector<CompressionTree> children);
+	std::vector<CompressionTree> Phase1(
+			SharedCudaPtr<char> data,
+			EncodingType et,
+			DataType dt,
+			Statistics stats,
+			int level);
 };
 
 } /* namespace ddj */
