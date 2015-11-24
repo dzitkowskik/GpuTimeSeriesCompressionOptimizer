@@ -49,6 +49,28 @@ private:
 	ExecutionPolicy _policy;
 };
 
+class GfcEncodingFactory : public EncodingFactory
+{
+public:
+	GfcEncodingFactory(DataType dt)
+		: EncodingFactory(dt, EncodingType::gfc)
+	{}
+	~GfcEncodingFactory(){}
+	GfcEncodingFactory(const GfcEncodingFactory& other)
+		: EncodingFactory(other.dataType, EncodingType::gfc)
+	{}
+
+	boost::shared_ptr<Encoding> Get()
+	{
+		return boost::make_shared<GfcEncoding>();
+	}
+
+	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
+	{
+		return Get();
+	}
+};
+
 } /* namespace ddj */
 
 #endif /* GFC_ENCODING_HPP_ */

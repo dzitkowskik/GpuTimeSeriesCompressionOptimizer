@@ -39,6 +39,8 @@ public:
 
 	boost::shared_ptr<Encoding> Get(SharedCudaPtr<char> data)
 	{
+		if(data->size() <= 0) return Get();
+
 		auto minMax = CudaArrayStatistics().MinMax(CastSharedCudaPtr<char, T>(data));
 		T min = std::get<0>(minMax);
 		T max = std::get<1>(minMax);

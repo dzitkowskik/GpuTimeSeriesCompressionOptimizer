@@ -37,7 +37,7 @@ TEST_P(PatchCompressionTest, OutsidePatch_CompressionOfRandomInts_data)
 	);
 }
 
-TEST_P(PatchCompressionTest, OutsidePatch_CompressionOfRandomInts_bigData)
+TEST_P(PatchCompressionTest, DISABLED_OutsidePatch_CompressionOfRandomInts_bigData)
 {
 	OutsidePatchEncoding encoder(501, 5000);
 	EXPECT_TRUE(

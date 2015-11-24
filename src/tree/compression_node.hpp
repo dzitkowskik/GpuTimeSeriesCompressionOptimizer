@@ -58,6 +58,8 @@ public:
 
     void Print();
 
+    SharedCompressionNodePtr Copy();
+
 public:
     static SharedCompressionNodePtr make_shared(EncodingType et, DataType dt)
     {

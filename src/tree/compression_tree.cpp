@@ -163,6 +163,13 @@ CompressionTree::CompressionTree(EncodingType et, DataType dt)
 	this->AddNode(CompressionNode::make_shared(et, dt), 0);
 }
 
+CompressionTree CompressionTree::Copy()
+{
+	CompressionTree tree;
+	tree._nextNo = this->_nextNo;
+	tree._root = this->_root->Copy();
+	return tree;
+}
 
 
 

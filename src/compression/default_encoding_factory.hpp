@@ -22,6 +22,7 @@
 #include "compression/afl/afl_encoding.hpp"
 #include "compression/const/const_encoding.hpp"
 #include "compression/float/float_encoding.hpp"
+#include "compression/gfc/gfc_encoding.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -61,6 +62,8 @@ public:
 				return boost::make_shared<UniqueEncodingFactory>(dataType);
 			case EncodingType::afl:
 				return boost::make_shared<AflEncodingFactory>(dataType);
+			case EncodingType::gfc:
+				return boost::make_shared<GfcEncodingFactory>(dataType);
 			case EncodingType::constData:
 				return boost::make_shared<ConstEncodingFactory>(dataType);
 			case EncodingType::floatToInt:

@@ -21,17 +21,25 @@ namespace ddj
 
 using Path = std::vector<EncodingType>;
 using PathList = std::list<Path>;
+using PossibleTree = std::pair<CompressionTree, size_t>;
 
 class PathGenerator
 {
 public:
 	PathList GeneratePaths();
 	CompressionTree GenerateTree(Path path, DataType type);
-	Path GetContinuations(EncodingType et, DataType dt, Statistics stats);
-	std::vector<CompressionTree> CrossTrees(
-			std::vector<CompressionTree> parents,
-			std::vector<CompressionTree> children);
-	std::vector<CompressionTree> Phase1(
+	Path GetContinuations(EncodingType et, DataType dt, Statistics stats, int level);
+
+	std::vector<PossibleTree> CrossTrees(
+			PossibleTree parent,
+			std::vector<PossibleTree> children);
+
+	std::vector<PossibleTree> CrossTrees(
+			PossibleTree parent,
+			std::vector<PossibleTree> childrenLeft,
+			std::vector<PossibleTree> childrenRight);
+
+	std::vector<PossibleTree> Phase1(
 			SharedCudaPtr<char> data,
 			EncodingType et,
 			DataType dt,

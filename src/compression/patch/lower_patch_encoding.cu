@@ -34,7 +34,10 @@ template<typename T>
 SharedCudaPtrVector<char> LowerPatchEncoding::Encode(SharedCudaPtr<T> data)
 {
 	if(data->size() <= 0)
-		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+		return SharedCudaPtrVector<char>{
+			CudaPtr<char>::make_shared(),
+			CudaPtr<char>::make_shared(),
+			CudaPtr<char>::make_shared()};
 
     int size = data->size();
 

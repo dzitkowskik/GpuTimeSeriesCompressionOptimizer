@@ -12,6 +12,8 @@
 #include <boost/assign/list_of.hpp>
 #include <iostream>
 
+#define MAX_LEVEL 3
+
 namespace ddj
 {
 
@@ -82,94 +84,143 @@ CompressionTree PathGenerator::GenerateTree(Path path, DataType type)
 	return tree;
 }
 
-Path PathGenerator::GetContinuations(EncodingType et, DataType dt, Statistics stats)
+Path PathGenerator::GetContinuations(EncodingType et, DataType dt, Statistics stats, int level)
 {
 	Path result;
 
 	if(et == EncodingType::afl || et == EncodingType::gfc) return result;
 
-	// DELTA
-	if(et != EncodingType::delta)
-		result.push_back(EncodingType::delta);
-
-	// SCALE
-	if(et != EncodingType::scale && stats.min != 0)
-		result.push_back(EncodingType::scale);
-
-	// FLOAT
-	if(et != EncodingType::floatToInt)
+	if(level < MAX_LEVEL)
 	{
-		if(dt != DataType::d_float || dt != DataType::d_double)
-			result.push_back(EncodingType::floatToInt);
-	}
+		// DELTA
+		if(et != EncodingType::delta)
+			result.push_back(EncodingType::delta);
 
-	// PATCH
-	if(et != EncodingType::patch)
-		result.push_back(EncodingType::patch);
+		// SCALE
+		if(et != EncodingType::scale && stats.min != 0)
+			result.push_back(EncodingType::scale);
 
-	// DICT
-	if(et != EncodingType::dict)
-		result.push_back(EncodingType::dict);
+		// FLOAT
+		if(et != EncodingType::floatToInt)
+		{
+			if(dt != DataType::d_float || dt != DataType::d_double)
+				result.push_back(EncodingType::floatToInt);
+		}
 
-	if(stats.sorted || stats.rlMetric > 2)
-	{
-		// CONST
-		if(et != EncodingType::constData)
-			result.push_back(EncodingType::constData);
+		// PATCH
+		if(et != EncodingType::patch)
+			result.push_back(EncodingType::patch);
 
-		// RLE
-		if(et != EncodingType::rle)
-			result.push_back(EncodingType::rle);
+		// DICT
+		if(et != EncodingType::dict)
+			result.push_back(EncodingType::dict);
+
+		if(stats.sorted || stats.rlMetric > 2)
+		{
+			// CONST
+			if(et != EncodingType::constData)
+				result.push_back(EncodingType::constData);
+
+			// RLE
+			if(et != EncodingType::rle)
+				result.push_back(EncodingType::rle);
+		}
 	}
 
 	// AFL & GFC
-	result.push_back(EncodingType::afl);
-	result.push_back(EncodingType::gfc);
+	if(dt == DataType::d_float || dt == DataType::d_double)
+		result.push_back(EncodingType::gfc);
+	else
+		result.push_back(EncodingType::afl);
 
 	return result;
 }
 
-std::vector<CompressionTree> PathGenerator::CrossTrees(
-		std::vector<CompressionTree> parents,
-		std::vector<CompressionTree> children)
+std::vector<PossibleTree> PathGenerator::CrossTrees(
+		PossibleTree parent,
+		std::vector<PossibleTree> children)
 {
-	std::vector<CompressionTree> result = parents;
-	for(auto& p : parents)
+	std::vector<PossibleTree> results;
+	for(auto& child : children)
 	{
-		auto part = p.CrossTree(children);
-		result.insert(result.end(), part.begin(), part.end());
+		auto tree = parent.first.Copy();
+		auto root = child.first.FindNode(0)->Copy();
+		tree.AddNode(root, 0);
+		results.push_back(std::make_pair(tree, child.second));
 	}
-	result;
+	return results;
 }
 
-std::vector<CompressionTree> PathGenerator::Phase1(
+std::vector<PossibleTree> PathGenerator::CrossTrees(
+		PossibleTree parent,
+		std::vector<PossibleTree> childrenLeft,
+		std::vector<PossibleTree> childrenRight)
+{
+	std::vector<PossibleTree> results;
+	for(auto& childLeft : childrenLeft)
+	{
+		for(auto& childRight : childrenRight)
+		{
+			printf("a\n");
+			auto tree = parent.first.Copy();
+			tree.AddNode(childLeft.first.FindNode(0)->Copy(), 0);
+			tree.AddNode(childRight.first.FindNode(0)->Copy(), 0);
+			results.push_back(std::make_pair(tree, childLeft.second + childRight.second));
+		}
+	}
+	return results;
+}
+
+std::vector<PossibleTree> PathGenerator::Phase1(
 		SharedCudaPtr<char> data,
 		EncodingType et,
 		DataType dt,
 		Statistics stats,
 		int level)
 {
+	Path cont;
 	DefaultEncodingFactory factory;
 	CudaArrayStatistics crs;
-	std::vector<CompressionTree> result;
-	std::vector<CompressionTree> part;
-	if(level == 3) return result;
-	auto cont = GetContinuations(et, dt, stats);
+	std::vector<PossibleTree> result;
+	std::vector<PossibleTree> part1, part2;
+	PossibleTree parent;
+	printf("phase1 data size = %lu\n", data->size());
+	cont = GetContinuations(et, dt, stats, level);
 	for(auto& c : cont)
 	{
-		result.push_back(CompressionTree(c, dt));
+		printf("Enc type = %s\n", GetEncodingTypeString(c).c_str());
+		parent.first = CompressionTree(c, dt);
 		auto encoding = factory.Get(c, dt)->Get(data);
+		printf("try to encode\n");
 		auto compr = encoding->Encode(data, dt);
+		printf("encoded\n");
+		parent.second = compr[0]->size();
+		printf("try to gen stats\n");
 		stats = crs.GenerateStatistics(data, dt);
-
-		part = Phase1(compr[1], c, dt, stats, level+1);
-		result = CrossTrees(result, part);
-
-		if(encoding->GetNumberOfResults() > 1)
+		printf("compr size = %d\n", compr.size());
+		if(encoding->GetNumberOfResults() == 1)
 		{
-			part = Phase1(compr[2], c, dt, stats, level+1);
-			result = CrossTrees(result, part);
+			printf("s1\n");
+			parent.second += compr[1]->size();
+			part1 = Phase1(compr[1], c, dt, stats, level+1);
+			part1 = CrossTrees(parent, part1);
+			printf("e1\n");
 		}
+		else if(encoding->GetNumberOfResults() == 2)
+		{
+			printf("s2\n");
+			parent.second += compr[1]->size();
+			part1 = Phase1(compr[1], c, dt, stats, level+1);
+			parent.second += compr[2]->size();
+			part2 = Phase1(compr[2], c, dt, stats, level+1);
+			part1 = CrossTrees(parent, part1, part2);
+			printf("e2\n");
+		}
+
+		if(part1.size() == 0)
+			part1 = std::vector<PossibleTree> { parent };
+
+		result.insert(result.end(), part1.begin(), part1.end());
 	}
 
 	return result;

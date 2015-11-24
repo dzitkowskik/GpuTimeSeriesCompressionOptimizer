@@ -15,6 +15,9 @@ namespace ddj
 	template<typename T>
 	SharedCudaPtrVector<char> FloatEncoding::Encode(SharedCudaPtr<T> data)
 	{
+		if(data->size() <= 0)
+			return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 		int precision = CudaArrayStatistics().Precision(data);
 
 		FloatingPointToIntegerOperator<T, int> op { precision };
@@ -28,6 +31,9 @@ namespace ddj
 	template<typename T>
 	SharedCudaPtr<T> FloatEncoding::Decode(SharedCudaPtrVector<char> input)
 	{
+		if(input[1]->size() <= 0)
+			return CudaPtr<T>::make_shared();
+
 		auto metadata = input[0];
 		auto data = MoveSharedCudaPtr<char, int>(input[1]);
 

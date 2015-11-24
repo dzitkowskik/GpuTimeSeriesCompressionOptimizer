@@ -103,4 +103,17 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
 	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
 }
 
+TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt)
+{
+	auto data = CastSharedCudaPtr<int, char>(GetIntRandomData());
+
+	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
+
+	auto results = PathGenerator().Phase1(data, EncodingType::none, DataType::d_int, stats, 0);
+
+	printf("number of trees = %d\n", results.size());
+	for(auto& result : results)
+		result.first.Print();
+}
+
 }

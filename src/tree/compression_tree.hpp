@@ -32,11 +32,9 @@ public:
     bool AddNode(SharedCompressionNodePtr node, uint parentNo);
     bool RemoveNode(uint nodeNo);
     void Reset();
-
+    CompressionTree Copy();
     size_t GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type);
-
     void Print();
-
     std::vector<CompressionTree> CrossTree(std::vector<CompressionTree> subtrees);
 
 private:

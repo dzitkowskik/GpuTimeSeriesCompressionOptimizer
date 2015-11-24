@@ -158,7 +158,19 @@ void CompressionNode::Print()
 }
 
 
+SharedCompressionNodePtr CompressionNode::Copy()
+{
+	CompressionNode* node = new CompressionNode(this->_encodingFactory);
+	node->_isLeaf = this->_isLeaf;
+	node->_nodeNo = this->_nodeNo;
+	node->_parentNo = this->_parentNo;
+	node->_encodingType = this->_encodingType;
+	node->_dataType = this->_dataType;
+	for(auto& child : this->_children)
+		node->_children.push_back(child->Copy());
 
+	return boost::shared_ptr<CompressionNode>(node);
+}
 
 
 

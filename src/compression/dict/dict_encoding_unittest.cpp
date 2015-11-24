@@ -34,7 +34,7 @@ TEST_P(DictEncodingTest, CompressionOfRandomInts_data)
 	);
 }
 
-TEST_P(DictEncodingTest, CompressionOfRandomInts_bigData)
+TEST_P(DictEncodingTest, DISABLED_CompressionOfRandomInts_bigData)
 {
 	DictEncoding encoder;
 	EXPECT_TRUE(

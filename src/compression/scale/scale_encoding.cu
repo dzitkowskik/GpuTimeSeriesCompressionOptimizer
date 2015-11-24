@@ -28,6 +28,9 @@ __global__ void scaleEncodeKernel(T* data, int size, T* result_data, T min, T* r
 template<typename T>
 SharedCudaPtrVector<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 	// ALLOCATE RESULTS
 	auto result_data = CudaPtr<char>::make_shared(data->size()*sizeof(T));
 	auto result_metadata = CudaPtr<char>::make_shared(sizeof(T));
@@ -61,6 +64,9 @@ __global__ void scaleDecodeKernel(T* data, int size, T* result, T* min)
 template<typename T>
 SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	if(input[1]->size() <= 0)
+		return CudaPtr<T>::make_shared();
+
 	auto metadata = input[0];
 	auto data = input[1];
 

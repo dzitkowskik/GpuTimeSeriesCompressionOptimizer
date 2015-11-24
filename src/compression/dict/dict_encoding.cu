@@ -66,6 +66,12 @@ SharedCudaPtr<int> DictEncoding::GetMostFrequentStencil(
 template<typename T>
 SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{
+			CudaPtr<char>::make_shared(),
+			CudaPtr<char>::make_shared(),
+			CudaPtr<char>::make_shared()};
+
 	auto mostFrequent = Histogram().GetMostFrequent(data, this->_freqCnt);
     auto mostFrequentStencil = GetMostFrequentStencil(data, mostFrequent);
     auto splittedData = this->_splitter.Split(data, mostFrequentStencil);
@@ -84,6 +90,9 @@ SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
 template<typename T>
 SharedCudaPtr<T> DictEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	if(input[1]->size() <= 0 && input[2]->size() <= 0)
+		return CudaPtr<T>::make_shared();
+
 	// UNPACK STENCIL
 	auto stencil = Stencil(input[0]);
 	auto mostFrequentCompressed = input[1];
