@@ -103,7 +103,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
 	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
 }
 
-TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt)
+TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt_CompressByBestTree)
 {
 	auto randomInt = GetIntRandomData();
 	auto data = CastSharedCudaPtr<int, char>(randomInt);
@@ -114,7 +114,7 @@ TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt)
 //	for(auto& tree : results)
 //		tree.first.Print(tree.second);
 	results[0].first.Fix();
-	results[0].first.Print();
+//	results[0].first.Print();
 	auto compressed = results[0].first.Compress(data);
 	CompressionTree t;
 	auto decompressed = t.Decompress(compressed);
