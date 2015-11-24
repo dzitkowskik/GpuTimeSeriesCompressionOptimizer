@@ -172,7 +172,14 @@ SharedCompressionNodePtr CompressionNode::Copy()
 	return boost::shared_ptr<CompressionNode>(node);
 }
 
-
+void CompressionNode::Fix()
+{
+	if(_isLeaf)
+		this->AddChild(boost::make_shared<CompressionNode>(
+				DefaultEncodingFactory().Get(EncodingType::none, _dataType)));
+	else
+		for(auto& child : _children) child->Fix();
+}
 
 
 

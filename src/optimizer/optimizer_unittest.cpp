@@ -105,15 +105,23 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
 
 TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt)
 {
-	auto data = CastSharedCudaPtr<int, char>(GetIntRandomData());
-
+	auto randomInt = GetIntRandomData();
+	auto data = CastSharedCudaPtr<int, char>(randomInt);
 	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
-
 	auto results = PathGenerator().Phase1(data, EncodingType::none, DataType::d_int, stats, 0);
-
 	printf("number of trees = %d\n", results.size());
-	for(auto& result : results)
-		result.first.Print();
+	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
+//	for(auto& tree : results)
+//		tree.first.Print(tree.second);
+	results[0].first.Fix();
+	results[0].first.Print();
+	auto compressed = results[0].first.Compress(data);
+	CompressionTree t;
+	auto decompressed = t.Decompress(compressed);
+
+	EXPECT_TRUE( CompareDeviceArrays(randomInt->get(), CastSharedCudaPtr<char, int>(decompressed)->get(), GetSize()));
+	printf("best tree statistic: %lu\n", results[0].second);
+	printf("compressed data size: %lu\n", compressed->size());
 }
 
 }

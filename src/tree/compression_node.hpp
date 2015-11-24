@@ -57,6 +57,7 @@ public:
     size_t PredictCompressionSize(SharedCudaPtr<char> data, DataType type);
 
     void Print();
+    void Fix();
 
     SharedCompressionNodePtr Copy();
 

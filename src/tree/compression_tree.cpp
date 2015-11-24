@@ -140,9 +140,10 @@ size_t CompressionTree::GetPredictedSizeAfterCompression(SharedCudaPtr<char> dat
 	return _root->PredictCompressionSize(data, type);
 }
 
-void CompressionTree::Print()
+void CompressionTree::Print(size_t performance)
 {
 	this->_root->Print();
+	if(performance != 0) std::cout << "  -  " << performance;
 	std::cout << std::endl;
 }
 
@@ -171,6 +172,10 @@ CompressionTree CompressionTree::Copy()
 	return tree;
 }
 
+void CompressionTree::Fix()
+{
+	this->_root->Fix();
+}
 
 
 

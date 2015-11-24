@@ -34,7 +34,8 @@ public:
     void Reset();
     CompressionTree Copy();
     size_t GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type);
-    void Print();
+    void Print(size_t performance = 0);
+    void Fix();
     std::vector<CompressionTree> CrossTree(std::vector<CompressionTree> subtrees);
 
 private:

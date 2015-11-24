@@ -164,7 +164,6 @@ Statistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 // TODO: Make this a common template in header file and use everywhere
 Statistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data, DataType type)
 {
-	printf("gen stats data size = %lu\n", data->size());
 	if(data->size() <= 0) return Statistics();
 	switch(type)
 	{

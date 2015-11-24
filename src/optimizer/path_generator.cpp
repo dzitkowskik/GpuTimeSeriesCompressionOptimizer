@@ -161,7 +161,6 @@ std::vector<PossibleTree> PathGenerator::CrossTrees(
 	{
 		for(auto& childRight : childrenRight)
 		{
-			printf("a\n");
 			auto tree = parent.first.Copy();
 			tree.AddNode(childLeft.first.FindNode(0)->Copy(), 0);
 			tree.AddNode(childRight.first.FindNode(0)->Copy(), 0);
@@ -181,40 +180,30 @@ std::vector<PossibleTree> PathGenerator::Phase1(
 	Path cont;
 	DefaultEncodingFactory factory;
 	CudaArrayStatistics crs;
-	std::vector<PossibleTree> result;
-	std::vector<PossibleTree> part1, part2;
+	std::vector<PossibleTree> result, part1, part2;
 	PossibleTree parent;
-	printf("phase1 data size = %lu\n", data->size());
+
 	cont = GetContinuations(et, dt, stats, level);
 	for(auto& c : cont)
 	{
-		printf("Enc type = %s\n", GetEncodingTypeString(c).c_str());
 		parent.first = CompressionTree(c, dt);
 		auto encoding = factory.Get(c, dt)->Get(data);
-		printf("try to encode\n");
 		auto compr = encoding->Encode(data, dt);
-		printf("encoded\n");
 		parent.second = compr[0]->size();
-		printf("try to gen stats\n");
 		stats = crs.GenerateStatistics(data, dt);
-		printf("compr size = %d\n", compr.size());
 		if(encoding->GetNumberOfResults() == 1)
 		{
-			printf("s1\n");
 			parent.second += compr[1]->size();
 			part1 = Phase1(compr[1], c, dt, stats, level+1);
 			part1 = CrossTrees(parent, part1);
-			printf("e1\n");
 		}
 		else if(encoding->GetNumberOfResults() == 2)
 		{
-			printf("s2\n");
 			parent.second += compr[1]->size();
 			part1 = Phase1(compr[1], c, dt, stats, level+1);
 			parent.second += compr[2]->size();
 			part2 = Phase1(compr[2], c, dt, stats, level+1);
 			part1 = CrossTrees(parent, part1, part2);
-			printf("e2\n");
 		}
 
 		if(part1.size() == 0)
