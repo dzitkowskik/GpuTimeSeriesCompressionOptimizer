@@ -37,7 +37,13 @@ PathList PathGenerator::GeneratePaths()
 					}
 			)
 			(Path {EncodingType::constData, EncodingType::afl, EncodingType::none})
-			(Path {EncodingType::rle, EncodingType::afl, EncodingType::none})
+			(Path
+					{
+					EncodingType::rle,
+						EncodingType::afl, EncodingType::none,
+						EncodingType::afl, EncodingType::none
+					}
+			)
 			(Path {EncodingType::afl, EncodingType::none})
 			(Path
 					{

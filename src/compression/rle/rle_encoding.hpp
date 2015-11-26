@@ -31,7 +31,7 @@ public:
 	RleEncoding(RleEncoding&&) = default;
 
 public:
-	unsigned int GetNumberOfResults() { return 1; }
+	unsigned int GetNumberOfResults() { return 2; }
 
 	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
 	{
@@ -43,25 +43,13 @@ public:
 
 protected:
 	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data)
-	{
-		return this->Encode<int>(data);
-	}
-
+	{ return this->Encode<int>(data); }
 	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data)
-	{
-		return this->Decode<int>(data);
-	}
-
+	{ return this->Decode<int>(data); }
 	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data)
-	{
-		return this->Encode<float>(data);
-	}
-
+	{ return this->Encode<float>(data); }
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data)
-	{
-		return this->Decode<float>(data);
-	}
-
+	{ return this->Decode<float>(data); }
 	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data)
 	{ return SharedCudaPtrVector<char>(); }
 	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)

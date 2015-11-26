@@ -38,14 +38,17 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
     metadata->fillFromHost((char*)&len, sizeof(int));
 
     // prepare data result
-    int outputSize = len * sizeof(int) + len * sizeof(T);
-    auto result = CudaPtr<char>::make_shared(outputSize);
+    auto resultLengths = CudaPtr<int>::make_shared(len);
+    auto resultValues = CudaPtr<T>::make_shared(len);
 
-    CUDA_CALL( cudaMemcpy(result->get(), lengths.data().get(), len*sizeof(int), CPY_DTD) );
-    auto resultDataPtr = result->get()+(len*sizeof(int));
-    CUDA_CALL( cudaMemcpy(resultDataPtr, output.data().get(), len*sizeof(T), CPY_DTD) );
+    resultLengths->fillFromHost(lengths.data().get(), len);
+    resultValues->fillFromHost(output.data().get(), len);
 
-    return SharedCudaPtrVector<char> {metadata, result};
+    return SharedCudaPtrVector<char> {
+    	metadata,
+    	CastSharedCudaPtr<int, char>(resultLengths),
+    	CastSharedCudaPtr<T, char>(resultValues)
+    };
 }
 
 size_t RleEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)

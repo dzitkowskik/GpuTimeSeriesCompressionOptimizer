@@ -25,9 +25,8 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
 	CUDA_CALL( cudaMemcpy(&length, metadata->get(), sizeof(int), CPY_DTH) );
 
 	// PREPARE INPUT DATA
-	auto data = input[1];
-    int* lengths = reinterpret_cast<int*>(data->get());
-    T* values = reinterpret_cast<T*>(lengths + length);
+    int* lengths = reinterpret_cast<int*>(input[1]->get());
+    T* values = reinterpret_cast<T*>(input[2]->get());
     thrust::device_ptr<int> lengthsPtr(lengths);
     thrust::device_ptr<T> valuesPtr(values);
     thrust::device_vector<int> lengthsVector(lengthsPtr, lengthsPtr + length);
