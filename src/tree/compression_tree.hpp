@@ -10,6 +10,7 @@
 
 #include "compression_node.hpp"
 #include "core/cuda_ptr.hpp"
+#include "tree/compression_statistics.hpp"
 
 namespace ddj {
 
@@ -17,6 +18,8 @@ class CompressionTree
 {
 public:
 	CompressionTree();
+	CompressionTree(SharedCompressionStatisticsPtr stats);
+	CompressionTree(SharedCompressionStatisticsPtr stats, int maxHeight);
 	CompressionTree(EncodingType et, DataType dt);
 	~CompressionTree();
 	CompressionTree(const CompressionTree& other);
@@ -38,12 +41,16 @@ public:
     void Fix();
     std::vector<CompressionTree> CrossTree(std::vector<CompressionTree> subtrees);
 
+    void UpdateStatistics();
+
 private:
     uint GetNextNo();
     void ResetNodeNumbers();
 
 private:
     SharedCompressionNodePtr _root;
+    SharedCompressionStatisticsPtr _stats;
+    int _maxHeight;
     uint _nextNo;
 };
 

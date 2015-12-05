@@ -12,14 +12,32 @@
 
 #include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
-
-
+#include <queue>
 
 namespace ddj {
-CompressionTree::CompressionTree() : _nextNo(0) {}
+
+CompressionTree::CompressionTree() : _nextNo(0), _maxHeight(0){}
+
+CompressionTree::CompressionTree(SharedCompressionStatisticsPtr stats)
+	: _nextNo(0), _maxHeight(5), _stats(stats)
+{}
+CompressionTree::CompressionTree(SharedCompressionStatisticsPtr stats, int maxHeight)
+	: _nextNo(0), _maxHeight(maxHeight), _stats(stats)
+{}
+
 CompressionTree::~CompressionTree(){}
 CompressionTree::CompressionTree(const CompressionTree& other)
-	: _nextNo(other._nextNo), _root(other._root) {}
+	: _nextNo(other._nextNo),
+	  _root(other._root),
+	  _maxHeight(other._maxHeight),
+	  _stats(other._stats)
+{}
+
+CompressionTree::CompressionTree(EncodingType et, DataType dt)
+	: _nextNo(0), _maxHeight(0)
+{
+	this->AddNode(CompressionNode::make_shared(et, dt), 0);
+}
 
 void CompressionTree::Reset()
 {
@@ -80,6 +98,7 @@ bool CompressionTree::RemoveNode(uint no)
 SharedCudaPtr<char> CompressionTree::Compress(SharedCudaPtr<char> data)
 {
     auto compressionResults = _root->Compress(data);
+    if(_stats != nullptr) this->UpdateStatistics();
     return CudaArrayCopy().Concatenate(compressionResults);
 }
 
@@ -159,11 +178,6 @@ std::vector<CompressionTree> CompressionTree::CrossTree(std::vector<CompressionT
 	return result;
 }
 
-CompressionTree::CompressionTree(EncodingType et, DataType dt)
-{
-	this->AddNode(CompressionNode::make_shared(et, dt), 0);
-}
-
 CompressionTree CompressionTree::Copy()
 {
 	CompressionTree tree;
@@ -177,6 +191,38 @@ void CompressionTree::Fix()
 	this->_root->Fix();
 }
 
+void CompressionTree::UpdateStatistics()
+{
+	int max = (1 << (_maxHeight+1)) - 2;
+	int no = 0;
+	std::queue<SharedCompressionNodePtr> fifo;
+	fifo.push(this->_root);
+	CompressionEdge edge;
+
+	auto fake = CompressionNode::make_shared(EncodingType::none, DataType::d_int);
+
+	while(!fifo.empty() && no < max)
+	{
+		auto el = fifo.front(); fifo.pop();
+		auto chld = el->Children();
+
+		if(chld.size() >= 1) {
+			edge = std::make_pair(el->GetEncodingType(), chld[0]->GetEncodingType());
+			_stats->Update(no, edge, chld[0]->GetCompressionRatio());
+			fifo.push(chld[0]);
+		} else {
+			fifo.push(fake);
+		} no++;
+
+		if(chld.size() >= 2) {
+			edge = std::make_pair(el->GetEncodingType(), chld[1]->GetEncodingType());
+			_stats->Update(no, edge, chld[1]->GetCompressionRatio());
+			fifo.push(chld[1]);
+		} else {
+			fifo.push(fake);
+		} no++;
+	}
+}
 
 
 

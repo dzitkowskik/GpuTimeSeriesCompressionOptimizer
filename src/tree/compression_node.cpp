@@ -113,9 +113,15 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 	else
 		for(auto& child : _children)
 		{
-			auto childResult = child->Compress(encodingResult[i++]);	// FIX THAT LINE CAUSES ERROR
+			auto childResult = child->Compress(encodingResult[i++]);
 			result.insert(result.end(), childResult.begin(), childResult.end());
 		}
+
+	// update compression ratio
+	size_t inputSize = data->size();
+	size_t outputSize = 0;
+	for(auto& r : result) outputSize += r->size();
+	this->SetCompressionRatio((double)inputSize/(double)outputSize);
 
 	return result;
 }
@@ -180,13 +186,5 @@ void CompressionNode::Fix()
 	else
 		for(auto& child : _children) child->Fix();
 }
-
-
-
-
-
-
-
-
 
 } /* namespace ddj */

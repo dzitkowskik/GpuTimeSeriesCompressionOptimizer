@@ -51,6 +51,8 @@ public:
     uint GetParentNo();
     void SetParentNo(uint no);
 
+    EncodingType GetEncodingType() { return _encodingType; }
+
     void SetMetadata(SharedCudaPtr<char> metadata);
     void SetData(SharedCudaPtr<char> data);
 
@@ -60,6 +62,10 @@ public:
     void Fix();
 
     SharedCompressionNodePtr Copy();
+    SharedCompressionNodePtrVector& Children() { return _children; }
+
+    void SetCompressionRatio(double ratio) { _compressionRatio = ratio; }
+    double GetCompressionRatio() { return _compressionRatio; }
 
 public:
     static SharedCompressionNodePtr make_shared(EncodingType et, DataType dt)
@@ -82,6 +88,7 @@ private:
     bool _isLeaf;
     uint _nodeNo;
     uint _parentNo;
+    double _compressionRatio;
 };
 
 } /* namespace ddj */

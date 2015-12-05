@@ -9,8 +9,8 @@
 #define DDJ_ENCODING_TYPE_HPP_
 
 #include "core/not_implemented_exception.hpp"
-
 #include <string>
+#include <boost/functional/hash.hpp>
 
 namespace ddj {
 
@@ -49,4 +49,22 @@ inline std::string GetEncodingTypeString(EncodingType type)
 }
 
 } /* namespace ddj */
+
+namespace std {
+
+template <>
+struct hash<std::pair<ddj::EncodingType, ddj::EncodingType> >
+{
+public:
+	size_t operator()(std::pair<ddj::EncodingType, ddj::EncodingType> x) const throw()
+	{
+		size_t result = 0;
+		boost::hash_combine(result, boost::hash_value(x.first));
+		boost::hash_combine(result, boost::hash_value(x.second));
+		return result;
+	}
+};
+
+} /* namespace std */
+
 #endif /* DDJ_ENCODING_TYPE_HPP_ */
