@@ -32,12 +32,16 @@ public:
 
 	std::vector<PossibleTree> CrossTrees(
 			PossibleTree parent,
-			std::vector<PossibleTree> children);
+			std::vector<PossibleTree> children,
+			size_t inputSize,
+			size_t parentMetadataSize);
 
 	std::vector<PossibleTree> CrossTrees(
 			PossibleTree parent,
 			std::vector<PossibleTree> childrenLeft,
-			std::vector<PossibleTree> childrenRight);
+			std::vector<PossibleTree> childrenRight,
+			size_t inputSize,
+			size_t parentMetadataSize);
 
 	std::vector<PossibleTree> Phase1(
 			SharedCudaPtr<char> data,

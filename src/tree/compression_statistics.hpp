@@ -33,10 +33,12 @@ public:
 
 public:
 	void Update(int edgeNo, CompressionEdge edgeType, double compressionRatio);
+	double Get(int edgeNo, CompressionEdge edgeType);
 	CompressionEdge GetAny(int edge);
 	CompressionEdge GetBest(int edge);
 	CompressionEdge GetBest(int edge, EncodingType beginningType);
 	void Print();
+	void PrintShort();
 
 public:
 	static SharedCompressionStatisticsPtr make_shared(int treeHeight)

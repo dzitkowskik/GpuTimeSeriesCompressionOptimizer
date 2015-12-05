@@ -16,7 +16,7 @@
 
 namespace ddj {
 
-CompressionTree::CompressionTree() : _nextNo(0), _maxHeight(0){}
+CompressionTree::CompressionTree() : _nextNo(0), _maxHeight(5){}
 
 CompressionTree::CompressionTree(SharedCompressionStatisticsPtr stats)
 	: _nextNo(0), _maxHeight(5), _stats(stats)
@@ -34,7 +34,7 @@ CompressionTree::CompressionTree(const CompressionTree& other)
 {}
 
 CompressionTree::CompressionTree(EncodingType et, DataType dt)
-	: _nextNo(0), _maxHeight(0)
+	: _nextNo(0), _maxHeight(5)
 {
 	this->AddNode(CompressionNode::make_shared(et, dt), 0);
 }
@@ -98,7 +98,7 @@ bool CompressionTree::RemoveNode(uint no)
 SharedCudaPtr<char> CompressionTree::Compress(SharedCudaPtr<char> data)
 {
     auto compressionResults = _root->Compress(data);
-    if(_stats != nullptr) this->UpdateStatistics();
+    if(_stats != nullptr) this->UpdateStatistics(_stats);
     return CudaArrayCopy().Concatenate(compressionResults);
 }
 
@@ -191,13 +191,14 @@ void CompressionTree::Fix()
 	this->_root->Fix();
 }
 
-void CompressionTree::UpdateStatistics()
+void CompressionTree::UpdateStatistics(SharedCompressionStatisticsPtr stats)
 {
 	int max = (1 << (_maxHeight+1)) - 2;
 	int no = 0;
 	std::queue<SharedCompressionNodePtr> fifo;
 	fifo.push(this->_root);
 	CompressionEdge edge;
+	double ratio = 0;
 
 	auto fake = CompressionNode::make_shared(EncodingType::none, DataType::d_int);
 
@@ -208,7 +209,8 @@ void CompressionTree::UpdateStatistics()
 
 		if(chld.size() >= 1) {
 			edge = std::make_pair(el->GetEncodingType(), chld[0]->GetEncodingType());
-			_stats->Update(no, edge, chld[0]->GetCompressionRatio());
+			ratio = (chld[0]->GetCompressionRatio() + el->GetCompressionRatio()) / 2.0;
+			stats->Update(no, edge, ratio);
 			fifo.push(chld[0]);
 		} else {
 			fifo.push(fake);
@@ -216,7 +218,8 @@ void CompressionTree::UpdateStatistics()
 
 		if(chld.size() >= 2) {
 			edge = std::make_pair(el->GetEncodingType(), chld[1]->GetEncodingType());
-			_stats->Update(no, edge, chld[1]->GetCompressionRatio());
+			ratio = (chld[0]->GetCompressionRatio() + el->GetCompressionRatio()) / 2.0;
+			stats->Update(no, edge, ratio);
 			fifo.push(chld[1]);
 		} else {
 			fifo.push(fake);

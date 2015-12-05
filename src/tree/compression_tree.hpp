@@ -41,7 +41,10 @@ public:
     void Fix();
     std::vector<CompressionTree> CrossTree(std::vector<CompressionTree> subtrees);
 
-    void UpdateStatistics();
+    void UpdateStatistics(SharedCompressionStatisticsPtr stats);
+
+    void SetStatistics(SharedCompressionStatisticsPtr stats) { this->_stats = stats; }
+    SharedCompressionStatisticsPtr GetStatistics() { return this->_stats; }
 
 private:
     uint GetNextNo();

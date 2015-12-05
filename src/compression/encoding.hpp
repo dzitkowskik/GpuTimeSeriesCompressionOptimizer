@@ -58,6 +58,15 @@ public:
 	virtual size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type) = 0;
 	virtual size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type) = 0;
 
+public:
+	static inline double GetCompressionRatio(size_t inputSize, size_t outputSize)
+	{
+		if(outputSize <= 0 || outputSize > inputSize) return 1.0;
+		double is = inputSize;
+		double os = outputSize;
+		return is/os;
+	}
+
 protected:
 	// INT
 	virtual SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data) = 0;

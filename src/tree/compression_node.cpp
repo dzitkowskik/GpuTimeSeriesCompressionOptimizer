@@ -14,7 +14,7 @@
 namespace ddj {
 
 CompressionNode::CompressionNode(SharedEncodingFactoryPtr factory)
-	: _nodeNo(0), _parentNo(0), _isLeaf(true), _encodingFactory(factory)
+	: _nodeNo(0), _parentNo(0), _isLeaf(true), _encodingFactory(factory), _compressionRatio(1.0)
 {
 	_encodingType = factory->encodingType;
 	_dataType = factory->dataType;
@@ -32,6 +32,7 @@ CompressionNode::CompressionNode(const CompressionNode& other)
 	_data = other._data;
 	_metadata = other._metadata;
 	_children = other._children;
+	_compressionRatio = other._compressionRatio;
 }
 
 void CompressionNode::AddChild(SharedCompressionNodePtr node)
@@ -121,7 +122,7 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 	size_t inputSize = data->size();
 	size_t outputSize = 0;
 	for(auto& r : result) outputSize += r->size();
-	this->SetCompressionRatio((double)inputSize/(double)outputSize);
+	this->SetCompressionRatio(Encoding::GetCompressionRatio(inputSize, outputSize));
 
 	return result;
 }
@@ -158,7 +159,7 @@ size_t CompressionNode::PredictCompressionSize(SharedCudaPtr<char> data, DataTyp
 
 void CompressionNode::Print()
 {
-	std::cout << GetEncodingTypeString(this->_encodingType) << ",";
+	std::cout << GetEncodingTypeString(this->_encodingType) << "[" << this->_compressionRatio << "]" << ",";
 	for(auto& child : this->_children)
 		child->Print();
 }
@@ -172,6 +173,7 @@ SharedCompressionNodePtr CompressionNode::Copy()
 	node->_parentNo = this->_parentNo;
 	node->_encodingType = this->_encodingType;
 	node->_dataType = this->_dataType;
+	node->_compressionRatio = this->_compressionRatio;
 	for(auto& child : this->_children)
 		node->_children.push_back(child->Copy());
 
@@ -181,8 +183,12 @@ SharedCompressionNodePtr CompressionNode::Copy()
 void CompressionNode::Fix()
 {
 	if(_isLeaf)
-		this->AddChild(boost::make_shared<CompressionNode>(
-				DefaultEncodingFactory().Get(EncodingType::none, _dataType)));
+	{
+		auto leaf = boost::make_shared<CompressionNode>(
+				DefaultEncodingFactory().Get(EncodingType::none, _dataType));
+		leaf->SetCompressionRatio(1.0);
+		this->AddChild(leaf);
+	}
 	else
 		for(auto& child : _children) child->Fix();
 }

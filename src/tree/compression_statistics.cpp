@@ -27,8 +27,16 @@ namespace ddj
 	{
 		 std::lock_guard<std::mutex> guard(this->_mutex);
 		 if((*_stat)[edgeNo][edgeType] < 1.0) (*_stat)[edgeNo][edgeType] = 1.0;
+		 if(compressionRatio < 1.0) compressionRatio = 1.0;
 		 (*_stat)[edgeNo][edgeType] += compressionRatio;
 		 (*_stat)[edgeNo][edgeType] /= 2.0;
+		 printf("START[%d] %s - %s ---> %f\n",
+				 edgeNo,
+				 GetEncodingTypeString(edgeType.first).c_str(),
+				 GetEncodingTypeString(edgeType.second).c_str(),
+				 compressionRatio);
+		 printf("Value = %f\n", (*_stat)[edgeNo][edgeType]);
+		 printf("END\n");
 	}
 
 	CompressionEdge CompressionStatistics::GetAny(int edge)
@@ -78,6 +86,11 @@ namespace ddj
 		 return bestEdge;
 	}
 
+	double CompressionStatistics::Get(int edgeNo, CompressionEdge edgeType)
+	{
+		return (*_stat)[edgeNo][edgeType];
+	}
+
 	void CompressionStatistics::Print()
 	{
 		printf("Compression tree statistics (tree height = %d)\n", _height);
@@ -92,7 +105,22 @@ namespace ddj
 						edge.second);
 			}
 		}
+	}
 
+	void CompressionStatistics::PrintShort()
+	{
+		printf("Compression tree short statistics (tree height = %d)\n", _height);
+		for(int edgeNo = 0; edgeNo < _stat->size(); edgeNo++)
+		{
+			auto edge = GetBest(edgeNo);
+			auto edgeStat = Get(edgeNo, edge);
+			if(edgeStat > 1.0)
+				printf("[%d]: %s - %s  ===  %lf\n",
+					edgeNo,
+					GetEncodingTypeString(edge.first).c_str(),
+					GetEncodingTypeString(edge.second).c_str(),
+					edgeStat);
+		}
 	}
 
 } /* namespace ddj */

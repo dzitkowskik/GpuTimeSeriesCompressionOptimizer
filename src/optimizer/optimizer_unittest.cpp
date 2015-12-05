@@ -109,7 +109,7 @@ TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt_CompressByBestTree)
 	auto data = CastSharedCudaPtr<int, char>(randomInt);
 	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
 	auto results = PathGenerator().Phase1(data, EncodingType::none, DataType::d_int, stats, 0);
-	printf("number of trees = %d\n", results.size());
+//	printf("number of trees = %d\n", results.size());
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 //	for(auto& tree : results)
 //		tree.first.Print(tree.second);
@@ -120,6 +120,43 @@ TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt_CompressByBestTree)
 	auto decompressed = t.Decompress(compressed);
 
 	EXPECT_TRUE( CompareDeviceArrays(randomInt->get(), CastSharedCudaPtr<char, int>(decompressed)->get(), GetSize()));
+	printf("best tree statistic: %lu\n", results[0].second);
+	printf("compressed data size: %lu\n", compressed->size());
+}
+
+TEST_F(OptimizerTest, PathGenerator_Phase1_Statistics)
+{
+	auto randomInt = GetIntRandomData();
+	auto data = CastSharedCudaPtr<int, char>(randomInt);
+	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
+	auto results = PathGenerator().Phase1(data, EncodingType::none, DataType::d_int, stats, 0);
+//	printf("number of trees = %d\n", results.size());
+	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
+
+	auto comprStats = CompressionStatistics::make_shared(5);
+
+	for(auto& tree : results)
+	{
+		tree.first.Fix();
+		tree.first.UpdateStatistics(comprStats);
+		tree.first.SetStatistics(comprStats);
+	}
+
+	printf("Best tree: \n");
+	results[0].first.Print(results[0].second);
+
+	printf("Before compression\n");
+	comprStats->PrintShort();
+
+	auto compressed = results[0].first.Compress(data);
+	CompressionTree t;
+	auto decompressed = t.Decompress(compressed);
+
+	printf("After compression\n");
+	comprStats->PrintShort();
+
+	EXPECT_TRUE( CompareDeviceArrays(randomInt->get(), CastSharedCudaPtr<char, int>(decompressed)->get(), GetSize()));
+	printf("size of data before compression: %lu\n", data->size());
 	printf("best tree statistic: %lu\n", results[0].second);
 	printf("compressed data size: %lu\n", compressed->size());
 }
