@@ -224,21 +224,4 @@ void CompressionTree::UpdateStatistics()
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 } /* namespace ddj */

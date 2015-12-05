@@ -20,7 +20,7 @@ namespace ddj
 	CompressionStatistics::~CompressionStatistics()
 	{
 		std::lock_guard<std::mutex> guard(this->_mutex);
-		delete [] _stat;
+		delete _stat;
 	}
 
 	void CompressionStatistics::Update(int edgeNo, CompressionEdge edgeType, double compressionRatio)
@@ -30,6 +30,15 @@ namespace ddj
 		 (*_stat)[edgeNo][edgeType] += compressionRatio;
 		 (*_stat)[edgeNo][edgeType] /= 2.0;
 	}
+
+	CompressionEdge CompressionStatistics::GetAny(int edge)
+		{
+			 std::lock_guard<std::mutex> guard(this->_mutex);
+			 CompressionEdge bestEdge;
+			 for(auto& opt : (*_stat)[edge])
+				 bestEdge = opt.first;
+			 return bestEdge;
+		}
 
 	CompressionEdge CompressionStatistics::GetBest(int edge)
 	{

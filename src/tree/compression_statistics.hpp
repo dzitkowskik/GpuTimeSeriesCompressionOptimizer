@@ -33,6 +33,7 @@ public:
 
 public:
 	void Update(int edgeNo, CompressionEdge edgeType, double compressionRatio);
+	CompressionEdge GetAny(int edge);
 	CompressionEdge GetBest(int edge);
 	CompressionEdge GetBest(int edge, EncodingType beginningType);
 	void Print();
