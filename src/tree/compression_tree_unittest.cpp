@@ -320,10 +320,10 @@ TEST_P(CompressionTreeTest, UpdateStatistics_ComplexTree)
 //	printf("size after comrpession = %lu\n", compressed->size()*sizeof(char));
 //	stats->Print();
 
-	EXPECT_EQ(EncodingType::scale, stats->GetAny(0).first);
-	EXPECT_EQ(EncodingType::delta, stats->GetAny(0).second);
-	EXPECT_EQ(EncodingType::patch, stats->GetAny(6).first);
-	EXPECT_EQ(EncodingType::afl, stats->GetAny(6).second);
+	EXPECT_EQ(EncodingType::scale, stats->GetAny(0).type.first);
+	EXPECT_EQ(EncodingType::delta, stats->GetAny(0).type.second);
+	EXPECT_EQ(EncodingType::patch, stats->GetAny(6).type.first);
+	EXPECT_EQ(EncodingType::afl, stats->GetAny(6).type.second);
 
 	ASSERT_EQ(expected->size(), actual->size());
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );

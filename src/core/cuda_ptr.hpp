@@ -73,6 +73,8 @@ public:
 		_size = size*sizeof(T);
 	}
 
+	void clear() { reset(nullptr, 0); }
+
 	void fill(T* ptr, size_t size)
 	{
 		reset(size);

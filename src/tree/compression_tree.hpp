@@ -11,6 +11,7 @@
 #include "compression_node.hpp"
 #include "core/cuda_ptr.hpp"
 #include "tree/compression_statistics.hpp"
+#include "tree/compression_edge.hpp"
 
 namespace ddj {
 
@@ -35,6 +36,7 @@ public:
     bool AddNode(SharedCompressionNodePtr node, uint parentNo);
     bool RemoveNode(uint nodeNo);
     void Reset();
+
     CompressionTree Copy();
     size_t GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type);
     void Print(size_t performance = 0);
@@ -42,9 +44,11 @@ public:
     std::vector<CompressionTree> CrossTree(std::vector<CompressionTree> subtrees);
 
     void UpdateStatistics(SharedCompressionStatisticsPtr stats);
-
     void SetStatistics(SharedCompressionStatisticsPtr stats) { this->_stats = stats; }
     SharedCompressionStatisticsPtr GetStatistics() { return this->_stats; }
+
+    double GetCompressionRatio() { return this->_root->GetCompressionRatio(); }
+    CompressionEdgeVector GetEdges();
 
 private:
     uint GetNextNo();

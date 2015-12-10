@@ -12,9 +12,9 @@ namespace ddj
 	CompressionStatistics::CompressionStatistics(int treeHeight)
 	{
 		std::lock_guard<std::mutex> guard(this->_mutex);
-		size_t size = (1 << (treeHeight+1)) - 2; // 2^(h+1) - 2
-		_stat = new Stat(size);
-		_height = treeHeight;
+		this->_height = treeHeight;
+		size_t size = GetEdgeNumber();
+		this->_stat = new Stat(size);
 	}
 
 	CompressionStatistics::~CompressionStatistics()
@@ -23,36 +23,45 @@ namespace ddj
 		delete _stat;
 	}
 
-	void CompressionStatistics::Update(int edgeNo, CompressionEdge edgeType, double compressionRatio)
+	size_t CompressionStatistics::GetEdgeNumber()
+	{
+		return (1 << (this->_height+1)) - 2; // 2^(h+1) - 2
+	}
+
+	void CompressionStatistics::Update(int edgeNo, EdgeType edgeType, double compressionRatio)
 	{
 		 std::lock_guard<std::mutex> guard(this->_mutex);
 		 if((*_stat)[edgeNo][edgeType] < 1.0) (*_stat)[edgeNo][edgeType] = 1.0;
 		 if(compressionRatio < 1.0) compressionRatio = 1.0;
 		 (*_stat)[edgeNo][edgeType] += compressionRatio;
 		 (*_stat)[edgeNo][edgeType] /= 2.0;
-		 printf("START[%d] %s - %s ---> %f\n",
-				 edgeNo,
-				 GetEncodingTypeString(edgeType.first).c_str(),
-				 GetEncodingTypeString(edgeType.second).c_str(),
-				 compressionRatio);
-		 printf("Value = %f\n", (*_stat)[edgeNo][edgeType]);
-		 printf("END\n");
+//		 printf("START[%d] %s - %s ---> %f\n",
+//				 edgeNo,
+//				 GetEncodingTypeString(edgeType.first).c_str(),
+//				 GetEncodingTypeString(edgeType.second).c_str(),
+//				 compressionRatio);
+//		 printf("Value = %f\n", (*_stat)[edgeNo][edgeType]);
+//		 printf("END\n");
 	}
 
-	CompressionEdge CompressionStatistics::GetAny(int edge)
-		{
-			 std::lock_guard<std::mutex> guard(this->_mutex);
-			 CompressionEdge bestEdge;
-			 for(auto& opt : (*_stat)[edge])
-				 bestEdge = opt.first;
-			 return bestEdge;
-		}
+	EdgeStatistic CompressionStatistics::GetAny(int edge)
+	{
+		 std::lock_guard<std::mutex> guard(this->_mutex);
+		 EdgeType bestEdge;
+		 double bestValue = 1;
+		 for(auto& opt : (*_stat)[edge])
+		 {
+			 bestEdge = opt.first;
+			 bestValue = opt.second;
+		 }
+		 return EdgeStatistic { bestEdge, bestValue };
+	}
 
-	CompressionEdge CompressionStatistics::GetBest(int edge)
+	EdgeStatistic CompressionStatistics::GetBest(int edge)
 	{
 		 std::lock_guard<std::mutex> guard(this->_mutex);
 
-		 CompressionEdge bestEdge;
+		 EdgeType bestEdge;
 		 double bestValue = 1;
 
 		 for(auto& opt : (*_stat)[edge])
@@ -64,14 +73,14 @@ namespace ddj
 			 }
 		 }
 
-		 return bestEdge;
+		 return EdgeStatistic { bestEdge, bestValue };
 	}
 
-	CompressionEdge CompressionStatistics::GetBest(int edge, EncodingType beginningType)
+	EdgeStatistic CompressionStatistics::GetBest(int edge, EncodingType beginningType)
 	{
 		 std::lock_guard<std::mutex> guard(this->_mutex);
 
-		 CompressionEdge bestEdge = std::make_pair(beginningType, EncodingType::none);
+		 EdgeType bestEdge = std::make_pair(beginningType, EncodingType::none);
 		 double bestValue = 1;
 
 		 for(auto& opt : (*_stat)[edge])
@@ -83,10 +92,10 @@ namespace ddj
 			 }
 		 }
 
-		 return bestEdge;
+		 return EdgeStatistic { bestEdge, bestValue };
 	}
 
-	double CompressionStatistics::Get(int edgeNo, CompressionEdge edgeType)
+	double CompressionStatistics::Get(int edgeNo, EdgeType edgeType)
 	{
 		return (*_stat)[edgeNo][edgeType];
 	}
@@ -113,14 +122,27 @@ namespace ddj
 		for(int edgeNo = 0; edgeNo < _stat->size(); edgeNo++)
 		{
 			auto edge = GetBest(edgeNo);
-			auto edgeStat = Get(edgeNo, edge);
-			if(edgeStat > 1.0)
+			if(edge.value > 1.0)
 				printf("[%d]: %s - %s  ===  %lf\n",
 					edgeNo,
-					GetEncodingTypeString(edge.first).c_str(),
-					GetEncodingTypeString(edge.second).c_str(),
-					edgeStat);
+					GetEncodingTypeString(edge.type.first).c_str(),
+					GetEncodingTypeString(edge.type.second).c_str(),
+					edge.value);
 		}
+	}
+
+	void CompressionStatistics::Set(int edgeNo, EdgeType edgeType, double compressionRatio)
+	{
+		(*_stat)[edgeNo][edgeType] = compressionRatio;
+	}
+
+	SharedCompressionStatisticsPtr CompressionStatistics::Copy()
+	{
+		auto result = CompressionStatistics::make_shared(this->_height);
+		for(int i = 0; i < _stat->size(); i++)
+			for(auto& edge : (*_stat)[i])
+				result->Set(i, edge.first, edge.second);
+		return result;
 	}
 
 } /* namespace ddj */

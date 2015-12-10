@@ -191,15 +191,12 @@ void CompressionTree::Fix()
 	this->_root->Fix();
 }
 
-void CompressionTree::UpdateStatistics(SharedCompressionStatisticsPtr stats)
+CompressionEdgeVector CompressionTree::GetEdges()
 {
-	int max = (1 << (_maxHeight+1)) - 2;
-	int no = 0;
+	CompressionEdgeVector result;
+	int max = (1 << (_maxHeight+1)) - 2, no = 0;
 	std::queue<SharedCompressionNodePtr> fifo;
 	fifo.push(this->_root);
-	CompressionEdge edge;
-	double ratio = 0;
-
 	auto fake = CompressionNode::make_shared(EncodingType::none, DataType::d_int);
 
 	while(!fifo.empty() && no < max)
@@ -207,23 +204,33 @@ void CompressionTree::UpdateStatistics(SharedCompressionStatisticsPtr stats)
 		auto el = fifo.front(); fifo.pop();
 		auto chld = el->Children();
 
+		// LEFT
 		if(chld.size() >= 1) {
-			edge = std::make_pair(el->GetEncodingType(), chld[0]->GetEncodingType());
-			ratio = (chld[0]->GetCompressionRatio() + el->GetCompressionRatio()) / 2.0;
-			stats->Update(no, edge, ratio);
+			result.push_back(CompressionEdge(el, chld[0], no));
 			fifo.push(chld[0]);
 		} else {
 			fifo.push(fake);
 		} no++;
 
+		// RIGHT
 		if(chld.size() >= 2) {
-			edge = std::make_pair(el->GetEncodingType(), chld[1]->GetEncodingType());
-			ratio = (chld[0]->GetCompressionRatio() + el->GetCompressionRatio()) / 2.0;
-			stats->Update(no, edge, ratio);
+			result.push_back(CompressionEdge(el, chld[1], no));
 			fifo.push(chld[1]);
 		} else {
 			fifo.push(fake);
 		} no++;
+	}
+
+	return result;
+}
+
+void CompressionTree::UpdateStatistics(SharedCompressionStatisticsPtr stats)
+{
+	auto edges = GetEdges();
+	for(auto& edge : edges)
+	{
+		double ratio = (edge.From()->GetCompressionRatio() + edge.To()->GetCompressionRatio()) / 2.0;
+		stats->Update(edge.GetNo(), edge.GetType(), ratio);
 	}
 }
 

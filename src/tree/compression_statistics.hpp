@@ -21,9 +21,15 @@ namespace ddj
 
 class CompressionStatistics;
 
-using CompressionEdge = std::pair<EncodingType, EncodingType>;
-using Stat = std::vector<std::unordered_map<CompressionEdge, double>>;
+using EdgeType = std::pair<EncodingType, EncodingType>;
+using Stat = std::vector<std::unordered_map<EdgeType, double>>;
 using SharedCompressionStatisticsPtr = boost::shared_ptr<CompressionStatistics>;
+
+struct EdgeStatistic
+{
+	EdgeType type;
+	double value;
+};
 
 class CompressionStatistics
 {
@@ -32,13 +38,17 @@ public:
 	virtual ~CompressionStatistics();
 
 public:
-	void Update(int edgeNo, CompressionEdge edgeType, double compressionRatio);
-	double Get(int edgeNo, CompressionEdge edgeType);
-	CompressionEdge GetAny(int edge);
-	CompressionEdge GetBest(int edge);
-	CompressionEdge GetBest(int edge, EncodingType beginningType);
+	void Update(int edgeNo, EdgeType edgeType, double compressionRatio);
+	void Set(int edgeNo, EdgeType edgeType, double compressionRatio);
+
+	double Get(int edgeNo, EdgeType edgeType);
+	EdgeStatistic GetAny(int edge);
+	EdgeStatistic GetBest(int edge);
+	EdgeStatistic GetBest(int edge, EncodingType beginningType);
 	void Print();
 	void PrintShort();
+	SharedCompressionStatisticsPtr Copy();
+	size_t GetEdgeNumber();
 
 public:
 	static SharedCompressionStatisticsPtr make_shared(int treeHeight)

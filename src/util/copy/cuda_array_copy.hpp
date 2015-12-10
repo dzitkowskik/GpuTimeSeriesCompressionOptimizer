@@ -10,6 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/cuda_stream.hpp"
+#include "core/execution_policy.hpp"
 
 namespace ddj
 {
@@ -26,6 +27,9 @@ public:
 
 	template<typename T>
 	SharedCudaPtr<T> ConcatenateParallel(SharedCudaPtrVector<T> data, SharedCudaStreamVector streams);
+
+private:
+	ExecutionPolicy _policy;
 };
 
 } /* namespace ddj */

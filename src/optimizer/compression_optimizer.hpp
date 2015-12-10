@@ -17,6 +17,8 @@ class CompressionOptimizer
 {
 public:
 	CompressionTree OptimizeTree(SharedCudaPtr<char> data, DataType type);
+
+
 };
 
 } /* namespace ddj */

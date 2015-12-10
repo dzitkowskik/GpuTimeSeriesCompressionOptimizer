@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "core/config.hpp"
+#include <celero/Celero.h>
 
 const char** getBenchmarkFilter(char** argv)
 {
@@ -15,5 +16,6 @@ int main(int argc, char** argv)
 	ddj::Config::GetInstance()->InitOptions(argc, argv, "config.ini");
     ::benchmark::Initialize(&argc, argv);
     ::benchmark::RunSpecifiedBenchmarks();
+    celero::Run(argc, argv);
     return 0;
 }

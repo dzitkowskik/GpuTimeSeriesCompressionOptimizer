@@ -52,6 +52,8 @@ public:
     void SetParentNo(uint no);
 
     EncodingType GetEncodingType() { return _encodingType; }
+    DataType GetDataType() { return _dataType; }
+    SharedEncodingFactoryPtr GetEncodingFactory() { return _encodingFactory; }
 
     void SetMetadata(SharedCudaPtr<char> metadata);
     void SetData(SharedCudaPtr<char> data);
@@ -60,6 +62,7 @@ public:
 
     void Print();
     void Fix();
+    void Reset(SharedEncodingFactoryPtr encodingFactory);
 
     SharedCompressionNodePtr Copy();
     SharedCompressionNodePtrVector& Children() { return _children; }

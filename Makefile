@@ -18,7 +18,7 @@ STANDART := --std=c++11
 NVCC_FLAGS := --cudart static --relocatable-device-code=false --default-stream per-thread
 
 LIBS := -lcudart -lboost_system -lboost_thread -lpthread -lboost_thread \
-	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand
+	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand -lcelero
 
 GENCODE_SM20    := -gencode arch=compute_20,code=sm_20
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30

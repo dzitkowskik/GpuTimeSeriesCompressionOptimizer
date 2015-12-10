@@ -193,4 +193,21 @@ void CompressionNode::Fix()
 		for(auto& child : _children) child->Fix();
 }
 
+void CompressionNode::Reset(SharedEncodingFactoryPtr encodingFactory)
+{
+	// free resources
+	this->_children.clear();
+	this->_data->clear();
+	this->_metadata->clear();
+
+	// this is last and not used yet node
+	this->_isLeaf = true;
+	this->_compressionRatio = 1.0;
+
+	// set new encoding factory
+	this->_encodingFactory = encodingFactory;
+	this->_encodingType = encodingFactory->encodingType;
+	this->_dataType = encodingFactory->dataType;
+}
+
 } /* namespace ddj */
