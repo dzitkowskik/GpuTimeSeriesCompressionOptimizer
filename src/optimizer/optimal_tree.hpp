@@ -24,7 +24,7 @@ public:
 		: _maxHeight(5)
 	{
 		this->_ratio = tree.GetCompressionRatio();
-		this->_tree = tree.Copy();
+		this->_tree = tree;
 		this->_statistics = tree.GetStatistics()->Copy();
 		this-> _maxEdgeNo = (1 << (_maxHeight+1)) - 2;
 

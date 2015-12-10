@@ -197,8 +197,8 @@ void CompressionNode::Reset(SharedEncodingFactoryPtr encodingFactory)
 {
 	// free resources
 	this->_children.clear();
-	this->_data->clear();
-	this->_metadata->clear();
+	if(this->_data != nullptr) this->_data->clear();
+	if(this->_metadata != nullptr) this->_metadata->clear();
 
 	// this is last and not used yet node
 	this->_isLeaf = true;
