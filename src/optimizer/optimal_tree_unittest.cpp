@@ -171,6 +171,48 @@ TEST_F(OptimalTreeTest, Replace_FakedTree_FakedStats_right_ReplaceEdgeOnly)
 	ASSERT_TRUE(result);
 }
 
+TEST_F(OptimalTreeTest, Replace_FakedTree_FakedStats_right_WholeNode)
+{
+	// Prepare tree
+	auto tree = GenerateFakeTree();
+	auto stats = GenerateFakeStatistics();
+	tree.SetStatistics(stats);
+	tree.FindNode(0)->SetCompressionRatio(5.0);
+	OptimalTree optTree(tree);
+
+//	printf("Before:\n");
+//	tree.Print(tree.GetCompressionRatio());
+
+	// Change statistics and compression ratio
+	stats->Set(2, EdgeType {EncodingType::patch, EncodingType::delta}, 4);
+	stats->Set(3, EdgeType {EncodingType::patch, EncodingType::dict}, 4);
+	stats->Set(6, EdgeType {EncodingType::delta, EncodingType::afl}, 6);
+	stats->Set(8, EdgeType {EncodingType::dict, EncodingType::afl}, 5);
+	stats->Set(9, EdgeType {EncodingType::dict, EncodingType::afl}, 5);
+	stats->Set(14, EdgeType {EncodingType::afl, EncodingType::none}, 6);
+	stats->Set(16, EdgeType {EncodingType::afl, EncodingType::none}, 6);
+	stats->Set(17, EdgeType {EncodingType::afl, EncodingType::none}, 6);
+	tree.FindNode(0)->SetCompressionRatio(1.0);
+
+	// Try to correct tree
+	auto result = optTree.TryCorrectTree();
+
+//	printf("After:\n");
+//	tree.Print(tree.GetCompressionRatio());
+
+	for(auto& edge : tree.GetEdges())
+		if(edge.GetNo() == 2)
+		{
+			EXPECT_EQ(EncodingType::patch, edge.GetType().first);
+			EXPECT_EQ(EncodingType::delta, edge.GetType().second);
+		} else if(edge.GetNo() == 3) {
+			EXPECT_EQ(EncodingType::patch, edge.GetType().first);
+			EXPECT_EQ(EncodingType::dict, edge.GetType().second);
+		}
+
+	ASSERT_TRUE(result);
+}
+
 
 } /* namespace ddj */
 
