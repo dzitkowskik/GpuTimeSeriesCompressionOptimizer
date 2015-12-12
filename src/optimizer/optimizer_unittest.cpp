@@ -195,4 +195,40 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_RandomDataParts_Int_Co
 	}
 }
 
+TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_TimeRealData_Compress)
+{
+	int N =3;
+	CompressionOptimizer optimizer;
+	SharedCudaPtrVector<int> timeDataParts;
+	SharedCudaPtrVector<char> compressedDataParts;
+	for(int i = 0; i < N; i++)
+		timeDataParts.push_back(
+				CudaArrayTransform().Cast<time_t, int>(GetNextTsIntDataFromTestFile()));
+
+	// Compress
+	for(int i = 0; i < N; i++)
+	{
+		auto compressedPart = optimizer.CompressData(
+			CastSharedCudaPtr<int, char>(timeDataParts[i]), DataType::d_int);
+		compressedDataParts.push_back(compressedPart);
+
+		optimizer.GetOptimalTree()->GetTree().Print(compressedPart->size());
+		printf("Compression ratio = %lf\n", optimizer.GetOptimalTree()->GetTree().GetCompressionRatio());
+		optimizer.GetStatistics()->PrintShort();
+	}
+
+	// Check
+	CompressionTree decompressionTree;
+	for(int i = 0; i < N; i++)
+	{
+		// Decompress
+		auto decompressedData = CastSharedCudaPtr<char, int>(
+				decompressionTree.Decompress(compressedDataParts[i]));
+		EXPECT_TRUE( CompareDeviceArrays(
+				timeDataParts[i]->get(),
+				decompressedData->get(),
+				timeDataParts[i]->size()) );
+	}
+}
+
 }

@@ -11,7 +11,8 @@
 #include "helpers/helper_device.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
-#include "time_series.h"
+#include "time_series.hpp"
+#include "time_series_reader.hpp"
 
 #include <gtest/gtest.h>
 
@@ -33,6 +34,7 @@ protected:
 	SharedCudaPtr<double> GetDoubleRandomData();
 	SharedCudaPtr<float> GetFloatRandomDataWithMaxPrecision(int maxPrecision);
 	SharedCudaPtr<time_t> GetTsIntDataFromTestFile();
+	SharedCudaPtr<time_t> GetNextTsIntDataFromTestFile();
 	SharedCudaPtr<float> GetTsFloatDataFromTestFile();
 	SharedCudaPtr<int> GetRandomStencilData();
 	SharedCudaPtr<int> GetFakeIntDataForHistogram();
@@ -40,6 +42,7 @@ protected:
 
 protected:
 	CudaArrayGenerator _generator;
+	TimeSeriesReader _tsReader;
 	int _size;
 };
 

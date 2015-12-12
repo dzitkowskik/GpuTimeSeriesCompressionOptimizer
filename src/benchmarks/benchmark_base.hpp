@@ -10,7 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "util/generator/cuda_array_generator.hpp"
-#include "time_series.h"
+#include "time_series_reader.hpp"
 #include "compression/data_type.hpp"
 
 #include <benchmark/benchmark.h>
@@ -32,6 +32,7 @@ protected:
 	void SetStatistics(benchmark::State& state, DataType type);
 
 protected:
+	TimeSeriesReader _tsReader;
 	CudaArrayGenerator _generator;
 };
 

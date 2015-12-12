@@ -34,12 +34,27 @@ SharedCudaPtr<float> UnittestBase::GetFloatRandomData()
 SharedCudaPtr<double> UnittestBase::GetDoubleRandomData()
 { return _generator.GenerateRandomDoubleDeviceArray(_size); }
 
+SharedCudaPtr<time_t> UnittestBase::GetNextTsIntDataFromTestFile()
+{
+	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
+	File file(dataFilePath);
+	CSVFileDefinition fileDefinition;
+	auto tsVector = _tsReader.ReadFromCSV<float>(file, fileDefinition, _size);
+	auto intData = tsVector[0].GetTimeRaw();
+	auto size = tsVector[0].GetSize();
+
+	auto result = CudaPtr<time_t>::make_shared();
+	result->fillFromHost(intData, size);
+
+	return result;
+}
+
 SharedCudaPtr<time_t> UnittestBase::GetTsIntDataFromTestFile()
 {
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
 	CSVFileDefinition fileDefinition;
-	auto tsVector = TimeSeries<float>::ReadFromCSV(file, fileDefinition, _size);
+	auto tsVector = TimeSeriesReader().ReadFromCSV<float>(file, fileDefinition, _size);
 	auto intData = tsVector[0].GetTimeRaw();
 	auto size = tsVector[0].GetSize();
 
@@ -75,7 +90,7 @@ SharedCudaPtr<float> UnittestBase::GetTsFloatDataFromTestFile()
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
 	CSVFileDefinition fileDefinition;
-	auto tsVector = TimeSeries<float>::ReadFromCSV(file, fileDefinition, _size);
+	auto tsVector = TimeSeriesReader().ReadFromCSV<float>(file, fileDefinition, _size);
 	auto floatData = tsVector[0].GetDataRaw();
 	auto size = tsVector[0].GetSize();
 

@@ -25,7 +25,7 @@ SharedCudaPtr<time_t> BenchmarkBase::GetTsIntDataFromFile(int n)
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("BENCHMARK_DATA_LOG");
 	File file(dataFilePath);
 	CSVFileDefinition fileDefinition;
-	auto tsVector = TimeSeries<float>::ReadFromCSV(file, fileDefinition, n);
+	auto tsVector = _tsReader.ReadFromCSV<float>(file, fileDefinition, n);
 	auto intData = tsVector[0].GetTimeRaw();
 	auto size = tsVector[0].GetSize();
 
@@ -57,7 +57,7 @@ SharedCudaPtr<float> BenchmarkBase::GetTsFloatDataFromFile(int n)
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("BENCHMARK_DATA_LOG");
 	File file(dataFilePath);
 	CSVFileDefinition fileDefinition;
-	auto tsVector = TimeSeries<float>::ReadFromCSV(file, fileDefinition, n);
+	auto tsVector = _tsReader.ReadFromCSV<float>(file, fileDefinition, n);
 	auto floatData = tsVector[0].GetDataRaw();
 	auto size = tsVector[0].GetSize();
 

@@ -43,6 +43,9 @@ Stencil ConstEncoding::GetConstStencil(SharedCudaPtr<T> data, T constValue)
 template<typename T>
 SharedCudaPtrVector<char> ConstEncoding::Encode(SharedCudaPtr<T> data)
 {
+	if(data->size() <= 0)
+			return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 	auto mostFrequent = Histogram().GetMostFrequent(data, 1);
 	T constValue;
 	CUDA_CALL( cudaMemcpy(&constValue, mostFrequent->get(), sizeof(T), CPY_DTH) );
@@ -81,6 +84,8 @@ __global__ void _constDecodeKernel(
 template<typename T>
 SharedCudaPtr<T> ConstEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	if(input[1]->size() <= 0) return CudaPtr<T>::make_shared();
+
 	auto metadata = input[0];
 	auto data = input[1];
 

@@ -18,16 +18,18 @@ void OptimalTree::Replace(
 {
 	if(edgeNo > _maxEdgeNo) return;
 
-	int resultCnt = node->GetEncodingFactory()->Get()->GetNumberOfResults();
+	auto encoding = node->GetEncodingFactory()->Get();
+	int resultCnt = encoding->GetNumberOfResults();
+	DataType type = encoding->GetReturnType(node->GetEncodingFactory()->dataType);
 	for(int i = 0; i < resultCnt; i++)
 	{
 		auto best = stats->GetBest(edgeNo+i, node->GetEncodingType());
 		if(best.value > 1) {
 			// TODO: Get correct data type
-			auto newChld = CompressionNode::make_shared(best.type.second, DataType::d_int);
+			auto newChld = CompressionNode::make_shared(best.type.second, type);
 			node->AddChild(newChld);
 			Replace(newChld, stats, 2*(edgeNo+i) + 2);
-		} else node->AddChild(CompressionNode::make_shared(EncodingType::none, DataType::d_int));
+		} else node->AddChild(CompressionNode::make_shared(EncodingType::none, type));
 	}
 
 	return;
@@ -41,9 +43,6 @@ bool OptimalTree::TryCorrectTree()
 	if(oldRatio <= newRatio && oldRatio > 1) return false;
 
 	// Get the weaker edge with minimal index
-	bool replace_parent = false;
-
-
 	auto newStats = this->_tree.GetStatistics();
 	auto oldStats = this->_statistics;
 
@@ -62,14 +61,14 @@ bool OptimalTree::TryCorrectTree()
 			{
 				// replace single edge
 				// TODO: Get correct data type
-				auto encFactory = DefaultEncodingFactory().Get(newEdgeWithSameBeginning.type.second, DataType::d_int);
+				auto encFactory = DefaultEncodingFactory().Get(newEdgeWithSameBeginning.type.second, edges[i].To()->GetDataType());
 				edges[i].To()->Reset(encFactory);
 				Replace(edges[i].To(), newStats, 2*(edgeNo + 1));
 			} else {
 				// replace whole parent node
 				// TODO: Get correct data type
 
-				auto encFactory = DefaultEncodingFactory().Get(bestEdge.type.first, DataType::d_int);
+				auto encFactory = DefaultEncodingFactory().Get(bestEdge.type.first, edges[i].From()->GetDataType());
 				edges[i].From()->Reset(encFactory);
 				Replace(edges[i].From(), newStats, edgeNo%2 ? edgeNo-1 : edgeNo);
 			}
