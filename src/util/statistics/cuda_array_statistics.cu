@@ -127,6 +127,7 @@ void _rlMetricKernel(T* data, size_t size, int* result)
 template<typename T, int N>
 float CudaArrayStatistics::RlMetric(SharedCudaPtr<T> data)
 {
+	if(N >= data->size()) return 1.0;
 	size_t size = data->size() - N;
 	auto result = CudaPtr<int>::make_shared(size);
 	this->_policy.setSize(size);
@@ -147,9 +148,9 @@ T CudaArrayStatistics::Mean(SharedCudaPtr<T> data)
 }
 
 template<typename T>
-Statistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
+DataStatistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 {
-	Statistics stats;
+	DataStatistics stats;
 	auto minMax = MinMax(data);
 	stats.min = std::get<0>(minMax);
 	stats.max = std::get<1>(minMax);
@@ -162,9 +163,9 @@ Statistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 }
 
 // TODO: Make this a common template in header file and use everywhere
-Statistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data, DataType type)
+DataStatistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data, DataType type)
 {
-	if(data->size() <= 0) return Statistics();
+	if(data->size() <= 0) return DataStatistics();
 	switch(type)
 	{
 		case DataType::d_int:

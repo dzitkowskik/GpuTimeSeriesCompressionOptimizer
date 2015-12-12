@@ -103,12 +103,14 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
 	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
 }
 
-TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt_CompressByBestTree)
+TEST_F(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_RandomInt_CompressByBestTree)
 {
+	CompressionOptimizer optimizer;
+
 	auto randomInt = GetIntRandomData();
 	auto data = CastSharedCudaPtr<int, char>(randomInt);
 	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
-	auto results = PathGenerator().Phase1(data, EncodingType::none, DataType::d_int, stats, 0);
+	auto results = optimizer.FullStatisticsUpdate(data, EncodingType::none, DataType::d_int, stats, 0);
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 	results[0].first.Fix();
 //	results[0].first.Print();
@@ -120,12 +122,14 @@ TEST_F(OptimizerTest, PathGenerator_Phase1_RandomInt_CompressByBestTree)
 //	printf("compressed data size: %lu\n", compressed->size());
 }
 
-TEST_F(OptimizerTest, PathGenerator_Phase1_Statistics)
+TEST_F(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_Statistics)
 {
+	CompressionOptimizer optimizer;
+
 	auto randomInt = GetIntRandomData();
 	auto data = CastSharedCudaPtr<int, char>(randomInt);
 	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
-	auto results = PathGenerator().Phase1(data, EncodingType::none, DataType::d_int, stats, 0);
+	auto results = optimizer.FullStatisticsUpdate(data, EncodingType::none, DataType::d_int, stats, 0);
 //	printf("number of trees = %d\n", results.size());
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 
@@ -154,6 +158,41 @@ TEST_F(OptimizerTest, PathGenerator_Phase1_Statistics)
 //	printf("size of data before compression: %lu\n", data->size());
 //	printf("best tree statistic: %lu\n", results[0].second);
 //	printf("compressed data size: %lu\n", compressed->size());
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_RandomDataParts_Int_Compress)
+{
+	int N = 3;
+	CompressionOptimizer optimizer;
+	SharedCudaPtrVector<int> randomIntDataParts;
+	SharedCudaPtrVector<char> compressedDataParts;
+	for(int i = 0; i < N; i++)
+		randomIntDataParts.push_back(GetIntRandomData(10, 10000));
+
+	// Compress
+	for(int i = 0; i < N; i++)
+	{
+		auto compressedPart = optimizer.CompressData(
+			CastSharedCudaPtr<int, char>(randomIntDataParts[i]), DataType::d_int);
+		compressedDataParts.push_back(compressedPart);
+
+//		optimizer.GetOptimalTree()->GetTree().Print(compressedPart->size());
+//		printf("Compression ratio = %lf\n", optimizer.GetOptimalTree()->GetTree().GetCompressionRatio());
+//		optimizer.GetStatistics()->PrintShort();
+	}
+
+	// Check
+	CompressionTree decompressionTree;
+	for(int i = 0; i < N; i++)
+	{
+		// Decompress
+		auto decompressedData = CastSharedCudaPtr<char, int>(
+				decompressionTree.Decompress(compressedDataParts[i]));
+		EXPECT_TRUE( CompareDeviceArrays(
+				randomIntDataParts[i]->get(),
+				decompressedData->get(),
+				randomIntDataParts[i]->size()) );
+	}
 }
 
 }

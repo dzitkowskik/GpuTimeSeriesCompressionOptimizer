@@ -11,11 +11,16 @@
 #include "tree/compression_tree.hpp"
 #include "tree/compression_statistics.hpp"
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <queue>
 #include <vector>
 
 namespace ddj
 {
+
+class OptimalTree;
+using SharedOptimalTreePtr = boost::shared_ptr<OptimalTree>;
 
 class OptimalTree
 {
@@ -32,12 +37,18 @@ public:
 	~OptimalTree(){}
 
 public:
-	CompressionTree& operator->() { return _tree; }
+	CompressionTree& GetTree() { return _tree; }
 	bool TryCorrectTree();
 	void Replace(
 			SharedCompressionNodePtr node,
 			SharedCompressionStatisticsPtr stats,
 			int edgeNo);
+
+public:
+	static SharedOptimalTreePtr make_shared(CompressionTree tree)
+	{
+		return boost::make_shared<OptimalTree>(tree);
+	}
 
 private:
 	int _maxHeight;

@@ -28,27 +28,7 @@ class PathGenerator
 public:
 	PathList GeneratePaths();
 	CompressionTree GenerateTree(Path path, DataType type);
-	Path GetContinuations(EncodingType et, DataType dt, Statistics stats, int level);
-
-	std::vector<PossibleTree> CrossTrees(
-			PossibleTree parent,
-			std::vector<PossibleTree> children,
-			size_t inputSize,
-			size_t parentMetadataSize);
-
-	std::vector<PossibleTree> CrossTrees(
-			PossibleTree parent,
-			std::vector<PossibleTree> childrenLeft,
-			std::vector<PossibleTree> childrenRight,
-			size_t inputSize,
-			size_t parentMetadataSize);
-
-	std::vector<PossibleTree> Phase1(
-			SharedCudaPtr<char> data,
-			EncodingType et,
-			DataType dt,
-			Statistics stats,
-			int level);
+	Path GetContinuations(EncodingType et, DataType dt, DataStatistics stats, int level);
 };
 
 } /* namespace ddj */

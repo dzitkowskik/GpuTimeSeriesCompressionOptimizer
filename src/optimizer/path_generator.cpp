@@ -90,7 +90,7 @@ CompressionTree PathGenerator::GenerateTree(Path path, DataType type)
 	return tree;
 }
 
-Path PathGenerator::GetContinuations(EncodingType et, DataType dt, Statistics stats, int level)
+Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistics stats, int level)
 {
 	Path result;
 
@@ -138,100 +138,6 @@ Path PathGenerator::GetContinuations(EncodingType et, DataType dt, Statistics st
 		result.push_back(EncodingType::gfc);
 	else
 		result.push_back(EncodingType::afl);
-
-	return result;
-}
-
-std::vector<PossibleTree> PathGenerator::CrossTrees(
-		PossibleTree parent,
-		std::vector<PossibleTree> children,
-		size_t inputSize,
-		size_t parentMetadataSize)
-{
-	std::vector<PossibleTree> results;
-	for(auto& child : children)
-	{
-		auto tree = parent.first.Copy();
-		auto root = child.first.FindNode(0)->Copy();
-		auto outputSize = child.second + parentMetadataSize;
-		tree.AddNode(root, 0);
-		tree.FindNode(0)->SetCompressionRatio(Encoding::GetCompressionRatio(inputSize, outputSize));
-		results.push_back(std::make_pair(tree, outputSize));
-	}
-	return results;
-}
-
-std::vector<PossibleTree> PathGenerator::CrossTrees(
-		PossibleTree parent,
-		std::vector<PossibleTree> childrenLeft,
-		std::vector<PossibleTree> childrenRight,
-		size_t inputSize,
-		size_t parentMetadataSize)
-{
-	std::vector<PossibleTree> results;
-	for(auto& childLeft : childrenLeft)
-	{
-		for(auto& childRight : childrenRight)
-		{
-			auto tree = parent.first.Copy();
-			size_t outputSize = childLeft.second + childRight.second + parentMetadataSize;
-			tree.AddNode(childLeft.first.FindNode(0)->Copy(), 0);
-			tree.AddNode(childRight.first.FindNode(0)->Copy(), 0);
-			tree.FindNode(0)->SetCompressionRatio(Encoding::GetCompressionRatio(inputSize, outputSize));
-			results.push_back(std::make_pair(tree, outputSize));
-		}
-	}
-	return results;
-}
-
-size_t _getSize(SharedCudaPtrVector<char> data)
-{
-	size_t result = 0;
-	for(auto& d : data)
-		result += d->size();
-	return result;
-}
-
-std::vector<PossibleTree> PathGenerator::Phase1(
-		SharedCudaPtr<char> data,
-		EncodingType et,
-		DataType dt,
-		Statistics stats,
-		int level)
-{
-	Path cont;
-	DefaultEncodingFactory factory;
-	CudaArrayStatistics crs;
-	std::vector<PossibleTree> result, part1, part2;
-	PossibleTree parent;
-
-	cont = GetContinuations(et, dt, stats, level);
-	for(auto& c : cont)
-	{
-		parent.first = CompressionTree(c, dt);
-		auto encoding = factory.Get(c, dt)->Get(data);
-		auto compr = encoding->Encode(data, dt);
-		parent.second = _getSize(compr);
-		parent.first.FindNode(0)->SetCompressionRatio(
-				Encoding::GetCompressionRatio(data->size(), parent.second));
-		stats = crs.GenerateStatistics(data, dt);
-		if(encoding->GetNumberOfResults() == 1)
-		{
-			part1 = Phase1(compr[1], c, dt, stats, level+1);
-			part1 = CrossTrees(parent, part1, data->size(), compr[0]->size());
-		}
-		else if(encoding->GetNumberOfResults() == 2)
-		{
-			part1 = Phase1(compr[1], c, dt, stats, level+1);
-			part2 = Phase1(compr[2], c, dt, stats, level+1);
-			part1 = CrossTrees(parent, part1, part2, data->size(), compr[0]->size());
-		}
-
-		if(part1.size() == 0)
-			part1 = std::vector<PossibleTree> { parent };
-
-		result.insert(result.end(), part1.begin(), part1.end());
-	}
 
 	return result;
 }

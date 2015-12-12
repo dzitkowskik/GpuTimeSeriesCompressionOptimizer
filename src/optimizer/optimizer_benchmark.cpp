@@ -38,7 +38,7 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressionOptimizer_Phase1
     auto trainData = CudaPtr<int>::make_shared();
     trainData->fill(randomIntData->get(), trainSize);
     auto trainDataChar = CastSharedCudaPtr<int, char>(trainData);
-	auto results = PathGenerator().Phase1(trainDataChar, EncodingType::none, DataType::d_int, Statistics(), 0);
+	auto results = PathGenerator().Phase1(trainDataChar, EncodingType::none, DataType::d_int, DataStatistics(), 0);
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 	results[0].first.Fix();
 //	results[0].first.Print(results[0].second);

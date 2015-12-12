@@ -17,7 +17,7 @@ namespace ddj
 
 __host__ __device__ int _getFloatPrecision(float number);
 
-struct Statistics
+struct DataStatistics
 {
 	double min;
 	double max;
@@ -38,10 +38,10 @@ public:
     template<typename T, int N=3> float RlMetric(SharedCudaPtr<T> data);
     template<typename T> T Mean(SharedCudaPtr<T> data);
 
-    Statistics GenerateStatistics(SharedCudaPtr<char> data, DataType type);
+    DataStatistics GenerateStatistics(SharedCudaPtr<char> data, DataType type);
 
 private:
-    template<typename T> Statistics getStatistics(SharedCudaPtr<T> data);
+    template<typename T> DataStatistics getStatistics(SharedCudaPtr<T> data);
 
 private:
     ExecutionPolicy _policy;

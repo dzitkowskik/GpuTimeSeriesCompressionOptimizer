@@ -37,7 +37,8 @@ bool OptimalTree::TryCorrectTree()
 {
 	auto oldRatio = this->_ratio;
 	auto newRatio = this->_tree.GetCompressionRatio();
-	if(oldRatio <= newRatio) return false;
+	this->_ratio = this->_tree.GetCompressionRatio();
+	if(oldRatio <= newRatio && oldRatio > 1) return false;
 
 	// Get the weaker edge with minimal index
 	bool replace_parent = false;
