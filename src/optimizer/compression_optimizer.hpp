@@ -70,6 +70,14 @@ private:
 	int _maxTreeHeight;
 
 private:
+	// BENCHMARKS
+	friend class CompressionOptimizerBenchmark;
+	friend class CompressionOptimizerBenchmark_BM_CompressByBestTree_ChoosenInPhase1_RandomInt_Benchmark;
+	friend class CompressionOptimizerBenchmark_BM_FullStatisticsUpdate_RawPhase1_Benchmark;
+	friend class CompressionOptimizerBenchmark_BM_UpdateStatistics_RawPhase2_Benchmark;
+	friend class CompressionOptimizerBenchmark_BM_TryCorrectTree_RawPhase3_Benchmark;
+
+	// UNIT TESTS
 	friend class OptimizerTest;
 	FRIEND_TEST(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_Statistics);
 	FRIEND_TEST(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_RandomInt_CompressByBestTree);
