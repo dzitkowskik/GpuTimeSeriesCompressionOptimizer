@@ -157,7 +157,7 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)(ben
 
 	SetStatistics(state, DataType::d_int);
 }
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)->Arg(1<<20)->Arg(1<<22);
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)->Arg(1<<20)->Arg(1<<22)->Arg(1<<24);
 
 } /* namespace ddj */
 
