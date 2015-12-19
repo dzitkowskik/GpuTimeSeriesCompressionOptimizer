@@ -14,7 +14,7 @@ BENCHMARK_DEFINE_F(AflEncodingBenchmark, BM_Afl_Random_Int_Encode)(benchmark::St
     AflEncoding encoding;
     Benchmark_Encoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(AflEncodingBenchmark, BM_Afl_Random_Int_Encode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(AflEncodingBenchmark, BM_Afl_Random_Int_Encode)->Arg(1<<15)->Arg(1<<20)->Arg(1<<26);
 
 BENCHMARK_DEFINE_F(AflEncodingBenchmark, BM_Afl_Random_Int_Decode)(benchmark::State& state)
 {
@@ -23,6 +23,6 @@ BENCHMARK_DEFINE_F(AflEncodingBenchmark, BM_Afl_Random_Int_Decode)(benchmark::St
     AflEncoding encoding;
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(AflEncodingBenchmark, BM_Afl_Random_Int_Decode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(AflEncodingBenchmark, BM_Afl_Random_Int_Decode)->Arg(1<<15)->Arg(1<<20)->Arg(1<<26);
 
 } /* namespace ddj */

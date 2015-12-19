@@ -117,8 +117,8 @@ template<typename T>
 SharedCudaPtr<T> DecodeAfl(T* data, size_t size, int minBit, int rest)
 {
 	// Calculate length
-	int comprBits = size * 8 - rest;
-	int length = comprBits / minBit;
+	long long comprBits = size * 8 - rest;
+	long long length = comprBits / minBit;
 
 	auto result = CudaPtr<int>::make_shared(length);
 	run_afl_decompress_gpu<int, 1>(minBit, data, result->get(), length);

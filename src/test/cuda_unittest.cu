@@ -19,4 +19,28 @@ TEST_F(CudaPtrTest, Concatenate_EqualSize_Vectors_Int_Size)
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(CudaPtrTest, MakeShared_AllocateArray_Size_32M_Int)
+{
+    int N = 1<<25;
+    auto data = CudaPtr<int>::make_shared(N);
+    data->set(1);
+    data->clear();
+}
+
+TEST_F(CudaPtrTest, MakeShared_AllocateArray_Size_64M_Int)
+{
+    int N = 1<<26;
+    auto data = CudaPtr<int>::make_shared(N);
+    data->set(1);
+    data->clear();
+}
+
+TEST_F(CudaPtrTest, MakeShared_AllocateArray_Size_128M_Int)
+{
+    int N = 1<<27;
+    auto data = CudaPtr<int>::make_shared(N);
+    data->set(1);
+    data->clear();
+}
+
 }

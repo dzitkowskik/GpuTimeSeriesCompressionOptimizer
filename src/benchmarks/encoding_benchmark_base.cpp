@@ -26,6 +26,7 @@ void EncodingBenchmarkBase::Benchmark_Encoding(
 
 		state.PauseTiming();
 		compr.clear();
+		data_copy->clear();
 		state.ResumeTiming();
 	}
 
@@ -43,6 +44,7 @@ void EncodingBenchmarkBase::Benchmark_Decoding(
 		state.PauseTiming();
 		SharedCudaPtr<char> data_copy = data->copy();
 		auto compr = encoding.Encode(data_copy, type);
+		data_copy->clear();
 		state.ResumeTiming();
 
 		// DECODE
@@ -50,7 +52,7 @@ void EncodingBenchmarkBase::Benchmark_Decoding(
 
 		state.PauseTiming();
 		compr.clear();
-		decompr.reset();
+		decompr->clear();
 		state.ResumeTiming();
 	}
 

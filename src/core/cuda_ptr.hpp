@@ -44,7 +44,7 @@ public:
 	CudaPtr(size_t size) : _pointer(NULL), _size(size*sizeof(T))
 	{
 		if(_size > 0)
-			CUDA_CALL( cudaMalloc((void**)&_pointer, _size) );
+			CUDA_ASSERT_RETURN( cudaMalloc((void**)&_pointer, _size) );
 	}
 	CudaPtr(T* pointer, size_t size) : _pointer(pointer), _size(size*sizeof(T)) {}
 

@@ -155,9 +155,11 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)(ben
 		optimizer.CompressData(data, DataType::d_int);
 	}
 
+//	optimizer.GetOptimalTree()->GetTree().Print();
+
 	SetStatistics(state, DataType::d_int);
 }
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)->Arg(1<<20)->Arg(1<<22)->Arg(1<<24);
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)->Arg(1<<22)->Arg(1<<24)->Arg(1<<26);
 
 } /* namespace ddj */
 
