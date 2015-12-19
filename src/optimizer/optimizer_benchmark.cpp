@@ -78,6 +78,25 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPha
 }
 BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_RandomInt)->Arg(1<<20);
 
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_Time)(benchmark::State& state)
+{
+	auto intData = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromFile(state.range_x()));
+    auto data = CastSharedCudaPtr<int, char>(intData);
+
+    while (state.KeepRunning())
+	{
+		auto results = CompressionOptimizer().FullStatisticsUpdate(
+				data,
+				EncodingType::none,
+				DataType::d_int,
+				DataStatistics(),
+				0);
+	}
+
+	SetStatistics(state, DataType::d_int);
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_Time)->Arg(1<<20);
+
 BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_RandomInt)(benchmark::State& state)
 {
 	CompressionOptimizer optimizer;
