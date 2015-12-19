@@ -108,41 +108,6 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_
 }
 BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_RandomInt)->Arg(1<<20);
 
-BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3)(benchmark::State& state)
-{
-	CompressionOptimizer optimizer;
-
-	auto randomIntData = GetIntRandomData(state.range_x(), 10,1000);
-	auto data = CastSharedCudaPtr<int, char>(randomIntData);
-	auto trainSize = state.range_x()/100;
-	auto trainData = CudaPtr<int>::make_shared();
-	trainData->fill(randomIntData->get(), trainSize);
-	auto trainDataChar = CastSharedCudaPtr<int, char>(trainData);
-
-	auto results = optimizer.FullStatisticsUpdate(
-			trainDataChar,
-			EncodingType::none,
-			DataType::d_int,
-			DataStatistics(),
-			0);
-
-	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
-	results[0].first.Fix();
-	results[0].first.UpdateStatistics(optimizer.GetStatistics());
-	results[0].first.SetStatistics(optimizer.GetStatistics());
-	auto optimalTree = OptimalTree::make_shared(results[0].first);
-
-	while (state.KeepRunning())
-	{
-		optimalTree->GetTree().FindNode(0)->SetCompressionRatio(1.0);
-		bool corrected = optimalTree->TryCorrectTree();
-		if(!corrected) printf("NOT CORRECTED!!\n");
-	}
-
-	SetStatistics(state, DataType::d_int);
-}
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3)->Arg(1<<20);
-
 BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3_RandomInt)(benchmark::State& state)
 {
 	CompressionOptimizer optimizer;
@@ -183,10 +148,11 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)(ben
 	CompressionOptimizer optimizer;
 
 	auto randomIntData = GetIntRandomData(state.range_x(), 10,1000);
+	auto data = CastSharedCudaPtr<int, char>(randomIntData);
 
 	while (state.KeepRunning())
 	{
-		optimizer.CompressData(randomIntData, DataType::d_int);
+		optimizer.CompressData(data, DataType::d_int);
 	}
 
 	SetStatistics(state, DataType::d_int);
