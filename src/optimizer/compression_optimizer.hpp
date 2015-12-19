@@ -73,9 +73,9 @@ private:
 	// BENCHMARKS
 	friend class CompressionOptimizerBenchmark;
 	friend class CompressionOptimizerBenchmark_BM_CompressByBestTree_ChoosenInPhase1_RandomInt_Benchmark;
-	friend class CompressionOptimizerBenchmark_BM_FullStatisticsUpdate_RawPhase1_Benchmark;
-	friend class CompressionOptimizerBenchmark_BM_UpdateStatistics_RawPhase2_Benchmark;
-	friend class CompressionOptimizerBenchmark_BM_TryCorrectTree_RawPhase3_Benchmark;
+	friend class CompressionOptimizerBenchmark_BM_FullStatisticsUpdate_RawPhase1_RandomInt_Benchmark;
+	friend class CompressionOptimizerBenchmark_BM_UpdateStatistics_RawPhase2_RandomInt_Benchmark;
+	friend class CompressionOptimizerBenchmark_BM_TryCorrectTree_RawPhase3_RandomInt_Benchmark;
 
 	// UNIT TESTS
 	friend class OptimizerTest;
