@@ -30,6 +30,7 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompression)
 	for(auto& path : paths)
 	{
 		auto tree = PathGenerator().GenerateTree(path, DataType::d_int);
+		tree.Print();
 
 		auto data = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromTestFile());
 		auto compressedData = tree.Compress(CastSharedCudaPtr<int, char>(data));

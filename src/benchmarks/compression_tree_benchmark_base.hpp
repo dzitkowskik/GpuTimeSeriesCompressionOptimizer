@@ -10,7 +10,7 @@
 
 #include "benchmarks/benchmark_base.hpp"
 #include "tree/compression_tree.hpp"
-#include "compression/data_type.hpp"
+#include "data_type.hpp"
 #include "helpers/helper_device.hpp"
 
 namespace ddj {

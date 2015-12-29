@@ -10,7 +10,10 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
-#include "compression/data_type.hpp"
+#include "core/not_implemented_exception.hpp"
+#include "data_type.hpp"
+
+#define MAX_PRECISION 10
 
 namespace ddj
 {

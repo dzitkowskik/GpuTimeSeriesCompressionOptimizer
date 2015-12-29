@@ -17,11 +17,16 @@ namespace ddj
 	{
 		if(data->size() <= 0)
 			return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
-
 		int precision = CudaArrayStatistics().Precision(data);
 
+		SharedCudaPtr<int> resultData;
 		FloatingPointToIntegerOperator<T, int> op { precision };
-		auto resultData = CudaArrayTransform().Transform<T, int>(data, op);
+
+		if(precision < MAX_PRECISION)
+			resultData = CudaArrayTransform().Transform<T, int>(data, op);
+		else
+			resultData = CastSharedCudaPtr<T, int>(data->copy());
+
 		auto resultMetadata = CudaPtr<char>::make_shared(sizeof(int));
 		resultMetadata->fillFromHost((char*)&precision, sizeof(int));
 
@@ -40,8 +45,12 @@ namespace ddj
 		int precision;
 		CUDA_CALL( cudaMemcpy(&precision, metadata->get(), sizeof(int), CPY_DTH) );
 
+		SharedCudaPtr<T> result;
 		IntegerToFloatingPointOperator<int, T> op { precision };
-		auto result = CudaArrayTransform().Transform<int, T>(data, op);
+		if(precision < MAX_PRECISION)
+			result = CudaArrayTransform().Transform<int, T>(data, op);
+		else
+			result = CastSharedCudaPtr<int, T>(data->copy());
 		return result;
 	}
 

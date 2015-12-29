@@ -48,7 +48,8 @@ __host__ __device__
 int _getFloatPrecision(float number)
 {
 	long int e = 1;
-	while(round(number*e)/e != number) e*=10;
+	long int maxPrecision = pow(10, MAX_PRECISION);
+	while(round(number*e)/e != number && e < maxPrecision) e*=10;
 	return logf(e) / logf(10);
 }
 

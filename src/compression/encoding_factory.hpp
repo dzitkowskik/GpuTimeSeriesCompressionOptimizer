@@ -10,7 +10,7 @@
 
 #include "compression/encoding.hpp"
 #include "compression/encoding_type.hpp"
-#include "compression/data_type.hpp"
+#include "data_type.hpp"
 #include "core/cuda_ptr.hpp"
 #include "core/not_implemented_exception.hpp"
 

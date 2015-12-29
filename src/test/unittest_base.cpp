@@ -39,12 +39,19 @@ SharedCudaPtr<time_t> UnittestBase::GetNextTsIntDataFromTestFile()
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
 	CSVFileDefinition fileDefinition;
-	auto tsVector = _tsReader.ReadFromCSV<float>(file, fileDefinition, _size);
-	auto intData = tsVector[0].GetTimeRaw();
-	auto size = tsVector[0].GetSize();
+    fileDefinition.Columns = std::vector<DataType> {
+            DataType::d_time,
+            DataType::d_float,
+            DataType::d_float,
+            DataType::d_float
+    };
+	auto ts = _tsReader.ReadFromCSV(file, fileDefinition, _size);
+
+	auto data = reinterpret_cast<time_t*>(ts.getColumn(0).getData());
+	auto size = ts.getColumn(0).getSize();
 
 	auto result = CudaPtr<time_t>::make_shared();
-	result->fillFromHost(intData, size);
+	result->fillFromHost(data, size);
 
 	return result;
 }
@@ -54,12 +61,18 @@ SharedCudaPtr<time_t> UnittestBase::GetTsIntDataFromTestFile()
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
 	CSVFileDefinition fileDefinition;
-	auto tsVector = TimeSeriesReader().ReadFromCSV<float>(file, fileDefinition, _size);
-	auto intData = tsVector[0].GetTimeRaw();
-	auto size = tsVector[0].GetSize();
+    fileDefinition.Columns = std::vector<DataType> {
+            DataType::d_time,
+            DataType::d_float,
+            DataType::d_float,
+            DataType::d_float
+    };
+	auto ts = TimeSeriesReader().ReadFromCSV(file, fileDefinition, _size);
+	auto data = reinterpret_cast<time_t*>(ts.getColumn(0).getData());
+	auto size = ts.getColumn(0).getSize();
 
 	auto result = CudaPtr<time_t>::make_shared();
-	result->fillFromHost(intData, size);
+	result->fillFromHost(data, size);
 
 	return result;
 }
@@ -90,13 +103,20 @@ SharedCudaPtr<float> UnittestBase::GetTsFloatDataFromTestFile()
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
 	CSVFileDefinition fileDefinition;
-	auto tsVector = TimeSeriesReader().ReadFromCSV<float>(file, fileDefinition, _size);
-	auto floatData = tsVector[0].GetDataRaw();
-	auto size = tsVector[0].GetSize();
+    fileDefinition.Columns = std::vector<DataType> {
+            DataType::d_time,
+            DataType::d_float,
+            DataType::d_float,
+            DataType::d_float
+    };
+
+	auto ts = TimeSeriesReader().ReadFromCSV(file, fileDefinition, _size);
+
+	auto data = reinterpret_cast<float*>(ts.getColumn(1).getData());
+	auto size = ts.getColumn(1).getSize();
 
 	auto result = CudaPtr<float>::make_shared();
-	result->fillFromHost(floatData, size);
-
+	result->fillFromHost(data, size);
 	return result;
 }
 

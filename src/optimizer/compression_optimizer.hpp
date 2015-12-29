@@ -9,7 +9,7 @@
 #define COMPRESSION_OPTIMIZER_HPP_
 
 #include "compression/encoding_type.hpp"
-#include "compression/data_type.hpp"
+#include "data_type.hpp"
 #include "util/statistics/cuda_array_statistics.hpp"
 #include "optimizer/optimal_tree.hpp"
 #include "optimizer/path_generator.hpp"

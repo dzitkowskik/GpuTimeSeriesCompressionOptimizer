@@ -10,7 +10,7 @@
 
 #include <benchmark/benchmark.h>
 #include "core/cuda_ptr.hpp"
-#include "compression/data_type.hpp"
+#include "data_type.hpp"
 #include "compression/encoding.hpp"
 #include "benchmarks/benchmark_base.hpp"
 
