@@ -47,6 +47,7 @@ namespace ddj
       hidden.add_options()
       ("TEST_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing test time series data")
       ("BENCHMARK_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing benchmark time series data")
+      ("NYSE_DATA_1GB", po::value<std::string>()->default_value(""), "default file containing nyse time series data from openbook")
       ;
 
       ifstream ifs(path.c_str());

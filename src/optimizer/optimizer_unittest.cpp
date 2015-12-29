@@ -10,6 +10,7 @@
 #include "optimizer/compression_optimizer.hpp"
 #include "helpers/helper_comparison.cuh"
 #include "helpers/helper_print.hpp"
+#include "core/macros.h"
 #include <gtest/gtest.h>
 
 namespace ddj
@@ -27,12 +28,15 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompression)
 {
 	auto paths = PathGenerator().GeneratePaths();
 
+	auto tsData = GetTsIntDataFromTestFile();
+	auto data = CudaArrayTransform().Cast<time_t, int>(tsData);
+//	HelperPrint::PrintSharedCudaPtr(data, "data");
+
 	for(auto& path : paths)
 	{
 		auto tree = PathGenerator().GenerateTree(path, DataType::d_int);
 		tree.Print();
 
-		auto data = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromTestFile());
 		auto compressedData = tree.Compress(CastSharedCudaPtr<int, char>(data));
 		auto decompressedData = tree.Decompress(compressedData);
 
@@ -44,6 +48,7 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompression)
 
 		ASSERT_EQ(expected->size(), actual->size());
 		EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+		CUDA_ASSERT_RETURN(cudaGetLastError());
 	}
 }
 
@@ -230,6 +235,29 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_TimeRealData_Compress)
 				decompressedData->get(),
 				timeDataParts[i]->size()) );
 	}
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_CompressData_SourceTimeNyse_Compress)
+{
+	CompressionOptimizer optimizer;
+
+	auto ts = Get1GBNyseTimeSeries();
+	int colIdx = 16; 	// column with index 16 is source time
+	size_t size = GetSize()*sizeof(int);
+	auto data = CudaPtr<char>::make_shared(size);
+	auto sourceTimeColumnRawData = ts->getColumn(colIdx).getData();
+	data->fillFromHost(sourceTimeColumnRawData, size);
+
+	auto compressedData =
+			optimizer.CompressData(data, ts->getColumn(colIdx).getType());
+	auto decompressedData =
+			optimizer.GetOptimalTree()->GetTree().Decompress(compressedData);
+
+	printf("Size before compression: %lu\n", size);
+	printf("Size after compression: %lu\n", compressedData->size());
+
+	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressedData->get(), data->size()) );
+	ts.reset();
 }
 
 }

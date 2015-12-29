@@ -45,14 +45,15 @@ SharedCudaPtr<time_t> UnittestBase::GetNextTsIntDataFromTestFile()
             DataType::d_float,
             DataType::d_float
     };
-	auto ts = _tsReader.ReadFromCSV(file, fileDefinition, _size);
+    auto ts = _tsReader.ReadFromCSV(file, fileDefinition, _size);
 
-	auto data = reinterpret_cast<time_t*>(ts.getColumn(0).getData());
-	auto size = ts.getColumn(0).getSize();
+	auto data = reinterpret_cast<time_t*>(ts->getColumn(0).getData());
+	auto size = ts->getColumn(0).getSize() / sizeof(time_t);
 
 	auto result = CudaPtr<time_t>::make_shared();
 	result->fillFromHost(data, size);
 
+	ts.reset();
 	return result;
 }
 
@@ -67,13 +68,15 @@ SharedCudaPtr<time_t> UnittestBase::GetTsIntDataFromTestFile()
             DataType::d_float,
             DataType::d_float
     };
+
 	auto ts = TimeSeriesReader().ReadFromCSV(file, fileDefinition, _size);
-	auto data = reinterpret_cast<time_t*>(ts.getColumn(0).getData());
-	auto size = ts.getColumn(0).getSize();
+	auto data = reinterpret_cast<time_t*>(ts->getColumn(0).getData());
+	auto size = ts->getColumn(0).getSize() / sizeof(time_t);
 
 	auto result = CudaPtr<time_t>::make_shared();
 	result->fillFromHost(data, size);
 
+	ts.reset();
 	return result;
 }
 
@@ -110,13 +113,15 @@ SharedCudaPtr<float> UnittestBase::GetTsFloatDataFromTestFile()
             DataType::d_float
     };
 
-	auto ts = TimeSeriesReader().ReadFromCSV(file, fileDefinition, _size);
+    auto ts = TimeSeriesReader().ReadFromCSV(file, fileDefinition, _size);
 
-	auto data = reinterpret_cast<float*>(ts.getColumn(1).getData());
-	auto size = ts.getColumn(1).getSize();
+	auto data = reinterpret_cast<float*>(ts->getColumn(1).getData());
+	auto size = ts->getColumn(1).getSize() / sizeof(float);
 
 	auto result = CudaPtr<float>::make_shared();
 	result->fillFromHost(data, size);
+
+	ts.reset();
 	return result;
 }
 
@@ -125,6 +130,22 @@ int UnittestBase::GetSize() { return _size; }
 SharedCudaPtr<float> UnittestBase::GetFloatRandomDataWithMaxPrecision(int maxPrecision)
 {
 	return _generator.CreateRandomFloatsWithMaxPrecision(_size, maxPrecision);
+}
+
+boost::shared_ptr<TimeSeries> UnittestBase::Get1GBNyseTimeSeries()
+{
+	auto result = boost::make_shared<TimeSeries>("NYSE");
+
+	BinaryFileDefinition fileDefinition;
+	fileDefinition.Columns = this->_nyseData;
+	fileDefinition.Header = this->_nyseDataHeader;
+
+	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("NYSE_DATA_1GB");
+	File file(dataFilePath);
+
+	auto ts = TimeSeriesReader().ReadFromBinary(file, fileDefinition, _size);
+
+	return ts;
 }
 
 } /* namespace ddj */

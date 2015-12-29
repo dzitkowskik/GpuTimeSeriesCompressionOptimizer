@@ -32,12 +32,13 @@ SharedCudaPtr<time_t> BenchmarkBase::GetTsIntDataFromFile(int n)
             DataType::d_float
     };
 	auto ts = _tsReader.ReadFromCSV(file, fileDefinition, n);
-	auto data = reinterpret_cast<time_t*>(ts.getColumn(0).getData());
-	auto size = ts.getColumn(0).getSize();
+	auto data = reinterpret_cast<time_t*>(ts->getColumn(0).getData());
+	auto size = ts->getColumn(0).getSize() / sizeof(time_t);
 
 	auto result = CudaPtr<time_t>::make_shared();
 	result->fillFromHost(data, size);
 
+	ts.reset();
 	return result;
 }
 
@@ -71,12 +72,13 @@ SharedCudaPtr<float> BenchmarkBase::GetTsFloatDataFromFile(int n)
     };
 	auto ts = _tsReader.ReadFromCSV(file, fileDefinition, n);
 
-	auto data = reinterpret_cast<float*>(ts.getColumn(1).getData());
-	auto size = ts.getColumn(1).getSize();
+	auto data = reinterpret_cast<float*>(ts->getColumn(1).getData());
+	auto size = ts->getColumn(1).getSize() / sizeof(float);
 
 	auto result = CudaPtr<float>::make_shared();
 	result->fillFromHost(data, size);
 
+	ts.reset();
 	return result;
 }
 
