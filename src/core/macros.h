@@ -19,6 +19,8 @@
 #define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
     printf("Error at %s:%d:error=%d\n",__FILE__,__LINE__,x);}} while(0)
 
+#define SUPPORTED_DATA_TYPES char, bool, short, int, unsigned, long, long long, float, double
+
 // Make a FOREACH macro
 #define FE_1(WHAT, X) WHAT(X)
 #define FE_2(WHAT, X, ...) WHAT(X)FE_1(WHAT, __VA_ARGS__)

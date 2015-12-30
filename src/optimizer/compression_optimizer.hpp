@@ -16,9 +16,13 @@
 #include "tree/compression_statistics.hpp"
 #include <boost/noncopyable.hpp>
 #include <gtest/gtest.h>
+#include <boost/make_shared.hpp>
 
 namespace ddj
 {
+
+class CompressionOptimizer;
+using SharedCompressionOptimizerPtr = boost::shared_ptr<CompressionOptimizer>;
 
 class CompressionOptimizer : private boost::noncopyable
 {
@@ -60,6 +64,12 @@ private:
 			DataType dt,
 			DataStatistics stats,
 			int level);
+
+public:
+	static SharedCompressionOptimizerPtr make_shared()
+	{
+		return boost::shared_ptr<CompressionOptimizer>();
+	}
 
 private:
 	SharedCompressionStatisticsPtr _statistics;
