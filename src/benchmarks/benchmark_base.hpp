@@ -20,6 +20,21 @@ namespace ddj
 
 class BenchmarkBase : public ::benchmark::Fixture
 {
+public:
+	BenchmarkBase()
+	{
+		CSVFileDefinition csvFileDefinition;
+		csvFileDefinition.Columns = std::vector<DataType> {
+	            DataType::d_time,
+	            DataType::d_float,
+	            DataType::d_float,
+	            DataType::d_float
+	    };
+
+		_tsReaderCSV = TimeSeriesReaderCSV(csvFileDefinition);
+	}
+	~BenchmarkBase(){}
+
 protected:
 	SharedCudaPtr<int> GetIntRandomData(int n, int from = 100, int to = 1000);
 	SharedCudaPtr<int> GetIntConsecutiveData(int n);
@@ -32,7 +47,7 @@ protected:
 	void SetStatistics(benchmark::State& state, DataType type);
 
 protected:
-	TimeSeriesReader _tsReader;
+	TimeSeriesReaderCSV _tsReaderCSV;
 	CudaArrayGenerator _generator;
 };
 

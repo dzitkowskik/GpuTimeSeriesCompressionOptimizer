@@ -8,6 +8,7 @@
 #ifndef PARALLEL_TS_COMPRESSOR_HPP_
 #define PARALLEL_TS_COMPRESSOR_HPP_
 
+#include "optimizer/compression_optimizer.hpp"
 #include "core/task/task_scheduler.hpp"
 #include "time_series_reader.hpp"
 
@@ -17,19 +18,24 @@ namespace ddj
 class ParallelTSCompressor
 {
 public:
-	ParallelTSCompressor();
-	virtual ~ParallelTSCompressor();
+	ParallelTSCompressor(SharedTimeSeriesReader reader);
+	virtual ~ParallelTSCompressor() {}
 
 public:
-	TimeSeries GetNextBatch();
-	void Compress();
+	void Compress(File& file, File& outputFile);
 
 private:
-	UniqueTaskSchedulerPtr _taskScheduler;
+	void init(SharedTimeSeriesPtr ts);
+
+private:
+	bool _initialized;
 	size_t _batchSize;
-	size_t _probeSize;
 	int _columnNumber;
+
+	UniqueTaskSchedulerPtr _taskScheduler;
+	SharedTimeSeriesReader _reader;
 	std::vector<SharedTimeSeriesPtr> _timeSeriesToCompress;
+	std::vector<SharedCompressionOptimizerPtr> _optimizers;
 };
 
 } /* namespace ddj */

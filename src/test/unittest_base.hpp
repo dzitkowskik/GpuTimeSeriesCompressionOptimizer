@@ -24,6 +24,26 @@ namespace ddj {
 class UnittestBase : public ::testing::Test
 {
 public:
+	UnittestBase() : _size(10000)
+	{
+		CSVFileDefinition csvFileDefinition;
+		csvFileDefinition.Columns = std::vector<DataType> {
+				DataType::d_time,
+				DataType::d_float,
+				DataType::d_float,
+				DataType::d_float
+		};
+
+		_tsReaderCSV = TimeSeriesReaderCSV(csvFileDefinition);
+
+		BinaryFileDefinition binaryFileDefinition;
+		binaryFileDefinition.Columns = _nyseData;
+		binaryFileDefinition.Header = _nyseDataHeader;
+		_tsReaderBinary = TimeSeriesReaderBinary(binaryFileDefinition);
+	}
+	~UnittestBase(){}
+
+public:
 	static void SetUpTestCase();
 	static void TearDownTestCase();
 
@@ -47,7 +67,8 @@ protected:
 
 protected:
 	CudaArrayGenerator _generator;
-	TimeSeriesReader _tsReader;
+	TimeSeriesReaderCSV _tsReaderCSV;
+	TimeSeriesReaderBinary _tsReaderBinary;
 	int _size;
 
 private:

@@ -14,6 +14,9 @@ namespace ddj
 TaskScheduler::TaskScheduler(int threadNumber)
 	: _threadNumber(threadNumber)
 {
+	// Create synchronizer
+	_synchronizer = boost::make_shared<TaskQueueSynchronizer>();
+
 	// Start service
 	_work = UniqueWorkPtr(new boost::asio::io_service::work(_ioService));
 
@@ -33,7 +36,9 @@ TaskScheduler::~TaskScheduler()
 int TaskScheduler::Schedule(SharedTaskPtr task)
 {
 	int nextId = _taskRegister.size();
+	_synchronizer->AddTask(nextId);
 	task->SetId(nextId);
+	task->SetSynchronizer(_synchronizer);
 	_taskRegister.push_back(task);
 	_ioService.post(boost::bind(&Task::Execute, task));
 	return nextId;

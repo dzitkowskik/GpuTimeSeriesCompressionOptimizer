@@ -14,8 +14,8 @@
 #include <boost/thread/thread.hpp>
 #include <boost/noncopyable.hpp>
 #include <vector>
-#include <queue>
 #include <memory>
+
 
 namespace ddj {
 
@@ -33,6 +33,7 @@ public:
 	TaskStatus Wait(int id);
 	std::vector<std::pair<int, TaskStatus>> WaitAll();
 	void Clear();
+	SharedTaskPtr GetTask(int id) { return _taskRegister[id]; }
 
 public:
 	static UniqueTaskSchedulerPtr make_unique(int threadNumber)
@@ -49,6 +50,7 @@ private:
 	boost::asio::io_service _ioService;
 	boost::thread_group _threadPool;
 	std::vector<SharedTaskPtr> _taskRegister;
+	boost::shared_ptr<TaskQueueSynchronizer> _synchronizer;
 };
 
 } /* namespace ddj */

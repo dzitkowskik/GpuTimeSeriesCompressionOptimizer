@@ -38,14 +38,8 @@ SharedCudaPtr<time_t> UnittestBase::GetNextTsIntDataFromTestFile()
 {
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
 	File file(dataFilePath);
-	CSVFileDefinition fileDefinition;
-    fileDefinition.Columns = std::vector<DataType> {
-            DataType::d_time,
-            DataType::d_float,
-            DataType::d_float,
-            DataType::d_float
-    };
-    auto ts = _tsReader.ReadFromCSV(file, fileDefinition, _size);
+
+    auto ts = _tsReaderCSV.Read(file, _size);
 
 	auto data = reinterpret_cast<time_t*>(ts->getColumn(0).getData());
 	auto size = ts->getColumn(0).getSize() / sizeof(time_t);
@@ -69,7 +63,7 @@ SharedCudaPtr<time_t> UnittestBase::GetTsIntDataFromTestFile()
             DataType::d_float
     };
 
-	auto ts = TimeSeriesReader().ReadFromCSV(file, fileDefinition, _size);
+	auto ts = TimeSeriesReaderCSV(fileDefinition).Read(file, _size);
 	auto data = reinterpret_cast<time_t*>(ts->getColumn(0).getData());
 	auto size = ts->getColumn(0).getSize() / sizeof(time_t);
 
@@ -113,7 +107,7 @@ SharedCudaPtr<float> UnittestBase::GetTsFloatDataFromTestFile()
             DataType::d_float
     };
 
-    auto ts = TimeSeriesReader().ReadFromCSV(file, fileDefinition, _size);
+    auto ts = TimeSeriesReaderCSV(fileDefinition).Read(file, _size);
 
 	auto data = reinterpret_cast<float*>(ts->getColumn(1).getData());
 	auto size = ts->getColumn(1).getSize() / sizeof(float);
@@ -143,7 +137,7 @@ boost::shared_ptr<TimeSeries> UnittestBase::Get1GBNyseTimeSeries()
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("NYSE_DATA_1GB");
 	File file(dataFilePath);
 
-	auto ts = TimeSeriesReader().ReadFromBinary(file, fileDefinition, _size);
+	auto ts = TimeSeriesReaderBinary(fileDefinition).Read(file, _size);
 
 	return ts;
 }

@@ -8,9 +8,12 @@
 #ifndef DDJ_TASK_HPP_
 #define DDJ_TASK_HPP_
 
+#include "task_queue_synchronizer.hpp"
+
 #include <mutex>
 #include <boost/make_shared.hpp>
 #include <boost/noncopyable.hpp>
+
 
 namespace ddj {
 
@@ -63,6 +66,8 @@ public:
 	void SetStatus(TaskStatus status) { _status = status; }
 	int GetId() { return _id; }
 	void SetId(int id) { _id = id; }
+	void SetSynchronizer(boost::shared_ptr<TaskQueueSynchronizer> synchronizer)
+	{ _synchronizer = synchronizer; }
 
 protected:
 	virtual void execute() = 0;
@@ -71,6 +76,7 @@ protected:
 	std::string _type;
 	TaskStatus _status;
 	int _id;
+	boost::shared_ptr<TaskQueueSynchronizer> _synchronizer;
 
 private:
 	std::mutex _taskDoneMutex;

@@ -24,14 +24,8 @@ SharedCudaPtr<time_t> BenchmarkBase::GetTsIntDataFromFile(int n)
 {
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("BENCHMARK_DATA_LOG");
 	File file(dataFilePath);
-	CSVFileDefinition fileDefinition;
-    fileDefinition.Columns = std::vector<DataType> {
-            DataType::d_time,
-            DataType::d_float,
-            DataType::d_float,
-            DataType::d_float
-    };
-	auto ts = _tsReader.ReadFromCSV(file, fileDefinition, n);
+
+	auto ts = _tsReaderCSV.Read(file, n);
 	auto data = reinterpret_cast<time_t*>(ts->getColumn(0).getData());
 	auto size = ts->getColumn(0).getSize() / sizeof(time_t);
 
@@ -63,14 +57,7 @@ SharedCudaPtr<float> BenchmarkBase::GetTsFloatDataFromFile(int n)
 {
 	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("BENCHMARK_DATA_LOG");
 	File file(dataFilePath);
-	CSVFileDefinition fileDefinition;
-    fileDefinition.Columns = std::vector<DataType> {
-            DataType::d_time,
-            DataType::d_float,
-            DataType::d_float,
-            DataType::d_float
-    };
-	auto ts = _tsReader.ReadFromCSV(file, fileDefinition, n);
+	auto ts = _tsReaderCSV.Read(file, n);
 
 	auto data = reinterpret_cast<float*>(ts->getColumn(1).getData());
 	auto size = ts->getColumn(1).getSize() / sizeof(float);
