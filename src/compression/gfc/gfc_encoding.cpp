@@ -11,6 +11,7 @@
 namespace ddj
 {
 
+// DOUBLE
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<double> data)
 {
@@ -26,6 +27,7 @@ template<>
 SharedCudaPtr<double> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 { return DecompressDouble(input); }
 
+// FLOAT
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 { return SharedCudaPtrVector<char>(); }
@@ -34,6 +36,7 @@ template<>
 SharedCudaPtr<float> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 { return SharedCudaPtr<float>(); }
 
+// INT
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<int> data)
 { return SharedCudaPtrVector<char>(); }
@@ -42,23 +45,30 @@ template<>
 SharedCudaPtr<int> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 { return SharedCudaPtr<int>(); }
 
-SharedCudaPtrVector<char> GfcEncoding::EncodeDouble(SharedCudaPtr<double> data)
-{ return this->Encode<double>(data); }
+// TIME
+template<>
+SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<time_t> data)
+{ return SharedCudaPtrVector<char>(); }
 
-SharedCudaPtr<double> GfcEncoding::DecodeDouble(SharedCudaPtrVector<char> data)
-{ return this->Decode<double>(data); }
+template<>
+SharedCudaPtr<time_t> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
+{ return SharedCudaPtr<time_t>(); }
 
 SharedCudaPtrVector<char> GfcEncoding::EncodeInt(SharedCudaPtr<int> data)
 { return this->Encode<int>(data); }
-
 SharedCudaPtr<int> GfcEncoding::DecodeInt(SharedCudaPtrVector<char> data)
 { return this->Decode<int>(data); }
-
+SharedCudaPtrVector<char> GfcEncoding::EncodeTime(SharedCudaPtr<time_t> data)
+{ return this->Encode<time_t>(data); }
+SharedCudaPtr<time_t> GfcEncoding::DecodeTime(SharedCudaPtrVector<char> data)
+{ return this->Decode<time_t>(data); }
 SharedCudaPtrVector<char> GfcEncoding::EncodeFloat(SharedCudaPtr<float> data)
 { return this->Encode<float>(data); }
-
 SharedCudaPtr<float> GfcEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
 { return this->Decode<float>(data); }
-
+SharedCudaPtrVector<char> GfcEncoding::EncodeDouble(SharedCudaPtr<double> data)
+{ return SharedCudaPtrVector<char>(); }
+SharedCudaPtr<double> GfcEncoding::DecodeDouble(SharedCudaPtrVector<char> data)
+{ return SharedCudaPtr<double>(); }
 
 } /* namespace ddj */

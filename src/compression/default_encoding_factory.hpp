@@ -48,6 +48,8 @@ public:
 				{
 					case DataType::d_int:
 						return boost::make_shared<PatchEncodingFactory<int>>(dataType, PatchType::outside);
+					case DataType::d_time:
+						return boost::make_shared<PatchEncodingFactory<time_t>>(dataType, PatchType::outside);
 					case DataType::d_float:
 						return boost::make_shared<PatchEncodingFactory<float>>(dataType, PatchType::outside);
 					default:

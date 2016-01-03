@@ -34,6 +34,6 @@ SharedCudaPtr<T> NoneEncoding::Decode(SharedCudaPtrVector<char> input)
 #define NONE_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> NoneEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> NoneEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(NONE_ENCODING_SPEC, char, float, int, long long, unsigned int)
+FOR_EACH(NONE_ENCODING_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

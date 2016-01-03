@@ -57,6 +57,6 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
 
 #define SCALE_DECODE_SPEC(X) \
     template SharedCudaPtr<X> RleEncoding::Decode<X>(SharedCudaPtrVector<char>);
-FOR_EACH(SCALE_DECODE_SPEC, float, int, long long, unsigned int)
+FOR_EACH(SCALE_DECODE_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

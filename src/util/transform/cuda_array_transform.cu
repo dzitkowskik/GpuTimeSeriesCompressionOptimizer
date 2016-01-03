@@ -107,6 +107,30 @@ FOR_EACH(TRANSFORM_IN_PLACE_SPEC, float, int, long, long long, unsigned int)
 FOR_EACH(TRANS_MODULUS_SPEC, int, long, long long, unsigned int)
 
 #define TRANSFORM_SPEC(X) \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, AdditionOperator		<X, char>>(SharedCudaPtr<X>, AdditionOperator		<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, SubtractionOperator		<X, char>>(SharedCudaPtr<X>, SubtractionOperator	<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, MultiplicationOperator	<X, char>>(SharedCudaPtr<X>, MultiplicationOperator	<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, AbsoluteOperator		<X, char>>(SharedCudaPtr<X>, AbsoluteOperator		<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, ZeroOperator			<X, char>>(SharedCudaPtr<X>, ZeroOperator			<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, OneOperator				<X, char>>(SharedCudaPtr<X>, OneOperator			<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, NegateOperator			<X, char>>(SharedCudaPtr<X>, NegateOperator			<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, FillOperator			<X, char>>(SharedCudaPtr<X>, FillOperator			<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, DivisionOperator		<X, char>>(SharedCudaPtr<X>, DivisionOperator		<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, FloatingPointToIntegerOperator<X, char>>(SharedCudaPtr<X>, FloatingPointToIntegerOperator<X, char> op); \
+		template SharedCudaPtr<char> CudaArrayTransform::Transform<X, char, IntegerToFloatingPointOperator<X, char>>(SharedCudaPtr<X>, IntegerToFloatingPointOperator<X, char> op); \
+		\
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, AdditionOperator			<X, short>>(SharedCudaPtr<X>, AdditionOperator		<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, SubtractionOperator		<X, short>>(SharedCudaPtr<X>, SubtractionOperator	<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, MultiplicationOperator	<X, short>>(SharedCudaPtr<X>, MultiplicationOperator<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, AbsoluteOperator			<X, short>>(SharedCudaPtr<X>, AbsoluteOperator		<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, ZeroOperator				<X, short>>(SharedCudaPtr<X>, ZeroOperator			<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, OneOperator				<X, short>>(SharedCudaPtr<X>, OneOperator			<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, NegateOperator			<X, short>>(SharedCudaPtr<X>, NegateOperator		<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, FillOperator				<X, short>>(SharedCudaPtr<X>, FillOperator			<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, DivisionOperator			<X, short>>(SharedCudaPtr<X>, DivisionOperator		<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, FloatingPointToIntegerOperator<X, short>>(SharedCudaPtr<X>, FloatingPointToIntegerOperator<X, short> op); \
+		template SharedCudaPtr<short> CudaArrayTransform::Transform<X, short, IntegerToFloatingPointOperator<X, short>>(SharedCudaPtr<X>, IntegerToFloatingPointOperator<X, short> op); \
+		\
 	    template SharedCudaPtr<int> CudaArrayTransform::Transform<X, int, AdditionOperator		<X, int>>(SharedCudaPtr<X>, AdditionOperator		<X, int> op); \
 	    template SharedCudaPtr<int> CudaArrayTransform::Transform<X, int, SubtractionOperator	<X, int>>(SharedCudaPtr<X>, SubtractionOperator		<X, int> op); \
 	    template SharedCudaPtr<int> CudaArrayTransform::Transform<X, int, MultiplicationOperator<X, int>>(SharedCudaPtr<X>, MultiplicationOperator	<X, int> op); \
@@ -178,7 +202,7 @@ FOR_EACH(TRANS_MODULUS_SPEC, int, long, long long, unsigned int)
 	    template SharedCudaPtr<long long int> CudaArrayTransform::Transform<X, long long int, DivisionOperator		<X, long long int>>(SharedCudaPtr<X>, DivisionOperator		<X, long long int> op); \
 	    template SharedCudaPtr<long long int> CudaArrayTransform::Transform<X, long long int, FloatingPointToIntegerOperator<X, long long int>>(SharedCudaPtr<X>, FloatingPointToIntegerOperator<X, long long int> op); \
 	    template SharedCudaPtr<long long int> CudaArrayTransform::Transform<X, long long int, IntegerToFloatingPointOperator<X, long long int>>(SharedCudaPtr<X>, IntegerToFloatingPointOperator<X, long long int> op);
-FOR_EACH(TRANSFORM_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(TRANSFORM_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 
 

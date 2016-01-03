@@ -32,6 +32,8 @@ public:
 protected:
 	SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data);
 	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data);
+	SharedCudaPtrVector<char> EncodeTime(SharedCudaPtr<time_t> data);
+	SharedCudaPtr<time_t> DecodeTime(SharedCudaPtrVector<char> data);
 	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data);
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data);
 	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data);

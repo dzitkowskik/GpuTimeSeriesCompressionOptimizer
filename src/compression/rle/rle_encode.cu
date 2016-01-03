@@ -87,6 +87,6 @@ size_t RleEncoding::GetCompressedSize(SharedCudaPtr<T> data)
 
 #define RLE_ENCODE_SPEC(X) \
     template SharedCudaPtrVector<char> RleEncoding::Encode<X>(SharedCudaPtr<X> data);
-FOR_EACH(RLE_ENCODE_SPEC, float, int, long long, unsigned int)
+FOR_EACH(RLE_ENCODE_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

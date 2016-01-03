@@ -14,6 +14,7 @@
 #include "optimizer/optimal_tree.hpp"
 #include "optimizer/path_generator.hpp"
 #include "tree/compression_statistics.hpp"
+
 #include <boost/noncopyable.hpp>
 #include <gtest/gtest.h>
 #include <boost/make_shared.hpp>
@@ -68,7 +69,7 @@ private:
 public:
 	static SharedCompressionOptimizerPtr make_shared()
 	{
-		return boost::shared_ptr<CompressionOptimizer>();
+		return boost::make_shared<CompressionOptimizer>();
 	}
 
 private:

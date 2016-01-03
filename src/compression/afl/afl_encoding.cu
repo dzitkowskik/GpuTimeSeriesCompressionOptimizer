@@ -11,15 +11,15 @@
 namespace ddj
 {
 
-template<>
-SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<int> data)
+template<typename T>
+SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<T> data)
 {
 	// Get minimal bit count needed to encode data
-	char minBit = CudaArrayStatistics().MinBitCnt<int>(data);
+	char minBit = CudaArrayStatistics().MinBitCnt<T>(data);
 
-	int elemBitSize = 8*sizeof(int);
+	int elemBitSize = 8*sizeof(T);
 	int comprElemCnt = (minBit * data->size() + elemBitSize - 1) / elemBitSize;
-	int comprDataSize = comprElemCnt * sizeof(int);
+	int comprDataSize = comprElemCnt * sizeof(T);
 	char rest = (comprDataSize*8) - (data->size()*minBit);
 
 	auto result = CudaPtr<char>::make_shared(comprDataSize);
@@ -30,8 +30,8 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<int> data)
 	host_metadata[0] = minBit;
 	host_metadata[1] = rest;
 
-	run_afl_compress_gpu<int, 1>(
-		minBit, data->get(), (int*)result->get(), data->size(), comprDataSize/sizeof(int));
+	run_afl_compress_gpu<T, 1>(
+		minBit, data->get(), (T*)result->get(), data->size(), comprDataSize/sizeof(T));
 
 	cudaDeviceSynchronize();
 	cudaError_t err = cudaGetLastError();
@@ -65,8 +65,39 @@ __global__ void _splitFloatKernel(
 	sign[idx] = fu.parts.sign;
 }
 
-template<>
-SharedCudaPtr<int> AflEncoding::Decode(SharedCudaPtrVector<char> input);
+template<typename T>
+SharedCudaPtr<T> DecodeAfl(T* data, size_t size, int minBit, int rest)
+{
+	// Calculate length
+	long long comprBits = size * 8 - rest;
+	long long length = comprBits / minBit;
+
+	auto result = CudaPtr<T>::make_shared(length);
+	run_afl_decompress_gpu<T, 1>(minBit, data, result->get(), length);
+	cudaDeviceSynchronize();
+
+	cudaError_t err = cudaGetLastError();
+	if(err != cudaSuccess)
+	{
+		printf("cuda error\n");
+		printf("post-kernel err is %s.\n", cudaGetErrorString(err));
+		exit(1);
+	}
+	return result;
+}
+
+template<typename T>
+SharedCudaPtr<T> AflEncoding::Decode(SharedCudaPtrVector<char> input)
+{
+	auto metadata = input[0]->copyToHost();
+	auto data = input[1];
+
+	// Get min bit and rest
+	int minBit = (*metadata)[0];
+	int rest = (*metadata)[1];
+
+	return DecodeAfl<T>((T*)data->get(), data->size(), minBit, rest);
+}
 
 template<>
 SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<float> data)
@@ -111,40 +142,6 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<float> data)
 	}
 
 	return SharedCudaPtrVector<char>{ metadata, CudaArrayCopy().Concatenate(resultVector) };
-}
-
-template<typename T>
-SharedCudaPtr<T> DecodeAfl(T* data, size_t size, int minBit, int rest)
-{
-	// Calculate length
-	long long comprBits = size * 8 - rest;
-	long long length = comprBits / minBit;
-
-	auto result = CudaPtr<int>::make_shared(length);
-	run_afl_decompress_gpu<int, 1>(minBit, data, result->get(), length);
-	cudaDeviceSynchronize();
-
-	cudaError_t err = cudaGetLastError();
-	if(err != cudaSuccess)
-	{
-		printf("cuda error\n");
-		printf("post-kernel err is %s.\n", cudaGetErrorString(err));
-		exit(1);
-	}
-	return result;
-}
-
-template<>
-SharedCudaPtr<int> AflEncoding::Decode(SharedCudaPtrVector<char> input)
-{
-	auto metadata = input[0]->copyToHost();
-	auto data = input[1];
-
-	// Get min bit and rest
-	int minBit = (*metadata)[0];
-	int rest = (*metadata)[1];
-
-	return DecodeAfl<int>((int*)data->get(), data->size(), minBit, rest);
 }
 
 __global__ void _composeFloatKernel(
@@ -240,6 +237,22 @@ SharedCudaPtr<int> AflEncoding::DecodeInt(SharedCudaPtrVector<char> data)
 	return this->Decode<int>(data);
 }
 
+SharedCudaPtrVector<char> AflEncoding::EncodeTime(SharedCudaPtr<time_t> data)
+{
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
+	return this->Encode<time_t>(data);
+}
+
+SharedCudaPtr<time_t> AflEncoding::DecodeTime(SharedCudaPtrVector<char> data)
+{
+	if(data[1]->size() <= 0)
+		return CudaPtr<time_t>::make_shared();
+
+	return this->Decode<time_t>(data);
+}
+
 SharedCudaPtrVector<char> AflEncoding::EncodeFloat(SharedCudaPtr<float> data)
 {
 	if(data->size() <= 0)
@@ -258,6 +271,7 @@ SharedCudaPtr<float> AflEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
 
 SharedCudaPtrVector<char> AflEncoding::EncodeDouble(SharedCudaPtr<double> data)
 { return SharedCudaPtrVector<char>(); }
+
 SharedCudaPtr<double> AflEncoding::DecodeDouble(SharedCudaPtrVector<char> data)
 { return SharedCudaPtr<double>(); }
 
@@ -324,5 +338,10 @@ size_t AflEncoding::GetCompressedSizeFloatingPoint(SharedCudaPtr<T> data)
 	size += GetMetadataSize(CastSharedCudaPtr<int, char>(mantissaResult), DataType::d_int);
 	return size;
 }
+
+#define AFL_ENCODING_SPEC(X) \
+	template SharedCudaPtrVector<char> AflEncoding::Encode<X>(SharedCudaPtr<X>); \
+	template SharedCudaPtr<X> AflEncoding::Decode<X>(SharedCudaPtrVector<char>);
+FOR_EACH(AFL_ENCODING_SPEC, int, long, unsigned int)
 
 } /* namespace ddj */

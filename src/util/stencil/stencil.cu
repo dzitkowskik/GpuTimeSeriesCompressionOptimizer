@@ -124,17 +124,23 @@ Stencil Stencil::Create(SharedCudaPtr<T> data, Predicate pred)
 	template Stencil Stencil::Create<X, NotEqualOperator<X>>(SharedCudaPtr<X> data, NotEqualOperator<X> pred); \
 	template Stencil Stencil::Create<X, InsideOperator<X>>(SharedCudaPtr<X> data, InsideOperator<X> pred); \
 	\
+	template Stencil Stencil::Create<X, OutsideOperator<char>>(SharedCudaPtr<X> data, OutsideOperator<char> pred); \
+	template Stencil Stencil::Create<X, OutsideOperator<short>>(SharedCudaPtr<X> data, OutsideOperator<short> pred); \
+	template Stencil Stencil::Create<X, OutsideOperator<double>>(SharedCudaPtr<X> data, OutsideOperator<double> pred); \
 	template Stencil Stencil::Create<X, OutsideOperator<float>>(SharedCudaPtr<X> data, OutsideOperator<float> pred); \
 	template Stencil Stencil::Create<X, OutsideOperator<int>>(SharedCudaPtr<X> data, OutsideOperator<int> pred); \
 	template Stencil Stencil::Create<X, OutsideOperator<long>>(SharedCudaPtr<X> data, OutsideOperator<long> pred); \
 	template Stencil Stencil::Create<X, OutsideOperator<long long>>(SharedCudaPtr<X> data, OutsideOperator<long long> pred); \
 	template Stencil Stencil::Create<X, OutsideOperator<unsigned int>>(SharedCudaPtr<X> data, OutsideOperator<unsigned int> pred); \
 	\
+	template Stencil Stencil::Create<X, LowerOperator<char>>(SharedCudaPtr<X> data, LowerOperator<char> pred); \
+	template Stencil Stencil::Create<X, LowerOperator<short>>(SharedCudaPtr<X> data, LowerOperator<short> pred); \
+	template Stencil Stencil::Create<X, LowerOperator<double>>(SharedCudaPtr<X> data, LowerOperator<double> pred); \
 	template Stencil Stencil::Create<X, LowerOperator<float>>(SharedCudaPtr<X> data, LowerOperator<float> pred); \
 	template Stencil Stencil::Create<X, LowerOperator<int>>(SharedCudaPtr<X> data, LowerOperator<int> pred); \
 	template Stencil Stencil::Create<X, LowerOperator<long>>(SharedCudaPtr<X> data, LowerOperator<long> pred); \
 	template Stencil Stencil::Create<X, LowerOperator<long long>>(SharedCudaPtr<X> data, LowerOperator<long long> pred); \
 	template Stencil Stencil::Create<X, LowerOperator<unsigned int>>(SharedCudaPtr<X> data, LowerOperator<unsigned int> pred);
-FOR_EACH(STENCIL_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(STENCIL_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 }/* namespace ddj */

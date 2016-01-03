@@ -46,6 +46,10 @@ protected:
 	{ return this->Encode<int>(data); }
 	SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data)
 	{ return this->Decode<int>(data); }
+	SharedCudaPtrVector<char> EncodeTime(SharedCudaPtr<time_t> data)
+	{ return this->Encode<time_t>(data); }
+	SharedCudaPtr<time_t> DecodeTime(SharedCudaPtrVector<char> data)
+	{ return this->Decode<time_t>(data); }
 	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data)
 	{ return this->Encode<float>(data); }
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data)

@@ -139,6 +139,6 @@ size_t DictEncoding::GetCompressedSize(SharedCudaPtr<T> data)
 #define DICT_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> DictEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> DictEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(DICT_ENCODING_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(DICT_ENCODING_SPEC, short, char, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

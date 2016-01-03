@@ -73,7 +73,7 @@ SharedCudaPtr<T> OutsidePatchEncoding::Decode(SharedCudaPtrVector<char> data)
 #define OUTSIDE_PATCH_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> OutsidePatchEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> OutsidePatchEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(OUTSIDE_PATCH_ENCODING_SPEC, float, int, long long, unsigned int)
+FOR_EACH(OUTSIDE_PATCH_ENCODING_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 
 } /* namespace ddj */

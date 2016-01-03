@@ -27,6 +27,8 @@ public:
 		{
 			case DataType::d_int:
 				return EncodeInt(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
+			case DataType::d_time:
+				return EncodeTime(boost::reinterpret_pointer_cast<CudaPtr<time_t>>(data));
 			case DataType::d_float:
 				return EncodeFloat(boost::reinterpret_pointer_cast<CudaPtr<float>>(data));
 			case DataType::d_double:
@@ -42,6 +44,8 @@ public:
 		{
 			case DataType::d_int:
 				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeInt(data));
+			case DataType::d_time:
+				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeTime(data));
 			case DataType::d_float:
 				return boost::reinterpret_pointer_cast<CudaPtr<char>>(DecodeFloat(data));
 			case DataType::d_double:
@@ -71,6 +75,10 @@ protected:
 	// INT
 	virtual SharedCudaPtrVector<char> EncodeInt(SharedCudaPtr<int> data) = 0;
 	virtual SharedCudaPtr<int> DecodeInt(SharedCudaPtrVector<char> data) = 0;
+
+	// TIME_T
+	virtual SharedCudaPtrVector<char> EncodeTime(SharedCudaPtr<time_t> data) = 0;
+	virtual SharedCudaPtr<time_t> DecodeTime(SharedCudaPtrVector<char> data) = 0;
 
 	// FLOAT
 	virtual SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data) = 0;

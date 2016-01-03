@@ -43,7 +43,7 @@ SharedCudaPtr<T> Histogram::GetMostFrequent(SharedCudaPtrPair<T, int> histogram,
 	template SharedCudaPtr<X> Histogram::GetMostFrequent<X>(SharedCudaPtrPair<X, int>, int); \
 	template SharedCudaPtr<int> Histogram::GetHistogram<X>(SharedCudaPtr<X>, int); \
 	template SharedCudaPtrPair<X, int> Histogram::GetDictionaryCounter<X>(SharedCudaPtr<X>);
-FOR_EACH(DELTA_ENCODING_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(DELTA_ENCODING_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 
 } /* namespace ddj */

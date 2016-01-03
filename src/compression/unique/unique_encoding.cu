@@ -305,6 +305,6 @@ size_t UniqueEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type
 	template SharedCudaPtr<X> UniqueEncoding::DecompressUnique<X>(SharedCudaPtr<char>); \
     template SharedCudaPtrVector<char> UniqueEncoding::Encode<X>(SharedCudaPtr<X>); \
     template SharedCudaPtr<X> UniqueEncoding::Decode<X>(SharedCudaPtrVector<char>);
-FOR_EACH(UNIQUE_ENCODING_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(UNIQUE_ENCODING_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

@@ -29,7 +29,6 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompression)
 	auto paths = PathGenerator().GeneratePaths();
 
 	auto tsData = GetTsIntDataFromTestFile();
-	printf("Data read success!!\n\n");
 	auto data = CudaArrayTransform().Cast<time_t, int>(tsData);
 //	HelperPrint::PrintSharedCudaPtr(data, "data");
 

@@ -171,6 +171,8 @@ DataStatistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data,
 	{
 		case DataType::d_int:
 			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
+		case DataType::d_time:
+			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<time_t>>(data));
 		case DataType::d_float:
 			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<float>>(data));
 		case DataType::d_double:
@@ -191,6 +193,6 @@ DataStatistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data,
     template float CudaArrayStatistics::RlMetric<X,5>(SharedCudaPtr<X>); \
     template float CudaArrayStatistics::RlMetric<X,6>(SharedCudaPtr<X>); \
     template X CudaArrayStatistics::Mean<X>(SharedCudaPtr<X> data);
-FOR_EACH(CUDA_ARRAY_STATISTICS_SPEC, double, float, int, long, long long, unsigned int)
+FOR_EACH(CUDA_ARRAY_STATISTICS_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

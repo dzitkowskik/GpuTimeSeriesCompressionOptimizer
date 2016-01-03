@@ -59,6 +59,6 @@ SharedCudaPtr<int> Histogram::CudaHistogram(SharedCudaPtr<T> data, int bucketCnt
 
 #define CUDA_HISTOGRAM_SPEC(X) \
 	template SharedCudaPtr<int> Histogram::CudaHistogram<X>(SharedCudaPtr<X>, int);
-FOR_EACH(CUDA_HISTOGRAM_SPEC, float, int, long, long long, unsigned int)
+FOR_EACH(CUDA_HISTOGRAM_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */
