@@ -10,52 +10,54 @@
 #include <signal.h>
 #include <boost/bind.hpp>
 
-//#include "tree/compression_node.hpp"
-//#include "util/generator/cuda_array_generator.hpp"
-//#include "compression/dict/dict_encoding.hpp"
-//#include "tests/encode_decode_unittest_helper.hpp"
-
 using namespace std;
 using namespace ddj;
+namespace po = boost::program_options;
 
-int wait_to_terminate()
+ConfigOptions GetProgramOptions()
 {
-  //wait for SIGINT
-  int sig_number;
-  sigset_t signal_set;\
-  sigemptyset (&signal_set);
-  sigaddset (&signal_set, SIGINT);
-  sigwait (&signal_set, &sig_number);
-  return EXIT_SUCCESS;
+	ConfigOptions options;
+
+	// SET CONSOLE OPTIONS
+	po::options_description consoleOptions("Config file options");
+	consoleOptions.add_options()
+			("help", "produce help message")
+			("c", "compress")
+			("d", "decompress")
+			("input-file", po::value<string>(), "input file")
+			("output-file", po::value<string>(), "output file")
+			;
+	options.ConsoleOptions = consoleOptions;
+
+	// SET CONSOLE POSITIONAL OPTIONS
+	po::positional_options_description consolePositionalOptions("Console positional options");
+	consolePositionalOptions.add("input-file", -2);
+	consolePositionalOptions.add("output-file", -1);
+	options.ConsolePositionalOptions = consolePositionalOptions;
+
+	// SET CONFIG FILE OPTIONS
+	po::options_description configFileOptions("Config file options");
+	options.ConfigFileOptions = configFileOptions;
+
+	return options;
 }
 
 void initialize_logger()
 {
-  log4cplus::initialize();
-  LogLog::getLogLog()->setInternalDebugging(true);
-  PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("logger.prop"));
+	log4cplus::initialize();
+	LogLog::getLogLog()->setInternalDebugging(true);
+	PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("logger.prop"));
 }
-
-//void test_dict_encoding()
-//{
-//	CudaArrayGenerator generator;
-//	auto d_int_random_data = generator.GenerateRandomIntDeviceArray(10000, 100, 1000);
-//	DictEncoding encoder;
-//	auto result = EncodeDecodeUnittestHelper::TestSize2<int>(
-//	boost::bind(&DictEncoding::Encode<int>, encoder, _1),
-//	boost::bind(&DictEncoding::Decode<int>, encoder, _1),
-//	d_int_random_data);
-//	if (result) printf("\n\nOK\n\n");
-//	else printf("\n\nFAIL\n\n");
-//}
 
 int main(int argc, char* argv[])
 {
-	ddj::Config::GetInstance()->InitOptions(argc, argv, "config.ini");
+	// Configure program
+	ConfigDefinition configDef { argc, argv, "config.ini", GetProgramOptions() };
+	ddj::Config::Initialize(configDef);
+
 	initialize_logger();
 
-	// START THE PROGRAM HERE
 
-	//  return wait_to_terminate();
+
 	return 0;
 }

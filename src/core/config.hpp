@@ -16,13 +16,28 @@ using namespace std;
 namespace ddj
 {
 
+struct ConfigOptions
+{
+	po::options_description ConfigFileOptions;
+	po::options_description ConsoleOptions;
+	po::positional_options_description ConsolePositionalOptions;
+};
+
+struct ConfigDefinition
+{
+	int argc;
+	char** argv;
+	std::string ConfigFile;
+	ConfigOptions Options;
+};
+
 class Config
 {
 private:
     static Config* _instance;
     po::variables_map _configMap;
 
-    Config() {};
+    Config(ConfigDefinition definition);
     virtual ~Config() {};
 
 public:
@@ -35,10 +50,10 @@ public:
 
     bool HasValue(string settingName);
     void ListAllSettings();
-    void InitOptions(int argc, char** argv, string path);
 
 public:
     static Config* GetInstance();
+    static void Initialize(ConfigDefinition definition);
 };
 
 } /* namespace ddj */

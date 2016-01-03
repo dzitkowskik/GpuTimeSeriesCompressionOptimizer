@@ -1,88 +1,90 @@
 /*
- * Config.cpp
- *
- *  Created on: Mar 13, 2015
- *      Author: Karol Dzitkowski
- */
+* Config.cpp
+*
+*  Created on: Mar 13, 2015
+*      Author: Karol Dzitkowski
+*/
 
 #include "config.hpp"
 #include <iostream>
 #include <fstream>
 #include <iterator>
 
+
+
 namespace ddj
 {
 
-  Config* Config::_instance(0);
+Config* Config::_instance(0);
 
-  Config* Config::GetInstance()
-  {
-    if (!_instance)
-    {
-      _instance = new Config;
-    }
+Config::Config(ConfigDefinition definition)
+{
+	try
+	{
+		_configMap = po::variables_map();
 
-    return _instance;
-  }
+		definition.Options.ConsoleOptions.add_options()
+		("help", "shows help message")
+		;
 
-  bool Config::HasValue(string settingName)
-  {
-    return _configMap.count(settingName);
-  }
+		ifstream ifs(definition.ConfigFile.c_str());
+		if (!ifs)
+		{
+			string msg = "can not open config file: ";
+			msg.append(definition.ConfigFile);
+			fprintf(stderr, "Error in %s: %s\n", __FILE__, msg.c_str());
+			return;
+		}
+		else
+		{
+			auto commandLineParser = po::command_line_parser(definition.argc, definition.argv)
+				.options(definition.Options.ConsoleOptions)
+				.positional(definition.Options.ConsolePositionalOptions)
+				.run();
+			po::store(po::parse_config_file(ifs, definition.Options.ConfigFileOptions), _configMap);
+			po::store(commandLineParser, _configMap);
+			notify(_configMap);
+		}
 
-  void Config::InitOptions(int argc, char** argv, string path)
-  {
-    try
-    {
-      _configMap = po::variables_map();
+		if (_configMap.count("help"))
+		{
+			std::cout << definition.Options.ConsoleOptions << std::endl;
+			exit(0);
+		}
+	}
+	catch (exception& e)
+	{
+		fprintf(stderr, "Error in file %s: %s\n", __FILE__, e.what());
+	}
+}
 
-      po::options_description console_options("Allowed options");
-      console_options.add_options()
-          ("help", "shows help message")
-          ("test", "runs all unit tests")
-          ("performance", "runs all performance tests")
-      ;
+Config* Config::GetInstance()
+{
+	if (!_instance)
+		throw std::runtime_error("Config not initialized!");
 
-      po::options_description hidden("Hidden options");
-      hidden.add_options()
-      ("TEST_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing test time series data")
-      ("BENCHMARK_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing benchmark time series data")
-      ("NYSE_DATA_1GB", po::value<std::string>()->default_value(""), "default file containing nyse time series data from openbook")
-      ;
+	return _instance;
+}
 
-      ifstream ifs(path.c_str());
-      if (!ifs)
-      {
-        string msg = "can not open config file: ";
-        msg.append(path);
-        fprintf(stderr, "Error in %s: %s\n", __FILE__, msg.c_str());
-        return;
-      }
-      else
-      {
-        po::store(po::parse_config_file(ifs, hidden), _configMap);
-        po::store(po::parse_command_line(argc, argv, console_options), _configMap);
-        notify(_configMap);
-      }
+bool Config::HasValue(string settingName)
+{
+	return _configMap.count(settingName);
+}
 
-      if (_configMap.count("help"))
-      {
-          std::cout << console_options << std::endl;
-          exit(0);
-      }
-    }
-    catch (exception& e)
-    {
-      fprintf(stderr, "Error in file %s: %s\n", __FILE__, e.what());
-    }
-  }
+void Config::Initialize(ConfigDefinition definition)
+{
+	if (!_instance)
+	{
+		_instance = new Config(definition);
+	}
+}
 
-  void Config::ListAllSettings()
-  {
-    po::variables_map::iterator it;
-    for (it = _configMap.begin(); it != _configMap.end(); ++it)
-    {
-      cout << it->first << "\n";
-    }
-  }
+void Config::ListAllSettings()
+{
+	po::variables_map::iterator it;
+	for (it = _configMap.begin(); it != _configMap.end(); ++it)
+		cout << it->first << "\n";
+}
+
+
 } /* namespace ddj */

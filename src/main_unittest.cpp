@@ -10,6 +10,34 @@
 //--gtest_filter=AflEncoding_Compression_Inst/AflCompressionTest.CompressionOfRandomInts_size/0
 //--gtest_repeat=10
 
+using namespace std;
+using namespace ddj;
+namespace po = boost::program_options;
+
+ConfigOptions GetProgramOptions()
+{
+	ConfigOptions options;
+
+	// SET CONSOLE OPTIONS
+	po::options_description consoleOptions("Config file options");
+	options.ConsoleOptions.add(consoleOptions);
+
+	// SET CONSOLE POSITIONAL OPTIONS
+	po::positional_options_description consolePositionalOptions;
+	options.ConsolePositionalOptions = consolePositionalOptions;
+
+	// SET CONFIG FILE OPTIONS
+	po::options_description configFileOptions("Config file options");
+	configFileOptions.add_options()
+	    ("TEST_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing test time series data")
+	    ("BENCHMARK_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing benchmark time series data")
+	    ("NYSE_DATA_1GB", po::value<std::string>()->default_value(""), "default file containing nyse time series data from openbook")
+	    ;
+	options.ConfigFileOptions.add(configFileOptions);
+
+	return options;
+}
+
 void initialize_logger()
 {
   log4cplus::initialize();
@@ -19,12 +47,9 @@ void initialize_logger()
 
 int main(int argc, char* argv[])
 {
-    ddj::Config::GetInstance()->InitOptions(argc, argv, "config.ini");
+	ConfigDefinition configDef { argc, argv, "config.ini", GetProgramOptions() };
+	ddj::Config::Initialize(configDef);
+	initialize_logger();
     ::testing::InitGoogleTest(&argc, argv);
-//    ::testing::FLAGS_gtest_repeat = 1;
-
-    auto value = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
-    printf("%s\n", value.c_str());
-
     return RUN_ALL_TESTS();
 }
