@@ -27,24 +27,25 @@ Config::Config(ConfigDefinition definition)
 		("help", "shows help message")
 		;
 
-		ifstream ifs(definition.ConfigFile.c_str());
-		if (!ifs)
+		if(definition.ConfigFile.size() > 0)
 		{
-			string msg = "can not open config file: ";
-			msg.append(definition.ConfigFile);
-			fprintf(stderr, "Error in %s: %s\n", __FILE__, msg.c_str());
-			return;
+			ifstream ifs(definition.ConfigFile.c_str());
+			if (!ifs)
+			{
+				string msg = "can not open config file: ";
+				msg.append(definition.ConfigFile);
+				fprintf(stderr, "Error in %s: %s\n", __FILE__, msg.c_str());
+			}
+			else
+				po::store(po::parse_config_file(ifs, definition.Options.ConfigFileOptions), _configMap);
 		}
-		else
-		{
-			auto commandLineParser = po::command_line_parser(definition.argc, definition.argv)
-				.options(definition.Options.ConsoleOptions)
-				.positional(definition.Options.ConsolePositionalOptions)
-				.run();
-			po::store(po::parse_config_file(ifs, definition.Options.ConfigFileOptions), _configMap);
-			po::store(commandLineParser, _configMap);
-			notify(_configMap);
-		}
+
+		auto commandLineParser = po::command_line_parser(definition.argc, definition.argv)
+			.options(definition.Options.ConsoleOptions)
+			.positional(definition.Options.ConsolePositionalOptions)
+			.run();
+		po::store(commandLineParser, _configMap);
+		notify(_configMap);
 
 		if (_configMap.count("help"))
 		{
