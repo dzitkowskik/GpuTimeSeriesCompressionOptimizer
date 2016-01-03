@@ -22,7 +22,8 @@ public:
 	virtual ~ParallelTSCompressor() {}
 
 public:
-	void Compress(File& file, File& outputFile);
+	void Compress(File& inputFile, File& outputFile);
+	void Decompress(File& inputFile, File& outputFile, FileDefinition& def);
 
 private:
 	void init(SharedTimeSeriesPtr ts);
