@@ -9,6 +9,7 @@
 #include "helpers/helper_comparison.cuh"
 #include "core/macros.h"
 #include "helpers/helper_print.hpp"
+#include "util/copy/cuda_array_copy.hpp"
 
 #include <boost/function.hpp>
 
@@ -37,8 +38,8 @@ bool CompressionUnittestBase::TestContent(
 //
 //	HelperPrint::PrintSharedCudaPtr(data, "data");
 //	HelperPrint::PrintSharedCudaPtr(decodedData, "decodedData");
-//	printf("Size before compression: %d bytes\n", data->size()*sizeof(T));
-//	printf("Size after compression: %d bytes\n", Concatenate(encodedData)->size());
+//	printf("Size before compression: %lu bytes\n", data->size()*sizeof(T));
+//	printf("Size after compression: %lu bytes\n", CudaArrayCopy().Concatenate(encodedData)->size());
 
 	return CompareDeviceArrays(data->get(), decodedData->get(), data->size());
 }

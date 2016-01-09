@@ -17,4 +17,7 @@
 SharedCudaPtrVector<char> CompressDouble(SharedCudaPtr<double> data, int blocks, int warpsperblock);
 SharedCudaPtr<double> DecompressDouble(SharedCudaPtrVector<char> input);
 
+SharedCudaPtrVector<char> CompressFloat(SharedCudaPtr<float> data, int blocks, int warpsperblock);
+SharedCudaPtr<float> DecompressFloat(SharedCudaPtrVector<char> input);
+
 #endif /* GFC_ENCODING_IMPL_CUH_ */

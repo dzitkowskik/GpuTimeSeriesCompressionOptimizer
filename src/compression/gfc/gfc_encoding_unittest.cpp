@@ -42,4 +42,37 @@ TEST_P(GfcCompressionTest, CompressionOfRandomDoubles_data)
 	);
 }
 
+TEST_P(GfcCompressionTest, CompressionOfRandomFloats_size)
+{
+	GfcEncoding encoder;
+    EXPECT_TRUE(
+		TestSize<float>(
+			boost::bind(&GfcEncoding::Encode<float>, encoder, _1),
+			boost::bind(&GfcEncoding::Decode<float>, encoder, _1),
+			GetFloatRandomData())
+    );
+}
+
+TEST_P(GfcCompressionTest, CompressionOfRandomFloats_data)
+{
+	GfcEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&GfcEncoding::Encode<float>, encoder, _1),
+			boost::bind(&GfcEncoding::Decode<float>, encoder, _1),
+			GetFloatRandomData())
+	);
+}
+
+TEST_P(GfcCompressionTest, CompressionOfRealDataFloats_data)
+{
+	GfcEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&GfcEncoding::Encode<float>, encoder, _1),
+			boost::bind(&GfcEncoding::Decode<float>, encoder, _1),
+			GetTsFloatDataFromTestFile())
+	);
+}
+
 } /* namespace ddj */

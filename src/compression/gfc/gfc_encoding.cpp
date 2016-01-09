@@ -30,17 +30,23 @@ SharedCudaPtr<double> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 // FLOAT
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
-{ return SharedCudaPtrVector<char>(); }
+{
+	unsigned long long size = data->size();
+	int warpsperblock = 32;
+	int subchunkCnt = 32;
+	unsigned long long blocksize = warpsperblock * subchunkCnt * WARPSIZE;
+	int blocks = (size + blocksize - 1) / blocksize;
+	return CompressFloat(data, blocks, warpsperblock);
+}
 
 template<>
 SharedCudaPtr<float> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
-{ return SharedCudaPtr<float>(); }
+{ return DecompressFloat(input); }
 
 // INT
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<int> data)
 { return SharedCudaPtrVector<char>(); }
-
 template<>
 SharedCudaPtr<int> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 { return SharedCudaPtr<int>(); }
@@ -49,10 +55,10 @@ SharedCudaPtr<int> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<time_t> data)
 { return SharedCudaPtrVector<char>(); }
-
 template<>
 SharedCudaPtr<time_t> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 { return SharedCudaPtr<time_t>(); }
+
 
 SharedCudaPtrVector<char> GfcEncoding::EncodeInt(SharedCudaPtr<int> data)
 { return this->Encode<int>(data); }

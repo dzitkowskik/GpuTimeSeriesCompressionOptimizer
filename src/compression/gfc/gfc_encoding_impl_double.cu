@@ -1,3 +1,10 @@
+/*
+ * gfc_encoding_impl_double.cu
+ *
+ *  Created on: Jan 9, 2016
+ *      Author: Karol Dzitkowski
+ */
+
 #include "compression/gfc/gfc_encoding_impl.cuh"
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,7 +28,7 @@ __device__ void WarpPrefixSum(int idx, T* arr, T value)
 	arr[idx] += arr[idx-16];	__threadfence_block();
 }
 
-__global__ void _gfcCompressKernel()
+__global__ void _gfcCompressKernelD()
 {
 	extern __shared__ int sBuffer[];
 
@@ -82,7 +89,7 @@ __global__ void _gfcCompressKernel()
 	if (warpIdx == 31) cOffsetData[warp] = offset;
 }
 
-__global__ void _gfcDecompressKernel()
+__global__ void _gfcDecompressKernelD()
 {
 	extern __shared__ int sBuffer[];
 
@@ -187,7 +194,7 @@ SharedCudaPtrVector<char> CompressDouble(SharedCudaPtr<double> data, int blocks,
 
 	boundaries->fillFromHost(cut, warpsCnt);
 
-	_gfcCompressKernel<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>();
+	_gfcCompressKernelD<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>();
 	cudaDeviceSynchronize();
 	CUDA_CALL( cudaGetLastError() );
 
@@ -286,7 +293,7 @@ SharedCudaPtr<double> DecompressDouble(SharedCudaPtrVector<char> input)
 		total += size;
 	}
 
-	_gfcDecompressKernel<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>();
+	_gfcDecompressKernelD<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>();
 	cudaDeviceSynchronize();
 	CUDA_CALL( cudaGetLastError() );
 
