@@ -51,7 +51,9 @@ void CompressionTask::execute()
 	d_data->fillFromHost(h_data, size);
 
 	// compress data
-	auto d_result = _optimizer->CompressData(d_data, _ts->getColumn(_columnId).getType());
+	auto type = _ts->getColumn(_columnId).getType();
+	printf("Task id = %d, compress type %s\n", _id, GetDataTypeString(type).c_str());
+	auto d_result = _optimizer->CompressData(d_data, type);
 
 	// send compressed batch to host
 	auto h_result = d_result->copyToHost();
@@ -62,6 +64,7 @@ void CompressionTask::execute()
 
 	// end task
 	_status = TaskStatus::success;
+	printf("Task %d succeed!\n", _id);
 }
 
 } /* namespace ddj */

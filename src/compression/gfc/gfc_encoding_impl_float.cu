@@ -11,12 +11,6 @@
 #include <assert.h>
 #include <cuda.h>
 
-__constant__ unsigned int* 	cData;
-__constant__ unsigned int* 	cDecompressedData;
-__constant__ uchar* cCompressedData;
-__constant__ int* 	cChunkSizeData;
-__constant__ int* 	cOffsetData;
-
 template<typename T>
 __device__ void WarpPrefixSum(int idx, T* arr, T value)
 {
@@ -28,7 +22,11 @@ __device__ void WarpPrefixSum(int idx, T* arr, T value)
 	arr[idx] += arr[idx-16];	__threadfence_block();
 }
 
-__global__ void _gfcCompressKernelF()
+__global__ void _gfcCompressKernelF(
+		unsigned int* 	cData,
+		uchar* cCompressedData,
+		int* 	cChunkSizeData,
+		int* 	cOffsetData)
 {
 	extern __shared__ int sBuffer[];
 
@@ -87,7 +85,10 @@ __global__ void _gfcCompressKernelF()
 	if (warpIdx == 31) cOffsetData[warp] = offset;
 }
 
-__global__ void _gfcDecompressKernelF()
+__global__ void _gfcDecompressKernelF(
+		uchar* cCompressedData,
+		unsigned int* 	cDecompressedData,
+		int* 	cChunkSizeData)
 {
 	extern __shared__ int sBuffer[];
 
@@ -177,20 +178,13 @@ SharedCudaPtrVector<char> CompressFloat(SharedCudaPtr<float> data, int blocks, i
 	auto compressed = CudaPtr<char>::make_shared((floats+1)/2*9);
 	auto boundaries = CudaPtr<int>::make_shared(warpsCnt);
 	auto offsets = CudaPtr<int>::make_shared(warpsCnt);
-
-	auto uncompressedPtr = uncompressed->get();
-	auto compressedPtr = compressed->get();
-	auto boundariesPtr = boundaries->get();
-	auto offsetsPtr = offsets->get();
-
-	CUDA_CALL( cudaMemcpyToSymbol(cData, &uncompressedPtr, sizeof(void *)) );
-	CUDA_CALL( cudaMemcpyToSymbol(cCompressedData, &compressedPtr, sizeof(void *)) );
-	CUDA_CALL( cudaMemcpyToSymbol(cChunkSizeData, &boundariesPtr, sizeof(void *)) );
-	CUDA_CALL( cudaMemcpyToSymbol(cOffsetData, &offsetsPtr, sizeof(void *)) );
-
 	boundaries->fillFromHost(cut, warpsCnt);
 
-	_gfcCompressKernelF<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>();
+	_gfcCompressKernelF<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>(
+			(unsigned int*)uncompressed->get(),
+			(uchar*)compressed->get(),
+			boundaries->get(),
+			offsets->get());
 	cudaDeviceSynchronize();
 	CUDA_CALL( cudaGetLastError() );
 
@@ -267,15 +261,6 @@ SharedCudaPtr<float> DecompressFloat(SharedCudaPtrVector<char> input)
 	auto compressed = CudaPtr<char>::make_shared((floats+1)/2*9);
 	auto decompressed = CudaPtr<float>::make_shared(floats);
 	auto boundaries = CudaPtr<int>::make_shared(warpsCnt);
-
-	auto decompressedPtr = decompressed->get();
-	auto compressedPtr = compressed->get();
-	auto boundariesPtr = boundaries->get();
-
-	CUDA_CALL( cudaMemcpyToSymbol(cDecompressedData, &decompressedPtr, sizeof(void *)) );
-	CUDA_CALL( cudaMemcpyToSymbol(cCompressedData, &compressedPtr, sizeof(void *)) );
-	CUDA_CALL( cudaMemcpyToSymbol(cChunkSizeData, &boundariesPtr, sizeof(void *)) );
-
     boundaries->fillFromHost(cut, warpsCnt);
 
 	// copy compressed data by chunk
@@ -289,7 +274,10 @@ SharedCudaPtr<float> DecompressFloat(SharedCudaPtrVector<char> input)
 		total += size;
 	}
 
-	_gfcDecompressKernelF<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>();
+	_gfcDecompressKernelF<<<blocks, WARPSIZE*warpsperblock, 32 * (3 * WARPSIZE / 2) * sizeof(int)>>>(
+			(uchar*)compressed->get(),
+			(unsigned int*)decompressed->get(),
+			boundaries->get());
 	cudaDeviceSynchronize();
 	CUDA_CALL( cudaGetLastError() );
 

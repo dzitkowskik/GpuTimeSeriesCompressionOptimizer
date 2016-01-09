@@ -109,7 +109,7 @@ Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistic
 		// FLOAT
 		if(et != EncodingType::floatToInt)
 		{
-			if(dt != DataType::d_float || dt != DataType::d_double)
+			if(dt == DataType::d_float)
 				result.push_back(EncodingType::floatToInt);
 		}
 

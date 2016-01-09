@@ -15,6 +15,10 @@ namespace ddj
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<double> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
+
 	unsigned long long size = data->size();
 	int warpsperblock = 16;
 	int subchunkCnt = 64;
@@ -25,12 +29,20 @@ SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<double> data)
 
 template<>
 SharedCudaPtr<double> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
-{ return DecompressDouble(input); }
+{
+	if(input[1]->size() <= 0)
+		return CudaPtr<double>::make_shared();
+
+	return DecompressDouble(input);
+}
 
 // FLOAT
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 	unsigned long long size = data->size();
 	int warpsperblock = 32;
 	int subchunkCnt = 32;
@@ -41,7 +53,12 @@ SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 
 template<>
 SharedCudaPtr<float> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
-{ return DecompressFloat(input); }
+{
+	if(input[1]->size() <= 0)
+		return CudaPtr<float>::make_shared();
+
+	return DecompressFloat(input);
+}
 
 // INT
 template<>
