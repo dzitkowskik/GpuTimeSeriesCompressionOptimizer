@@ -217,6 +217,7 @@ SharedCudaPtrVector<char> CompressFloat(SharedCudaPtr<float> data, int blocks, i
 		CUDA_CALL(
 			cudaMemcpy(result->get()+total, compressed->get()+offset, (*h_offsets)[i], CPY_DTD)
 		);
+//		printf("result_size=%lu, total=%d, offset=%d, size=%d\n", result->size(), total, offset, (*h_offsets)[i]);
 		total+=(*h_offsets)[i];
 	}
 
@@ -271,6 +272,7 @@ SharedCudaPtr<float> DecompressFloat(SharedCudaPtrVector<char> input)
 		offset = ((start+1)/2*9);
 		size = (*h_offsets)[i]-offset;
 		CUDA_CALL(cudaMemcpy(compressed->get() + offset, data->get() + total, size*sizeof(char), CPY_DTD));
+//		printf("cmpr_size=%lu, data_size=%lu, offset=%d, total=%d, size=%d\n", compressed->size(), data->size(), offset, total, size);
 		total += size;
 	}
 

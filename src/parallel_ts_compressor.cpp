@@ -27,7 +27,7 @@ void ParallelTSCompressor::init(SharedTimeSeriesPtr ts)
 	_columnNumber = ts->getColumnsNumber();
 	for(int i = 0; i < _columnNumber; i++)
 		_optimizers.push_back(CompressionOptimizer::make_shared());
-	_taskScheduler = TaskScheduler::make_unique(_columnNumber);
+	_taskScheduler = TaskScheduler::make_unique(1);
 	_initialized = true;
 }
 
@@ -66,18 +66,16 @@ void ParallelTSCompressor::Decompress(File& inputFile, File& outputFile, FileDef
 		// read data from file and save as ts column
 		ts->getColumn(i).reserveSize(size);
 		inputFile.ReadRaw(ts->getColumn(i).getData(), size);
-
 		// schedule decompression task
 		_taskScheduler->Schedule(DecompressionTask::make_shared(ts, i++));
-
 		if(i == _columnNumber)
 		{
 			i = 0;
-
 			// wait for all tasks to complete
+			printf("START WAITING!!\n");
 			_taskScheduler->WaitAll();
+			printf("STOP WAITING!!\n");
 			_taskScheduler->Clear();
-
 			// write part of time series to file
 			_reader->Write(outputFile, *ts);
 		}

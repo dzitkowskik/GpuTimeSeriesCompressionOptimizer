@@ -16,7 +16,11 @@ template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<double> data)
 {
 	if(data->size() <= 0)
-		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+		return SharedCudaPtrVector<char>{
+					CudaPtr<char>::make_shared(),
+					CudaPtr<char>::make_shared(),
+					CudaPtr<char>::make_shared()
+					};
 
 
 	unsigned long long size = data->size();
@@ -30,7 +34,7 @@ SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<double> data)
 template<>
 SharedCudaPtr<double> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	if(input[1]->size() <= 0)
+	if(input[2]->size() <= 0)
 		return CudaPtr<double>::make_shared();
 
 	return DecompressDouble(input);
@@ -41,7 +45,11 @@ template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 {
 	if(data->size() <= 0)
-		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+		return SharedCudaPtrVector<char>{
+					CudaPtr<char>::make_shared(),
+					CudaPtr<char>::make_shared(),
+					CudaPtr<char>::make_shared()
+					};
 
 	unsigned long long size = data->size();
 	int warpsperblock = 32;
@@ -54,7 +62,7 @@ SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 template<>
 SharedCudaPtr<float> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	if(input[1]->size() <= 0)
+	if(input[2]->size() <= 0)
 		return CudaPtr<float>::make_shared();
 
 	return DecompressFloat(input);

@@ -71,6 +71,15 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
 	TreeCompressionTest_Compress_Decompress(compressionTree);
 }
 
+TEST_P(CompressionTreeTest, SimpleOneNodeTree_Gfc_Float_Compress_Decompress)
+{
+	CompressionTree compressionTree;
+	auto node = boost::make_shared<CompressionNode>(boost::make_shared<GfcEncodingFactory>(DataType::d_float));
+	ASSERT_TRUE( compressionTree.AddNode(node, 0) );
+	compressionTree.Fix();
+	TreeCompressionTest_Compress_Decompress(compressionTree);
+}
+
 TEST_P(CompressionTreeTest, SimpleTwoNodeTree_DeltaAndScale_Int_Compress_Decompress)
 {
 	CompressionTree compressionTree;

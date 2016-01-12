@@ -114,6 +114,7 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 	else
 		for(auto& child : _children)
 		{
+//			printf("Encoding Result[%d] size = %lu\n", i, encodingResult[i]->size());
 			auto childResult = child->Compress(encodingResult[i++]);
 			result.insert(result.end(), childResult.begin(), childResult.end());
 		}
@@ -130,6 +131,10 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 SharedCudaPtr<char> CompressionNode::Decompress()
 {
 	auto encoding = _encodingFactory->Get();
+	printf("Decoding using %s - data %s\n",
+			GetEncodingTypeString(_encodingFactory->encodingType).c_str(),
+			GetDataTypeString(_dataType).c_str());
+
 	SharedCudaPtrVector<char> data { _metadata };
 
 	if(_isLeaf) data.push_back(_data);
@@ -184,10 +189,13 @@ void CompressionNode::Fix()
 {
 	if(_isLeaf)
 	{
-		auto leaf = boost::make_shared<CompressionNode>(
-				DefaultEncodingFactory().Get(EncodingType::none, _dataType));
-		leaf->SetCompressionRatio(1.0);
-		this->AddChild(leaf);
+		for(int i = 0; i < _encodingFactory->Get()->GetNumberOfResults(); i++)
+		{
+			auto leaf = boost::make_shared<CompressionNode>(
+					DefaultEncodingFactory().Get(EncodingType::none, _dataType));
+			leaf->SetCompressionRatio(1.0);
+			this->AddChild(leaf);
+		}
 	}
 	else
 		for(auto& child : _children) child->Fix();

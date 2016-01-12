@@ -100,10 +100,9 @@ public:
 
 	SharedCudaPtr<T> copy()
 	{
-		auto count = this->size();
-		auto result = make_shared(count);
-		result->fill(_pointer, count);
-		return result;
+		auto result = CudaPtr<char>::make_shared(_size);
+		result->fill((char*)_pointer, _size);
+		return boost::reinterpret_pointer_cast<CudaPtr<T>>(result);
 	}
 
 	SharedCudaPtr<T> copy(size_t size)

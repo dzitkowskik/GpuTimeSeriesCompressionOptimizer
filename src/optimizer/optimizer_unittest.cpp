@@ -260,4 +260,23 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_SourceTimeNyse_Compress)
 	ts.reset();
 }
 
+TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_TsFloatData_Twice)
+{
+	CompressionOptimizer optimizer;
+
+	auto floatData = GetTsFloatDataFromTestFile();
+	auto data = CastSharedCudaPtr<float, char>(floatData);
+
+	optimizer.CompressData(data, DataType::d_float);
+	auto compressedData = optimizer.CompressData(data, DataType::d_float);
+
+	auto decompressedData =
+			optimizer.GetOptimalTree()->GetTree().Decompress(compressedData);
+
+	printf("Size before compression: %lu\n", data->size());
+	printf("Size after compression: %lu\n", compressedData->size());
+
+	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressedData->get(), data->size()) );
+}
+
 }

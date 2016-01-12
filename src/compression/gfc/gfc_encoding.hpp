@@ -25,10 +25,10 @@ public:
 	GfcEncoding(GfcEncoding&&) = default;
 
 public:
-	unsigned int GetNumberOfResults() { return 1; }
+	unsigned int GetNumberOfResults() { return 2; }
 
 	size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type)
-	{ return 0; }
+	{ return 3*sizeof(int); }
 
 	size_t GetCompressedSize(SharedCudaPtr<char> data, DataType type)
 	{ return 0; }

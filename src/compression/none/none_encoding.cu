@@ -13,11 +13,12 @@ namespace ddj {
 template<typename T>
 SharedCudaPtrVector<char> NoneEncoding::Encode(SharedCudaPtr<T> data)
 {
+
 	// ALLOCATE RESULTS
 	auto resultData = MoveSharedCudaPtr<T, char>(data->copy());
 	auto resultMetadata = CudaPtr<char>::make_shared(sizeof(size_t));
 
-	size_t dataSize = data->size()*sizeof(T);
+	size_t dataSize = resultData->size();
 	resultMetadata->fillFromHost((char*)&dataSize, sizeof(size_t));
 
 	return SharedCudaPtrVector<char> {resultMetadata, resultData};
@@ -26,6 +27,7 @@ SharedCudaPtrVector<char> NoneEncoding::Encode(SharedCudaPtr<T> data)
 template<typename T>
 SharedCudaPtr<T> NoneEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	printf("Decode using NoneEncoding - metadata size = %lu, data size = %lu\n", input[0]->size(),input[1]->size());
 	auto data = input[1];
 	auto resultData = data->copy();
 	return MoveSharedCudaPtr<char, T>(resultData);
