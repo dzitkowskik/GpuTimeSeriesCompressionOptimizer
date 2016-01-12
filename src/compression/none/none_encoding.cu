@@ -30,6 +30,7 @@ SharedCudaPtr<T> NoneEncoding::Decode(SharedCudaPtrVector<char> input)
 	printf("Decode using NoneEncoding - metadata size = %lu, data size = %lu\n", input[0]->size(),input[1]->size());
 	auto data = input[1];
 	auto resultData = data->copy();
+	printf("NoneEncoding done!\n");
 	return MoveSharedCudaPtr<char, T>(resultData);
 }
 

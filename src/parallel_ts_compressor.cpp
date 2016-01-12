@@ -33,11 +33,14 @@ void ParallelTSCompressor::init(SharedTimeSeriesPtr ts)
 
 void ParallelTSCompressor::Compress(File& inputFile, File& outputFile)
 {
+	CUDA_CALL( cudaGetLastError() );
+
 	SharedTimeSeriesPtr ts;
 	do
 	{
 		// read batch data from source
 		ts = _reader->Read(inputFile, _batchSize);
+		ts->print(5);
 
 		if(!_initialized) init(ts);
 
@@ -53,12 +56,15 @@ void ParallelTSCompressor::Compress(File& inputFile, File& outputFile)
 
 void ParallelTSCompressor::Decompress(File& inputFile, File& outputFile, FileDefinition& def)
 {
+	CUDA_CALL( cudaGetLastError() );
+
 	// Create part of time series
 	SharedTimeSeriesPtr ts = TimeSeries::make_shared(def);
 
 	// read size of data chunk
 	size_t size = 0;
 	int i = 0;
+	printf("Start decompressing!\n");
 	while(!inputFile.ReadRaw((char*)&size, sizeof(size_t)))
 	{
 		if(!_initialized) init(ts);
@@ -72,11 +78,10 @@ void ParallelTSCompressor::Decompress(File& inputFile, File& outputFile, FileDef
 		{
 			i = 0;
 			// wait for all tasks to complete
-			printf("START WAITING!!\n");
 			_taskScheduler->WaitAll();
-			printf("STOP WAITING!!\n");
 			_taskScheduler->Clear();
 			// write part of time series to file
+			ts->updateRecordsCnt();
 			_reader->Write(outputFile, *ts);
 		}
 	}
