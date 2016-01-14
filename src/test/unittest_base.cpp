@@ -156,6 +156,8 @@ SharedCudaPtr<T> UnittestBase::GetFakeDataWithPatternA(
 	size_t size = s == 0 ? _size : s;
 	auto h_result = new T[size];
 	size_t start = part*size;
+
+	// Prepare data
 	min = min + (T)(start/len)*step;
 	for(size_t i = 0; i < size; i++)
 	{
@@ -174,8 +176,74 @@ SharedCudaPtr<T> UnittestBase::GetFakeDataWithPatternA(
 	return d_result;
 }
 
+template<typename T>
+SharedCudaPtr<T> UnittestBase::GetFakeDataWithPatternB(
+		int part,
+		size_t len,
+		T min,
+		T max,
+		size_t s)
+{
+	int maxRand = 5;
+	srand(time(NULL));
+	size_t size = s == 0 ? _size : s;
+	auto h_result = new T[size];
+	size_t start = part*size;
+	auto value = max;
+	auto step = (max-min)/len/2;
+
+	// Prepare data
+	for(size_t i = 0; i < size; i++)
+	{
+		if((start+i)/len % 2 == 0)	// pattern1
+		{
+			auto randomInt = rand() % (maxRand+1);
+			switch(i%2)
+			{
+				case 0: value = max-randomInt; break;
+				case 1: value = min+randomInt; break;
+			}
+		} else { // pattern2
+			auto x = (start+i) % len;
+			value = x < (len/2) ? max - x*step : max-(len-x)*step;
+		}
+		h_result[i] = value;
+	}
+
+	auto d_result = CudaPtr<T>::make_shared(size);
+	d_result->fillFromHost(h_result, size);
+	delete [] h_result;
+	return d_result;
+}
+
+SharedCudaPtr<time_t> UnittestBase::GetFakeDataForTime(
+		time_t min,
+		double flatness,
+		size_t s)
+{
+	int maxStep=2;
+	srand(time(NULL));
+	size_t size = s == 0 ? _size : s;
+	auto h_result = new time_t[size];
+	auto value = min;
+
+	// Prepare data
+	for(size_t i = 0; i < size; i++)
+	{
+		auto step = 1 + (rand() % maxStep);
+		if(rand()%100 > flatness*100) value += step;
+		h_result[i] = value;
+	}
+
+	auto d_result = CudaPtr<time_t>::make_shared(size);
+	d_result->fillFromHost(h_result, size);
+	delete [] h_result;
+	return d_result;
+}
+
 #define UNITTEST_BASE_SPEC(X) \
-	template SharedCudaPtr<X> UnittestBase::GetFakeDataWithPatternA<X>(int, size_t, X, X, X, size_t);
+	template SharedCudaPtr<X> UnittestBase::GetFakeDataWithPatternA<X>(int, size_t, X, X, X, size_t); \
+	template SharedCudaPtr<X> UnittestBase::GetFakeDataWithPatternB<X>(int, size_t, X, X, size_t);
 FOR_EACH(UNITTEST_BASE_SPEC, short, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

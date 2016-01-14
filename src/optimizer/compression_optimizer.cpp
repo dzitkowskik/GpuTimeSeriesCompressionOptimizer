@@ -142,7 +142,7 @@ bool CompressionOptimizer::IsFullUpdateNeeded()
 size_t CompressionOptimizer::GetSampleDataForFullUpdateSize(size_t partDataSize, DataType type)
 {
 	size_t typeSizeInBytes = GetDataTypeSize(type);
-	return std::min(partDataSize/(typeSizeInBytes*100), 1000*typeSizeInBytes);
+	return std::min(partDataSize/(typeSizeInBytes*1000), 1000*typeSizeInBytes);
 }
 
 SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataPart, DataType type)

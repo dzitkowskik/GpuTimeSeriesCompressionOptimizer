@@ -368,9 +368,9 @@ TEST_P(CompressionTreeTest, FakeDataPatternA_Float_GoodTree)
 
 	tree.Print(tree.GetCompressionRatio());
 
-	printf("Size before compression = %lu\n", data->size());
-	printf("Size after compression = %lu\n", compressedData->size());
-	printf("CompressionRatio = %f\n", (float)data->size()/(float)compressedData->size());
+//	printf("Size before compression = %lu\n", data->size());
+//	printf("Size after compression = %lu\n", compressedData->size());
+//	printf("CompressionRatio = %f\n", (float)data->size()/(float)compressedData->size());
 
 	auto decompressedData = tree.Decompress(compressedData);
 
