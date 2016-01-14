@@ -279,4 +279,41 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_TsFloatData_Twi
 	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressedData->get(), data->size()) );
 }
 
+TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_PatternA_5Parts)
+{
+	int N = 5;
+	CompressionOptimizer optimizer;
+	SharedCudaPtrVector<float> floatDataParts;
+	SharedCudaPtrVector<char> compressedDataParts;
+	for(int i = 0; i < N; i++)
+		floatDataParts.push_back(GetFakeDataWithPatternA<float>(i, 1e2, 1.5f, -10.0f, 1e6f, 1e6));
+
+	//	HelperPrint::PrintSharedCudaPtr(floatDataParts[0], "data1");
+
+	// Compress
+	for(int i = 0; i < N; i++)
+	{
+		auto compressedPart = optimizer.CompressData(
+			CastSharedCudaPtr<float, char>(floatDataParts[i]), DataType::d_float);
+		compressedDataParts.push_back(compressedPart);
+
+		optimizer.GetOptimalTree()->GetTree().Print(compressedPart->size());
+		printf("Compression ratio = %lf\n", optimizer.GetOptimalTree()->GetTree().GetCompressionRatio());
+		optimizer.GetStatistics()->PrintShort();
+	}
+
+	// Check
+	CompressionTree decompressionTree;
+	for(int i = 0; i < N; i++)
+	{
+		// Decompress
+		auto decompressedData = CastSharedCudaPtr<char, float>(
+				decompressionTree.Decompress(compressedDataParts[i]));
+		EXPECT_TRUE( CompareDeviceArrays(
+				floatDataParts[i]->get(),
+				decompressedData->get(),
+				floatDataParts[i]->size()) );
+	}
+}
+
 }

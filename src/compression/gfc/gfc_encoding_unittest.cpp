@@ -75,4 +75,21 @@ TEST_P(GfcCompressionTest, CompressionOfRealDataFloats_data)
 	);
 }
 
+TEST_P(GfcCompressionTest, CompressionOfFakeFloats_PatternA_data)
+{
+	GfcEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<float>(
+			boost::bind(&GfcEncoding::Encode<float>, encoder, _1),
+			boost::bind(&GfcEncoding::Decode<float>, encoder, _1),
+			GetFakeDataWithPatternA<float>(0))
+	);
+	EXPECT_TRUE(
+			TestContent<float>(
+				boost::bind(&GfcEncoding::Encode<float>, encoder, _1),
+				boost::bind(&GfcEncoding::Decode<float>, encoder, _1),
+				GetFakeDataWithPatternA<float>(1, 1e3, 0.1, -3.0, 3e6))
+		);
+}
+
 } /* namespace ddj */

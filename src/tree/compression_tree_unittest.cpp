@@ -10,6 +10,7 @@
 #include "helpers/helper_print.hpp"
 #include "tree/compression_tree.hpp"
 #include "tree/compression_node.hpp"
+#include "optimizer/path_generator.hpp"
 #include <boost/make_shared.hpp>
 #include <gtest/gtest.h>
 
@@ -336,6 +337,45 @@ TEST_P(CompressionTreeTest, UpdateStatistics_ComplexTree)
 
 	ASSERT_EQ(expected->size(), actual->size());
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+}
+
+//			PATCH
+//			/	\
+//		CONST	FloatToInt
+//					|
+//				   RLE
+//				  /   \
+//			  CONST   SCALE
+//						|
+//					   AFL
+TEST_P(CompressionTreeTest, FakeDataPatternA_Float_GoodTree)
+{
+	Path path
+	{
+		EncodingType::patch,
+			EncodingType::constData, EncodingType::none,
+			EncodingType::floatToInt,
+				EncodingType::rle,
+					EncodingType::constData, EncodingType::none,
+					EncodingType::scale, EncodingType::afl, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
+
+	auto floatData = GetFakeDataWithPatternA<float>(0, 1e2, 1.5f, -10.0f, 1e6f, 1e6);
+	auto data = CastSharedCudaPtr<float, char>(floatData);
+
+	auto compressedData = tree.Compress(data);
+
+	tree.Print(tree.GetCompressionRatio());
+
+	printf("Size before compression = %lu\n", data->size());
+	printf("Size after compression = %lu\n", compressedData->size());
+	printf("CompressionRatio = %f\n", (float)data->size()/(float)compressedData->size());
+
+	auto decompressedData = tree.Decompress(compressedData);
+
+	ASSERT_EQ(decompressedData->size(), data->size());
+	EXPECT_TRUE( CompareDeviceArrays(decompressedData->get(), data->get(), data->size()) );
 }
 
 } /* namespace ddj */

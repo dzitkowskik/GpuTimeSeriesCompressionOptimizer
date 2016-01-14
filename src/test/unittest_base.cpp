@@ -1,4 +1,5 @@
 #include "unittest_base.hpp"
+#include "core/macros.h"
 
 namespace ddj {
 
@@ -141,5 +142,40 @@ boost::shared_ptr<TimeSeries> UnittestBase::Get1GBNyseTimeSeries()
 
 	return ts;
 }
+
+template<typename T>
+SharedCudaPtr<T> UnittestBase::GetFakeDataWithPatternA(
+		int part,
+		size_t len,
+		T step,
+		T min,
+		T max,
+		size_t s)
+{
+
+	size_t size = s == 0 ? _size : s;
+	auto h_result = new T[size];
+	size_t start = part*size;
+	min = min + (T)(start/len)*step;
+	for(size_t i = 0; i < size; i++)
+	{
+		auto value = min;
+		if((start+i) % len == 0)
+		{
+			value = max;
+			min += step;
+		}
+		h_result[i] = value;
+	}
+
+	auto d_result = CudaPtr<T>::make_shared(size);
+	d_result->fillFromHost(h_result, size);
+	delete [] h_result;
+	return d_result;
+}
+
+#define UNITTEST_BASE_SPEC(X) \
+	template SharedCudaPtr<X> UnittestBase::GetFakeDataWithPatternA<X>(int, size_t, X, X, X, size_t);
+FOR_EACH(UNITTEST_BASE_SPEC, short, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

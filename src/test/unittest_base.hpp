@@ -62,6 +62,16 @@ protected:
 	SharedCudaPtr<int> GetRandomStencilData();
 	SharedCudaPtr<int> GetFakeIntDataForHistogram();
 
+	template<typename T>
+	SharedCudaPtr<T> GetFakeDataWithPatternA(
+			int part=0,
+			size_t len=1e3,
+			T step=10,
+			T min=0,
+			T max=1e6,
+			size_t s=0);
+
+
 	boost::shared_ptr<TimeSeries> Get1GBNyseTimeSeries();
 	int GetSize();
 
