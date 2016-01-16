@@ -149,12 +149,10 @@ SharedCudaPtr<char> CompressionTree::Decompress(SharedCudaPtr<char> data)
 {
 	Reset();
 	size_t offset = 0;
-	printf("A\n");
 	auto root = DecompressNodes(data, offset);
 	AddNode(root, 0);
 	Print();
-	printf("DataType = %s\n", GetDataTypeString(root->GetDataType()).c_str());
-	printf("B\n");
+	// printf("DataType = %s\n", GetDataTypeString(root->GetDataType()).c_str());
 	return _root->Decompress();
 }
 

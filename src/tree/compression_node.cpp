@@ -131,9 +131,9 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 SharedCudaPtr<char> CompressionNode::Decompress()
 {
 	auto encoding = _encodingFactory->Get();
-	printf("Decoding using %s - data %s\n",
-			GetEncodingTypeString(_encodingFactory->encodingType).c_str(),
-			GetDataTypeString(_dataType).c_str());
+	// printf("Decoding using %s - data %s\n",
+	// 		GetEncodingTypeString(_encodingFactory->encodingType).c_str(),
+	// 		GetDataTypeString(_dataType).c_str());
 
 	SharedCudaPtrVector<char> data { _metadata };
 
@@ -144,8 +144,8 @@ SharedCudaPtr<char> CompressionNode::Decompress()
 			auto childResult = child->Decompress();
 			data.push_back(childResult);
 		}
-
-	return encoding->Decode(data, _dataType);
+	auto result = encoding->Decode(data, _dataType);
+	return result;
 }
 
 size_t CompressionNode::PredictCompressionSize(SharedCudaPtr<char> data, DataType type)

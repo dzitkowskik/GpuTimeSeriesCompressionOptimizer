@@ -70,7 +70,7 @@ protected:
 	// ------											min
 	SharedCudaPtr<time_t> GetFakeDataForTime(
 			time_t min=0,
-			double flatness=0.5d,
+			double flatness=0.5,
 			size_t s=0);
 
 

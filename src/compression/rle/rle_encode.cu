@@ -30,6 +30,7 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
         thrust::constant_iterator<int>(1),
         output.begin(),
         lengths.begin());
+
     // get true output length
     int len = reduceResult.first - output.begin();
 

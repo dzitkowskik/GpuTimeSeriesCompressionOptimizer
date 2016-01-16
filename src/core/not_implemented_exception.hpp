@@ -9,6 +9,7 @@
 #define DDJ_NOT_IMPLEMENTED_EXCEPTION_HPP_
 
 #include <stdexcept>
+#include <string>
 
 namespace ddj {
 

@@ -61,7 +61,7 @@ __global__ void addValueKernel(T* data, const int size, T* value)
 template<typename T>
 SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	if(input[1]->size() <= 0) return CudaPtr<T>::make_shared();
+	if(input[0]->size() <= 0) return CudaPtr<T>::make_shared();
 
 	auto metadata = input[0];
 	auto data = input[1];

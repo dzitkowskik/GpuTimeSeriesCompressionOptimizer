@@ -22,11 +22,11 @@ class PatchEncodingFactory : public EncodingFactory
 {
 public:
 	PatchType patchType;
-	T factor;
 
 	PatchEncodingFactory(DataType dt, PatchType pt)
 		: EncodingFactory(dt, EncodingType::patch), patchType(pt)
-	{ factor = 0.1; }
+	{}
+
 	~PatchEncodingFactory(){}
 	PatchEncodingFactory(const PatchEncodingFactory& other)
 		: EncodingFactory(other.dataType, EncodingType::patch), patchType(other.patchType)
@@ -48,9 +48,9 @@ public:
 		switch(patchType)
 		{
 			case PatchType::outside:
-				return boost::make_shared<OutsidePatchEncoding>(min, max, factor);
+				return boost::make_shared<OutsidePatchEncoding>(min, max);
 			case PatchType::lower:
-				return boost::make_shared<LowerPatchEncoding>(min, max, factor);
+				return boost::make_shared<LowerPatchEncoding>(min, max);
 			default:
 				throw NotImplementedException("Patch Encoding of this type not implemented");
 		}

@@ -59,8 +59,8 @@ public:
 	size_t operator()(std::pair<ddj::EncodingType, ddj::EncodingType> x) const throw()
 	{
 		size_t result = 0;
-		boost::hash_combine(result, boost::hash_value(x.first));
-		boost::hash_combine(result, boost::hash_value(x.second));
+		boost::hash_combine(result, boost::hash_value((int)x.first));
+		boost::hash_combine(result, boost::hash_value((int)x.second));
 		return result;
 	}
 };
