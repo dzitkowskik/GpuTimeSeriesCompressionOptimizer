@@ -5,7 +5,7 @@
 #define CPY_HTD cudaMemcpyHostToDevice
 #define CPY_HTH cudaMemcpyHostToHost
 
-#define CUDA_ASSERT_RETURN(value) {                               \
+#define CUDA_ASSERT_RETURN(value) {                              \
     cudaError_t _m_cudaStat = value;                             \
     if (_m_cudaStat != cudaSuccess) {                            \
         fprintf(stderr, "Error %s at line %d in file %s\n",      \
@@ -13,8 +13,8 @@
         exit(1);                                                 \
     } }
 
-#define CUDA_CALL(x) do { if((x)!=cudaSuccess) { \
-    printf("Error at %s:%d - %s\n",__FILE__,__LINE__,cudaGetErrorString(x)); }} while(0)
+#define CUDA_CALL(x) do { cudaError_t err = x; if((err)!=cudaSuccess) { \
+    printf("Error at %s:%d - %s\n",__FILE__,__LINE__,cudaGetErrorString(err)); }} while(0)
 
 #define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
     printf("Error at %s:%d:error=%d\n",__FILE__,__LINE__,x);}} while(0)

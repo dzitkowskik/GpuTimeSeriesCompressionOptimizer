@@ -88,6 +88,9 @@ __global__ void _compressUniqueKernel(
 template<typename T>
 SharedCudaPtr<char> UniqueEncoding::CompressUnique(SharedCudaPtr<T> data, SharedCudaPtr<T> unique)
 {
+	if(data->size() <= 0)
+		return CudaPtr<char>::make_shared();
+
     // CALCULATE SIZES
 	int uniqueSize = unique->size();                        // how many distinct items to encode
 	int dataSize = data->size();							// size of data to compress
@@ -111,14 +114,19 @@ SharedCudaPtr<char> UniqueEncoding::CompressUnique(SharedCudaPtr<T> data, Shared
         unique->size(),
         (unsigned int*)(result->get()+headerSize),
         outputSize);
-    cudaDeviceSynchronize();
 
     // ATTACH HEADER
-    CUDA_CALL( cudaMemcpy(result->get(), &uniqueSize, sizeof(size_t), CPY_HTD) );
-    CUDA_CALL( cudaMemcpy(result->get()+sizeof(size_t), &dataSize, sizeof(size_t), CPY_HTD) );
-    CUDA_CALL( cudaMemcpy(result->get()+2*sizeof(size_t), unique->get(), uniqueSizeInBytes, CPY_DTD) );
-    cudaDeviceSynchronize();
+	size_t sizes[2];
+	sizes[0] = uniqueSize;
+	sizes[1] = dataSize;
 
+    CUDA_CALL( cudaMemcpy(result->get(), &sizes, 2*sizeof(size_t), CPY_HTD) );
+    CUDA_CALL( cudaMemcpy(result->get()+2*sizeof(size_t), unique->get(), uniqueSizeInBytes, CPY_DTD) );
+
+	// printf("COMPRESS UNIQUE - uniqueSize = %d, dataSize = %d\n", uniqueSize, dataSize);
+
+	cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
     return result;
 }
 
@@ -128,7 +136,7 @@ SharedCudaPtrVector<char> UniqueEncoding::Encode(SharedCudaPtr<T> data)
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
 
-//	HelperPrint::PrintSharedCudaPtr(data, "After Delta");
+	//	HelperPrint::PrintSharedCudaPtr(data, "After Delta");
 
     auto unique = FindUnique(data);
 
@@ -202,11 +210,17 @@ __global__ void _decompressUniqueKernel(
 template<typename T>
 SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
 {
+	if(data->size() <= 0)
+		return CudaPtr<T>::make_shared();
+
 	// GET SIZES
 	size_t sizes[2];
 	CUDA_CALL( cudaMemcpy(&sizes[0], data->get(), 2*sizeof(size_t), CPY_DTH) );
 	int uniqueCnt = sizes[0];
 	int outputSize = sizes[1];
+
+	// printf("UNIQUE ENCODING - uniqueCnt = %d\n", uniqueCnt);
+	// printf("UNIQUE ENCODING - outputSize = %d\n", outputSize);
 
 	// GETE UNIQUE VALUES DATA
 	auto unique = CudaPtr<T>::make_shared(uniqueCnt);
@@ -219,7 +233,7 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
     int unitBitSize = 8 * sizeof(unsigned int);             // single unit size in bits
     int dataPerUnitCnt = unitBitSize / bitsNeeded;          // how many items are in one unit
     int unitCnt =  data->size() / unitSize;                 // how many units are in data
-    int uniqueSizeInBytes = uniqueCnt * sizeof(T);    	// size in bytes of unique array
+    int uniqueSizeInBytes = uniqueCnt * sizeof(T);    		// size in bytes of unique array
     int headerSize = uniqueSizeInBytes + 2 * sizeof(size_t);// size of data header
 
     // DECOMPRESS DATA USING UNIQUE VALUES
@@ -233,8 +247,9 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
         result->size(),
         bitsNeeded,
         dataPerUnitCnt);
-
     cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+
     return result;
 }
 
@@ -252,7 +267,7 @@ SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
     size_t outputSize = sizes[1];
 
     // CALCULATE SIZES
-    int bitsNeeded = ALT_BITLEN(uniqueSize-1);          // min bit cnt to encode unique values
+    int bitsNeeded = ALT_BITLEN(uniqueSize-1);          	// min bit cnt to encode unique values
     int unitSize = sizeof(unsigned int);                    // single unit size in bytes
     int unitBitSize = 8 * sizeof(unsigned int);             // single unit size in bits
     int dataPerUnitCnt = unitBitSize / bitsNeeded;          // how many items are in one unit

@@ -35,12 +35,12 @@ TEST_F(CudaPtrTest, MakeShared_AllocateArray_Size_64M_Int)
     data->clear();
 }
 
-TEST_F(CudaPtrTest, MakeShared_AllocateArray_Size_128M_Int)
-{
-    int N = 1<<27;
-    auto data = CudaPtr<int>::make_shared(N);
-    data->set(1);
-    data->clear();
-}
+// TEST_F(CudaPtrTest, MakeShared_AllocateArray_Size_128M_Int)
+// {
+//     int N = 1<<27;
+//     auto data = CudaPtr<int>::make_shared(N);
+//     data->set(1);
+//     data->clear();
+// }
 
 }

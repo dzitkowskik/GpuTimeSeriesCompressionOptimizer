@@ -50,13 +50,13 @@ protected:
 	SharedCudaPtr<time_t> DecodeTime(SharedCudaPtrVector<char> data)
 	{ return this->Decode<time_t>(data); }
 	SharedCudaPtrVector<char> EncodeFloat(SharedCudaPtr<float> data)
-	{ return this->Encode<float>(data); }
+	{ return this->Encode<int>(CastSharedCudaPtr<float, int>(data)); }
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data)
-	{ return this->Decode<float>(data); }
+	{ return CastSharedCudaPtr<int, float>(this->Decode<int>(data)); }
 	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data)
-	{ return SharedCudaPtrVector<char>(); }
+	{ return this->Encode<time_t>(CastSharedCudaPtr<double, time_t>(data)); }
 	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)
-	{ return SharedCudaPtr<double>(); }
+	{ return CastSharedCudaPtr<time_t, double>(this->Decode<time_t>(data)); }
 
 public:
 	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);

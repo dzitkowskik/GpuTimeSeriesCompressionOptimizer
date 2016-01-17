@@ -20,13 +20,17 @@
 
 namespace ddj {
 
-class CompressionTreeTest : public UnittestBase, public ::testing::WithParamInterface<int>
+class CompressionTreeTestBase : public UnittestBase
+{
+public:
+	template<typename T>
+	void CompressDecompressTest(CompressionTree& compressionTree, SharedCudaPtr<T> data);
+};
+
+class CompressionTreeTest : public CompressionTreeTestBase, public ::testing::WithParamInterface<int>
 {
 protected:
 	virtual void SetUp() { _size = GetParam(); }
-
-public:
-	void TreeCompressionTest_Compress_Decompress(CompressionTree& compressionTree);
 };
 
 
@@ -43,23 +47,28 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_NoException)
 	tree.Compress(MoveSharedCudaPtr<int, char>(GetIntRandomData()));
 }
 
-void CompressionTreeTest::TreeCompressionTest_Compress_Decompress(CompressionTree& compressionTree)
+template<typename T>
+void CompressionTreeTestBase::CompressDecompressTest(CompressionTree& compressionTree, SharedCudaPtr<T> data)
 {
-	auto randomData = GetIntRandomData();
-    auto dataCopy = randomData->copy();
-	auto compressed = compressionTree.Compress(MoveSharedCudaPtr<int, char>(dataCopy));
+	printf("Testing tree:\n");
+	compressionTree.Print();
+	auto compressed = compressionTree.Compress(CastSharedCudaPtr<T, char>(data));
 
 	CompressionTree decompressionTree;
 	auto decompressed = decompressionTree.Decompress(compressed);
 
-	auto expected = randomData;
-	auto actual = MoveSharedCudaPtr<char, int>(decompressed);
+	auto expected = data;
+	auto actual = CastSharedCudaPtr<char, T>(decompressed);
 
 	ASSERT_EQ(expected->size(), actual->size());
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
 
-//	printf("Uncompressed size = %d\n", d_int_random_data->size()*sizeof(int));
-//	printf("Compressed size = %d\n", compressed->size());
+	// printf("Data size = %lu\n", data->size()*sizeof(T));
+	// printf("Compressed size = %lu\n", compressed->size());
+	// printf("Decompressed size = %lu\n", decompressed->size());
+	//
+	// HelperPrint::PrintSharedCudaPtr(expected, "expected");
+	// HelperPrint::PrintSharedCudaPtr(actual, "actual");
 }
 
 TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
@@ -69,7 +78,7 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
 	auto leafNode = boost::make_shared<CompressionNode>(boost::make_shared<NoneEncodingFactory>(DataType::d_int));
 	node->AddChild(leafNode);
 	ASSERT_TRUE( compressionTree.AddNode(node, 0) );
-	TreeCompressionTest_Compress_Decompress(compressionTree);
+	CompressDecompressTest<int>(compressionTree, GetIntRandomData());
 }
 
 TEST_P(CompressionTreeTest, SimpleOneNodeTree_Gfc_Float_Compress_Decompress)
@@ -78,7 +87,7 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Gfc_Float_Compress_Decompress)
 	auto node = boost::make_shared<CompressionNode>(boost::make_shared<GfcEncodingFactory>(DataType::d_float));
 	ASSERT_TRUE( compressionTree.AddNode(node, 0) );
 	compressionTree.Fix();
-	TreeCompressionTest_Compress_Decompress(compressionTree);
+	CompressDecompressTest<int>(compressionTree, GetIntRandomData());
 }
 
 TEST_P(CompressionTreeTest, SimpleTwoNodeTree_DeltaAndScale_Int_Compress_Decompress)
@@ -90,7 +99,7 @@ TEST_P(CompressionTreeTest, SimpleTwoNodeTree_DeltaAndScale_Int_Compress_Decompr
 	secondNode->AddChild(leafNode);
 	node->AddChild(secondNode);
 	ASSERT_TRUE( compressionTree.AddNode(node, 0) );
-	TreeCompressionTest_Compress_Decompress(compressionTree);
+	CompressDecompressTest<int>(compressionTree, GetIntRandomData());
 }
 
 //     DICT
@@ -113,7 +122,7 @@ TEST_P(CompressionTreeTest, ComplexTree_Dict_Compress_Decompress)
     right->AddChild(noneRight);
     root->AddChild(right);
 	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
-	TreeCompressionTest_Compress_Decompress(compressionTree);
+	CompressDecompressTest<int>(compressionTree, GetIntRandomData());
 }
 
 //         PATCH
@@ -125,7 +134,6 @@ TEST_P(CompressionTreeTest, ComplexTree_Patch_Compress_Decompress)
 {
 	CompressionTree compressionTree;
 	auto pef = new PatchEncodingFactory<int>(DataType::d_int, PatchType::outside);
-	pef->factor = 0.1;
 	auto root = boost::make_shared<CompressionNode>(boost::shared_ptr<PatchEncodingFactory<int>>(pef));
 	auto right = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
 	auto left = boost::make_shared<CompressionNode>(boost::make_shared<DictEncodingFactory>(DataType::d_int));
@@ -144,7 +152,7 @@ TEST_P(CompressionTreeTest, ComplexTree_Patch_Compress_Decompress)
 	root->AddChild(right);
 
 	ASSERT_TRUE( compressionTree.AddNode(root, 0) );
-	TreeCompressionTest_Compress_Decompress(compressionTree);
+	CompressDecompressTest<int>(compressionTree, GetIntRandomData());
 }
 
 //		SCALE
@@ -159,7 +167,6 @@ TEST_P(CompressionTreeTest, ComplexTree_Delta_Scale_Patch_Afl_RealData_Time_Comp
 	CompressionTree compressionTree;
 	auto data = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromTestFile());
 	auto pef = new PatchEncodingFactory<int>(DataType::d_int, PatchType::lower);
-	pef->factor = 0.2;
 	auto root = boost::make_shared<CompressionNode>(boost::make_shared<ScaleEncodingFactory>(DataType::d_int));
 	auto delta = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
 	auto patch = boost::make_shared<CompressionNode>(boost::shared_ptr<PatchEncodingFactory<int>>(pef));
@@ -216,14 +223,14 @@ TEST_P(CompressionTreeTest, ComplexTree_Scale_Rle_Delta_Unique_RealData_Time_Com
 	CompressionTree decompressionTree;
 	auto decompressed = decompressionTree.Decompress(compressed);
 
-//	HelperPrint::PrintSharedCudaPtr(data, "data");
-//	HelperPrint::PrintSharedCudaPtr(CastSharedCudaPtr<char, int>(decompressed), "decompressed");
+	//	HelperPrint::PrintSharedCudaPtr(data, "data");
+	//	HelperPrint::PrintSharedCudaPtr(CastSharedCudaPtr<char, int>(decompressed), "decompressed");
 
 	auto expected = data;
 	auto actual = MoveSharedCudaPtr<char, int>(decompressed);
 
-//	printf("size before compression = %d\n", data->size()*sizeof(int));
-//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
+	//	printf("size before compression = %d\n", data->size()*sizeof(int));
+	//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
 
 	ASSERT_EQ(expected->size(), actual->size());
 	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
@@ -305,7 +312,6 @@ TEST_P(CompressionTreeTest, UpdateStatistics_ComplexTree)
 
 	auto data = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromTestFile());
 	auto pef = new PatchEncodingFactory<int>(DataType::d_int, PatchType::lower);
-	pef->factor = 0.2;
 	auto root = boost::make_shared<CompressionNode>(boost::make_shared<ScaleEncodingFactory>(DataType::d_int));
 	auto delta = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
 	auto patch = boost::make_shared<CompressionNode>(boost::shared_ptr<PatchEncodingFactory<int>>(pef));
@@ -326,9 +332,9 @@ TEST_P(CompressionTreeTest, UpdateStatistics_ComplexTree)
 	auto expected = data;
 	auto actual = MoveSharedCudaPtr<char, int>(decompressed);
 
-//	printf("size before compression = %lu\n", data->size()*sizeof(int));
-//	printf("size after comrpession = %lu\n", compressed->size()*sizeof(char));
-//	stats->Print();
+	//	printf("size before compression = %lu\n", data->size()*sizeof(int));
+	//	printf("size after comrpession = %lu\n", compressed->size()*sizeof(char));
+	//	stats->Print();
 
 	EXPECT_EQ(EncodingType::scale, stats->GetAny(0).type.first);
 	EXPECT_EQ(EncodingType::delta, stats->GetAny(0).type.second);
@@ -348,7 +354,7 @@ TEST_P(CompressionTreeTest, UpdateStatistics_ComplexTree)
 //			  CONST   SCALE
 //						|
 //					   AFL
-TEST_P(CompressionTreeTest, FakeDataPatternA_Float_GoodTree)
+TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_GoodTree)
 {
 	Path path
 	{
@@ -362,20 +368,101 @@ TEST_P(CompressionTreeTest, FakeDataPatternA_Float_GoodTree)
 	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
 
 	auto floatData = GetFakeDataWithPatternA<float>(0, 1e2, 1.5f, -10.0f, 1e6f, 1e6);
+	CompressDecompressTest<float>(tree, floatData);
+}
+
+//	DELTA -> FLOAT_TO_INT -> AFL -> NONE
+TEST_P(CompressionTreeTest, RandomFloats_WithPrecision_3_Delta_FloatToInt_Afl)
+{
+	Path path {
+		EncodingType::delta,
+			EncodingType::floatToInt,
+				EncodingType::afl, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
+	auto floatData = GetFloatRandomDataWithMaxPrecision(3);
+	CompressDecompressTest<float>(tree, floatData);
+}
+
+//	SCALE -> DELTA -> GFC -> 2*NONE
+TEST_P(CompressionTreeTest, RandomFloats_WithPrecision_3_Scale_Delta_Gfc)
+{
+	Path path {
+		EncodingType::scale,
+			EncodingType::delta,
+				EncodingType::gfc, EncodingType::none, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
+	auto floatData = GetFloatRandomDataWithMaxPrecision(3);
+	CompressDecompressTest<float>(tree, floatData);
+}
+
+// GFC -> 2*NONE
+TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_WithPrecision_3_OnlyGfc)
+{
+	Path path {
+		EncodingType::gfc, EncodingType::none, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
+	auto floatData = GetFakeDataWithPatternA<float>(0, 1e2, 1.5f, -10.0f, 1e6f, 1e6);
+	CompressDecompressTest<float>(tree, floatData);
+}
+
+// DICT -> 2*NONE
+TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_WithPrecision_3_OnlyDict)
+{
+	Path path {
+		EncodingType::dict, EncodingType::none, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
+	auto floatData = GetFakeDataWithPatternA<float>(0, 1e2, 1.5f, -10.0f, 1e6f, 1e6);
+	CompressDecompressTest<float>(tree, floatData);
+}
+
+//			 DICT
+//			/	 \
+//	   SCALE     DELTA
+//		|			|
+//	  DELTA		FLOAT_TO_INT
+//		|		    |
+//	   GFC	       AFL
+TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_TreeWith_Dict_And_FloatToInt)
+{
+	Path path
+	{
+		EncodingType::dict,
+			EncodingType::scale, EncodingType::delta,
+				EncodingType::gfc, EncodingType::none, EncodingType::none,
+			EncodingType::delta, EncodingType::floatToInt,
+				EncodingType::afl, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
+	auto floatData = GetFakeDataWithPatternA<float>(0, 1e2, 1.5f, -10.0f, 1e6f, 1e6);
+	CompressDecompressTest<float>(tree, floatData);
+}
+
+TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_SpecialCaseWithDict_CompressedBy_ScaleDelta)
+{
+	auto floatData = GetFakeDataWithPatternA<float>(0, 1e2, 1.5f, -10.0f, 1e6f, 1e6);
 	auto data = CastSharedCudaPtr<float, char>(floatData);
+	auto dict = boost::make_shared<CompressionNode>(boost::make_shared<DictEncodingFactory>(DataType::d_float));
+	auto result = dict->Compress(data);
 
-	auto compressedData = tree.Compress(data);
+	Path path {
+		EncodingType::scale, EncodingType::delta, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_float);
+	auto compressed = tree.Compress(result[1]);
+	auto decompressed = tree.Decompress(compressed);
 
-	tree.Print(tree.GetCompressionRatio());
+	auto expected = CastSharedCudaPtr<char, float>(result[1]);
+	auto actual = CastSharedCudaPtr<char, float>(decompressed);
 
-//	printf("Size before compression = %lu\n", data->size());
-//	printf("Size after compression = %lu\n", compressedData->size());
-//	printf("CompressionRatio = %f\n", (float)data->size()/(float)compressedData->size());
+	ASSERT_EQ(expected->size(), actual->size());
+	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
 
-	auto decompressedData = tree.Decompress(compressedData);
-
-	ASSERT_EQ(decompressedData->size(), data->size());
-	EXPECT_TRUE( CompareDeviceArrays(decompressedData->get(), data->get(), data->size()) );
+	// HelperPrint::PrintSharedCudaPtr(expected, "expected");
+	// HelperPrint::PrintSharedCudaPtr(actual, "actual");
 }
 
 } /* namespace ddj */

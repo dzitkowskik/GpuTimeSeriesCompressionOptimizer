@@ -145,4 +145,26 @@ TEST_F(SplitterTest, Merge_manual_complex_int)
 	EXPECT_TRUE( CompareDeviceArrays(data->get(), result->get(), data->size()) );
 }
 
+TEST_F(SplitterTest, Merge_manual_complex_float)
+{
+    Splitter splitter;
+    auto data = GetFloatRandomData();
+	auto size = GetSize();
+
+	int h_stencil[size];
+	auto d_stencil = CudaPtr<int>::make_shared(size);
+	for(int i=0; i<size; i++)
+	{
+		if(i < size/4) h_stencil[i] = 0;
+		else if(i < size/2) h_stencil[i] = 1;
+		else if(i < 3*size/4) h_stencil[i] = 0;
+		else h_stencil[i] = 1;
+	}
+	CUDA_CALL( cudaMemcpy(d_stencil->get(), h_stencil, size*sizeof(int), CPY_HTD) );
+	auto splittedData = splitter.Split(data, d_stencil);
+
+    auto result = splitter.Merge(splittedData, d_stencil);
+	EXPECT_TRUE( CompareDeviceArrays(data->get(), result->get(), data->size()) );
+}
+
 } /* namespace ddj */

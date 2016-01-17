@@ -39,6 +39,9 @@ SharedCudaPtrVector<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
 	thrust::device_ptr<T> data_ptr(data->get());
 	T min = thrust::min_element(data_ptr, data_ptr+data->size())[0];
 
+	// TAKE ABSOLUTE VALUE
+	if (min < 0) min = -min;
+
 	// SCALE DATA BY MIN VALUE
 	this->_policy.setSize(data->size());
 	cudaLaunch(this->_policy, scaleEncodeKernel<T>,

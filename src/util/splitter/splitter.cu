@@ -153,7 +153,10 @@ __global__ void _mergeKernel(
 template<typename T>
 SharedCudaPtr<T> Splitter::Merge(SharedCudaPtrTuple<T> data, SharedCudaPtr<int> stencil)
 {
-	int size = stencil->size();
+	// printf("START MERGE KERNEL (data[0] size = %lu, data[1] size = %lu)\n",
+	// 	std::get<0>(data)->size(), std::get<1>(data)->size());
+
+	size_t size = stencil->size();
 	auto result = CudaPtr<T>::make_shared(size);
 	auto prefixSum_true = exclusivePrefixSum_thrust(stencil);
 	auto prefixSum_false = exclusivePrefixSum_thrust(NegateStencil(stencil));
@@ -170,6 +173,7 @@ SharedCudaPtr<T> Splitter::Merge(SharedCudaPtrTuple<T> data, SharedCudaPtr<int> 
 	);
 
 	cudaDeviceSynchronize();
+	CUDA_CALL( cudaGetLastError() );
 
 	return result;
 }
