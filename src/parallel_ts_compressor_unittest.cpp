@@ -93,6 +93,6 @@ TEST_F(ParallelTsCompressorTest, Decompress_CSV_Info_Test_Data_CompareFile)
 	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
 
 	EXPECT_TRUE( inputFile.Compare(outputFileDecompr) );
-}
+} 
 
 } /* namespace ddj */
