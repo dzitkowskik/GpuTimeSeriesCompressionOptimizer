@@ -23,7 +23,7 @@ void DecompressionTask::execute()
 	// set proper device
 	CUDA_CALL( cudaSetDevice(_deviceId) );
 
-	printf("Task %d START\n", _id);
+	// printf("Task %d START\n", _id);
 
 	// copy data from ts column to GPU
 	auto d_data = CudaPtr<char>::make_shared(_ts->getColumn(_columnId).getSize());
@@ -31,9 +31,9 @@ void DecompressionTask::execute()
 
 	// decompress
 	auto typeStr = GetDataTypeString(_ts->getColumn(_columnId).getType());
-	printf("Task %d DECOMPRESS data with size %lu and type %s\n", _id, d_data->size(), typeStr.c_str());
+	// printf("Task %d DECOMPRESS data with size %lu and type %s\n", _id, d_data->size(), typeStr.c_str());
 	auto d_decompressedData = CompressionTree().Decompress(d_data);
-	printf("Task %d DONE\n", _id);
+	// printf("Task %d DONE\n", _id);
 
 	// copy to host as a column of time series
 	_ts->getColumn(_columnId).reserveSize(d_decompressedData->size());
@@ -42,7 +42,7 @@ void DecompressionTask::execute()
 
 	// end task
 	_status = TaskStatus::success;
-	printf("Task %d END\n", _id);
+	// printf("Task %d END\n", _id);
 }
 
 } /* namespace ddj */

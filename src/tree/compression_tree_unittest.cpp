@@ -66,7 +66,7 @@ void CompressionTreeTestBase::CompressDecompressTest(CompressionTree& compressio
 	// printf("Data size = %lu\n", data->size()*sizeof(T));
 	// printf("Compressed size = %lu\n", compressed->size());
 	// printf("Decompressed size = %lu\n", decompressed->size());
-	//
+
 	// HelperPrint::PrintSharedCudaPtr(expected, "expected");
 	// HelperPrint::PrintSharedCudaPtr(actual, "actual");
 }
@@ -464,5 +464,47 @@ TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_SpecialCaseWithDict_Compr
 	// HelperPrint::PrintSharedCudaPtr(expected, "expected");
 	// HelperPrint::PrintSharedCudaPtr(actual, "actual");
 }
+
+// delta[1],patch[1],delta[1],afl[1],none[1],delta[1],afl[1],none[1],
+//
+//				DELTA
+// 				  |
+// 				PATCH
+// 			   /	 \
+// 			DELTA	DELTA
+// 			  |		  |
+//			 AFL	 AFL
+TEST_F(CompressionTreeTestBase, RealTSData_Time_Delta_Patch_Delta_Afl)
+{
+	Path path
+	{
+		EncodingType::delta,
+			EncodingType::patch,
+				EncodingType::delta,
+					EncodingType::afl, EncodingType::none,
+				EncodingType::delta,
+					EncodingType::afl, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_time);
+	auto timeData = GetTsIntDataFromTestFile();
+	CompressDecompressTest<time_t>(tree, timeData);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 } /* namespace ddj */

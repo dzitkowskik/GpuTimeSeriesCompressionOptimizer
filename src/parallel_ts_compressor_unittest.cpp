@@ -56,9 +56,8 @@ TEST_F(ParallelTsCompressorTest, Decompress_Binary_Info_Test_Data_CompareFile)
 	auto outputFileDecompr = File::GetTempFile();
 	auto headerFile = File("sample_data/info.header");
 
-	auto fileDefinition = TimeSeriesReader::ReadFileDefinition(headerFile);
-	auto reader = TimeSeriesReaderBinary::make_shared(BinaryFileDefinition(fileDefinition), 4);
-
+	auto fileDefinition = BinaryFileDefinition(TimeSeriesReader::ReadFileDefinition(headerFile));
+	auto reader = TimeSeriesReaderBinary::make_shared(fileDefinition, 4);
 	ParallelTSCompressor compressor(reader);
 	compressor.Compress(inputFile, outputFileCompr);
 
@@ -69,7 +68,13 @@ TEST_F(ParallelTsCompressorTest, Decompress_Binary_Info_Test_Data_CompareFile)
 
 	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
 
-	EXPECT_TRUE( inputFile.Compare(outputFileDecompr) );
+	auto newInputFile = File("sample_data/info.inf");
+	auto ts1 = TimeSeriesReaderBinary(fileDefinition, 4).Read(newInputFile);
+	ts1->print(5);
+	auto ts2 = TimeSeriesReaderBinary(fileDefinition, 4).Read(outputFileDecompr);
+	ts2->print(5);
+
+	EXPECT_TRUE( ts1->compare(*ts2) );
 }
 
 TEST_F(ParallelTsCompressorTest, Decompress_CSV_Info_Test_Data_CompareFile)
@@ -93,6 +98,6 @@ TEST_F(ParallelTsCompressorTest, Decompress_CSV_Info_Test_Data_CompareFile)
 	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
 
 	EXPECT_TRUE( inputFile.Compare(outputFileDecompr) );
-} 
+}
 
 } /* namespace ddj */
