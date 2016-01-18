@@ -40,7 +40,7 @@ void ParallelTSCompressor::Compress(File& inputFile, File& outputFile)
 	{
 		// read batch data from source
 		ts = _reader->Read(inputFile, _batchSize);
-		ts->print(5);
+		// ts->print(5);
 
 		if(!_initialized) init(ts);
 
@@ -64,7 +64,7 @@ void ParallelTSCompressor::Decompress(File& inputFile, File& outputFile, FileDef
 	// read size of data chunk
 	size_t size = 0;
 	int i = 0;
-	printf("Start decompressing!\n");
+	// printf("Start decompressing!\n");
 	while(!inputFile.ReadRaw((char*)&size, sizeof(size_t)))
 	{
 		if(!_initialized) init(ts);

@@ -18,6 +18,7 @@ void UnittestBase::TearDownTestCase()
 
 void UnittestBase::SetUp()
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
 	_size = 10000;
 }
 

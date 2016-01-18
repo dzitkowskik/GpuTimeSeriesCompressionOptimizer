@@ -286,7 +286,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_P
 	SharedCudaPtrVector<float> floatDataParts;
 	SharedCudaPtrVector<char> compressedDataParts;
 	for(int i = 0; i < N; i++)
-		floatDataParts.push_back(GetFakeDataWithPatternA<float>(i, 1e2, 1.5f, -10.0f, 1e6f, 1e6));
+		floatDataParts.push_back(GetFakeDataWithPatternA<float>(i, 1e2, 1.5f, -10.0f, 1e6f, GetSize()));
 
 	//	HelperPrint::PrintSharedCudaPtr(floatDataParts[0], "data1");
 
@@ -323,7 +323,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_Pat
 	SharedCudaPtrVector<int> dataParts;
 	SharedCudaPtrVector<char> compressedDataParts;
 	for(int i = 0; i < N; i++)
-		dataParts.push_back(GetFakeDataWithPatternA<int>(i, 1e4, 1, -10, 1e6, 1e6));
+		dataParts.push_back(GetFakeDataWithPatternA<int>(i, 1e4, 1, -10, 1e6, GetSize()));
 
 	//	HelperPrint::PrintSharedCudaPtr(dataParts[0], "data1");
 
@@ -356,7 +356,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_Pat
 TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_PatternB_25Parts)
 {
 	int N = 25;
-	int SIZE = 1e6;
+	int SIZE = GetSize();
 	CompressionOptimizer optimizer;
 	SharedCudaPtrVector<int> dataParts;
 	SharedCudaPtrVector<char> compressedDataParts;
@@ -395,7 +395,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_Pat
 TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_PatternB_9Parts)
 {
 	int N = 9;
-	int SIZE = 1e6;
+	int SIZE = GetSize();
 	CompressionOptimizer optimizer;
 	SharedCudaPtrVector<float> floatDataParts;
 	SharedCudaPtrVector<char> compressedDataParts;

@@ -30,7 +30,7 @@ std::tuple<T,T> CudaArrayStatistics::MinMax(SharedCudaPtr<T> data)
 template<typename T>
 char getMinBit(T min, T max)
 {
-	int result = 32;
+	int result = sizeof(T)*8;
 	if (min >= 0)
 		result = ALT_BITLEN(max);
 	return result;

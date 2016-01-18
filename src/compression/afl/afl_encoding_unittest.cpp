@@ -102,6 +102,28 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_ConsecutiveInts_data)
 	);
 }
 
+TEST_P(AflCompressionTest, Afl_Encode_Decode_FakeTime_data)
+{
+	AflEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<time_t>(
+			boost::bind(&AflEncoding::Encode<time_t>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<time_t>, encoder, _1),
+			GetFakeDataForTime(0, 0.75, GetSize()))
+	);
+}
+
+TEST_P(AflCompressionTest, Afl_Encode_Decode_RealTime_data)
+{
+	AflEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<time_t>(
+			boost::bind(&AflEncoding::Encode<time_t>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<time_t>, encoder, _1),
+			GetTsIntDataFromTestFile())
+	);
+}
+
 TEST_P(AflCompressionTest, GetMetadataSize_Consecutive_Int)
 {
 	TestGetMetadataSize<AflEncoding, int>(GetIntConsecutiveData());

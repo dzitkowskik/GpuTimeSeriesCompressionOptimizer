@@ -505,6 +505,4 @@ TEST_F(CompressionTreeTestBase, RealTSData_Time_Delta_Patch_Delta_Afl)
 
 
 
-
-
 } /* namespace ddj */
