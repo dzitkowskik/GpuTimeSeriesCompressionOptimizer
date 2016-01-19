@@ -52,6 +52,12 @@ public:
 						return boost::make_shared<PatchEncodingFactory<time_t>>(dataType, PatchType::outside);
 					case DataType::d_float:
 						return boost::make_shared<PatchEncodingFactory<float>>(dataType, PatchType::outside);
+					case DataType::d_double:
+						return boost::make_shared<PatchEncodingFactory<double>>(dataType, PatchType::outside);
+					case DataType::d_short:
+						return boost::make_shared<PatchEncodingFactory<short>>(dataType, PatchType::outside);
+					case DataType::d_char:
+						return boost::make_shared<PatchEncodingFactory<char>>(dataType, PatchType::outside);
 					default:
 						throw NotImplementedException("Encoding of this type not implemented");
 				}

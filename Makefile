@@ -14,13 +14,12 @@ SRC_CUDA_EXT := cu
 SRC_EXT := cpp
 
 COMPILER := nvcc
-STANDART := --std=c++11
+STANDART := --std=c++11 
 NVCC_FLAGS := --cudart static --relocatable-device-code=false --default-stream per-thread
 
 LIBS := -lcudart -lboost_system -lboost_thread -lpthread \
 	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand -lcelero
 
-GENCODE_SM20    := -gencode arch=compute_20,code=sm_20
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30
 GENCODE_SM35	:= -gencode arch=compute_35,code=sm_35
 

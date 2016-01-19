@@ -28,20 +28,10 @@ std::tuple<T,T> CudaArrayStatistics::MinMax(SharedCudaPtr<T> data)
 }
 
 template<typename T>
-char getMinBit(T min, T max)
-{
-	int result = sizeof(T)*8;
-	if (min >= 0)
-		result = ALT_BITLEN(max);
-	return result;
-
-}
-
-template<typename T>
 char CudaArrayStatistics::MinBitCnt(SharedCudaPtr<T> data)
 {
 	auto minMax = MinMax(data);
-	return getMinBit(std::get<0>(minMax), std::get<1>(minMax));
+	return BITLEN(std::get<0>(minMax), std::get<1>(minMax));
 }
 
 __host__ __device__
@@ -157,7 +147,7 @@ DataStatistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 	auto minMax = MinMax(data);
 	stats.min = std::get<0>(minMax);
 	stats.max = std::get<1>(minMax);
-	stats.minBitCnt = getMinBit(stats.min, stats.max);
+	stats.minBitCnt = BITLEN(stats.min, stats.max);
 	stats.precision = Precision(data);
 	stats.sorted = Sorted(data);
 	stats.rlMetric = RlMetric(data);

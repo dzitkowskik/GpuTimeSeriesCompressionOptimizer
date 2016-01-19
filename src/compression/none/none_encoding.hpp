@@ -57,9 +57,17 @@ protected:
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data)
 	{ return this->Decode<float>(data); }
 	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data)
-	{ return SharedCudaPtrVector<char>(); }
+	{ return this->Encode<double>(data); }
 	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)
-	{ return SharedCudaPtr<double>(); }
+	{ return this->Decode<double>(data); }
+	SharedCudaPtrVector<char> EncodeShort(SharedCudaPtr<short> data)
+	{ return this->Encode<short>(data); }
+	SharedCudaPtr<short> DecodeShort(SharedCudaPtrVector<char> data)
+	{ return this->Decode<short>(data); }
+	SharedCudaPtrVector<char> EncodeChar(SharedCudaPtr<char> data)
+	{ return this->Encode<char>(data); }
+	SharedCudaPtr<char> DecodeChar(SharedCudaPtrVector<char> data)
+	{ return this->Decode<char>(data); }
 
 public:
 	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);

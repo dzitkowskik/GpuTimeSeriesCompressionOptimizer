@@ -53,6 +53,6 @@ bool CompressionUnittestBase::TestContent(
 			boost::function<SharedCudaPtrVector<char> (SharedCudaPtr<X> data)>, 	\
 			boost::function<SharedCudaPtr<X> (SharedCudaPtrVector<char> data)>, 	\
 			SharedCudaPtr<X> data);
-FOR_EACH(COMPRESSION_UNITTEST_BASE_SPEC, double, float, int, long, long long, unsigned int)
+FOR_EACH(COMPRESSION_UNITTEST_BASE_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

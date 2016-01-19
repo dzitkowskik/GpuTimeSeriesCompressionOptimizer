@@ -247,7 +247,7 @@ __device__ __host__ void afl_compress_base_value_gpu (
     SETNPBITS(compressed_data + cblock_id, value, bit_ret, bit_pos);
 
     if (bit_ret < bit_length)
-        SETNPBITS(compressed_data + cblock_id + CWARP_SIZE, value >> bit_ret, bit_length - bit_ret, 0);
+        SETNPBITS(compressed_data + cblock_id + CWARP_SIZE, (T)(value >> bit_ret), bit_length - bit_ret, 0);
 }
 
 // For now only those versions are available and will be compiled and linked
@@ -262,8 +262,8 @@ __device__ __host__ void afl_compress_base_value_gpu (
 
 // A fast aligned version WARP_SIZE = 32
 #define AFL_SPEC(X) GFL_SPEC(X, 32)
-FOR_EACH(AFL_SPEC, int, long, unsigned int, unsigned long)
+FOR_EACH(AFL_SPEC, char, short, int, long, unsigned int, unsigned long)
 
 // Non aligned version - identical to classical CPU/GPU version (up to 10x slower then AFL)
 #define FL_SPEC(X) GFL_SPEC(X, 1)
-FOR_EACH(FL_SPEC, int, long, unsigned int, unsigned long)
+FOR_EACH(FL_SPEC, char, short, int, long, unsigned int, unsigned long)

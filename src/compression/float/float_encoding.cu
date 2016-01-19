@@ -57,6 +57,6 @@ namespace ddj
 #define FLOAT_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> FloatEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> FloatEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(FLOAT_ENCODING_SPEC, short, double, float, int, long, long long, unsigned int)
+FOR_EACH(FLOAT_ENCODING_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

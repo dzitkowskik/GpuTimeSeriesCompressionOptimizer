@@ -124,6 +124,28 @@ TEST_P(AflCompressionTest, Afl_Encode_Decode_RealTime_data)
 	);
 }
 
+TEST_P(AflCompressionTest, Afl_Encode_Decode_Short_data)
+{
+	AflEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&AflEncoding::Encode<short>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(AflCompressionTest, Afl_Encode_Decode_Char_data)
+{
+	AflEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&AflEncoding::Encode<char>, encoder, _1),
+			boost::bind(&AflEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
+	);
+}
+
 TEST_P(AflCompressionTest, GetMetadataSize_Consecutive_Int)
 {
 	TestGetMetadataSize<AflEncoding, int>(GetIntConsecutiveData());

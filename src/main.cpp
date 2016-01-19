@@ -28,6 +28,7 @@ ConfigOptions GetProgramOptions()
 			("header-file,h", po::value<string>(), "header file")
 			("input-file,i", po::value<string>(), "input file")
 			("output-file,o", po::value<string>(), "output file")
+			("generate,g", po::value<int>(), "generate sample data")
 			;
 	options.ConsoleOptions.add(consoleOptions);
 
@@ -84,6 +85,12 @@ int main(int argc, char* argv[])
 		printf("START DECOMPRESSING\n");
 		compressor.Decompress(inputFile, outputFile, fileDefinition);
 		printf("DECOMPRESSING DONE\n");
+	}
+	else if (conf->HasValue("generate"))
+	{
+		printf("START GENERATING DATA\n");
+
+		printf("GENERATING DATA DONE\n");
 	}
 	else std::cout << configDef.Options.ConsoleOptions << std::endl;
 

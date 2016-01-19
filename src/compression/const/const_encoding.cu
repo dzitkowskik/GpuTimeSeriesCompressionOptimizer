@@ -137,6 +137,6 @@ template<typename T> size_t ConstEncoding::GetCompressedSize(SharedCudaPtr<T> da
 #define CONST_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> ConstEncoding::Encode<X>(SharedCudaPtr<X> data); \
 	template SharedCudaPtr<X> ConstEncoding::Decode<X>(SharedCudaPtrVector<char> data);
-FOR_EACH(CONST_ENCODING_SPEC, short, float, int, long, long long, unsigned int)
+FOR_EACH(CONST_ENCODING_SPEC, char, short, double, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

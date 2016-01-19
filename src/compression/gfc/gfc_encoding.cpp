@@ -84,6 +84,22 @@ template<>
 SharedCudaPtr<time_t> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 { return SharedCudaPtr<time_t>(); }
 
+// SHORT
+template<>
+SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<short> data)
+{ return SharedCudaPtrVector<char>(); }
+template<>
+SharedCudaPtr<short> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
+{ return SharedCudaPtr<short>(); }
+
+// CHAR
+template<>
+SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<char> data)
+{ return SharedCudaPtrVector<char>(); }
+template<>
+SharedCudaPtr<char> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
+{ return SharedCudaPtr<char>(); }
+
 
 SharedCudaPtrVector<char> GfcEncoding::EncodeInt(SharedCudaPtr<int> data)
 { return this->Encode<int>(data); }
@@ -98,8 +114,16 @@ SharedCudaPtrVector<char> GfcEncoding::EncodeFloat(SharedCudaPtr<float> data)
 SharedCudaPtr<float> GfcEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
 { return this->Decode<float>(data); }
 SharedCudaPtrVector<char> GfcEncoding::EncodeDouble(SharedCudaPtr<double> data)
-{ return SharedCudaPtrVector<char>(); }
+{ return this->Encode<double>(data); }
 SharedCudaPtr<double> GfcEncoding::DecodeDouble(SharedCudaPtrVector<char> data)
-{ return SharedCudaPtr<double>(); }
+{ return this->Decode<double>(data); }
+SharedCudaPtrVector<char> GfcEncoding::EncodeShort(SharedCudaPtr<short> data)
+{ return this->Encode<short>(data); }
+SharedCudaPtr<short> GfcEncoding::DecodeShort(SharedCudaPtrVector<char> data)
+{ return this->Decode<short>(data); }
+SharedCudaPtrVector<char> GfcEncoding::EncodeChar(SharedCudaPtr<char> data)
+{ return this->Encode<char>(data); }
+SharedCudaPtr<char> GfcEncoding::DecodeChar(SharedCudaPtrVector<char> data)
+{ return this->Decode<char>(data); }
 
 } /* namespace ddj */

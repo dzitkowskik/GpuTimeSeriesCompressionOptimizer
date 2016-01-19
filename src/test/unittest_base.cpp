@@ -153,7 +153,7 @@ SharedCudaPtr<T> UnittestBase::GetFakeDataWithPatternA(
 		T max,
 		size_t s)
 {
-
+	T oldMin = min;
 	size_t size = s == 0 ? _size : s;
 	auto h_result = new T[size];
 	size_t start = part*size;
@@ -162,11 +162,12 @@ SharedCudaPtr<T> UnittestBase::GetFakeDataWithPatternA(
 	min = min + (T)(start/len)*step;
 	for(size_t i = 0; i < size; i++)
 	{
-		auto value = min;
+		auto value = min < max ? (min > oldMin ? min : oldMin) : max;
 		if((start+i) % len == 0)
 		{
 			value = max;
 			min += step;
+			if(min > max || min < oldMin) step = -step;
 		}
 		h_result[i] = value;
 	}
@@ -245,6 +246,6 @@ SharedCudaPtr<time_t> UnittestBase::GetFakeDataForTime(
 #define UNITTEST_BASE_SPEC(X) \
 	template SharedCudaPtr<X> UnittestBase::GetFakeDataWithPatternA<X>(int, size_t, X, X, X, size_t); \
 	template SharedCudaPtr<X> UnittestBase::GetFakeDataWithPatternB<X>(int, size_t, X, X, size_t);
-FOR_EACH(UNITTEST_BASE_SPEC, short, float, int, long, long long, unsigned int)
+FOR_EACH(UNITTEST_BASE_SPEC, char, short, float, int, long, long long, unsigned int)
 
 } /* namespace ddj */

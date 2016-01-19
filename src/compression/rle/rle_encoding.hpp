@@ -58,6 +58,14 @@ protected:
 	{ return this->Encode<double>(data); }
 	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)
 	{ return this->Decode<double>(data); }
+	SharedCudaPtrVector<char> EncodeShort(SharedCudaPtr<short> data)
+	{ return this->Encode<short>(data); }
+	SharedCudaPtr<short> DecodeShort(SharedCudaPtrVector<char> data)
+	{ return this->Decode<short>(data); }
+	SharedCudaPtrVector<char> EncodeChar(SharedCudaPtr<char> data)
+	{ return this->Encode<char>(data); }
+	SharedCudaPtr<char> DecodeChar(SharedCudaPtrVector<char> data)
+	{ return this->Decode<char>(data); }
 
 	template<typename T>
 	size_t GetCompressedSize(SharedCudaPtr<T> data);

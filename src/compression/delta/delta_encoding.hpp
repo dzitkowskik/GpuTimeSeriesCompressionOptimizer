@@ -62,6 +62,14 @@ protected:
 	{ return this->Encode<time_t>(CastSharedCudaPtr<double, time_t>(data)); }
 	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data)
 	{ return CastSharedCudaPtr<time_t, double>(this->Decode<time_t>(data)); }
+	SharedCudaPtrVector<char> EncodeShort(SharedCudaPtr<short> data)
+	{ return this->Encode<short>(data); }
+	SharedCudaPtr<short> DecodeShort(SharedCudaPtrVector<char> data)
+	{ return this->Decode<short>(data); }
+	SharedCudaPtrVector<char> EncodeChar(SharedCudaPtr<char> data)
+	{ return this->Encode<char>(data); }
+	SharedCudaPtr<char> DecodeChar(SharedCudaPtrVector<char> data)
+	{ return this->Decode<char>(data); }
 
 public:
 	template<typename T> SharedCudaPtrVector<char> Encode(SharedCudaPtr<T> data);

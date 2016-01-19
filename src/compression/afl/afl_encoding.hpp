@@ -38,6 +38,10 @@ protected:
 	SharedCudaPtr<float> DecodeFloat(SharedCudaPtrVector<char> data);
 	SharedCudaPtrVector<char> EncodeDouble(SharedCudaPtr<double> data);
 	SharedCudaPtr<double> DecodeDouble(SharedCudaPtrVector<char> data);
+	SharedCudaPtrVector<char> EncodeShort(SharedCudaPtr<short> data);
+	SharedCudaPtr<short> DecodeShort(SharedCudaPtrVector<char> data);
+	SharedCudaPtrVector<char> EncodeChar(SharedCudaPtr<char> data);
+	SharedCudaPtr<char> DecodeChar(SharedCudaPtrVector<char> data);
 
 	template<typename T>
 	size_t GetCompressedSizeIntegral(SharedCudaPtr<T> data);

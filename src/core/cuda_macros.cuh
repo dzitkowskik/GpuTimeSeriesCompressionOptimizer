@@ -1,8 +1,6 @@
 #ifndef DDJ_CUDA_MACROS_CUH_
 #define DDJ_CUDA_MACROS_CUH_
 
-// This should work independently from _CUDA_ARCH__ number
-
 #define CWORD_SIZE(T)(T) (sizeof(T) * 8)
 
 #define NBITSTOMASK(n) ((1<<(n)) - 1)
@@ -13,28 +11,11 @@
 #define _unused(x) x __attribute__((unused))
 #define convert_struct(n, s)  struct sgn {signed int x:n;} __attribute__((unused)) s
 
-__inline__ __device__
-int warpAllReduceMax(int val) {
-
-    val = max(val, __shfl_xor(val,16));
-    val = max(val, __shfl_xor(val, 8));
-    val = max(val, __shfl_xor(val, 4));
-    val = max(val, __shfl_xor(val, 2));
-    val = max(val, __shfl_xor(val, 1));
-
-    /*int m = val;*/
-    /*for (int mask = warpSize/2; mask > 0; mask /= 2) {*/
-        /*m = __shfl_xor(val, mask);*/
-        /*val = m > val ? m : val;*/
-    /*}*/
-    return val;
-}
-
-//TODO: distinguish between signed/unsigned versions
-
-// This depend on _CUDA_ARCH__ number
-
-
+/*
+ *
+ *				SETNPBITS
+ *
+ */
 
 template <typename T>
 __device__ __host__ __forceinline__ T SETNPBITS( T *source, T value, const unsigned int num_bits, const unsigned int bit_start)
@@ -60,6 +41,12 @@ __device__ __host__ __forceinline__ unsigned long SETNPBITS( unsigned long *sour
     *source |= (value & mask) << bit_start; // set values
     return *source;
 }
+
+/*
+ *
+ *				GETNPBITS
+ *
+ */
 
 __device__ __host__ __forceinline__ unsigned int GETNPBITS( int source, unsigned int num_bits, unsigned int bit_start)
 {
@@ -105,6 +92,18 @@ __device__ __host__ __forceinline__ unsigned long GETNPBITS( unsigned long sourc
 #endif
 }
 
+__device__ __host__ __forceinline__ unsigned char GETNPBITS( char source, unsigned int num_bits, unsigned int bit_start)
+{ return ((source>>bit_start) & NBITSTOMASK(num_bits)); }
+
+__device__ __host__ __forceinline__ unsigned short GETNPBITS( short source, unsigned int num_bits, unsigned int bit_start)
+{ return ((source>>bit_start) & NBITSTOMASK(num_bits)); }
+
+/*
+ *
+ *				GETNBITS
+ *
+ */
+
 __device__ __host__ __forceinline__ unsigned long GETNBITS( long source, unsigned int num_bits)
 {
 #if __CUDA_ARCH__ > 200  // Use bfe implementation
@@ -141,53 +140,46 @@ __device__ __host__ __forceinline__ unsigned int GETNBITS( unsigned int source, 
 #endif
 }
 
-__device__ __host__ __forceinline__ unsigned int BITLEN(unsigned int word)
+__device__ __host__ __forceinline__ unsigned char GETNBITS( char source, unsigned int num_bits)
 {
-    unsigned int ret=0;
-#if __CUDA_ARCH__ > 200
-    asm volatile ("bfind.u32 %0, %1;" : "=r"(ret) : "r"(word));
-#else
-    while (word >>= 1)
-      ret++;
+#if __CUDA_ARCH__ > 200  // Use bfe implementation
+    return GETNPBITS(source, num_bits, 0);
+#else // In other case this will be faster
+    return ((source) & NBITSTOMASK(num_bits));
 #endif
-   return ret > 64 ? 0 : ret;
 }
 
-__device__ __host__ __forceinline__ unsigned int BITLEN(unsigned long word)
+__device__ __host__ __forceinline__ unsigned short GETNBITS( short source, unsigned int num_bits)
 {
-    unsigned int ret=0;
-#if __CUDA_ARCH__ > 200
-    asm volatile ("bfind.u64 %0, %1;" : "=r"(ret) : "l"(word));
-#else
-    while (word >>= 1)
-      ret++;
+#if __CUDA_ARCH__ > 200  // Use bfe implementation
+    return GETNPBITS(source, num_bits, 0);
+#else // In other case this will be faster
+    return ((source) & NBITSTOMASK(num_bits));
 #endif
-   return ret > 64 ? 0 : ret;
 }
 
-__device__ __host__ __forceinline__ unsigned int BITLEN(int word)
+/*
+ *
+ *				BITLEN
+ *
+ */
+
+
+template<typename T>
+inline char BITLEN(T min, T max)
 {
-    unsigned int ret=0;
-#if __CUDA_ARCH__ > 200
-    asm volatile ("bfind.s32 %0, %1;" : "=r"(ret) : "r"(word));
-#else
-    while (word >>= 1)
-      ret++;
-#endif
-   return ret > 64 ? 0 : ret;
+	char ret=8*sizeof(T);
+	if(min<0) return ret;
+	else ret=0;
+	while(max>>=1) ret++;
+	return ret+1;
 }
 
-__device__ __host__ __forceinline__ unsigned int BITLEN(long word)
-{
-    unsigned int ret=0;
-#if __CUDA_ARCH__ > 200
-    asm volatile ("bfind.s64 %0, %1;" : "=r"(ret) : "l"(word));
-#else
-    while (word >>= 1)
-      ret++;
-#endif
-   return ret > 64 ? 0 : ret;
-}
+template<> inline char BITLEN(float min, float max)
+{ return 32; }
+
+template<> inline char BITLEN(double min, double max)
+{ return 64; }
 
 __host__ __device__
 inline int ALT_BITLEN(int v)
@@ -204,6 +196,12 @@ inline int ALT_BITLEN(int v)
     r |= (v >> 1);
     return r+1;
 }
+
+/*
+ *
+ *				OTHERS
+ *
+ */
 
 #define SGN(a) (int)((unsigned int)((int)a) >> (sizeof(int) * CHAR_BIT - 1))
 #define GETNSGNBITS(a,n,b) ((SGN(a) << (n-1)) | GETNBITS(((a)>>(b-n)), (n-1)))

@@ -14,6 +14,9 @@ namespace ddj
 template<typename T>
 SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<T> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 	// Get minimal bit count needed to encode data
 	char minBit = CudaArrayStatistics().MinBitCnt<T>(data);
 
@@ -89,6 +92,9 @@ SharedCudaPtr<T> DecodeAfl(T* data, size_t size, int minBit, int rest)
 template<typename T>
 SharedCudaPtr<T> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	if(input[1]->size() <= 0)
+		return CudaPtr<T>::make_shared();
+
 	auto metadata = input[0]->copyToHost();
 	auto data = input[1];
 
@@ -102,6 +108,9 @@ SharedCudaPtr<T> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 template<>
 SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<float> data)
 {
+	if(data->size() <= 0)
+		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+
 	auto minMax = CudaArrayStatistics().MinMax(data);
 	char allPositive = std::get<0>(minMax) >= 0 ? 1 : 0;
 	char allNegative = std::get<1>(minMax) < 0 ? 2 : 0;
@@ -163,6 +172,9 @@ __global__ void _composeFloatKernel(
 template<>
 SharedCudaPtr<float> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	if(input[1]->size() <= 0)
+		return CudaPtr<float>::make_shared();
+
 	int offset = 0, step = sizeof(char);
 
 	auto metadata = input[0];
@@ -222,58 +234,29 @@ SharedCudaPtr<float> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 }
 
 SharedCudaPtrVector<char> AflEncoding::EncodeInt(SharedCudaPtr<int> data)
-{
-	if(data->size() <= 0)
-		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
-
-	return this->Encode<int>(data);
-}
-
+{ return this->Encode<int>(data); }
 SharedCudaPtr<int> AflEncoding::DecodeInt(SharedCudaPtrVector<char> data)
-{
-	if(data[1]->size() <= 0)
-		return CudaPtr<int>::make_shared();
-
-	return this->Decode<int>(data);
-}
-
+{ return this->Decode<int>(data); }
 SharedCudaPtrVector<char> AflEncoding::EncodeTime(SharedCudaPtr<time_t> data)
-{
-	if(data->size() <= 0)
-		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
-
-	return this->Encode<time_t>(data);
-}
-
+{ return this->Encode<time_t>(data); }
 SharedCudaPtr<time_t> AflEncoding::DecodeTime(SharedCudaPtrVector<char> data)
-{
-	if(data[1]->size() <= 0)
-		return CudaPtr<time_t>::make_shared();
-
-	return this->Decode<time_t>(data);
-}
-
+{ return this->Decode<time_t>(data); }
 SharedCudaPtrVector<char> AflEncoding::EncodeFloat(SharedCudaPtr<float> data)
-{
-	if(data->size() <= 0)
-		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
-
-	return this->Encode<float>(data);
-}
-
+{ return this->Encode<float>(data); }
 SharedCudaPtr<float> AflEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
-{
-	if(data[1]->size() <= 0)
-		return CudaPtr<float>::make_shared();
-
-	return this->Decode<float>(data);
-}
-
+{ return this->Decode<float>(data); }
 SharedCudaPtrVector<char> AflEncoding::EncodeDouble(SharedCudaPtr<double> data)
 { return SharedCudaPtrVector<char>(); }
-
 SharedCudaPtr<double> AflEncoding::DecodeDouble(SharedCudaPtrVector<char> data)
 { return SharedCudaPtr<double>(); }
+SharedCudaPtrVector<char> AflEncoding::EncodeShort(SharedCudaPtr<short> data)
+{ return this->Encode<short>(data); }
+SharedCudaPtr<short> AflEncoding::DecodeShort(SharedCudaPtrVector<char> data)
+{ return this->Decode<short>(data); }
+SharedCudaPtrVector<char> AflEncoding::EncodeChar(SharedCudaPtr<char> data)
+{ return this->Encode<char>(data); }
+SharedCudaPtr<char> AflEncoding::DecodeChar(SharedCudaPtrVector<char> data)
+{ return this->Decode<char>(data); }
 
 size_t AflEncoding::GetMetadataSize(SharedCudaPtr<char> data, DataType type)
 {
@@ -342,6 +325,6 @@ size_t AflEncoding::GetCompressedSizeFloatingPoint(SharedCudaPtr<T> data)
 #define AFL_ENCODING_SPEC(X) \
 	template SharedCudaPtrVector<char> AflEncoding::Encode<X>(SharedCudaPtr<X>); \
 	template SharedCudaPtr<X> AflEncoding::Decode<X>(SharedCudaPtrVector<char>);
-FOR_EACH(AFL_ENCODING_SPEC, int, long, unsigned int)
+FOR_EACH(AFL_ENCODING_SPEC, char, short, int, long, unsigned int)
 
 } /* namespace ddj */
