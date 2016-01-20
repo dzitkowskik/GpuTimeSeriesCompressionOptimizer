@@ -61,24 +61,14 @@ protected:
 	SharedCudaPtr<float> GetTsFloatDataFromTestFile();
 	SharedCudaPtr<int> GetRandomStencilData();
 	SharedCudaPtr<int> GetFakeIntDataForHistogram();
-
-	// pattern suitable for time (monotonically increasing function)
-	//                              ------------
-	//                        ------
-	//          --------------
-	//       ---
-	// ------											min
 	SharedCudaPtr<time_t> GetFakeDataForTime(
 			time_t min=0,
 			double flatness=0.5,
-			size_t s=0);
-
-
-	// *		*		*		*		*	  *			max
-	//					 -------
-	//			 -------		 ------
-	//	-------							------			min
-	//  <-len->
+			size_t s=0)
+	{
+		size_t size = s == 0 ? _size : s;
+		return _generator.GetFakeDataForTime(min, flatness, size);
+	}
 	template<typename T>
 	SharedCudaPtr<T> GetFakeDataWithPatternA(
 			int part=0,
@@ -86,24 +76,22 @@ protected:
 			T step=10,
 			T min=0,
 			T max=1e6,
-			size_t s=0);
-
-	//     pattern 1	|		pattern2		|	pattern1
-	//	* * * * * * * *	*                       * * * * * * * *		max-rand(0,5)
-	//	 # # # # # # #	  *                   *  # # # # # # # 		max-rand(0,5)
-	//						*               *
-	//						  *           *
-	//							*       *
-	//  * * * * * * * *			  *   *			 * * * * * * * *	min+rand(0,5)
-	//	 # # # # # # #				*			  # # # # # # # 	min+rand(0,5)
-	//  <------len-----> <---------len---------> <-----len------>
+			size_t s=0)
+	{
+		size_t size = s == 0 ? _size : s;
+		return _generator.GetFakeDataWithPatternA(part, len, step, min, max, size);
+	}
 	template<typename T>
 	SharedCudaPtr<T> GetFakeDataWithPatternB(
 			int part=0,
 			size_t len=2*1e6,
 			T min=-1e5,
 			T max=+1e5,
-			size_t s=0);
+			size_t s=0)
+	{
+		size_t size = s == 0 ? _size : s;
+		return _generator.GetFakeDataWithPatternB(part, len, min, max, size);
+	}
 
 	boost::shared_ptr<TimeSeries> Get1GBNyseTimeSeries();
 	int GetSize();

@@ -29,11 +29,52 @@ public:
     SharedCudaPtr<int> GenerateRandomIntDeviceArray(int size, int from, int to);
     SharedCudaPtr<int> GenerateConsecutiveIntDeviceArray(int size);
     SharedCudaPtr<int> GenerateRandomStencil(int size);
-
     template<typename T> SharedCudaPtr<T> CreateConsecutiveNumbersArray(int size, T start);
     template<typename T> SharedCudaPtr<T> CreateConsecutiveNumbersArray(int size, T start, T step);
-
     SharedCudaPtr<float> CreateRandomFloatsWithMaxPrecision(int size, int maxPrecision);
+
+	// pattern suitable for time (monotonically increasing function)
+	//                              ------------
+	//                        ------
+	//          --------------
+	//       ---
+	// ------											min
+	SharedCudaPtr<time_t> GetFakeDataForTime(
+			time_t min=0,
+			double flatness=0.5,
+			size_t size=1e6);
+
+
+	// *		*		*		*		*	  *			max
+	//					 -------
+	//			 -------		 ------
+	//	-------							------			min
+	//  <-len->
+	template<typename T>
+	SharedCudaPtr<T> GetFakeDataWithPatternA(
+			int part=0,
+			size_t len=1e3,
+			T step=10,
+			T min=0,
+			T max=1e6,
+			size_t size=1e6);
+
+	//     pattern 1	|		pattern2		|	pattern1
+	//	* * * * * * * *	*                       * * * * * * * *		max-rand(0,5)
+	//	 # # # # # # #	  *                   *  # # # # # # # 		max-rand(0,5)
+	//						*               *
+	//						  *           *
+	//							*       *
+	//  * * * * * * * *			  *   *			 * * * * * * * *	min+rand(0,5)
+	//	 # # # # # # #				*			  # # # # # # # 	min+rand(0,5)
+	//  <------len-----> <---------len---------> <-----len------>
+	template<typename T>
+	SharedCudaPtr<T> GetFakeDataWithPatternB(
+			int part=0,
+			size_t len=2*1e6,
+			T min=-1e5,
+			T max=+1e5,
+			size_t size=1e6);
 
 private:
     curandGenerator_t _gen;
