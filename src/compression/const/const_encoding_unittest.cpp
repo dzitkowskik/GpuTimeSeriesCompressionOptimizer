@@ -18,7 +18,7 @@ class ConstEncodingTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
     ConstEncoding_Compression_Inst,
     ConstEncodingTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(ConstEncodingTest, CompressionOfRandomInts_size)
 {
@@ -83,6 +83,28 @@ TEST_P(ConstEncodingTest, CompressionOf_Float_FromFile)
 			boost::bind(&ConstEncoding::Encode<float>, encoder, _1),
 			boost::bind(&ConstEncoding::Decode<float>, encoder, _1),
 			GetTsFloatDataFromTestFile())
+	);
+}
+
+TEST_P(ConstEncodingTest, CompressionOf_PatternA_Short)
+{
+	ConstEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&ConstEncoding::Encode<short>, encoder, _1),
+			boost::bind(&ConstEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(ConstEncodingTest, CompressionOf_PatternA_Char)
+{
+	ConstEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&ConstEncoding::Encode<char>, encoder, _1),
+			boost::bind(&ConstEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
 	);
 }
 

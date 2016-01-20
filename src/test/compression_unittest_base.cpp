@@ -36,8 +36,8 @@ bool CompressionUnittestBase::TestContent(
 	auto encodedData = encodeFunction(data);
 	auto decodedData = decodeFunction(encodedData);
 //
-//	HelperPrint::PrintSharedCudaPtr(data, "data");
-//	HelperPrint::PrintSharedCudaPtr(decodedData, "decodedData");
+//	HelperPrint::PrintSharedCudaPtr(data->copy(100), "data");
+//	HelperPrint::PrintSharedCudaPtr(decodedData->copy(100), "decodedData");
 //	printf("Size before compression: %lu bytes\n", data->size()*sizeof(T));
 //	printf("Size after compression: %lu bytes\n", CudaArrayCopy().Concatenate(encodedData)->size());
 

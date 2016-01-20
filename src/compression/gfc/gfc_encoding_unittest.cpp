@@ -18,7 +18,7 @@ class GfcCompressionTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
 	GfcEncoding_Compression_Inst,
 	GfcCompressionTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(GfcCompressionTest, CompressionOfRandomDoubles_size)
 {

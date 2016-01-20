@@ -12,7 +12,7 @@ class AflCompressionTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
 	AflEncoding_Compression_Inst,
 	AflCompressionTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(AflCompressionTest, Afl_Encode_Decode_RandomInts_size)
 {

@@ -10,7 +10,7 @@ class DictEncodingTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
 	DictEncoding_Compression_Inst,
 	DictEncodingTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(DictEncodingTest, CompressionOfRandomInts_size)
 {
@@ -97,6 +97,28 @@ TEST_P(DictEncodingTest, CompressionOf_RandomFloatsWithMaxPrecision2_data)
 			boost::bind(&DictEncoding::Encode<float>, encoder, _1),
 			boost::bind(&DictEncoding::Decode<float>, encoder, _1),
 			GetFloatRandomDataWithMaxPrecision(2))
+	);
+}
+
+TEST_P(DictEncodingTest, CompressionOf_PatternA_Short)
+{
+	DictEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&DictEncoding::Encode<short>, encoder, _1),
+			boost::bind(&DictEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(DictEncodingTest, CompressionOf_PatternA_Char)
+{
+	DictEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&DictEncoding::Encode<char>, encoder, _1),
+			boost::bind(&DictEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
 	);
 }
 

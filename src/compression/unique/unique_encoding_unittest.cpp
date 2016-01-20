@@ -11,7 +11,7 @@ class UniqueEncodingTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
 	UniqueEncoding_Compression_Inst,
 	UniqueEncodingTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(UniqueEncodingTest, CompressionOfRandomInts_size)
 {
@@ -78,6 +78,28 @@ TEST_P(UniqueEncodingTest, CompressionOf_Long_FromFile)
 			boost::bind(&UniqueEncoding::Decode<time_t>, encoder, _1),
 			GetTsIntDataFromTestFile())
     );
+}
+
+TEST_P(UniqueEncodingTest, CompressionOf_PatternA_Short)
+{
+	UniqueEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&UniqueEncoding::Encode<short>, encoder, _1),
+			boost::bind(&UniqueEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(UniqueEncodingTest, CompressionOf_PatternA_Char)
+{
+	UniqueEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&UniqueEncoding::Encode<char>, encoder, _1),
+			boost::bind(&UniqueEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
+	);
 }
 
 TEST_P(UniqueEncodingTest, GetMetadataSize_Consecutive_Int)

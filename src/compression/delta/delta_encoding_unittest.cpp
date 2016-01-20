@@ -10,7 +10,7 @@ class DeltaCompressionTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
 	DeltaEncoding_Compression_Inst,
 	DeltaCompressionTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(DeltaCompressionTest, CompressionOfRandomInts_size)
 {
@@ -53,6 +53,28 @@ TEST_P(DeltaCompressionTest, CompressionOfRandomFloats_data)
 			boost::bind(&DeltaEncoding::Encode<float>, encoder, _1),
 			boost::bind(&DeltaEncoding::Decode<float>, encoder, _1),
 			GetFloatRandomData())
+	);
+}
+
+TEST_P(DeltaCompressionTest, CompressionOf_PatternA_Short)
+{
+	DeltaEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&DeltaEncoding::Encode<short>, encoder, _1),
+			boost::bind(&DeltaEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(DeltaCompressionTest, CompressionOf_PatternA_Char)
+{
+	DeltaEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&DeltaEncoding::Encode<char>, encoder, _1),
+			boost::bind(&DeltaEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
 	);
 }
 

@@ -18,7 +18,7 @@ class FloatEncodingTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
     FloatEncoding_Compression_Inst,
     FloatEncodingTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(FloatEncodingTest, CompressionOfRandomFloats_WithMaxPrecision_3_size)
 {
@@ -50,6 +50,28 @@ TEST_P(FloatEncodingTest, CompressionOf_Float_FromFile)
 			boost::bind(&FloatEncoding::Encode<float>, encoder, _1),
 			boost::bind(&FloatEncoding::Decode<float>, encoder, _1),
 			GetTsFloatDataFromTestFile())
+	);
+}
+
+TEST_P(FloatEncodingTest, CompressionOf_PatternA_Short)
+{
+	FloatEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&FloatEncoding::Encode<short>, encoder, _1),
+			boost::bind(&FloatEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(FloatEncodingTest, CompressionOf_PatternA_Char)
+{
+	FloatEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&FloatEncoding::Encode<char>, encoder, _1),
+			boost::bind(&FloatEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
 	);
 }
 

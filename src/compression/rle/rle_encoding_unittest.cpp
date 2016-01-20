@@ -10,7 +10,7 @@ class RleCompressionTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
 	RleEncoding_Compression_Inst,
 	RleCompressionTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(RleCompressionTest, CompressionOfRandomInts_size)
 {
@@ -53,6 +53,28 @@ TEST_P(RleCompressionTest, CompressionOfRandomFloats_data)
 			boost::bind(&RleEncoding::Encode<float>, encoder, _1),
 			boost::bind(&RleEncoding::Decode<float>, encoder, _1),
 			GetFloatRandomData())
+	);
+}
+
+TEST_P(RleCompressionTest, CompressionOf_PatternA_Short)
+{
+	RleEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&RleEncoding::Encode<short>, encoder, _1),
+			boost::bind(&RleEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(RleCompressionTest, CompressionOf_PatternA_Char)
+{
+	RleEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&RleEncoding::Encode<char>, encoder, _1),
+			boost::bind(&RleEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
 	);
 }
 

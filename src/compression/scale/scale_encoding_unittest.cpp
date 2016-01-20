@@ -10,7 +10,7 @@ class ScaleCompressionTest : public CompressionUnittestBase {};
 INSTANTIATE_TEST_CASE_P(
     ScaleEncoding_Compression_Inst,
     ScaleCompressionTest,
-    ::testing::Values(10, 1000, 10000));
+    ::testing::Values(100, 100000));
 
 TEST_P(ScaleCompressionTest, CompressionOfRandomInts_size)
 {
@@ -53,6 +53,28 @@ TEST_P(ScaleCompressionTest, CompressionOfRandomFloats_data)
 			boost::bind(&ScaleEncoding::Encode<float>, encoder, _1),
 			boost::bind(&ScaleEncoding::Decode<float>, encoder, _1),
 			GetFloatRandomData())
+	);
+}
+
+TEST_P(ScaleCompressionTest, CompressionOf_PatternA_Short)
+{
+	ScaleEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<short>(
+			boost::bind(&ScaleEncoding::Encode<short>, encoder, _1),
+			boost::bind(&ScaleEncoding::Decode<short>, encoder, _1),
+			GetFakeDataWithPatternA<short>(0, GetSize()/3, 1, 0, 1e3))
+	);
+}
+
+TEST_P(ScaleCompressionTest, CompressionOf_PatternA_Char)
+{
+	ScaleEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<char>(
+			boost::bind(&ScaleEncoding::Encode<char>, encoder, _1),
+			boost::bind(&ScaleEncoding::Decode<char>, encoder, _1),
+			GetFakeDataWithPatternA<char>(0, GetSize()/3, 1, 0, 1e2))
 	);
 }
 
