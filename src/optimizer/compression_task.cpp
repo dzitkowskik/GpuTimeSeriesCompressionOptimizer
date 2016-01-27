@@ -52,9 +52,9 @@ void CompressionTask::execute()
 
 	// compress data
 	auto type = _ts->getColumn(_columnId).getType();
-	// printf("Task id = %d, compress type %s\n", _id, GetDataTypeString(type).c_str());
+	printf("Task id = %d, compress type %s\n", _id, GetDataTypeString(type).c_str());
 	auto d_result = _optimizer->CompressData(d_data, type);
-	// printf("Task id = %d, compression DONE\n", _id);
+	printf("Task id = %d, compression DONE\n", _id);
 	CUDA_CALL( cudaGetLastError() );
 
 	// send compressed batch to host

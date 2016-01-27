@@ -16,7 +16,11 @@
 namespace ddj
 {
 
-class OptimizerTest : public UnittestBase {};
+class OptimizerTest : public UnittestBase
+{
+public:
+	void TestCompressionOptimizerOnNyseCol(int colIdx);
+};
 
 TEST_F(OptimizerTest, PathGenerator_GeneratePaths)
 {
@@ -237,12 +241,11 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_TimeRealData_Compress)
 	}
 }
 
-TEST_F(OptimizerTest, CompressionOptimizer_CompressData_SourceTimeNyse_Compress)
+void OptimizerTest::TestCompressionOptimizerOnNyseCol(int colIdx)
 {
 	CompressionOptimizer optimizer;
 
 	auto ts = Get1GBNyseTimeSeries();
-	int colIdx = 16; 	// column with index 16 is source time
 	size_t size = GetSize()*sizeof(int);
 	auto data = CudaPtr<char>::make_shared(size);
 	auto sourceTimeColumnRawData = ts->getColumn(colIdx).getData();
@@ -258,6 +261,28 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_SourceTimeNyse_Compress)
 
 	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressedData->get(), data->size()) );
 	ts.reset();
+
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_Nyse_Int_Compress)
+{
+	TestCompressionOptimizerOnNyseCol(0);
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_Nyse_Short_Compress)
+{
+	TestCompressionOptimizerOnNyseCol(1);
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_Nyse_Char_Compress)
+{
+	TestCompressionOptimizerOnNyseCol(3);
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_CompressData_SourceTimeNyse_Compress)
+{
+	int colIdx = 16; 	// column with index 16 is source time
+	TestCompressionOptimizerOnNyseCol(colIdx);
 }
 
 TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_TsFloatData_Twice)

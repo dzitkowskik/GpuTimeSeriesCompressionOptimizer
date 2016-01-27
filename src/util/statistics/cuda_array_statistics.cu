@@ -161,6 +161,10 @@ DataStatistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data,
 	// printf("Generating statistics for data with size = %lu\n", data->size());
 	switch(type)
 	{
+		case DataType::d_char:
+			return getStatistics(data);
+		case DataType::d_short:
+			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<short>>(data));
 		case DataType::d_int:
 			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<int>>(data));
 		case DataType::d_time:
