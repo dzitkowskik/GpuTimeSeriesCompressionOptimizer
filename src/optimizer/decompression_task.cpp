@@ -31,9 +31,9 @@ void DecompressionTask::execute()
 
 	// decompress
 	auto typeStr = GetDataTypeString(_ts->getColumn(_columnId).getType());
-//	printf("Task %d DECOMPRESS data with size %lu and type %s\n", _id, d_data->size(), typeStr.c_str());
+	printf("Task %d DECOMPRESS data with size %lu and type %s\n", _id, d_data->size(), typeStr.c_str());
 	auto d_decompressedData = CompressionTree().Decompress(d_data);
-//	printf("Task %d DECOMPRESS DONE\n", _id);
+	printf("Task %d DECOMPRESS DONE - decompressed data with size = %lu\n", _id, d_decompressedData->size());
 
 	// copy to host as a column of time series
 	_ts->getColumn(_columnId).reserveSize(d_decompressedData->size());
@@ -42,7 +42,7 @@ void DecompressionTask::execute()
 
 	// end task
 	_status = TaskStatus::success;
-	// printf("Task %d END\n", _id);
+	 printf("Task %d END\n", _id);
 }
 
 } /* namespace ddj */

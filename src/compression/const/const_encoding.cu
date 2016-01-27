@@ -84,7 +84,8 @@ __global__ void _constDecodeKernel(
 template<typename T>
 SharedCudaPtr<T> ConstEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	if(input[1]->size() <= 0) return CudaPtr<T>::make_shared();
+	if(input[0]->size() <= 0) return CudaPtr<T>::make_shared();
+	printf("CONST START\n");
 
 	auto metadata = input[0];
 	auto data = input[1];
@@ -106,7 +107,7 @@ SharedCudaPtr<T> ConstEncoding::Decode(SharedCudaPtrVector<char> input)
 			(T*)data->get(),
 			result->get());
 	cudaDeviceSynchronize();
-
+	printf("CONST END\n");
 	return result;
 }
 
