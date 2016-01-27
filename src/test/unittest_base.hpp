@@ -94,6 +94,7 @@ protected:
 	}
 
 	boost::shared_ptr<TimeSeries> Get1GBNyseTimeSeries();
+	void Save1MFrom1GNyseDataInSampleData(size_t size = 0);
 	int GetSize();
 
 protected:

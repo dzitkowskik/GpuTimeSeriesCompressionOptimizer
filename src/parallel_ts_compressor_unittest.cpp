@@ -100,4 +100,55 @@ TEST_F(ParallelTsCompressorTest, Decompress_CSV_Info_Test_Data_CompareFile)
 	EXPECT_TRUE( inputFile.Compare(outputFileDecompr) );
 }
 
+TEST_F(ParallelTsCompressorTest, CompressDecompress_CSV_NYSE_CompareFile)
+{
+	auto inputFile = File("sample_data/nyse.csv");
+	auto outputFileCompr = File::GetTempFile();
+	auto outputFileDecompr = File::GetTempFile();
+	auto headerFile = File("sample_data/nyse.header");
+
+	auto fileDefinition = TimeSeriesReader::ReadFileDefinition(headerFile);
+	auto reader = TimeSeriesReaderCSV::make_shared(CSVFileDefinition(fileDefinition));
+
+	ParallelTSCompressor compressor(reader);
+	compressor.Compress(inputFile, outputFileCompr);
+
+	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	printf("Compression output = %s with size %lu\n", outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
+
+	compressor.Decompress(outputFileCompr, outputFileDecompr, fileDefinition);
+
+	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
+
+	EXPECT_TRUE( inputFile.Compare(outputFileDecompr) );
+}
+
+TEST_F(ParallelTsCompressorTest, CompressDecompress_Binary_NYSE_CompareFile)
+{
+	auto inputFile = File("sample_data/nyse.inf");
+	auto outputFileCompr = File::GetTempFile();
+	auto outputFileDecompr = File::GetTempFile();
+	auto headerFile = File("sample_data/nyse.header");
+
+	auto fileDefinition = BinaryFileDefinition(TimeSeriesReader::ReadFileDefinition(headerFile));
+	auto reader = TimeSeriesReaderBinary::make_shared(fileDefinition);
+	ParallelTSCompressor compressor(reader);
+	compressor.Compress(inputFile, outputFileCompr);
+
+	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	printf("Compression output = %s with size %lu\n", outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
+
+	compressor.Decompress(outputFileCompr, outputFileDecompr, fileDefinition);
+
+	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
+
+	auto newInputFile = File("sample_data/nyse.inf");
+	auto ts1 = TimeSeriesReaderBinary(fileDefinition).Read(newInputFile);
+	//	ts1->print(5);
+	auto ts2 = TimeSeriesReaderBinary(fileDefinition).Read(outputFileDecompr);
+	//	ts2->print(5);
+
+	EXPECT_TRUE( ts1->compare(*ts2) );
+}
+
 } /* namespace ddj */

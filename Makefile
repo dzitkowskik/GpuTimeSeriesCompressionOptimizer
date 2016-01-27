@@ -75,7 +75,7 @@ release: export EXCLUDED_FILES := \
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
-test: export CODE_FLAGS := -G -g -O0 --debug --device-debug
+test: export CODE_FLAGS := -O3 #-G -g -O0 --debug --device-debug
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -name '*_benchmark*'
@@ -107,7 +107,7 @@ modules: data_module
 data_module:
 	@echo "Beginning module DATA build"
 	@$(START_TIME)
-	@cmake -Bmodules/data -Hmodules/data
+	@cmake -Bmodules/data -Hmodules/data -DCMAKE_BUILD_TYPE=Release
 	@$(MAKE) -C "modules/data" --no-print-directory
 	@echo "Total build time: "
 	@$(END_TIME)

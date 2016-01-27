@@ -144,4 +144,26 @@ boost::shared_ptr<TimeSeries> UnittestBase::Get1GBNyseTimeSeries()
 	return ts;
 }
 
+void UnittestBase::Save1MFrom1GNyseDataInSampleData(size_t size)
+{
+	if(size == 0) size = _size;
+
+	BinaryFileDefinition fileDefinition;
+	fileDefinition.Columns = this->_nyseData;
+	fileDefinition.Header = this->_nyseDataHeader;
+
+	auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("NYSE_DATA_1GB");
+	File file(dataFilePath);
+
+	File outputBin("sample_data/nyse.inf");
+	File outputCsv("sample_data/nyse.csv");
+	File outputDef("sample_data/nyse.header");
+
+	auto ts = TimeSeriesReaderBinary(fileDefinition).Read(file, size);
+	TimeSeriesReaderBinary(fileDefinition).Write(outputBin, *ts);
+	TimeSeriesReaderCSV(fileDefinition).Write(outputCsv, *ts);
+
+	TimeSeriesReader::WriteFileDefinition(outputDef, fileDefinition);
+}
+
 } /* namespace ddj */

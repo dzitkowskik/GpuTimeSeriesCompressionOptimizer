@@ -39,6 +39,13 @@ TEST(OtherTests, SharedCudaPtr_ReinterpretCast)
         EXPECT_EQ((*expected)[i], (*actual)[i]);
 }
 
+class ANyseTest : public UnittestBase {};
+
+TEST_F(ANyseTest, CreateNyseUnittestFileInSampleData)
+{
+	Save1MFrom1GNyseDataInSampleData(1e5);
+}
+
 class MostFrequentTest : public UnittestBase {};
 
 TEST_F(MostFrequentTest, CompressDecompressMostFrequent_random_int)

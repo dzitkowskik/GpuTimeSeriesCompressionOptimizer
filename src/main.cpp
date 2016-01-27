@@ -149,11 +149,11 @@ void generate(size_t size)
 	ts->updateRecordsCnt();
 	// CREATE CSV
 	auto reader = TimeSeriesReaderCSV::make_shared(CSVFileDefinition(def));
-	auto outputFile = File("generated.csv");
+	auto outputFile = File("sample_data/generated.csv");
 	reader->Write(outputFile, *ts);
 
 	// CREATE BINARY
 	auto reader2 = TimeSeriesReaderBinary::make_shared(BinaryFileDefinition(def));
-	auto outputFile2 = File("generated.inf");
+	auto outputFile2 = File("sample_data/generated.inf");
 	reader2->Write(outputFile2, *ts);
 }
