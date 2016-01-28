@@ -19,8 +19,10 @@ namespace ddj {
 template<typename T>
 SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	 printf("RLE decoding: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu\n",
-	 	input[0]->size(), input[1]->size(), input[2]->size());
+	printf("RLE decoding: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu\n",
+			input[0]->size(), input[1]->size(), input[2]->size());
+
+	if(input[1]->size() <= 0) return CudaPtr<T>::make_shared();
 
 	// GET LENGTH FROM METADATA
 	int length;
