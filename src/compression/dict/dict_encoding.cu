@@ -66,6 +66,8 @@ SharedCudaPtr<int> DictEncoding::GetMostFrequentStencil(
 template<typename T>
 SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
 {
+//	printf("DICT ENCODING data size = %lu\n", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{
 			CudaPtr<char>::make_shared(),
@@ -79,8 +81,8 @@ SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
     auto mostFrequentCompressed = UniqueEncoding().CompressUnique(std::get<0>(splittedData), mostFrequent);
     auto otherData = MoveSharedCudaPtr<T, char>(std::get<1>(splittedData));
 
-	// printf("DICT ENCODED output[0] size = %lu, output[1] size = %lu, output[2] size = %lu\n",
-	// 	packedMostFrequentStencil->size(), mostFrequentCompressed->size(), otherData->size());
+//    printf("DICT ENCODED output[0] size = %lu, output[1] size = %lu, output[2] size = %lu\n",
+//	 	packedMostFrequentStencil->size(), mostFrequentCompressed->size(), otherData->size());
 
     return SharedCudaPtrVector<char> {packedMostFrequentStencil, mostFrequentCompressed, otherData};
 }

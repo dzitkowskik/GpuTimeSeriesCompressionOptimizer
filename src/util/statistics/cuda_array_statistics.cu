@@ -141,7 +141,7 @@ T CudaArrayStatistics::Mean(SharedCudaPtr<T> data)
 template<typename T>
 DataStatistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 {
-	// printf("Get statistics for data with size = %lu\n", data->size());
+//	printf("Get statistics for data with size = %lu\n", data->size());
 	if(data->size() <= 0) return DataStatistics();
 	DataStatistics stats;
 	auto minMax = MinMax(data);
@@ -158,7 +158,7 @@ DataStatistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 // TODO: Make this a common template in header file and use everywhere
 DataStatistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data, DataType type)
 {
-	// printf("Generating statistics for data with size = %lu\n", data->size());
+//	printf("Generating statistics for data with size = %lu\n", data->size());
 	switch(type)
 	{
 		case DataType::d_char:

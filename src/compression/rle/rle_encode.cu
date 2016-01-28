@@ -18,10 +18,18 @@ namespace ddj {
 template<typename T>
 SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
 {
+//	printf("START RLE ENCODE data size = %lu\n", data->size());
+
     thrust::device_ptr<T> d_ptr(data->get());
     thrust::device_vector<T> input(d_ptr, d_ptr + data->size());
     thrust::device_vector<T> output(data->size());
     thrust::device_vector<int>  lengths(data->size());
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+
+//	printf("START REDUCE BY KEY\n");
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
 
     // compute run lengths
     auto reduceResult = thrust::reduce_by_key(
@@ -44,6 +52,8 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
 
     resultLengths->fillFromHost(lengths.data().get(), len);
     resultValues->fillFromHost(output.data().get(), len);
+
+//    printf("END RLE ENCODE\n");
 
     return SharedCudaPtrVector<char> {
     	metadata,

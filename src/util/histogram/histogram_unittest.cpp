@@ -209,6 +209,16 @@ TEST_F(HistogramTest, GetDictionaryCounter_FakeData)
 	CheckHistogramResult<int, CpuHistogramSparse>(randomData, result);
 }
 
+TEST_F(HistogramTest, GetDictionaryCounter_OneBin)
+{
+	std::vector<int> hData;
+	for(int i = 0; i < _size; i++)
+	hData.push_back(0);
+	auto dData = CudaPtr<int>::make_shared(_size);
+	dData->fillFromHost(hData.data(), _size);
+	auto result = Histogram().GetDictionaryCounter(dData);
+	CheckHistogramResult<int, CpuHistogramSparse>(dData, result);
+}
 
 TEST_F(HistogramTest, GetHistogream_FakeData)
 {

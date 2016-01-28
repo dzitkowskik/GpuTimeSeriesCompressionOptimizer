@@ -103,15 +103,15 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 	{
 		parent.first = CompressionTree(c, dt);
 		auto encoding = factory.Get(c, dt)->Get(data);
-		// printf("Compress %s using %s\n", GetDataTypeString(dt).c_str(), GetEncodingTypeString(c).c_str());
+//		printf("Compress %s using %s\n", GetDataTypeString(dt).c_str(), GetEncodingTypeString(c).c_str());
 		auto compr = encoding->Encode(data, dt);
-		// printf("Compression success!\n");
+//		printf("Compression success!\n");
 		parent.second = _getSize(compr);
 		parent.first.FindNode(0)->SetCompressionRatio(
 				Encoding::GetCompressionRatio(data->size(), parent.second));
-		// printf("Try generate statistics\n");
+//		printf("Try generate statistics\n");
 		stats = crs.GenerateStatistics(data, dt);
-		// printf("Statistics generated!\n");
+//		printf("Statistics generated!\n");
 		if(encoding->GetNumberOfResults() == 1)
 		{
 			part1 = FullStatisticsUpdate(compr[1], c, dt, stats, level+1);
@@ -157,7 +157,7 @@ SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataP
 				type,
 				dataSampleStatistics,
 				0);
-
+//		printf("Full statistics update DONE\n");
 		for(auto& tree : possibleTrees)
 		{
 			tree.first.Fix();

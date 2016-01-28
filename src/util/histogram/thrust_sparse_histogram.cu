@@ -19,6 +19,8 @@ namespace ddj {
 template<typename T>
 SharedCudaPtrPair<T, int> Histogram::ThrustSparseHistogram(SharedCudaPtr<T> data)
 {
+//	printf("GET THRUST SPARSE HISTOGRAM data size = %lu\n", data->size());
+
 	thrust::device_ptr<T> data_ptr(data->get());
 	thrust::device_vector<T> input_keys_dvec(data_ptr, data_ptr+data->size());
 
@@ -35,18 +37,33 @@ SharedCudaPtrPair<T, int> Histogram::ThrustSparseHistogram(SharedCudaPtr<T> data
 											thrust::plus<int>(),
 											thrust::not_equal_to<T>());
 
+//	printf("Number of bins = %d\n", num_bins);
+
 	// allocate histogram storage
 	auto output_keys = CudaPtr<T>::make_shared(num_bins);
 	auto output_counts = CudaPtr<int>::make_shared(num_bins);
 	thrust::device_ptr<T> output_keys_ptr(output_keys->get());
 	thrust::device_ptr<int> output_counts_ptr(output_counts->get());
 
+//	CUDA_ASSERT_RETURN( cudaGetLastError() );
+
+//	printf("START REDUCE_BY_KEY\n");
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+
 	// compact find the end of each bin of values
+//	if(num_bins == 1) {
+//		output_keys_ptr[0] = input_keys_dvec[0];
+//		output_counts_ptr[0] = data->size();
+//	} else {
 	thrust::reduce_by_key(  input_keys_dvec.begin(),
 							input_keys_dvec.end(),
 							thrust::constant_iterator<int>(1),
 							output_keys_ptr,
 							output_counts_ptr);
+//	}
+
+//	printf("HISTOGRAM DONE\n");
 
 	return SharedCudaPtrPair<T, int>(output_keys, output_counts);
 }

@@ -75,7 +75,7 @@ release: export EXCLUDED_FILES := \
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
-test: export CODE_FLAGS := -O3 #-G -g -O0 --debug --device-debug
+test: export CODE_FLAGS := -G -g -O0 --debug --device-debug
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -name '*_benchmark*'

@@ -16,7 +16,7 @@ namespace ddj
 
 ParallelTSCompressor::ParallelTSCompressor(SharedTimeSeriesReader reader)
 	: _reader(reader),
-	  _batchSize(1e4),
+	  _batchSize(1e6),
 	  _columnNumber(2),
 	  _initialized(false)
 {
@@ -27,7 +27,7 @@ void ParallelTSCompressor::init(SharedTimeSeriesPtr ts)
 	_columnNumber = ts->getColumnsNumber();
 	for(int i = 0; i < _columnNumber; i++)
 		_optimizers.push_back(CompressionOptimizer::make_shared());
-	_taskScheduler = TaskScheduler::make_unique(2);
+	_taskScheduler = TaskScheduler::make_unique(1);
 	_initialized = true;
 }
 
@@ -40,7 +40,7 @@ void ParallelTSCompressor::Compress(File& inputFile, File& outputFile)
 	{
 		// read batch data from source
 		ts = _reader->Read(inputFile, _batchSize);
-//		ts->print(5);
+		ts->print(5);
 
 		if(!_initialized) init(ts);
 

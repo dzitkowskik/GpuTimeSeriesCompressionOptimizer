@@ -78,6 +78,17 @@ TEST_P(RleCompressionTest, CompressionOf_PatternA_Char)
 	);
 }
 
+TEST_P(RleCompressionTest, CompressionOf_One_Time_Element)
+{
+	RleEncoding encoder;
+	EXPECT_TRUE(
+		TestContent<time_t>(
+			boost::bind(&RleEncoding::Encode<time_t>, encoder, _1),
+			boost::bind(&RleEncoding::Decode<time_t>, encoder, _1),
+			GetFakeDataForTime(0, 0.5, 1))
+	);
+}
+
 TEST_P(RleCompressionTest, GetMetadataSize)
 {
 	TestGetMetadataSize<RleEncoding, int>(GetIntConsecutiveData());

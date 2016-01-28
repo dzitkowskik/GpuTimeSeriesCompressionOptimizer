@@ -28,7 +28,9 @@ SharedCudaPtrPair<T, int> Histogram::GetDictionaryCounter(SharedCudaPtr<T> data)
 template<typename T>
 SharedCudaPtr<T> Histogram::GetMostFrequent(SharedCudaPtr<T> data, int freqCnt)
 {
+//	printf("GET HISTOGRAM\n");
 	auto histogram = GetDictionaryCounter(data);
+//	printf("GET MOST FREQUENT\n");
 	return GetMostFrequentSparse(histogram, freqCnt);
 }
 

@@ -104,9 +104,9 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 {
 	auto encoding = _encodingFactory->Get(data);
 
-	// printf("START Encoding using %s - data %s\n",
-	// 		GetEncodingTypeString(_encodingFactory->encodingType).c_str(),
-	// 		GetDataTypeString(_dataType).c_str());
+//	 printf("START Encoding using %s - data %s\n",
+//	 		GetEncodingTypeString(_encodingFactory->encodingType).c_str(),
+//	 		GetDataTypeString(_dataType).c_str());
 
 	auto encodingResult = encoding->Encode(data, _dataType);
 
@@ -130,9 +130,9 @@ SharedCudaPtrVector<char> CompressionNode::Compress(SharedCudaPtr<char> data)
 	for(auto& r : result) outputSize += r->size();
 	this->SetCompressionRatio(Encoding::GetCompressionRatio(inputSize, outputSize));
 
-	// printf("END Encoding using %s - data %s\n",
-	// 		GetEncodingTypeString(_encodingFactory->encodingType).c_str(),
-	// 		GetDataTypeString(_dataType).c_str());
+//	 printf("END Encoding using %s - data %s\n",
+//	 		GetEncodingTypeString(_encodingFactory->encodingType).c_str(),
+//	 		GetDataTypeString(_dataType).c_str());
 
 	return result;
 }
