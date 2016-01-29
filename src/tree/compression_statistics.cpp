@@ -100,35 +100,51 @@ namespace ddj
 		return (*_stat)[edgeNo][edgeType];
 	}
 
-	void CompressionStatistics::Print()
+	void CompressionStatistics::Print(std::ostream& stream)
 	{
-		printf("Compression tree statistics (tree height = %d)\n", _height);
+		stream << "Compression tree statistics (tree height = " << _height << "):" << std::endl;
 		for(int edgeNo = 0; edgeNo < _stat->size(); edgeNo++)
 		{
 			for(auto& edge : (*_stat)[edgeNo])
 			{
-				printf("[%d]: %s - %s  ===  %lf\n",
-						edgeNo,
-						GetEncodingTypeString(edge.first.first).c_str(),
-						GetEncodingTypeString(edge.first.second).c_str(),
-						edge.second);
+				stream << "\t[" << edgeNo << "]:";
+				stream << GetEncodingTypeString(edge.first.first).c_str();
+				stream << " - ";
+				stream << GetEncodingTypeString(edge.first.second).c_str();
+				stream << " === " << edge.second << std::endl;
 			}
 		}
 	}
 
-	void CompressionStatistics::PrintShort()
+	void CompressionStatistics::PrintShort(std::ostream& stream)
 	{
-		printf("Compression tree short statistics (tree height = %d)\n", _height);
+		stream << "Compression tree statistics (tree height = " << _height << "):" << std::endl;
 		for(int edgeNo = 0; edgeNo < _stat->size(); edgeNo++)
 		{
 			auto edge = GetBest(edgeNo);
 			if(edge.value > 1.0)
-				printf("[%d]: %s - %s  ===  %lf\n",
-					edgeNo,
-					GetEncodingTypeString(edge.type.first).c_str(),
-					GetEncodingTypeString(edge.type.second).c_str(),
-					edge.value);
+			{
+				stream << "\t[" << edgeNo << "]:";
+				stream << GetEncodingTypeString(edge.type.first).c_str();
+				stream << " - ";
+				stream << GetEncodingTypeString(edge.type.second).c_str();
+				stream << " === " << edge.value << std::endl;
+			}
 		}
+	}
+
+	std::string CompressionStatistics::ToString()
+	{
+		std::stringstream ss;
+		Print(ss);
+		return ss.str();
+	}
+
+	std::string CompressionStatistics::ToStringShort()
+	{
+		std::stringstream ss;
+		PrintShort(ss);
+		return ss.str();
 	}
 
 	void CompressionStatistics::Set(int edgeNo, EdgeType edgeType, double compressionRatio)

@@ -1,6 +1,6 @@
 #include "test/unittest_base.hpp"
-#include "helpers/helper_comparison.cuh"
-#include "helpers/helper_print.hpp"
+#include "core/cuda_array.hpp"
+
 #include "stencil.hpp"
 
 namespace ddj {

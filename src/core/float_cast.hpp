@@ -1,8 +1,11 @@
 /*
- * helper_print.hpp 07-11-2015 Karol Dzitkowski
+ * float_cast.hpp 07-11-2015 Karol Dzitkowski
  */
-#ifndef DDJ_HELPER_FLOAT_HPP_
-#define DDJ_HELPER_FLOAT_HPP_
+#ifndef DDJ_CORE_FLOAT_CAST_HPP_
+#define DDJ_CORE_FLOAT_CAST_HPP_
+
+namespace ddj
+{
 
 union floatCastUnion {
   float value;
@@ -22,4 +25,5 @@ union doubleCastUnion {
   } parts;
 };
 
-#endif
+} /* namespace ddj */
+#endif /* DDJ_CORE_FLOAT_CAST_HPP_ */

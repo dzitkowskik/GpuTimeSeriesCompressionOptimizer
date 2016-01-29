@@ -1,7 +1,7 @@
 #include "unittest_base.hpp"
 #include "util/histogram/histogram.hpp"
-#include "helpers/helper_print.hpp"
-#include "helpers/helper_comparison.cuh"
+
+#include "core/cuda_array.hpp"
 #include "compression/dict/dict_encoding.hpp"
 #include "compression/unique/unique_encoding.hpp"
 #include "util/splitter/splitter.hpp"

@@ -152,7 +152,7 @@ SharedCudaPtr<char> CompressionTree::Decompress(SharedCudaPtr<char> data)
 	auto root = DecompressNodes(data, offset);
 	AddNode(root, 0);
 	// printf("DataType = %s\n", GetDataTypeString(root->GetDataType()).c_str());
-	Print();
+	// Print();
 	return _root->Decompress();
 }
 
@@ -166,6 +166,11 @@ void CompressionTree::Print(size_t performance)
 	this->_root->Print();
 	if(performance != 0) std::cout << "  -  " << performance;
 	std::cout << std::endl;
+}
+
+std::string CompressionTree::ToString()
+{
+	return this->_root->ToString();
 }
 
 std::vector<CompressionTree> CompressionTree::CrossTree(std::vector<CompressionTree> subtrees)

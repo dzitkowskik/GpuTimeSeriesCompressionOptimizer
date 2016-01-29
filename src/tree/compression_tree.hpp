@@ -12,6 +12,7 @@
 #include "core/cuda_ptr.hpp"
 #include "tree/compression_statistics.hpp"
 #include "tree/compression_edge.hpp"
+#include <string>
 
 namespace ddj {
 
@@ -40,6 +41,7 @@ public:
     CompressionTree Copy();
     size_t GetPredictedSizeAfterCompression(SharedCudaPtr<char> data, DataType type);
     void Print(size_t performance = 0);
+	std::string ToString();
     void Fix();
     std::vector<CompressionTree> CrossTree(std::vector<CompressionTree> subtrees);
 

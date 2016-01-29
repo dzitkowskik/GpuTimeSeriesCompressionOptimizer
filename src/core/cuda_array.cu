@@ -1,9 +1,20 @@
-#include "helper_comparison.cuh"
+/*
+*  cuda_array.cu
+*
+*  Created on: Jan 29, 2016
+*      Author: Karol Dzitkowski
+*/
+
+#include "core/cuda_array.hpp"
 #include "core/cuda_macros.cuh"
 #include "core/macros.h"
 #include <boost/type_traits/is_same.hpp>
 
 #define MAX_FLOAT_DIFF 0.0001f
+#define COMP_THREADS_PER_BLOCK 512
+
+namespace ddj
+{
 
 // ulp = units in the last place; maxulps = maximum number of
 // representable floating point numbers by which x and y may differ.
@@ -48,7 +59,8 @@ __global__ void _compareElementsKernel(T* a, T*b, int size, bool* out)
 	out[iElement] = a[iElement] != b[iElement];
 }
 
-template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
+template <typename T>
+bool CompareDeviceArrays(T* a, T* b, int size)
 {
     bool* out;
     CUDA_CALL(cudaMalloc((void**)&out, size*sizeof(T)));
@@ -67,5 +79,8 @@ template <typename T> bool CompareDeviceArrays(T* a, T* b, int size)
     return result == 0;
 }
 
-#define COMP_SPEC(X) template bool CompareDeviceArrays <X> (X* a, X* b, int size);
+#define COMP_SPEC(X) \
+    template bool CompareDeviceArrays<X>(X* a, X* b, int size);
 FOR_EACH(COMP_SPEC, char, short, double, float, int, long, long long, unsigned int)
+
+} /* namespace ddj */

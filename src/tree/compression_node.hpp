@@ -8,14 +8,17 @@
 #ifndef DDJ_COMPRESSION_NODE_HPP_
 #define DDJ_COMPRESSION_NODE_HPP_
 
-#include <boost/shared_ptr.hpp>
-#include <core/cuda_ptr.hpp>
-#include <boost/function.hpp>
-
+#include "core/cuda_ptr.hpp"
 #include "compression/encoding_type.hpp"
 #include "data_type.hpp"
 #include "compression/encoding_factory.hpp"
 #include "compression/default_encoding_factory.hpp"
+
+#include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
+#include <string>
+#include <sstream>
+#include <iostream>
 
 namespace ddj {
 
@@ -60,7 +63,8 @@ public:
 
     size_t PredictCompressionSize(SharedCudaPtr<char> data, DataType type);
 
-    void Print();
+    void Print(std::ostream& stream = std::cout);
+	std::string ToString();
     void Fix();
     void Reset(SharedEncodingFactoryPtr encodingFactory);
 
@@ -87,7 +91,7 @@ private:
 
     SharedCudaPtr<char> _data;
     SharedCudaPtr<char> _metadata;
-    
+
     bool _isLeaf;
     uint _nodeNo;
     uint _parentNo;

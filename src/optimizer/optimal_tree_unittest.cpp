@@ -8,8 +8,8 @@
 #include "test/unittest_base.hpp"
 #include "tree/compression_tree.hpp"
 #include "optimizer/optimal_tree.hpp"
-#include "helpers/helper_comparison.cuh"
-#include "helpers/helper_print.hpp"
+#include "core/cuda_array.hpp"
+
 #include <gtest/gtest.h>
 
 namespace ddj

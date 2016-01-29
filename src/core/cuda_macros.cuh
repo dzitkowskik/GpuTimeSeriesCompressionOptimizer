@@ -168,9 +168,16 @@ __device__ __host__ __forceinline__ unsigned short GETNBITS( short source, unsig
 template<typename T>
 inline char BITLEN(T min, T max)
 {
-	char ret=8*sizeof(T);
-	if(min<0) return ret;
-	else ret=0;
+	if(min<0) return 8*sizeof(T);
+	char ret=0;
+	while(max>>=1) ret++;
+	return ret+1;
+}
+
+template<>
+inline char BITLEN(unsigned int min, unsigned int max)
+{
+	char ret=0;
 	while(max>>=1) ret++;
 	return ret+1;
 }

@@ -8,8 +8,8 @@
 #include "test/unittest_base.hpp"
 #include "optimizer/path_generator.hpp"
 #include "optimizer/compression_optimizer.hpp"
-#include "helpers/helper_comparison.cuh"
-#include "helpers/helper_print.hpp"
+#include "core/cuda_array.hpp"
+
 #include "core/macros.h"
 #include <gtest/gtest.h>
 
@@ -51,7 +51,7 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompression)
 		//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
 
 		ASSERT_EQ(expected->size(), actual->size());
-		EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+		EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 	}
 }
 
@@ -91,7 +91,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_TimeDataFromFile)
 	// printf("Size after compression: %d\n", (int)compressed->size());
 
 	EXPECT_LE( compressed->size(), data->size() );
-	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
+	EXPECT_TRUE( CudaArray().Compare(data, decompressed) );
 }
 
 TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
@@ -109,7 +109,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_OptimizeTree_RandomInt)
 	// printf("Size after compression: %d\n", (int)compressed->size());
 
 	EXPECT_LE( compressed->size(), data->size() );
-	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressed->get(), data->size()) );
+	EXPECT_TRUE( CudaArray().Compare(data, decompressed) );
 }
 
 TEST_F(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_RandomInt_CompressByBestTree)
@@ -126,7 +126,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_RandomInt_Compre
 	auto compressed = results[0].first.Compress(data);
 	CompressionTree t;
 	auto decompressed = t.Decompress(compressed);
-	EXPECT_TRUE( CompareDeviceArrays(randomInt->get(), CastSharedCudaPtr<char, int>(decompressed)->get(), GetSize()));
+	EXPECT_TRUE( CudaArray().Compare(randomInt, CastSharedCudaPtr<char, int>(decompressed)) );
 	//	printf("best tree statistic: %lu\n", results[0].second);
 	//	printf("compressed data size: %lu\n", compressed->size());
 }
@@ -163,7 +163,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_Statistics)
 	//	printf("After compression\n");
 	//	comprStats->PrintShort();
 
-	EXPECT_TRUE( CompareDeviceArrays(randomInt->get(), CastSharedCudaPtr<char, int>(decompressed)->get(), GetSize()));
+	EXPECT_TRUE( CudaArray().Compare(randomInt, CastSharedCudaPtr<char, int>(decompressed)) );
 	//	printf("size of data before compression: %lu\n", data->size());
 	//	printf("best tree statistic: %lu\n", results[0].second);
 	//	printf("compressed data size: %lu\n", compressed->size());
@@ -197,10 +197,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_RandomDataParts_Int_Co
 		// Decompress
 		auto decompressedData = CastSharedCudaPtr<char, int>(
 				decompressionTree.Decompress(compressedDataParts[i]));
-		EXPECT_TRUE( CompareDeviceArrays(
-				randomIntDataParts[i]->get(),
-				decompressedData->get(),
-				randomIntDataParts[i]->size()) );
+		EXPECT_TRUE( CudaArray().Compare(randomIntDataParts[i], decompressedData) );
 	}
 }
 
@@ -233,10 +230,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_TimeRealData_Compress)
 		// Decompress
 		auto decompressedData = CastSharedCudaPtr<char, int>(
 				decompressionTree.Decompress(compressedDataParts[i]));
-		EXPECT_TRUE( CompareDeviceArrays(
-				timeDataParts[i]->get(),
-				decompressedData->get(),
-				timeDataParts[i]->size()) );
+		EXPECT_TRUE( CudaArray().Compare(timeDataParts[i], decompressedData) );
 	}
 }
 
@@ -258,7 +252,7 @@ void OptimizerTest::TestCompressionOptimizerOnNyseCol(int colIdx)
 	// printf("Size before compression: %lu\n", size);
 	// printf("Size after compression: %lu\n", compressedData->size());
 
-	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressedData->get(), data->size()) );
+	EXPECT_TRUE( CudaArray().Compare(data, decompressedData) );
 	ts.reset();
 
 }
@@ -300,7 +294,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_TsFloatData_Twi
 	// printf("Size before compression: %lu\n", data->size());
 	// printf("Size after compression: %lu\n", compressedData->size());
 
-	EXPECT_TRUE( CompareDeviceArrays(data->get(), decompressedData->get(), data->size()) );
+	EXPECT_TRUE( CudaArray().Compare(data, decompressedData) );
 }
 
 TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_PatternA_5Parts)
@@ -333,10 +327,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_P
 		// Decompress
 		auto decompressedData = CastSharedCudaPtr<char, float>(
 				decompressionTree.Decompress(compressedDataParts[i]));
-		EXPECT_TRUE( CompareDeviceArrays(
-				floatDataParts[i]->get(),
-				decompressedData->get(),
-				floatDataParts[i]->size()) );
+		EXPECT_TRUE( CudaArray().Compare(floatDataParts[i], decompressedData) );
 	}
 }
 
@@ -370,10 +361,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_Pat
 		// Decompress
 		auto decompressedData = CastSharedCudaPtr<char, int>(
 				decompressionTree.Decompress(compressedDataParts[i]));
-		EXPECT_TRUE( CompareDeviceArrays(
-				dataParts[i]->get(),
-				decompressedData->get(),
-				dataParts[i]->size()) );
+		EXPECT_TRUE( CudaArray().Compare(dataParts[i], decompressedData) );
 	}
 }
 
@@ -409,10 +397,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_Pat
 		auto decompressedData = CastSharedCudaPtr<char, int>(
 				decompressionTree.Decompress(compressedDataParts[i]));
 
-		EXPECT_TRUE( CompareDeviceArrays(
-				dataParts[i]->get(),
-				decompressedData->get(),
-				dataParts[i]->size()) );
+		EXPECT_TRUE( CudaArray().Compare(dataParts[i], decompressedData) );
 	}
 }
 
@@ -426,8 +411,6 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_P
 	for(int i = 0; i < N; i++)
 		floatDataParts.push_back(GetFakeDataWithPatternB<float>(i, 3*SIZE, -1e4f, 1e4f, SIZE/2));
 
-	//	HelperPrint::PrintSharedCudaPtr(floatDataParts[0], "data1");
-
 	// Compress
 	for(int i = 0; i < N; i++)
 	{
@@ -435,9 +418,14 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_P
 			CastSharedCudaPtr<float, char>(floatDataParts[i]), DataType::d_float);
 		compressedDataParts.push_back(compressedPart);
 
-		// optimizer.GetOptimalTree()->GetTree().Print(compressedPart->size());
-		// printf("Compression ratio = %lf\n", optimizer.GetOptimalTree()->GetTree().GetCompressionRatio());
-		// optimizer.GetStatistics()->PrintShort();
+		auto optimalTree = optimizer.GetOptimalTree()->GetTree();
+		LOG4CPLUS_TRACE_FMT(
+			_logger,
+			"Optimal tree: \n\t %s \n Ratio = %f \n %s",
+			optimalTree.ToString().c_str(),
+			optimalTree.GetCompressionRatio(),
+			optimizer.GetStatistics()->ToStringShort().c_str()
+		);
 	}
 
 	// Check
@@ -447,10 +435,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_P
 		// Decompress
 		auto decompressedData = CastSharedCudaPtr<char, float>(
 				decompressionTree.Decompress(compressedDataParts[i]));
-		EXPECT_TRUE( CompareDeviceArrays(
-				floatDataParts[i]->get(),
-				decompressedData->get(),
-				floatDataParts[i]->size()) );
+		EXPECT_TRUE( CudaArray().Compare(floatDataParts[i], decompressedData) );
 	}
 }
 }

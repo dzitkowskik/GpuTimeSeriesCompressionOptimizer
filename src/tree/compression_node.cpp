@@ -174,13 +174,19 @@ size_t CompressionNode::PredictCompressionSize(SharedCudaPtr<char> data, DataTyp
 }
 
 
-void CompressionNode::Print()
+void CompressionNode::Print(std::ostream& stream)
 {
-	std::cout << GetEncodingTypeString(this->_encodingType) << "[" << this->_compressionRatio << "]" << ",";
+	stream << GetEncodingTypeString(this->_encodingType) << "[" << this->_compressionRatio << "]" << ",";
 	for(auto& child : this->_children)
-		child->Print();
+		child->Print(stream);
 }
 
+std::string CompressionNode::ToString()
+{
+	std::stringstream ss;
+	Print(ss);
+	return ss.str();
+}
 
 SharedCompressionNodePtr CompressionNode::Copy()
 {

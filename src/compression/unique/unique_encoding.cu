@@ -9,7 +9,7 @@
 #include "core/cuda_macros.cuh"
 #include "core/not_implemented_exception.hpp"
 #include "core/cuda_launcher.cuh"
-#include "helpers/helper_print.hpp"
+
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
 #include <thrust/sort.h>

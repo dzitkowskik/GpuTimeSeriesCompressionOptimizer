@@ -1,6 +1,6 @@
 #include "test/compression_unittest_base.hpp"
 #include "unique_encoding.hpp"
-#include "helpers/helper_print.hpp"
+
 #include <gtest/gtest.h>
 #include <boost/bind.hpp>
 

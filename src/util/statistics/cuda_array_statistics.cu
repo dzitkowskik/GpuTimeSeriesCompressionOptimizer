@@ -26,7 +26,7 @@ std::tuple<T,T> CudaArrayStatistics::MinMax(SharedCudaPtr<T> data)
 	T max = *(tuple.second);
 	return std::make_tuple(min, max);
 }
-
+ 
 template<typename T>
 char CudaArrayStatistics::MinBitCnt(SharedCudaPtr<T> data)
 {

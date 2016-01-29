@@ -19,8 +19,11 @@ namespace ddj {
 template<typename T>
 SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	printf("RLE decoding: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu\n",
-			input[0]->size(), input[1]->size(), input[2]->size());
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"RLE decoding START: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu",
+		input[0]->size(), input[1]->size(), input[2]->size()
+	);
 
 	if(input[1]->size() <= 0) return CudaPtr<T>::make_shared();
 
@@ -28,8 +31,6 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
 	int length;
 	auto metadata = input[0];
 	CUDA_CALL( cudaMemcpy(&length, metadata->get(), sizeof(int), CPY_DTH) );
-
-	printf("Length = %d\n", length);
 
 	// PREPARE INPUT DATA
     int* lengths = reinterpret_cast<int*>(input[1]->get());
@@ -59,7 +60,7 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
     thrust::device_ptr<T> resultPtr(result->get());
     thrust::gather(indices.begin(), indices.end(), valuesVector.begin(), resultPtr);
 
-    printf("RLE END\n");
+    LOG4CPLUS_INFO_FMT(_logger, "RLE decoding END");
 
     return result;
 }

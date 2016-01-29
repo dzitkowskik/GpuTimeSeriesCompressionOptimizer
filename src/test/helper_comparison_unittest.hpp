@@ -1,7 +1,7 @@
 #ifndef DDJ_HELPER_COMPARISON_UNITTEST_H_
 #define DDJ_HELPER_COMPARISON_UNITTEST_H_
 
-#include "helpers/helper_comparison.cuh"
+#include "core/cuda_array.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_device.hpp"
 

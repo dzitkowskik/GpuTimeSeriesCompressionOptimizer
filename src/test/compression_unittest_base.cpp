@@ -6,9 +6,9 @@
  */
 
 #include "compression_unittest_base.hpp"
-#include "helpers/helper_comparison.cuh"
+#include "core/cuda_array.hpp"
 #include "core/macros.h"
-#include "helpers/helper_print.hpp"
+
 #include "util/copy/cuda_array_copy.hpp"
 
 #include <boost/function.hpp>

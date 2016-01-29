@@ -6,7 +6,7 @@
  */
 
 #include "compression/rle/rle_encoding.hpp"
-#include "helpers/helper_print.hpp"
+
 #include "core/macros.h"
 
 #include <thrust/device_vector.h>
@@ -19,14 +19,14 @@ template<typename T>
 SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
 {
     CUDA_ASSERT_RETURN( cudaGetLastError() );
-    //	printf("START RLE ENCODE data size = %lu\n", data->size());
+    LOG4CPLUS_INFO_FMT(_logger, "RLE encoding START: data size = %lu", data->size());
 
     thrust::device_ptr<T> d_ptr(data->get());
     thrust::device_vector<T> input(d_ptr, d_ptr + data->size());
     thrust::device_vector<T> output(data->size());
     thrust::device_vector<int>  lengths(data->size());
 
-    //	printf("START REDUCE BY KEY\n");
+    LOG4CPLUS_TRACE_FMT(_logger, "START REDUCE BY KEY");
 
     // compute run lengths
     auto reduceResult = thrust::reduce_by_key(
@@ -50,7 +50,7 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
     resultLengths->fillFromHost(lengths.data().get(), len);
     resultValues->fillFromHost(output.data().get(), len);
 
-    //    printf("END RLE ENCODE\n");
+    LOG4CPLUS_INFO_FMT(_logger, "RLE enoding END");
     CUDA_ASSERT_RETURN( cudaGetLastError() );
 
     return SharedCudaPtrVector<char> {
@@ -89,6 +89,7 @@ size_t RleEncoding::GetCompressedSize(SharedCudaPtr<T> data)
 		thrust::constant_iterator<int>(1),
 		output.begin(),
 		lengths.begin());
+
 	// get true output length
 	int len = reduceResult.first - output.begin();
 	return len * sizeof(int) + len * sizeof(T);

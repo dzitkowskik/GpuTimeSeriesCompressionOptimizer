@@ -15,6 +15,8 @@
 #include <vector>
 #include <utility>
 #include <mutex>
+#include <iostream>
+#include <string>
 
 namespace ddj
 {
@@ -45,8 +47,10 @@ public:
 	EdgeStatistic GetAny(int edge);
 	EdgeStatistic GetBest(int edge);
 	EdgeStatistic GetBest(int edge, EncodingType beginningType);
-	void Print();
-	void PrintShort();
+	void Print(std::ostream& stream = std::cout);
+	void PrintShort(std::ostream& stream = std::cout);
+	std::string ToString();
+	std::string ToStringShort();
 	SharedCompressionStatisticsPtr Copy();
 	size_t GetEdgeNumber();
 

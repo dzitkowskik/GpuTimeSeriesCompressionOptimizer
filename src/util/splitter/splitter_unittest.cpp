@@ -1,5 +1,5 @@
 #include "test/unittest_base.hpp"
-#include "helpers/helper_comparison.cuh"
+#include "core/cuda_array.hpp"
 #include "core/macros.h"
 #include "core/cuda_ptr.hpp"
 #include "splitter.hpp"

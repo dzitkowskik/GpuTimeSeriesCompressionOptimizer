@@ -6,8 +6,8 @@
  */
 
 #include "test/unittest_base.hpp"
-#include "helpers/helper_comparison.cuh"
-#include "helpers/helper_print.hpp"
+#include "core/cuda_array.hpp"
+
 #include "tree/compression_tree.hpp"
 #include "tree/compression_node.hpp"
 #include "optimizer/path_generator.hpp"
@@ -61,7 +61,7 @@ void CompressionTreeTestBase::CompressDecompressTest(CompressionTree& compressio
 	auto actual = CastSharedCudaPtr<char, T>(decompressed);
 
 	ASSERT_EQ(expected->size(), actual->size());
-	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+	EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 
 	// printf("Data size = %lu\n", data->size()*sizeof(T));
 	// printf("Compressed size = %lu\n", compressed->size());
@@ -192,7 +192,7 @@ TEST_P(CompressionTreeTest, ComplexTree_Delta_Scale_Patch_Afl_RealData_Time_Comp
 	//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
 
 	ASSERT_EQ(expected->size(), actual->size());
-	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+	EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 }
 
 //		SCALE
@@ -233,7 +233,7 @@ TEST_P(CompressionTreeTest, ComplexTree_Scale_Rle_Delta_Unique_RealData_Time_Com
 	//	printf("size after comrpession = %d\n", compressed->size()*sizeof(char));
 
 	ASSERT_EQ(expected->size(), actual->size());
-	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+	EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 }
 
 //		DELTA
@@ -295,7 +295,7 @@ TEST_P(CompressionTreeTest, DISABLED_SimpleTree_Patch_Afl_RandomInt_BigSize)
 	//	HelperPrint::PrintSharedCudaPtr(actual, "actual");
 
 	ASSERT_EQ(expected->size(), actual->size());
-	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+	EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 }
 
 //		SCALE
@@ -342,7 +342,7 @@ TEST_P(CompressionTreeTest, UpdateStatistics_ComplexTree)
 	EXPECT_EQ(EncodingType::afl, stats->GetAny(6).type.second);
 
 	ASSERT_EQ(expected->size(), actual->size());
-	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+	EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 }
 
 //			PATCH
@@ -459,7 +459,7 @@ TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_SpecialCaseWithDict_Compr
 	auto actual = CastSharedCudaPtr<char, float>(decompressed);
 
 	ASSERT_EQ(expected->size(), actual->size());
-	EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
+	EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 
 	// HelperPrint::PrintSharedCudaPtr(expected, "expected");
 	// HelperPrint::PrintSharedCudaPtr(actual, "actual");

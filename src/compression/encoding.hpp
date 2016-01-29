@@ -9,6 +9,7 @@
 #define DDJ_ENCODING_HPP_
 
 #include "core/cuda_ptr.hpp"
+#include "core/logger.h"
 #include "data_type.hpp"
 #include <boost/pointer_cast.hpp>
 
@@ -17,7 +18,8 @@ namespace ddj {
 class Encoding
 {
 public:
-	Encoding(){}
+	Encoding() : _logger(log4cplus::Logger::getRoot()) {}
+	Encoding(log4cplus::Logger logger) : _logger(logger) {}
 	virtual ~Encoding(){}
 
 public:
@@ -103,6 +105,9 @@ protected:
 	// CHAR
 	virtual SharedCudaPtrVector<char> EncodeChar(SharedCudaPtr<char> data) = 0;
 	virtual SharedCudaPtr<char> DecodeChar(SharedCudaPtrVector<char> data) = 0;
+
+protected:
+	log4cplus::Logger _logger;
 };
 
 } /* namespace ddj */

@@ -1,4 +1,4 @@
-#include "helpers/helper_comparison.cuh"
+#include "core/cuda_array.hpp"
 #include "core/macros.h"
 #include "core/cuda_ptr.hpp"
 #include "util/other/cpu_histogram.hpp"
@@ -6,7 +6,7 @@
 #include "core/config.hpp"
 #include "test/unittest_base.hpp"
 #include "compression/delta/delta_encoding.hpp"
-#include "helpers/helper_print.hpp"
+
 
 #include <cuda_runtime_api.h>
 #include <vector>
