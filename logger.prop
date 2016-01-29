@@ -2,7 +2,7 @@ log4cplus.rootLogger=WARN, FILE
 
 log4cplus.logger.myDefaultLogger=OFF, STDERR
 
-log4cplus.logger.UnittestBase=ALL, STDOUT
+log4cplus.logger.UnittestBase=INFO, UFILE
 log4cplus.additivity.UnittestBase=false
 
 log4cplus.logger.RleEncoding=OFF, STDOUT
@@ -21,6 +21,13 @@ log4cplus.appender.FILE.MaxFileSize=50MB
 log4cplus.appender.FILE.MaxBackupIndex=2
 log4cplus.appender.FILE.layout=log4cplus::PatternLayout
 log4cplus.appender.FILE.layout.ConversionPattern=[%-4p][%d{%m/%d/%y %H:%M:%S}][%l]%%%x%% %m%n
+
+log4cplus.appender.UFILE=log4cplus::RollingFileAppender
+log4cplus.appender.UFILE.File=unittest.log
+log4cplus.appender.UFILE.MaxFileSize=50MB
+log4cplus.appender.UFILE.MaxBackupIndex=2
+log4cplus.appender.UFILE.layout=log4cplus::PatternLayout
+log4cplus.appender.UFILE.layout.ConversionPattern=[%-4p][%d{%m/%d/%y %H:%M:%S}][%l]%%%x%% %m%n
 
 log4cplus.appender.STDOUT=log4cplus::ConsoleAppender
 log4cplus.appender.STDOUT.ImmediateFlush = true
