@@ -8,7 +8,7 @@
 #include "optimizer/decompression_task.hpp"
 #include "file.hpp"
 #include "core/task/task_queue_synchronizer.hpp"
-#include "helpers/helper_device.hpp"
+#include "core/cuda_device.hpp"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>

@@ -11,7 +11,7 @@
 #include "benchmarks/benchmark_base.hpp"
 #include "tree/compression_tree.hpp"
 #include "data_type.hpp"
-#include "helpers/helper_device.hpp"
+#include "core/cuda_device.hpp"
 
 namespace ddj {
 
@@ -20,7 +20,7 @@ class CompressionTreeBenchmarkBase : public BenchmarkBase
 public:
 	CompressionTreeBenchmarkBase()
 	{
-		HelperDevice hc;
+		CudaDevice hc;
 		int devId = hc.SetCudaDeviceWithMaxFreeMem();
 		printf("TEST SET UP ON DEVICE %d\n", devId);
 	}

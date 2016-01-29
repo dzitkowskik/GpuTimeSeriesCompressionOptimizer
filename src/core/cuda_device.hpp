@@ -1,21 +1,21 @@
 /*
- * helper_device.hpp 26-03-2015 Karol Dzitkowski
+ * cuda_device.hpp 26-03-2015 Karol Dzitkowski
  */
 
-#ifndef DDJ_HELPER_DEVICE_H_
-#define DDJ_HELPER_DEVICE_H_
+#ifndef DDJ_CORE_CUDA_DEVICE_HPP_
+#define DDJ_CORE_CUDA_DEVICE_HPP_
 
 #include "core/config.hpp"
 #include <cuda_runtime_api.h>
 
 namespace ddj {
 
-class HelperDevice {
+class CudaDevice {
 private:
 	Config* _config;
 
 public:
-	HelperDevice()
+	CudaDevice()
         : _config(Config::GetInstance()) { }
 
 	int    CudaGetDevicesCount();
@@ -26,4 +26,4 @@ public:
 };
 
 } /* namespace ddj */
-#endif /* DDJ_HELPER_DEVICE_H_ */
+#endif /* DDJ_CORE_CUDA_DEVICE_HPP_ */

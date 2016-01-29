@@ -41,7 +41,7 @@ BENCHMARK_REGISTER_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDelta_Enc
 //	  AFL	NONE
 BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDeltaPatchAfl_Encoding_RandomInt)(benchmark::State& state)
 {
-	HelperDevice hc;
+	CudaDevice hc;
 	int devId = hc.SetCudaDeviceWithMaxFreeMem();
 	printf("TEST SET UP ON DEVICE %d\n", devId);
 
@@ -77,7 +77,7 @@ BENCHMARK_REGISTER_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDeltaPatc
 //	  AFL	NONE
 BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDeltaPatchAfl_Encoding_TimeFromFile)(benchmark::State& state)
 {
-	HelperDevice hc;
+	CudaDevice hc;
 	int devId = hc.SetCudaDeviceWithMaxFreeMem();
 	printf("TEST SET UP ON DEVICE %d\n", devId);
 

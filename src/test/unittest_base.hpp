@@ -9,7 +9,7 @@
 #define DDJ_UNITTEST_BASE_HPP_
 
 #include "data_type.hpp"
-#include "helpers/helper_device.hpp"
+#include "core/cuda_device.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
 #include "time_series.hpp"

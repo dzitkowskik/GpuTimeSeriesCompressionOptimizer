@@ -7,7 +7,7 @@
 
 #include "file.hpp"
 #include "core/task/task_queue_synchronizer.hpp"
-#include "helpers/helper_device.hpp"
+#include "core/cuda_device.hpp"
 #include "optimizer/compression_task.hpp"
 
 #include <vector>
