@@ -10,6 +10,7 @@ tags
 gpuStore
 build/
 config.ini
+sample_data/nyse.*
 
 ### OSX ###
 .DS_Store
