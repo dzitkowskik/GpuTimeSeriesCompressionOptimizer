@@ -43,6 +43,7 @@ void CompressionTask::execute()
 {
 	// set proper device
 	CUDA_CALL( cudaSetDevice(_deviceId) );
+	LOG4CPLUS_TRACE_FMT(_logger, "Compression task %d started on device %d", _id, _deviceId);
 
 	// copy data to device
 	auto h_data = _ts->getColumn(_columnId).getData();
@@ -52,9 +53,15 @@ void CompressionTask::execute()
 
 	// compress data
 	auto type = _ts->getColumn(_columnId).getType();
-//	printf("Task id = %d, compress type %s\n", _id, GetDataTypeString(type).c_str());
+	LOG4CPLUS_DEBUG_FMT(_logger, "Task id = %d, compress type %s with size %lu",
+		_id, GetDataTypeString(type).c_str(), d_data->size());
+	////////////////////////////////////////////////////////////////////
 	auto d_result = _optimizer->CompressData(d_data, type);
-//	printf("Task id = %d, compression DONE\n", _id);
+	////////////////////////////////////////////////////////////////////
+	LOG4CPLUS_DEBUG_FMT(_logger, "Task id = %d, compressed to size %lu",
+		_id, d_result->size());
+
+	// check for errors
 	CUDA_CALL( cudaGetLastError() );
 
 	// send compressed batch to host
@@ -66,7 +73,7 @@ void CompressionTask::execute()
 
 	// end task
 	_status = TaskStatus::success;
-	 printf("Task %d succeed!\n", _id);
+	LOG4CPLUS_TRACE_FMT(_logger, "Compression task %d ended on device %d", _id, _deviceId);
 }
 
 } /* namespace ddj */

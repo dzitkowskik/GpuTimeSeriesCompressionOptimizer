@@ -19,6 +19,7 @@ class ParallelTsCompressorTest : public UnittestBase {};
 // ./gpuStore --gtest_filter=ParallelTsCompressorTest.Compress_Info_Test_Data_no_exception
 TEST_F(ParallelTsCompressorTest, Compress_Binary_Info_Test_Data_no_exception)
 {
+	LOG4CPLUS_INFO(_logger, "OptimizerTest, Compress_Binary_Info_Test_Data_no_exception");
 	auto inputFile = File("sample_data/info.inf");
 	auto outputFile = File::GetTempFile();
 	auto headerFile = File("sample_data/info.header");
@@ -29,12 +30,15 @@ TEST_F(ParallelTsCompressorTest, Compress_Binary_Info_Test_Data_no_exception)
 	ParallelTSCompressor compressor(reader);
 	compressor.Compress(inputFile, outputFile);
 
-	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
-	printf("Compression output = %s with size %lu\n", outputFile.GetPath().c_str(), outputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
+		inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression output = %s with size %lu",
+		outputFile.GetPath().c_str(), outputFile.GetSize()/1024);
 }
 
 TEST_F(ParallelTsCompressorTest, Compress_CSV_Info_Test_Data_no_exception)
 {
+	LOG4CPLUS_INFO(_logger, "OptimizerTest, Compress_CSV_Info_Test_Data_no_exception");
 	auto inputFile = File("sample_data/info.log");
 	auto outputFile = File::GetTempFile();
 	auto headerFile = File("sample_data/info.header");
@@ -45,12 +49,15 @@ TEST_F(ParallelTsCompressorTest, Compress_CSV_Info_Test_Data_no_exception)
 	ParallelTSCompressor compressor(reader);
 	compressor.Compress(inputFile, outputFile);
 
-	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
-	printf("Compression output = %s with size %lu\n", outputFile.GetPath().c_str(), outputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
+		inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression output = %s with size %lu",
+		outputFile.GetPath().c_str(), outputFile.GetSize()/1024);
 }
 
 TEST_F(ParallelTsCompressorTest, Decompress_Binary_Info_Test_Data_CompareFile)
 {
+	LOG4CPLUS_INFO(_logger, "OptimizerTest, Decompress_Binary_Info_Test_Data_CompareFile");
 	auto inputFile = File("sample_data/info.inf");
 	auto outputFileCompr = File::GetTempFile();
 	auto outputFileDecompr = File::GetTempFile();
@@ -61,12 +68,15 @@ TEST_F(ParallelTsCompressorTest, Decompress_Binary_Info_Test_Data_CompareFile)
 	ParallelTSCompressor compressor(reader);
 	compressor.Compress(inputFile, outputFileCompr);
 
-	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
-	printf("Compression output = %s with size %lu\n", outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
+		inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression output = %s with size %lu",
+		outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
 
 	compressor.Decompress(outputFileCompr, outputFileDecompr, fileDefinition);
 
-	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Decompression output = %s with size %lu",
+		outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
 
 	auto newInputFile = File("sample_data/info.inf");
 	auto ts1 = TimeSeriesReaderBinary(fileDefinition, 4).Read(newInputFile);
@@ -77,6 +87,7 @@ TEST_F(ParallelTsCompressorTest, Decompress_Binary_Info_Test_Data_CompareFile)
 
 TEST_F(ParallelTsCompressorTest, Decompress_CSV_Info_Test_Data_CompareFile)
 {
+	LOG4CPLUS_INFO(_logger, "OptimizerTest, Decompress_CSV_Info_Test_Data_CompareFile");
 	auto inputFile = File("sample_data/info.log");
 	auto outputFileCompr = File::GetTempFile();
 	auto outputFileDecompr = File::GetTempFile();
@@ -88,18 +99,22 @@ TEST_F(ParallelTsCompressorTest, Decompress_CSV_Info_Test_Data_CompareFile)
 	ParallelTSCompressor compressor(reader);
 	compressor.Compress(inputFile, outputFileCompr);
 
-	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
-	printf("Compression output = %s with size %lu\n", outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
+		inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression output = %s with size %lu",
+		outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
 
 	compressor.Decompress(outputFileCompr, outputFileDecompr, fileDefinition);
 
-	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Decompression output = %s with size %lu",
+		outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
 
 	EXPECT_TRUE( inputFile.Compare(outputFileDecompr) );
 }
 
-TEST_F(ParallelTsCompressorTest, CompressDecompress_CSV_NYSE_CompareFile)
+TEST_F(ParallelTsCompressorTest, DISABLED_CompressDecompress_CSV_NYSE_CompareFile)
 {
+	LOG4CPLUS_INFO(_logger, "OptimizerTest, CompressDecompress_CSV_NYSE_CompareFile");
 	Save1MFrom1GNyseDataInSampleData(1e5);
 
 	auto inputFile = File("sample_data/nyse.csv");
@@ -113,18 +128,22 @@ TEST_F(ParallelTsCompressorTest, CompressDecompress_CSV_NYSE_CompareFile)
 	ParallelTSCompressor compressor(reader);
 	compressor.Compress(inputFile, outputFileCompr);
 
-	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
-	printf("Compression output = %s with size %lu\n", outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
+		inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression output = %s with size %lu",
+		outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
 
 	compressor.Decompress(outputFileCompr, outputFileDecompr, fileDefinition);
 
-	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Decompression output = %s with size %lu",
+		outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
 
 	EXPECT_TRUE( inputFile.Compare(outputFileDecompr) );
 }
 
-TEST_F(ParallelTsCompressorTest, CompressDecompress_Binary_NYSE_CompareFile)
+TEST_F(ParallelTsCompressorTest, DISABLED_CompressDecompress_Binary_NYSE_CompareFile)
 {
+	LOG4CPLUS_INFO(_logger, "OptimizerTest, CompressDecompress_Binary_NYSE_CompareFile");
 	Save1MFrom1GNyseDataInSampleData(1e5);
 
 	auto inputFile = File("sample_data/nyse.inf");
@@ -137,18 +156,19 @@ TEST_F(ParallelTsCompressorTest, CompressDecompress_Binary_NYSE_CompareFile)
 	ParallelTSCompressor compressor(reader);
 	compressor.Compress(inputFile, outputFileCompr);
 
-	printf("Compression input = %s with size %lu\n", inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
-	printf("Compression output = %s with size %lu\n", outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
+		inputFile.GetPath().c_str(), inputFile.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Compression output = %s with size %lu",
+		outputFileCompr.GetPath().c_str(), outputFileCompr.GetSize()/1024);
 
 	compressor.Decompress(outputFileCompr, outputFileDecompr, fileDefinition);
 
-	printf("Decompression output = %s with size %lu\n", outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
+	LOG4CPLUS_INFO_FMT(_logger, "Decompression output = %s with size %lu",
+		outputFileDecompr.GetPath().c_str(), outputFileDecompr.GetSize()/1024);
 
 	auto newInputFile = File("sample_data/nyse.inf");
 	auto ts1 = TimeSeriesReaderBinary(fileDefinition).Read(newInputFile);
-	//	ts1->print(5);
 	auto ts2 = TimeSeriesReaderBinary(fileDefinition).Read(outputFileDecompr);
-	//	ts2->print(5);
 
 	EXPECT_TRUE( ts1->compare(*ts2) );
 }

@@ -8,6 +8,15 @@ log4cplus.additivity.UnittestBase=false
 log4cplus.logger.RleEncoding=OFF, STDOUT
 log4cplus.additivity.RleEncoding=false
 
+log4cplus.logger.CompressionTask=ALL, STDOUT
+log4cplus.additivity.CompressionTask=false
+
+log4cplus.logger.DecompressionTask=ALL, STDOUT
+log4cplus.additivity.DecompressionTask=false
+
+log4cplus.logger.ParallelTSCompressor=ALL, STDOUT
+log4cplus.additivity.ParallelTSCompressor=false
+
 log4cplus.appender.STDERR=log4cplus::ConsoleAppender
 log4cplus.appender.STDERR.logToStdErr=true
 log4cplus.appender.STDERR.ImmediateFlush = true

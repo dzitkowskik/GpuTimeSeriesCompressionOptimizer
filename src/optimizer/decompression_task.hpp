@@ -11,6 +11,7 @@
 #include "file.hpp"
 #include "core/task/task.hpp"
 #include "time_series.hpp"
+#include "core/logger.h"
 #include "optimizer/compression_optimizer.hpp"
 #include <boost/make_shared.hpp>
 
@@ -25,7 +26,7 @@ class DecompressionTask : public Task
 public:
 	DecompressionTask(SharedTimeSeriesPtr ts, int columnId)
 		: _ts(ts), _columnId(columnId), _deviceId(0)
-	{}
+	{ init(); }
 
 	virtual ~DecompressionTask() {}
 
@@ -33,7 +34,7 @@ public:
 		: _ts(other._ts),
 		  _columnId(other._columnId),
 		  _deviceId(other._deviceId)
-	{}
+	{ init(); }
 
 public:
 	void SetDevice(int deviceId) { _deviceId = deviceId; }
@@ -50,9 +51,16 @@ protected:
 	void execute();
 
 private:
+	void init()
+	{
+		_logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("DecompressionTask"));
+	}
+
+private:
 	int _deviceId;
 	int _columnId;
 	SharedTimeSeriesPtr _ts;
+	log4cplus::Logger _logger;
 };
 
 } /* namespace ddj */

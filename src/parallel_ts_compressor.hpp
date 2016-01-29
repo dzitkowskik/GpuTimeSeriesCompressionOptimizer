@@ -11,6 +11,7 @@
 #include "optimizer/compression_optimizer.hpp"
 #include "core/task/task_scheduler.hpp"
 #include "time_series_reader.hpp"
+#include "core/logger.h"
 
 namespace ddj
 {
@@ -32,6 +33,7 @@ private:
 	bool _initialized;
 	size_t _batchSize;
 	int _columnNumber;
+	log4cplus::Logger _logger;
 
 	UniqueTaskSchedulerPtr _taskScheduler;
 	SharedTimeSeriesReader _reader;
