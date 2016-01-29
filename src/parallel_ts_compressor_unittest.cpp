@@ -70,9 +70,7 @@ TEST_F(ParallelTsCompressorTest, Decompress_Binary_Info_Test_Data_CompareFile)
 
 	auto newInputFile = File("sample_data/info.inf");
 	auto ts1 = TimeSeriesReaderBinary(fileDefinition, 4).Read(newInputFile);
-	//	ts1->print(5);
 	auto ts2 = TimeSeriesReaderBinary(fileDefinition, 4).Read(outputFileDecompr);
-	//	ts2->print(5);
 
 	EXPECT_TRUE( ts1->compare(*ts2) );
 }

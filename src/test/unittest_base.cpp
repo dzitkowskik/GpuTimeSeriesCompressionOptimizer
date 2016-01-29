@@ -7,7 +7,8 @@ void UnittestBase::SetUpTestCase()
 {
 	HelperDevice hc;
 	int devId = hc.SetCudaDeviceWithMaxFreeMem();
-	printf("TEST SET UP ON DEVICE %d\n", devId);
+	auto logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("UnittestBase"));
+	LOG4CPLUS_INFO_FMT(logger, "TEST SET UP ON DEVICE %d\n", devId);
 	cudaGetLastError();
 }
 

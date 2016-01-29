@@ -14,6 +14,7 @@
 #include "core/cuda_ptr.hpp"
 #include "time_series.hpp"
 #include "time_series_reader.hpp"
+#include "core/logger.h"
 
 #include <vector>
 #include <gtest/gtest.h>
@@ -24,7 +25,8 @@ namespace ddj {
 class UnittestBase : public ::testing::Test
 {
 public:
-	UnittestBase() : _size(10000)
+	UnittestBase()
+		: _size(10000), _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("UnittestBase")))
 	{
 		CSVFileDefinition csvFileDefinition;
 		csvFileDefinition.Columns = std::vector<DataType> {
@@ -102,6 +104,7 @@ protected:
 	TimeSeriesReaderCSV _tsReaderCSV;
 	TimeSeriesReaderBinary _tsReaderBinary;
 	int _size;
+	log4cplus::Logger _logger;
 
 private:
 	std::vector<DataType> _nyseData = std::vector<DataType> {

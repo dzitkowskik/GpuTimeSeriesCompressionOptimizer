@@ -43,7 +43,8 @@ void initialize_logger()
 {
   log4cplus::initialize();
   LogLog::getLogLog()->setInternalDebugging(true);
-  PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("logger.prop"));
+  auto loggerConfPath = ddj::Config::GetInstance()->GetValue<std::string>("LOG_CONFIG");
+  PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(loggerConfPath));
 }
 
 int main(int argc, char* argv[])
@@ -51,6 +52,8 @@ int main(int argc, char* argv[])
 	ConfigDefinition configDef { argc, argv, "config.ini", GetProgramOptions() };
 	ddj::Config::Initialize(configDef);
 	initialize_logger();
+	auto logger = Logger::getInstance("myDefaultLogger");
+	LOG4CPLUS_DEBUG(logger, "START UNITTESTING");
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
