@@ -144,6 +144,12 @@ boost::shared_ptr<TimeSeries> UnittestBase::Get1GBNyseTimeSeries()
 	return ts;
 }
 
+bool fileExists(const char *fileName)
+{
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+
 void UnittestBase::Save1MFrom1GNyseDataInSampleData(size_t size)
 {
 	if(size == 0) size = _size;
@@ -158,6 +164,8 @@ void UnittestBase::Save1MFrom1GNyseDataInSampleData(size_t size)
 	File outputBin("sample_data/nyse.inf");
 	File outputCsv("sample_data/nyse.csv");
 	File outputDef("sample_data/nyse.header");
+
+	if(fileExists(outputCsv.GetPath().c_str())) return;
 
 	auto ts = TimeSeriesReaderBinary(fileDefinition).Read(file, size);
 	TimeSeriesReaderBinary(fileDefinition).Write(outputBin, *ts);

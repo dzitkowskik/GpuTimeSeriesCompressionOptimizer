@@ -32,6 +32,7 @@ ConfigOptions GetProgramOptions()
 	    ("TEST_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing test time series data")
 	    ("BENCHMARK_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing benchmark time series data")
 	    ("NYSE_DATA_1GB", po::value<std::string>()->default_value(""), "default file containing nyse time series data from openbook")
+		("LOG_CONFIG", po::value<std::string>()->default_value("logger.prop", "file containing log4cplus configuration"))
 	    ;
 	options.ConfigFileOptions.add(configFileOptions);
 

@@ -1,6 +1,5 @@
 log4cplus.rootLogger=DEBUG, STDOUT, R
 log4cplus.logger.test=DEBUG, STDOUT
-log4j.additivity.test = false
 
 log4cplus.appender.STDOUT=log4cplus::ConsoleAppender
 log4cplus.appender.STDOUT.logToStdErr=true

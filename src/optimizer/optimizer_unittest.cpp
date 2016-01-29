@@ -52,7 +52,6 @@ TEST_F(OptimizerTest, PathGenerator_GenerateTree_TestCompression)
 
 		ASSERT_EQ(expected->size(), actual->size());
 		EXPECT_TRUE( CompareDeviceArrays(expected->get(), actual->get(), expected->size()) );
-		CUDA_ASSERT_RETURN(cudaGetLastError());
 	}
 }
 

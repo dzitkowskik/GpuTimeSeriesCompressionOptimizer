@@ -102,6 +102,8 @@ TEST_F(ParallelTsCompressorTest, Decompress_CSV_Info_Test_Data_CompareFile)
 
 TEST_F(ParallelTsCompressorTest, CompressDecompress_CSV_NYSE_CompareFile)
 {
+	Save1MFrom1GNyseDataInSampleData(1e5);
+
 	auto inputFile = File("sample_data/nyse.csv");
 	auto outputFileCompr = File::GetTempFile();
 	auto outputFileDecompr = File::GetTempFile();
@@ -125,6 +127,8 @@ TEST_F(ParallelTsCompressorTest, CompressDecompress_CSV_NYSE_CompareFile)
 
 TEST_F(ParallelTsCompressorTest, CompressDecompress_Binary_NYSE_CompareFile)
 {
+	Save1MFrom1GNyseDataInSampleData(1e5);
+
 	auto inputFile = File("sample_data/nyse.inf");
 	auto outputFileCompr = File::GetTempFile();
 	auto outputFileDecompr = File::GetTempFile();

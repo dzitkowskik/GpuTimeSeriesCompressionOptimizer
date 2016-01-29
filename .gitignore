@@ -9,6 +9,7 @@ tags
 .clang_complete
 gpuStore
 build/
+config.ini
 
 ### OSX ###
 .DS_Store
