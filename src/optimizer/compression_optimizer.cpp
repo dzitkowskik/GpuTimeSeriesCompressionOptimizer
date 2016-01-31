@@ -89,7 +89,6 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 		SharedCudaPtr<char> data,
 		EncodingType et,
 		DataType dt,
-		DataStatistics stats,
 		int level)
 {
 	Path cont;
@@ -98,29 +97,34 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 	std::vector<PossibleTree> result, part1, part2;
 	PossibleTree parent;
 
+	LOG4CPLUS_DEBUG(_logger, "Try generate statistics");
+	DataStatistics stats = crs.GenerateStatistics(data, dt);
+	LOG4CPLUS_DEBUG(_logger, "Statistics generated");
+
 	cont = _pathGenerator.GetContinuations(et, dt, stats, level);
 	for(auto& c : cont)
 	{
 		parent.first = CompressionTree(c, dt);
 		auto encoding = factory.Get(c, dt)->Get(data);
-//		printf("Compress %s using %s\n", GetDataTypeString(dt).c_str(), GetEncodingTypeString(c).c_str());
+
+		LOG4CPLUS_DEBUG_FMT(_logger, "Compress %s of size %lu using %s",
+			GetDataTypeString(dt).c_str(), data->size(), GetEncodingTypeString(c).c_str());
 		auto compr = encoding->Encode(data, dt);
-//		printf("Compression success!\n");
+		LOG4CPLUS_DEBUG(_logger, "Compression success");
+
 		parent.second = _getSize(compr);
 		parent.first.FindNode(0)->SetCompressionRatio(
 				Encoding::GetCompressionRatio(data->size(), parent.second));
-//		printf("Try generate statistics\n");
-		stats = crs.GenerateStatistics(data, dt);
-//		printf("Statistics generated!\n");
+
 		if(encoding->GetNumberOfResults() == 1)
 		{
-			part1 = FullStatisticsUpdate(compr[1], c, dt, stats, level+1);
+			part1 = FullStatisticsUpdate(compr[1], c, dt, level+1);
 			part1 = CrossTrees(parent, part1, data->size(), compr[0]->size());
 		}
 		else if(encoding->GetNumberOfResults() == 2)
 		{
-			part1 = FullStatisticsUpdate(compr[1], c, dt, stats, level+1);
-			part2 = FullStatisticsUpdate(compr[2], c, dt, stats, level+1);
+			part1 = FullStatisticsUpdate(compr[1], c, dt, level+1);
+			part2 = FullStatisticsUpdate(compr[2], c, dt, level+1);
 			part1 = CrossTrees(parent, part1, part2, data->size(), compr[0]->size());
 		}
 
@@ -142,22 +146,23 @@ bool CompressionOptimizer::IsFullUpdateNeeded()
 size_t CompressionOptimizer::GetSampleDataForFullUpdateSize(size_t partDataSize, DataType type)
 {
 	size_t typeSizeInBytes = GetDataTypeSize(type);
-	return std::min(partDataSize/(typeSizeInBytes*1000), 1000*typeSizeInBytes);
+	size_t numberOfElements = partDataSize / typeSizeInBytes;
+	if(numberOfElements <= 1000) return partDataSize;
+	else if (numberOfElements <= 10000) return 1000*typeSizeInBytes;
+	else return (numberOfElements/100)*typeSizeInBytes;
 }
 
 SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataPart, DataType type)
 {
 	if(IsFullUpdateNeeded())
 	{
-		auto dataSampleForFullUpdate = dataPart->copy(GetSampleDataForFullUpdateSize(dataPart->size(), type));
-		auto dataSampleStatistics = CudaArrayStatistics().GenerateStatistics(dataSampleForFullUpdate, type);
+		LOG4CPLUS_DEBUG(_logger, "START full statistics update");
+		auto dataSampleForFullUpdate = dataPart->copy(
+			GetSampleDataForFullUpdateSize(dataPart->size(), type));
 		auto possibleTrees = FullStatisticsUpdate(
-				dataSampleForFullUpdate,
-				EncodingType::none,
-				type,
-				dataSampleStatistics,
-				0);
-//		printf("Full statistics update DONE\n");
+			dataSampleForFullUpdate, EncodingType::none, type, 0);
+		LOG4CPLUS_DEBUG(_logger, "END full statistics update");
+
 		for(auto& tree : possibleTrees)
 		{
 			tree.first.Fix();
@@ -170,13 +175,14 @@ SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataP
 			possibleTrees.end(),
 			[&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 
-
 		_optimalTree = OptimalTree::make_shared((*bestTree).first);
+		LOG4CPLUS_INFO(_logger, "Optimal tree: \n" << _optimalTree->GetTree().ToString());
 	}
 
 	auto compressedData = _optimalTree->GetTree().Compress(dataPart);
 	bool treeCorrected = _optimalTree->TryCorrectTree();
-//	printf("Tree corrected = %s\n", treeCorrected ? "true" : "false");
+
+	LOG4CPLUS_TRACE_FMT(_logger, "Tree corrected = %s\n", treeCorrected ? "true" : "false");
 	_partsProcessed++;
 	_totalBytesProcessed += dataPart->size();
 	return compressedData;

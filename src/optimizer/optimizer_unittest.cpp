@@ -129,8 +129,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_RandomInt_Compre
 
 	auto randomInt = GetIntRandomData();
 	auto data = CastSharedCudaPtr<int, char>(randomInt);
-	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
-	auto results = optimizer.FullStatisticsUpdate(data, EncodingType::none, DataType::d_int, stats, 0);
+	auto results = optimizer.FullStatisticsUpdate(data, EncodingType::none, DataType::d_int, 0);
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 	results[0].first.Fix();
 	auto compressed = results[0].first.Compress(data);
@@ -146,8 +145,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_FullStatisticsUpdate_Statistics)
 
 	auto randomInt = GetIntRandomData();
 	auto data = CastSharedCudaPtr<int, char>(randomInt);
-	auto stats = CudaArrayStatistics().GenerateStatistics(data, DataType::d_int);
-	auto results = optimizer.FullStatisticsUpdate(data, EncodingType::none, DataType::d_int, stats, 0);
+	auto results = optimizer.FullStatisticsUpdate(data, EncodingType::none, DataType::d_int, 0);
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 
 	auto comprStats = CompressionStatistics::make_shared(5);

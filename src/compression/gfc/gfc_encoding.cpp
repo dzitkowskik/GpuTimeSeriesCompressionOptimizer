@@ -80,7 +80,8 @@ SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 	auto result = CompressFloat(data, blocks, warpsperblock);
 
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
-	LOG4CPLUS_INFO(_logger, "GFC (FLOAT) enoding END");
+	size_t encodedSize = result[0]->size()+result[1]->size()+result[2]->size();
+	LOG4CPLUS_INFO_FMT(_logger, "GFC (FLOAT) enoding (encoded to size %lu) END", encodedSize);
 
 	return result;
 }

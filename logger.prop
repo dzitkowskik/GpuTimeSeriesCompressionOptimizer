@@ -11,23 +11,26 @@ log4cplus.additivity.CompressionTask=false
 log4cplus.logger.DecompressionTask=ALL, STDOUT
 log4cplus.additivity.DecompressionTask=false
 
+log4cplus.logger.CompressionOptimizer=INFO, STDOUT
+log4cplus.additivity.CompressionOptimizer=false
+
 log4cplus.logger.ParallelTSCompressor=ALL, STDOUT
 log4cplus.additivity.ParallelTSCompressor=false
 
 log4cplus.logger.Encoding=OFF, STDOUT
 log4cplus.additivity.Encoding=false
 
-log4cplus.logger.Encoding.Afl=ALL
-log4cplus.logger.Encoding.Const=ALL
-log4cplus.logger.Encoding.Delta=ALL
-log4cplus.logger.Encoding.Dict=ALL
-log4cplus.logger.Encoding.Float=ALL
-log4cplus.logger.Encoding.Gfc=ALL
-log4cplus.logger.Encoding.None=ALL
-log4cplus.logger.Encoding.Patch=ALL
-log4cplus.logger.Encoding.Rle=ALL
-log4cplus.logger.Encoding.Scale=ALL
-log4cplus.logger.Encoding.Unique=ALL
+log4cplus.logger.Encoding.Afl=OFF
+log4cplus.logger.Encoding.Const=OFF
+log4cplus.logger.Encoding.Delta=OFF
+log4cplus.logger.Encoding.Dict=OFF
+log4cplus.logger.Encoding.Float=OFF
+log4cplus.logger.Encoding.Gfc=OFF
+log4cplus.logger.Encoding.None=OFF
+log4cplus.logger.Encoding.Patch=OFF
+log4cplus.logger.Encoding.Rle=OFF
+log4cplus.logger.Encoding.Scale=OFF
+log4cplus.logger.Encoding.Unique=OFF
 
 log4cplus.appender.STDERR=log4cplus::ConsoleAppender
 log4cplus.appender.STDERR.logToStdErr=true

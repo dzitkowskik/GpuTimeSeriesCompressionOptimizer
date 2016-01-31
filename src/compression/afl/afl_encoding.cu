@@ -18,7 +18,10 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<T> data)
 	LOG4CPLUS_INFO_FMT(_logger, "AFL encoding START: data size = %lu", data->size());
 
 	if(data->size() <= 0)
-		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
+		return SharedCudaPtrVector<char>{
+					CudaPtr<char>::make_shared(),
+					CudaPtr<char>::make_shared()
+					};
 
 	// Get minimal bit count needed to encode data
 	char minBit = CudaArrayStatistics().MinBitCnt<T>(data);

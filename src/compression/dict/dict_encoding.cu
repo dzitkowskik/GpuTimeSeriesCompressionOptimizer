@@ -84,7 +84,7 @@ SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
 
 	LOG4CPLUS_TRACE_FMT(
 		_logger,
-		"DICT ENCODED output[0] size = %lu, output[1] size = %lu, output[2] size = %lu\n",
+		"DICT ENCODED output[0] size = %lu, output[1] size = %lu, output[2] size = %lu",
 	 	packedMostFrequentStencil->size(), mostFrequentCompressed->size(), otherData->size()
 	);
 

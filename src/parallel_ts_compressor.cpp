@@ -27,7 +27,7 @@ void ParallelTSCompressor::init(SharedTimeSeriesPtr ts)
 	_columnNumber = ts->getColumnsNumber();
 	for(int i = 0; i < _columnNumber; i++)
 		_optimizers.push_back(CompressionOptimizer::make_shared());
-	_taskScheduler = TaskScheduler::make_unique(_columnNumber);
+	_taskScheduler = TaskScheduler::make_unique(1);
 	_initialized = true;
 }
 

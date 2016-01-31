@@ -26,7 +26,7 @@ std::tuple<T,T> CudaArrayStatistics::MinMax(SharedCudaPtr<T> data)
 	T max = *(tuple.second);
 	return std::make_tuple(min, max);
 }
- 
+
 template<typename T>
 char CudaArrayStatistics::MinBitCnt(SharedCudaPtr<T> data)
 {
@@ -141,9 +141,9 @@ T CudaArrayStatistics::Mean(SharedCudaPtr<T> data)
 template<typename T>
 DataStatistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 {
-//	printf("Get statistics for data with size = %lu\n", data->size());
-	if(data->size() <= 0) return DataStatistics();
 	DataStatistics stats;
+	stats.size = data->size();
+	if(stats.size <= 0) return stats;
 	auto minMax = MinMax(data);
 	stats.min = std::get<0>(minMax);
 	stats.max = std::get<1>(minMax);
@@ -158,7 +158,6 @@ DataStatistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 // TODO: Make this a common template in header file and use everywhere
 DataStatistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data, DataType type)
 {
-//	printf("Generating statistics for data with size = %lu\n", data->size());
 	switch(type)
 	{
 		case DataType::d_char:

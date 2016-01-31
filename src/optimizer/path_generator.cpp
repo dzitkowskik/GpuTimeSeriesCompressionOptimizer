@@ -94,7 +94,8 @@ Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistic
 {
 	Path result;
 
-	if(et == EncodingType::afl || et == EncodingType::gfc) return result;
+	if(et == EncodingType::afl || et == EncodingType::gfc || stats.size <= 0)
+		return result;
 
 	if(level < MAX_LEVEL)
 	{

@@ -29,6 +29,7 @@ struct DataStatistics
 	bool sorted;
 	float rlMetric;
 	double mean;
+	size_t size;
 };
 
 class CudaArrayStatistics

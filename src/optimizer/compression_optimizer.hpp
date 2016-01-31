@@ -10,6 +10,7 @@
 
 #include "compression/encoding_type.hpp"
 #include "data_type.hpp"
+#include "core/logger.h"
 #include "util/statistics/cuda_array_statistics.hpp"
 #include "optimizer/optimal_tree.hpp"
 #include "optimizer/path_generator.hpp"
@@ -32,6 +33,8 @@ public:
 		: _partsProcessed(0), _totalBytesProcessed(0), _maxTreeHeight(5)
 	{
 		_statistics = CompressionStatistics::make_shared(_maxTreeHeight);
+		_logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CompressionOptimizer"));
+		LOG4CPLUS_TRACE(_logger, "Compression optimizer created");
 	}
 	~CompressionOptimizer(){}
 
@@ -63,7 +66,6 @@ private:
 			SharedCudaPtr<char> data,
 			EncodingType et,
 			DataType dt,
-			DataStatistics stats,
 			int level);
 
 public:
@@ -79,6 +81,7 @@ private:
 	size_t _partsProcessed;
 	size_t _totalBytesProcessed;
 	int _maxTreeHeight;
+	log4cplus::Logger _logger;
 
 private:
 	// BENCHMARKS
