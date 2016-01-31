@@ -11,6 +11,9 @@ gpuStore
 build/
 config.ini
 sample_data/nyse.*
+sample_data/generated.inf
+sample_data/generated.csv
+sample_data/infoWithErrors.inf
 
 ### OSX ###
 .DS_Store

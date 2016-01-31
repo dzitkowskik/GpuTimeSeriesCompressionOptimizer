@@ -14,7 +14,7 @@ log4cplus.additivity.DecompressionTask=false
 log4cplus.logger.ParallelTSCompressor=ALL, STDOUT
 log4cplus.additivity.ParallelTSCompressor=false
 
-log4cplus.logger.Encoding=ALL, STDOUT
+log4cplus.logger.Encoding=OFF, STDOUT
 log4cplus.additivity.Encoding=false
 
 log4cplus.logger.Encoding.Afl=ALL
