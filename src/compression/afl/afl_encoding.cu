@@ -14,6 +14,9 @@ namespace ddj
 template<typename T>
 SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<T> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO_FMT(_logger, "AFL encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
 
@@ -36,19 +39,13 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<T> data)
 	run_afl_compress_gpu<T, 1>(
 		minBit, data->get(), (T*)result->get(), data->size(), comprDataSize/sizeof(T));
 
-	cudaDeviceSynchronize();
-	cudaError_t err = cudaGetLastError();
-	if(err != cudaSuccess)
-	{
-		printf("cuda error\n");
-		printf("post-kernel err is %s.\n", cudaGetErrorString(err));
-	    exit(1);
-	}
-
 	metadata->fillFromHost(host_metadata, 4*sizeof(char));
 	CUDA_CALL( cudaFreeHost(host_metadata) );
 
 	cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO_FMT(_logger, "AFL enoding END");
+
 	return SharedCudaPtrVector<char> {metadata, result};
 }
 
@@ -78,20 +75,20 @@ SharedCudaPtr<T> DecodeAfl(T* data, size_t size, int minBit, int rest)
 	auto result = CudaPtr<T>::make_shared(length);
 	run_afl_decompress_gpu<T, 1>(minBit, data, result->get(), length);
 	cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
 
-	cudaError_t err = cudaGetLastError();
-	if(err != cudaSuccess)
-	{
-		printf("cuda error\n");
-		printf("post-kernel err is %s.\n", cudaGetErrorString(err));
-		exit(1);
-	}
 	return result;
 }
 
 template<typename T>
 SharedCudaPtr<T> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"AFL decoding START: input[0] size = %lu, input[1] size = %lu",
+		input[0]->size(), input[1]->size()
+	);
+
 	if(input[1]->size() <= 0)
 		return CudaPtr<T>::make_shared();
 
@@ -102,12 +99,19 @@ SharedCudaPtr<T> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 	int minBit = (*metadata)[0];
 	int rest = (*metadata)[1];
 
-	return DecodeAfl<T>((T*)data->get(), data->size(), minBit, rest);
+	// Perform decoding
+	auto result = DecodeAfl<T>((T*)data->get(), data->size(), minBit, rest);
+
+	LOG4CPLUS_INFO_FMT(_logger, "AFL decoding END");
+	return result;
 }
 
 template<>
 SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<float> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO_FMT(_logger, "AFL (FLOAT) encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
 
@@ -150,6 +154,9 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<float> data)
 		metadata = CudaArrayCopy().Concatenate(SharedCudaPtrVector<char>{metadata, stencil});
 	}
 
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO_FMT(_logger, "AFL (FLOAT) enoding END");
+
 	return SharedCudaPtrVector<char>{ metadata, CudaArrayCopy().Concatenate(resultVector) };
 }
 
@@ -172,6 +179,12 @@ __global__ void _composeFloatKernel(
 template<>
 SharedCudaPtr<float> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"AFL (FLOAT) decoding START: input[0] size = %lu, input[1] size = %lu",
+		input[0]->size(), input[1]->size()
+	);
+
 	if(input[1]->size() <= 0)
 		return CudaPtr<float>::make_shared();
 
@@ -195,7 +208,6 @@ SharedCudaPtr<float> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 
 	// decode mantissa
 	auto mantissaDecoded = DecodeAfl<int>((int*)(data->get()+offset), compressedMantissaSize, minBit, rest);
-
 	long int compressedExponentSize = data->size() - compressedMantissaSize - 8;
 	offset += compressedMantissaSize;
 
@@ -229,6 +241,8 @@ SharedCudaPtr<float> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 			size,
 			result->get());
 	cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO_FMT(_logger, "AFL decoding END");
 
 	return result;
 }

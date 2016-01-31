@@ -22,7 +22,7 @@ namespace ddj
 class FloatEncoding : public Encoding
 {
 public:
-	FloatEncoding(){}
+	FloatEncoding() : Encoding("Encoding.Float") {}
 	virtual ~FloatEncoding(){}
 	FloatEncoding(const FloatEncoding&) = default;
 

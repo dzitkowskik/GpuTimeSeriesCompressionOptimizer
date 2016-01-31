@@ -25,7 +25,7 @@ namespace ddj {
 class RleEncoding : public Encoding
 {
 public:
-	RleEncoding() : Encoding(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("RleEncoding"))) {}
+	RleEncoding() : Encoding("Encoding.Rle") {}
 	~RleEncoding(){}
 	RleEncoding(const RleEncoding&) = default;
 	RleEncoding(RleEncoding&&) = default;

@@ -22,7 +22,7 @@ namespace ddj
 class ConstEncoding : public Encoding
 {
 public:
-	ConstEncoding(){}
+	ConstEncoding() : Encoding("Encoding.Const") {}
 	virtual ~ConstEncoding(){}
 	ConstEncoding(const ConstEncoding&) = default;
 

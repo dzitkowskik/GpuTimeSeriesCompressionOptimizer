@@ -25,7 +25,7 @@ namespace ddj
 class NoneEncoding : public Encoding
 {
 public:
-	NoneEncoding(){}
+	NoneEncoding() : Encoding("Encoding.None") {}
 	~NoneEncoding(){}
 	NoneEncoding(const NoneEncoding&) = default;
 	NoneEncoding(NoneEncoding&&) = default;

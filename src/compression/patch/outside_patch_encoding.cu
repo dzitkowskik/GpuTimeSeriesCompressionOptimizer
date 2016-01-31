@@ -34,6 +34,9 @@ OutsideOperator<T> OutsidePatchEncoding::GetOperator()
 template<typename T>
 SharedCudaPtrVector<char> OutsidePatchEncoding::Encode(SharedCudaPtr<T> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO_FMT(_logger, "PATCH (OUTSIDE) encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{
 			CudaPtr<char>::make_shared(),
@@ -51,23 +54,37 @@ SharedCudaPtrVector<char> OutsidePatchEncoding::Encode(SharedCudaPtr<T> data)
     auto operatorTrue = MoveSharedCudaPtr<T, char>(std::get<0>(splittedData));
     auto operatorFalse = MoveSharedCudaPtr<T, char>(std::get<1>(splittedData));
 
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "PATCH (OUTSIDE) enoding END");
+
     return SharedCudaPtrVector<char> {stencilPacked, operatorTrue, operatorFalse};
 }
 
 template<typename T>
-SharedCudaPtr<T> OutsidePatchEncoding::Decode(SharedCudaPtrVector<char> data)
+SharedCudaPtr<T> OutsidePatchEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	if(data[1]->size() <= 0 && data[2]->size() <= 0)
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"PATCH (OUTSIDE) decoding START: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu",
+		input[0]->size(), input[1]->size(), input[2]->size()
+	);
+
+	if(input[1]->size() <= 0 && input[2]->size() <= 0)
 		return CudaPtr<T>::make_shared();
 
-	auto stencilMetadata = data[0];
-	auto operatorTrue = CastSharedCudaPtr<char, T>(data[1]);
-	auto operatorFalse = CastSharedCudaPtr<char, T>(data[2]);
+	auto stencilMetadata = input[0];
+	auto operatorTrue = CastSharedCudaPtr<char, T>(input[1]);
+	auto operatorFalse = CastSharedCudaPtr<char, T>(input[2]);
 
 	// Uncompress stencil
 	auto stencil = Stencil().unpack(stencilMetadata);
 
-	return this->_splitter.Merge(std::make_tuple(operatorTrue, operatorFalse), stencil);
+	auto result = this->_splitter.Merge(std::make_tuple(operatorTrue, operatorFalse), stencil);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "PATCH (OUTSIDE) decoding END");
+
+	return result;
 }
 
 #define OUTSIDE_PATCH_ENCODING_SPEC(X) \

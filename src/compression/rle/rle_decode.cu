@@ -60,7 +60,8 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
     thrust::device_ptr<T> resultPtr(result->get());
     thrust::gather(indices.begin(), indices.end(), valuesVector.begin(), resultPtr);
 
-    LOG4CPLUS_INFO_FMT(_logger, "RLE decoding END");
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "RLE decoding END");
 
     return result;
 }

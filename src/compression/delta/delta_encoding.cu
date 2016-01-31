@@ -29,6 +29,9 @@ __global__ void deltaEncodeKernel(T* data, int size, T* result)
 template<typename T>
 SharedCudaPtrVector<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO_FMT(_logger, "DELTA encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
 
@@ -46,6 +49,8 @@ SharedCudaPtrVector<char> DeltaEncoding::Encode(SharedCudaPtr<T> data)
 	CUDA_CALL( cudaMemcpy(result_metadata->get(), data->get(), sizeof(T), cudaMemcpyDeviceToDevice) );
 
 	cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "DELTA enoding END");
 
 	return SharedCudaPtrVector<char> {result_metadata, result_data};
 }
@@ -61,6 +66,12 @@ __global__ void addValueKernel(T* data, const int size, T* value)
 template<typename T>
 SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"DELTA decoding START: input[0] size = %lu, input[1] size = %lu",
+		input[0]->size(), input[1]->size()
+	);
+
 	if(input[0]->size() <= 0) return CudaPtr<T>::make_shared();
 
 	auto metadata = input[0];
@@ -82,6 +93,10 @@ SharedCudaPtr<T> DeltaEncoding::Decode(SharedCudaPtrVector<char> input)
 		size,
 		(T*)metadata->get()
 	);
+
+	cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "DELTA decoding END");
 
 	return result;
 }

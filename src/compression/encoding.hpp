@@ -19,7 +19,9 @@ class Encoding
 {
 public:
 	Encoding() : _logger(log4cplus::Logger::getRoot()) {}
-	Encoding(log4cplus::Logger logger) : _logger(logger) {}
+	Encoding(const char* loggerName)
+		: _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(loggerName))) 
+	{}
 	virtual ~Encoding(){}
 
 public:

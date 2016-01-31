@@ -26,10 +26,15 @@ namespace ddj {
 class DictEncoding : public Encoding
 {
 public:
-	DictEncoding() : _freqCnt(4) {}
+	DictEncoding()
+		: _freqCnt(4), Encoding("Encoding.Dict") {}
 	~DictEncoding() {}
-	DictEncoding(const DictEncoding& other) : _freqCnt(other._freqCnt) {};
-	DictEncoding(DictEncoding&& other) : _freqCnt(std::move(other._freqCnt)) {};
+	DictEncoding(const DictEncoding& other)
+		: _freqCnt(other._freqCnt), Encoding("DictEncoding")
+	{};
+	DictEncoding(DictEncoding&& other)
+		: _freqCnt(std::move(other._freqCnt)), Encoding("DictEncoding")
+	{};
 
 public:
 	void SetFreqCnt(int freqCnt) { _freqCnt = freqCnt; }

@@ -21,8 +21,8 @@ namespace ddj {
 class ScaleEncoding : public Encoding
 {
 public:
-	ScaleEncoding(){}
-	~ScaleEncoding(){}
+	ScaleEncoding() : Encoding("Encoding.Scale") {}
+	~ScaleEncoding() {}
 	ScaleEncoding(const ScaleEncoding&) = default;
 
 public:

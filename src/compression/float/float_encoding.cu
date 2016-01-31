@@ -15,10 +15,16 @@ namespace ddj
 	template<typename T>
 	SharedCudaPtrVector<char> FloatEncoding::Encode(SharedCudaPtr<T> data)
 	{
-		if(data->size() <= 0)
-			return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
-		int precision = CudaArrayStatistics().Precision(data);
+		CUDA_ASSERT_RETURN( cudaGetLastError() );
+	    LOG4CPLUS_INFO_FMT(_logger, "FLOAT encoding START: data size = %lu", data->size());
 
+		if(data->size() <= 0)
+			return SharedCudaPtrVector<char>{
+						CudaPtr<char>::make_shared(),
+						CudaPtr<char>::make_shared()
+						};
+
+		int precision = CudaArrayStatistics().Precision(data);
 		SharedCudaPtr<int> resultData;
 		FloatingPointToIntegerOperator<T, int> op { precision };
 
@@ -30,12 +36,21 @@ namespace ddj
 		auto resultMetadata = CudaPtr<char>::make_shared(sizeof(int));
 		resultMetadata->fillFromHost((char*)&precision, sizeof(int));
 
+		CUDA_ASSERT_RETURN( cudaGetLastError() );
+	    LOG4CPLUS_INFO(_logger, "FLOAT enoding END");
+
 		return SharedCudaPtrVector<char> { resultMetadata, MoveSharedCudaPtr<int, char>(resultData) };
 	}
 
 	template<typename T>
 	SharedCudaPtr<T> FloatEncoding::Decode(SharedCudaPtrVector<char> input)
 	{
+		LOG4CPLUS_INFO_FMT(
+			_logger,
+			"FLOAT decoding START: input[0] size = %lu, input[1] size = %lu",
+			input[0]->size(), input[1]->size()
+		);
+
 		if(input[1]->size() <= 0)
 			return CudaPtr<T>::make_shared();
 
@@ -51,6 +66,10 @@ namespace ddj
 			result = CudaArrayTransform().Transform<int, T>(data, op);
 		else
 			result = CastSharedCudaPtr<int, T>(data->copy());
+
+		CUDA_ASSERT_RETURN( cudaGetLastError() );
+	    LOG4CPLUS_INFO(_logger, "FLOAT decoding END");
+
 		return result;
 	}
 

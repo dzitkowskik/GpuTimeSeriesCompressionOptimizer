@@ -19,7 +19,7 @@ namespace ddj
 class GfcEncoding : public Encoding
 {
 public:
-	GfcEncoding() {}
+	GfcEncoding() : Encoding("Encoding.Gfc") {}
 	~GfcEncoding() {}
 	GfcEncoding(const GfcEncoding&) = default;
 	GfcEncoding(GfcEncoding&&) = default;

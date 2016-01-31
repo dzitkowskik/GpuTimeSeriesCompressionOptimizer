@@ -133,10 +133,11 @@ SharedCudaPtr<char> UniqueEncoding::CompressUnique(SharedCudaPtr<T> data, Shared
 template<typename T>
 SharedCudaPtrVector<char> UniqueEncoding::Encode(SharedCudaPtr<T> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO_FMT(_logger, "UNIQUE encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
-
-	//	HelperPrint::PrintSharedCudaPtr(data, "After Delta");
 
     auto unique = FindUnique(data);
 
@@ -172,6 +173,10 @@ SharedCudaPtrVector<char> UniqueEncoding::Encode(SharedCudaPtr<T> data)
         unique->get(),
         unique->size()*sizeof(T),
         CPY_DTD) );
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "UNIQUE enoding END");
+
     return SharedCudaPtrVector<char> {resultMetadata, resultData};
 }
 
@@ -256,6 +261,12 @@ SharedCudaPtr<T> UniqueEncoding::DecompressUnique(SharedCudaPtr<char> data)
 template<typename T>
 SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"UNIQUE decoding START: input[0] size = %lu, input[1] size = %lu",
+		input[0]->size(), input[1]->size()
+	);
+
 	if(input[1]->size() <= 0)
 		return CudaPtr<T>::make_shared();
 
@@ -284,10 +295,10 @@ SharedCudaPtr<T> UniqueEncoding::Decode(SharedCudaPtrVector<char> input)
         result->size(),
         bitsNeeded,
         dataPerUnitCnt);
-
     cudaDeviceSynchronize();
 
-//    HelperPrint::PrintSharedCudaPtr(result, "decoded by unique");
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "UNIQUE decoding END");
 
     return result;
 }

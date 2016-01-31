@@ -15,6 +15,9 @@ namespace ddj
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<double> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO_FMT(_logger, "GFC (DOUBLE) encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{
 					CudaPtr<char>::make_shared(),
@@ -22,28 +25,46 @@ SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<double> data)
 					CudaPtr<char>::make_shared()
 					};
 
-
 	unsigned long long size = data->size();
 	int warpsperblock = 16;
 	int subchunkCnt = 64;
 	unsigned long long blocksize = warpsperblock * subchunkCnt * WARPSIZE;
 	int blocks = (size + blocksize - 1) / blocksize;
-	return CompressDouble(data, blocks, warpsperblock);
+	auto result = CompressDouble(data, blocks, warpsperblock);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "GFC (DOUBLE) enoding END");
+
+	return result;
 }
 
 template<>
 SharedCudaPtr<double> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"GFC (DOUBLE) decoding START: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu",
+		input[0]->size(), input[1]->size(), input[2]->size()
+	);
+
 	if(input[2]->size() <= 0)
 		return CudaPtr<double>::make_shared();
 
-	return DecompressDouble(input);
+	auto result = DecompressDouble(input);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "GFC (DOUBLE) decoding END");
+
+	return result;
 }
 
 // FLOAT
 template<>
 SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO_FMT(_logger, "GFC (FLOAT) encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{
 					CudaPtr<char>::make_shared(),
@@ -56,16 +77,32 @@ SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<float> data)
 	int subchunkCnt = 32;
 	unsigned long long blocksize = warpsperblock * subchunkCnt * WARPSIZE;
 	int blocks = (size + blocksize - 1) / blocksize;
-	return CompressFloat(data, blocks, warpsperblock);
+	auto result = CompressFloat(data, blocks, warpsperblock);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "GFC (FLOAT) enoding END");
+
+	return result;
 }
 
 template<>
 SharedCudaPtr<float> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"GFC (FLOAT) decoding START: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu",
+		input[0]->size(), input[1]->size(), input[2]->size()
+	);
+
 	if(input[2]->size() <= 0)
 		return CudaPtr<float>::make_shared();
 
-	return DecompressFloat(input);
+	auto result = DecompressFloat(input);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "GFC (FLOAT) decoding END");
+
+	return result;
 }
 
 // INT

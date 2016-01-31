@@ -32,6 +32,7 @@ ConfigOptions GetProgramOptions()
 			("input-file,i", po::value<string>(), "input file")
 			("output-file,o", po::value<string>(), "output file")
 			("generate,g", po::value<int>()->default_value(DEFAULT_GENERATE_SIZE), "generate sample data")
+			("padding,p", po::value<int>(), "binary data padding")
 			;
 	options.ConsoleOptions.add(consoleOptions);
 
@@ -75,8 +76,12 @@ int main(int argc, char* argv[])
 	printf("Output file: %s\n", outputFile.GetPath().c_str());
 	printf("Header file: %s\n", headerFile.GetPath().c_str());
 
+	// get padding if available
+	int padding = 0;
+	if(conf->HasValue("padding")) padding = conf->GetValue<int>("padding");
+
 	auto fileDefinition = TimeSeriesReader::ReadFileDefinition(headerFile);
-	auto reader = TimeSeriesReaderBinary::make_shared(BinaryFileDefinition(fileDefinition));
+	auto reader = TimeSeriesReaderBinary::make_shared(BinaryFileDefinition(fileDefinition), padding);
 
 	ParallelTSCompressor compressor(reader);
 	if(conf->HasValue("compress")) // Compress

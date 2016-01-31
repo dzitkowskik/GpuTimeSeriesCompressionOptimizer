@@ -66,7 +66,8 @@ SharedCudaPtr<int> DictEncoding::GetMostFrequentStencil(
 template<typename T>
 SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
 {
-//	printf("DICT ENCODING data size = %lu\n", data->size());
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO_FMT(_logger, "DICT encoding START: data size = %lu", data->size());
 
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{
@@ -81,8 +82,14 @@ SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
     auto mostFrequentCompressed = UniqueEncoding().CompressUnique(std::get<0>(splittedData), mostFrequent);
     auto otherData = MoveSharedCudaPtr<T, char>(std::get<1>(splittedData));
 
-//    printf("DICT ENCODED output[0] size = %lu, output[1] size = %lu, output[2] size = %lu\n",
-//	 	packedMostFrequentStencil->size(), mostFrequentCompressed->size(), otherData->size());
+	LOG4CPLUS_TRACE_FMT(
+		_logger,
+		"DICT ENCODED output[0] size = %lu, output[1] size = %lu, output[2] size = %lu\n",
+	 	packedMostFrequentStencil->size(), mostFrequentCompressed->size(), otherData->size()
+	);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "DICT enoding END");
 
     return SharedCudaPtrVector<char> {packedMostFrequentStencil, mostFrequentCompressed, otherData};
 }
@@ -96,8 +103,11 @@ SharedCudaPtrVector<char> DictEncoding::Encode(SharedCudaPtr<T> data)
 template<typename T>
 SharedCudaPtr<T> DictEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	// printf("DICT DECODE input[0] size = %lu, input[1] size = %lu, input[2] size = %lu\n",
-	// 	input[0]->size(), input[1]->size(), input[2]->size());
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"DICT decoding START: input[0] size = %lu, input[1] size = %lu, input[2] size = %lu",
+		input[0]->size(), input[1]->size(), input[2]->size()
+	);
 
 	if(input[1]->size() <= 0 && input[2]->size() <= 0)
 		return CudaPtr<T>::make_shared();
@@ -111,7 +121,12 @@ SharedCudaPtr<T> DictEncoding::Decode(SharedCudaPtrVector<char> input)
 	auto mostFrequent = UniqueEncoding().DecompressUnique<T>(mostFrequentCompressed);
 
 	// MERGE DATA
-	return this->_splitter.Merge<T>(std::make_tuple(mostFrequent, other), *stencil);
+	auto result = this->_splitter.Merge<T>(std::make_tuple(mostFrequent, other), *stencil);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "DICT decoding END");
+
+	return result;
 }
 
 size_t DictEncoding::GetCompressedSize(SharedCudaPtr<char> data, DataType type)

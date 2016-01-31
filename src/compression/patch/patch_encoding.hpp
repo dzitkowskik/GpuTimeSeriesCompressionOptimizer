@@ -24,7 +24,7 @@ namespace ddj {
 class PatchEncoding : public Encoding
 {
 public:
-	PatchEncoding(PatchType type) : _type(type)	{}
+	PatchEncoding(PatchType type) : _type(type), Encoding("Encoding.Patch") {}
 	virtual ~PatchEncoding(){}
 	PatchEncoding(const PatchEncoding& other) : _type(other._type) {}
 	PatchEncoding(PatchEncoding&& other) : _type(std::move(other._type)) {}

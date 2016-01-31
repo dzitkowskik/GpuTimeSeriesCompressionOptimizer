@@ -18,7 +18,7 @@ namespace ddj
 class AflEncoding : public Encoding
 {
 public:
-	AflEncoding(){}
+	AflEncoding() : Encoding("Encoding.Afl") {}
 	~AflEncoding(){}
 	AflEncoding(const AflEncoding&) = default;
 	AflEncoding(AflEncoding&&) = default;

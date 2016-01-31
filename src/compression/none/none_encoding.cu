@@ -13,6 +13,8 @@ namespace ddj {
 template<typename T>
 SharedCudaPtrVector<char> NoneEncoding::Encode(SharedCudaPtr<T> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO_FMT(_logger, "NONE encoding START: data size = %lu", data->size());
 
 	// ALLOCATE RESULTS
 	auto resultData = MoveSharedCudaPtr<T, char>(data->copy());
@@ -21,16 +23,29 @@ SharedCudaPtrVector<char> NoneEncoding::Encode(SharedCudaPtr<T> data)
 	size_t dataSize = resultData->size();
 	resultMetadata->fillFromHost((char*)&dataSize, sizeof(size_t));
 
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "NONE enoding END");
+
 	return SharedCudaPtrVector<char> {resultMetadata, resultData};
 }
 
 template<typename T>
 SharedCudaPtr<T> NoneEncoding::Decode(SharedCudaPtrVector<char> input)
 {
-	// printf("Decode using NoneEncoding - metadata size = %lu, data size = %lu\n", input[0]->size(),input[1]->size());
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"NONE decoding START: input[0] size = %lu, input[1] size = %lu",
+		input[0]->size(), input[1]->size()
+	);
+
 	auto data = input[1];
 	auto resultData = data->copy();
-	return MoveSharedCudaPtr<char, T>(resultData);
+	auto result = MoveSharedCudaPtr<char, T>(resultData);
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "RLE decoding END");
+
+	return result;
 }
 
 #define NONE_ENCODING_SPEC(X) \

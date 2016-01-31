@@ -25,7 +25,7 @@ namespace ddj {
 class DeltaEncoding : public Encoding
 {
 public:
-	DeltaEncoding(){}
+	DeltaEncoding() : Encoding("Encoding.Delta") {}
 	~DeltaEncoding(){}
 	DeltaEncoding(const DeltaEncoding&) = default;
 	DeltaEncoding(DeltaEncoding&&) = default;

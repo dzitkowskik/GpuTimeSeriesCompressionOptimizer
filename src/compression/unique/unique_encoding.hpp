@@ -25,8 +25,8 @@ namespace ddj {
 class UniqueEncoding : public Encoding
 {
 public:
-	UniqueEncoding(){}
-	~UniqueEncoding(){}
+	UniqueEncoding() : Encoding("Encoding.Unique") {}
+	~UniqueEncoding() {}
 	UniqueEncoding(const UniqueEncoding&) = default;
 	UniqueEncoding(UniqueEncoding&&) = default;
 

@@ -50,8 +50,8 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
     resultLengths->fillFromHost(lengths.data().get(), len);
     resultValues->fillFromHost(output.data().get(), len);
 
-    LOG4CPLUS_INFO_FMT(_logger, "RLE enoding END");
     CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO(_logger, "RLE enoding END");
 
     return SharedCudaPtrVector<char> {
     	metadata,

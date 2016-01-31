@@ -28,6 +28,9 @@ __global__ void scaleEncodeKernel(T* data, int size, T* result_data, T min, T* r
 template<typename T>
 SharedCudaPtrVector<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
 {
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+    LOG4CPLUS_INFO_FMT(_logger, "SCALE encoding START: data size = %lu", data->size());
+
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{ CudaPtr<char>::make_shared(), CudaPtr<char>::make_shared() };
 
@@ -50,8 +53,10 @@ SharedCudaPtrVector<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
 			(T*)result_data->get(),
 			min,
 			(T*)result_metadata->get());
-
 	cudaDeviceSynchronize();
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "SCALE enoding END");
 
 	return SharedCudaPtrVector<char> {result_metadata, result_data};
 }
@@ -67,6 +72,12 @@ __global__ void scaleDecodeKernel(T* data, int size, T* result, T* min)
 template<typename T>
 SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtrVector<char> input)
 {
+	LOG4CPLUS_INFO_FMT(
+		_logger,
+		"SCALE decoding START: input[0] size = %lu, input[1] size = %lu",
+		input[0]->size(), input[1]->size()
+	);
+
 	if(input[1]->size() <= 0)
 		return CudaPtr<T>::make_shared();
 
@@ -82,8 +93,10 @@ SharedCudaPtr<T> ScaleEncoding::Decode(SharedCudaPtrVector<char> input)
 			size,
 			result->get(),
 			(T*)metadata->get());
-
 	cudaDeviceSynchronize();
+
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_INFO(_logger, "SCALE decoding END");
 
 	return result;
 }
