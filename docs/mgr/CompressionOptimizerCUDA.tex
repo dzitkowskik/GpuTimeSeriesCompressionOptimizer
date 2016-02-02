@@ -31,12 +31,9 @@ bindingoffset=10mm, top=25mm, bottom=25mm}
 \newcommand*{\abs}[1]{\left\vert{#1}\right\vert}
 \newcommand*{\om}{\omega}
 
-\author{Autor}
-\title{Tytu³ pracy}
-
+\author{Karol Dzitkowski}
+\title{Optymalizator kompresji szeregów czasowych na GPU}
 \begin{document}
-
-% Za¿ó³æ gêœl¹ jaŸñ.
 \begin{titlepage}
 \pagestyle{empty}
 
@@ -52,12 +49,12 @@ bindingoffset=10mm, top=25mm, bottom=25mm}
 \end{table}
 
 % \vfill
-\begin{center}PRACA DYPLOMOWA MAGISTERSKA/LICENCJACKA\end{center}
-\begin{center}MATEMATYKA\end{center}\end{Large}
+\begin{center}PRACA DYPLOMOWA MAGISTERSKA\end{center}
+\begin{center}INFORMATYKA\end{center}\end{Large}
 % \vfill
 \begin{center}
 \Huge
-\textbf{Tytu³ pracy}
+\textbf{Optymalizator kompresji szeregów czasowych na GPU}
 \end{center}
 % \vfill\vfill
 \vfill
@@ -65,17 +62,17 @@ bindingoffset=10mm, top=25mm, bottom=25mm}
 \Large
 Autor:\\
 \LARGE
-Anna Zdolna
+Karol Dzitkowski
 \end{center}
 \vfill
 \begin{center}
 \Large
-Promotor: prof. dr hab. Jan Wybitny
+Promotor: dr in¿. Krzysztof Kaczmarski
 \end{center}
 \vfill
 \begin{center}
 \large
-Warszawa, miesi¹c rok
+Warszawa, luty 2016
 \end{center}
 \newpage
 \hfill
@@ -97,52 +94,78 @@ podpis promotora & \hspace*{100pt} & podpis autora
 \hyphenation{Syl-ves-tra}
 \hyphenation{Syl-ves-ter-a}
 
+\renewcommand{\abstractname}{Abstrakt}
+
 \begin{abstract}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+Wiele urz¹dzeñ takich jak czujniki, stacje pomiarowe, czy nawet serwery, produkuj¹ ogromne iloœci danych w postaci szeregów czasowych, które nastêpnie s¹ przetwarzane i sk³adowane do póŸniejszej analizy. Ogromn¹ rolê w tym procesie stanowi przetwarzanie danych na kartach graficznych w celu przyspieszenia obliczeñ. Aby wydajnie korzystaæ z GPGPU przedstawiono szereg rozwi¹zañ, korzystaj¹cych z kart graficznych jako koprocesory w bazach danych lub nawet bazy danych po stronie GPU. We wszystkich rozwi¹zaniach bardzo istotn¹ rolê stanowi kompresja danych. Szeregi czasowe s¹ bardzo szczególnym rodzajem danych, dla których kluczowy jest dobór odpowiedniej kompresji wedle charakterystyki danych szeregu. W tej pracy przedstawiê nowe podejœcie do kompresji szeregów czasowych po stronie GPU, przy u¿yciu planera buduj¹cego na bie¿¹co drzewa kompresji na podstawie statystyk nap³ywaj¹cych danych. Przedstawione rozwi¹zanie kompresuje dane za pomoc¹ lekkich i bezstratnych kompresji w technologii CUDA.
+\end{abstract}
+
+\renewcommand{\abstractname}{Abstract}
+
+\begin{abstract}
+Many devices such as sensors, measuring stations or even servers produce enormous amounts of data in the form of time series, which are then processed and stored for later analysis. A huge role in this process takes data processing on graphics cards in order to accelerate calculations. To efficiently use the GPGPU a number of solutions has been presented, that use the GPU as a coprocessor in a databases. There were also attempts to create a GPU-side databases. It has been known that data compression plays here the crucial role. Time series are special kind of data, for which choosing the right compression according to the characteristics of the data series is essencial. In this paper I present a new approach to compression of time series on the side of the GPU, using a planner to keep building the compression tree based on statistics of incoming data. The solution compresses data using lightweight and lossless compression in CUDA technology.
 \end{abstract}
 
 %-----------Pocz¹tek czêœci zasadniczej-----------
 
 \chapter{Wstêp}
-\section{Czêœæ}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+Poni¿sza praca zawiera opis implementacji optymalizatora kompresji szeregów czasowych, bazuj¹cego na dynamicznie generowanych statystykach danych. Pomys³ opiera siê na tworzeniu drzew kompresji (kompresja kaskadowa) oraz zbieraniu statystyk o krawêdziach takich drzew - jak dobrze dana para kompresji sprawdza siê dla nap³ywaj¹cych danych. System bêdzie równie¿ dynamicznie zmienia³ - korygowa³, takie drzewa w zale¿noœci od charakterystyki kolejnych paczek danych.
+W za³o¿eniu system ma umo¿liwiæ kompresjê du¿ych iloœci danych przy wykorzystaniu potencja³u obliczeniowego wspó³czesnych kart graficznych. 
 
-\subsection{Podczêœæ}
-\begin{definition}[Definicja czegokolwiek]
-  Cokolwiek jest czymkolwiek.
-\end{definition}
+\section{Procesory graficzne}
+Procesory graficzne sta³y siê znacz¹cymi i potê¿nymi koprocesorami obliczeñ dla wielu aplikacji i systemów, takich jak bazy danych, badania naukowe czy wyszukiwarki www. Nowoczesne GPU posiadaj¹ moc obliczeniow¹ o rz¹d wiêksz¹ ni¿ zwykle, wielordzeniowe procesory CPU, takie jak AMD FX 8XXX czy Intel Core i7. Dla przyk³adu flagowa konstrukcja firmy NVIDIA - GeForce GTX Titan X osi¹ga moc 6600 GFLOPS (miliardów operacji zmiennoprzecinkowych na sekundê), przy $336 GB/s$ przepustowoœci pamiêci, podczas gdy najszybsze procesory takie jak Intel Core i7-5960x osi¹gaj¹ nieca³e 180 GFLOPS, przy przepustowoœci $68 GB/s$. Kartom graficznym dorównuj¹ tylko inne jednostki typu SIMD, na przyk³¹d karty obliczeniowe Xeon Phi. Pomimo tak osza³amiaj¹cych wyników, programowanie na jednostkach SIMD jest o wiele trudniejsze,   
+jak równie¿ ograniczone przepustowoœci¹ szyny PCI-E, która wynosi w porywach $8 GB/s$, co dodatkowo przemawia za u¿yciem kompresji przy przetwarzaniu szeregów czasowych, choæby w celu przyspieszenia kopiowania danych z i na kartê graficzn¹ w celu wykonania obliczeñ.
 
-\begin{remark}
-  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-\end{remark}
+\section{Szeregi czasowe}
+Terabajty danych w postaci szeregów czasowych s¹ przetwarzane i analizowane ka¿dego dnia na ca³ym œwiecie. Zapytania i agregacje na tak wielkich porcjach danych jest czasoch³onne i wymaga du¿ej iloœci zasobów. Aby zmierzyæ siê z tym problemem, powsta³y wyspecjalizowane bazy danych, wspieraj¹ce analizê szeregów czasowych. Wa¿nym czynnikiem w tych rozwi¹zaniach jest kompresja oraz u¿ycie procesorów graficznych w celu przyspieszenia obliczeñ. Aby przetwarzaæ dane na GPU bez koniecznoœci ich ci¹g³ego kopiowania poprzez szynê PCI-E, powstaj¹ bazy danych po stronie GPU (najczêœciej rozproszone), takie jak MapD lub DDJ (zaproponowana miêdzy innymi przeze mnie w poprzedniej pracy - in¿ynierskiej).
+Innymi rozwi¹zaniami s¹ koprocesory obliczeniowe GPU, wspomagaj¹ce dzia³anie baz takich jak Cassandra, HBase, TepoDB, OpenTSDB czy PostgreSQL. Charakterystyka danych wielu szeregów wskazuje, ¿e przy odpowiedniej obróbce mog¹ byæ kompresowane z bardzo du¿ym wspó³czynnikiem, szczególnie jeœli by³oby mo¿liwe kompresowanie za pomoc¹ dynamicznie zmieniaj¹cych siê ci¹gów (ró¿nych) algorytmów kompresji i transformacji danych. Dla przyk³adu, jeœli jakiœ fragment szeregu jest sta³y, z nielicznymi wyj¹tkami, warto by³oby usun¹æ wyj¹tki, a resztê skompresowaæ jako jedn¹ liczbê - uzyskuj¹c wspó³czynnik kompresji rzêdu d³ugoœci danych.   
 
-\begin{theorem}[Pietii Gorasa]
-	$a^2+b^2=c^2$
-\end{theorem}
+\section{SIMD i lekka kompresja}
+Bazy danych przechowuj¹ce szeregi czasowe s¹ najczêœciej zorientowane kolumnowo oraz stosuj¹ metody lekkiej kompresji w celu oszczêdnoœci pamiêci. W tych przypadkach stosuje siê metody lekkiej kompresji, takie jak kodowanie s³ownikowe, delta lub sta³ej liczby bitów, zamiast bardziej skomplikowanych i wolniejszych metod, które czêsto zapewni³yby lepszy poziom kompresji. Systemy te ³aduj¹ swoje dane do pamiêci trwa³ej paczkami, które mog¹ byæ kompresowane osobo i byæ mo¿e przy u¿yciu ró¿nych algorytmów, zmieniaj¹cych siê dynamicznie w czasie. Takie kolumny wartoœci numerycznych tego samego typu wspaniale przetwarza siê przy u¿yciu procesorów typu SIMD, co daje wielokrotne przyspieszenie w stosunku do tradycyjnych architektur. Okazuje siê ¿e wiêkszoœæ algorytmów lekkiej kompresji mo¿e z du¿ym powodzeniem byæ w ten sposób zrównoleglona. Równie¿ dynamiczne generowanie statystyk nap³ywaj¹cych danych mo¿e byæ przyspieszone z u¿yciem SIMD, co otwiera mo¿liwoœæ implementacji wydajnych systemów, dynamicznie optymalizuj¹cych u¿yte kompresje w celu zwiêkszenia wspó³czynnika kompresji danych. Dodatkowo u¿ycie kaskadowej kompresji mo¿e wielokrotnie wzmocniæ poziom kompresji, pod warunkiem stworzenia dobrego planu kompresji, w³aœnie na podstawie wygenerowanych statystyk. Ogromna moc obliczeniowa procesorów graficznych mo¿e pozwoliæ wygenerowaæ taki plan w rozs¹dnym czasie. Takie u¿ycie jest mo¿liwe np. w bazach danych po stronie GPU, gdzie jest to niezmiernie wa¿ne z powodu œcis³ego limitu pamiêci na kartach i ich wysokiego kosztu.
 
-\begin{proof}
-  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-\end{proof}
+\section{Zawartoœæ pracy}
+W tej pracy przedstawiê planer kompresji (optymalizator) kompresuj¹cy nap³ywaj¹ce paczki danych. Zaprezentujê nowe podejœcie, planera buduj¹cego drzewa kompresji i ucz¹cego siê ich konstrukcji na podstawie na bie¿¹co generowanych statystyk wêz³ów takich drzew (jak równie¿ statystyk nap³ywaj¹cych danych). Przedstawiê równie¿ zaimplementowane œrodowisko oraz u¿yte algorytmy lekkiej kompresji. W ramach tej pracy stworzone zosta³y 4 biblioteki, wykorzystuj¹ce technologiê NVIDIA CUDA, tworz¹ce framework optymalizatora kompresji oraz program w sposób równoleg³y kompresuj¹cy kolumny podanego szeregu czasowego.
+Rozdzia³ 2 zawiera opis wczeœniejszych prac prowadzonych w tych tematach, a tak¿e krótki opis architektury CUDA. W rozdziale 3 omówiê stworzony framework oraz metody lekkiej kompresji, ze szczególnym uwzglêdnieniem kompresji FL oraz GFC. Rozdzia³ 4 jest w ca³oœci poœwiêcony optymalizatorowi kompresji oraz generowaniu drzew i statystyk. Nastêpnie przedstawiê wyniki prac i eksperymentów. Ostatni rozdzia³ (szósty) to podsumowanie oraz zakres przysz³ych prac i optymalizacji.
 
-\begin{lemma}[Dy]
-	Dy-lemat
-\end{lemma}
+\chapter{Wczeœniejsze prace}
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+\section{CUDA}
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+	\begin{figure}[h!]
+		\centering
+		\hspace*{-0.5cm}\includegraphics[scale=0.55]{img/CUDA_arch}
+		\caption{Architektura NVIDIA CUDA}
+		\label{ref:cuda_arch}
+	\end{figure}
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+Jedn¹ z wielu zalet architektury kart graficznych jest to, ¿e sk³adaj¹ siê z kilku multiprocesorów (SMs - Streaming Multiprocessors) architektury SIMD. Jest to w³aœciwie architektura typu SIMT, gdzie multiprocesor wykonuje w¹tki w grupach o licznoœci 32 zwanymi \emph{warps}. Architektura ta jest zbli¿ona do SIMD z t¹ ró¿nic¹, ¿e to nie organizacja wektora danych kontroluje jednostki obliczeniowe, a organizacja instrukcji pojedyñczego w¹tku. Umo¿liwia on zatem pisanie równolegle wykonywanego kodu dla niezale¿nych i skalowalnych w¹tków, jak i dla w¹tkuch koordynowanych danymi.
+Wszystkie w¹tki wykonuj¹ ten sam kod funkcji kernela. Ponadto CUDA tworzy abstrakcjê bloków w¹tków, które zorganizowane s¹ w siatkê (GRID) i wspó³dziel¹ zasoby multiprocesora. Wa¿na jest równie¿ hierarchia pamiêci, w której czêœæ przydzielana jest w¹tkom w postaci pamiêci lokalnej i rejestrów, oraz pamiêci wspó³dzielonej przez w¹tki z tego samego bloku (Shared Memory) - te pamiêci musz¹ byæ znane w trakcie kompilacji kernela. Najwolniejsza jest pamiêæ globalna (Device Memory), wspólna dla wszystkich w¹tków, wszystkich bloków, na wszystkich multiprocesorach. Dok³adny opis tej architektury mo¿na znaleŸæ bezpoœrednio na stronie producenta.
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumyeirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diamvoluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+	\begin{figure}[h!]
+		\centering
+		\hspace*{-0.5cm}\includegraphics[scale=0.55]{img/CUDA_grid}
+		\caption{Abstrakcja bloków i siatki w CUDA}
+		\label{ref:cuda_grid}
+	\end{figure}
+
+\chapter{Opis systemu}
+
+\chapter{Optymalizator kompresji}
+
+\chapter{Wyniki}
+
+\chapter{Podsumowanie}
+
 
 %-----------Koniec czêœci zasadniczej-----------
 
 \begin{thebibliography}{11}
+
 \bibitem[1]{B} Stanis³aw Bia³as, \emph{Macierze. Wybrane problemy}, AGH Uczelniane Wydawnictwa Naukowo-Dydaktyczne, Kraków, 2006.
 \bibitem[2]{H} Nicholas J. Higham, \emph{Accuracy and stability of numerical algorithms}, SIAM, Philadelphia 1996.
 \bibitem[3]{H2} Nicholas J. Higham, \emph{Functions of Matrices. Theory and Computation}, SIAM, Philadelphia 2008.
 \bibitem[4]{DJ} Maksymilian Dryja, Janina i Micha³ Jankowscy, \emph{Przegl¹d metod i algorytmów numerycznych, czêœæ 2}, Wydawnictwa Naukowo-Techiczne, Warszawa 1982.
+\bibitem[5]{MAPD} Mostak, T., 2013. \emph{An overview of MapD (massively parallel database). White paper}, Massachusetts Institute of Technology, Cambridge, MA.
 \end{thebibliography}
 \tableofcontents
 \clearpage
