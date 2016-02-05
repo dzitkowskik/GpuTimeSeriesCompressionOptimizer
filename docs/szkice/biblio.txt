@@ -6,3 +6,6 @@ Nadathur Satish, Mark Harris, and Michael Garland. "Designing Efficient Sorting 
 
 Alcantara, Dan A., et al. "Real-time parallel hashing on the GPU." ACM Transactions on Graphics (TOG) 28.5 (2009): 154.
 
+https://developer.nvidia.com/thrust
+
+http://developer.download.nvidia.com/compute/cuda/compute-docs/cuda-performance-report.pdf

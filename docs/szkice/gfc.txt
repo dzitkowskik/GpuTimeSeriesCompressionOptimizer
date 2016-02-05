@@ -1,0 +1,49 @@
+Algorytm GFC:
+\begin{enumerate}
+\item Ustal wartość przewidywaną na 0
+\item Ustal indeks początku danych przetwarzanych przez \emph{warp} jako $beg$
+\item Wykonaj $\lambda$ razy punkty 3 do 13 (dla i = 0 do $\lambda - 1$)
+\item Weź różnicę pomiędzy daną z kolejnym indeksem wejściowym ($\mu_{i}(t)$) a wartością przewidywaną
+\item Zapisz bit znaku tej różnicy jako $sign$
+\item Zapisz jako $diff$ watość absolutną tej różnicy
+\item Oblicz minimalną ilość bajtów potrzebną do zapisania reprezentacji bitowej tej liczby (ilość dolnych, niezerowych bajtów) i zapisz jako $minByte$
+\item Wykonaj sumę prefiksową na wątkach obliczając sumaryczny rozmiar kompresowanej paczki (bez nagłówka), czyli zsumuj $minByte$ z wszystkich wątków z tego samego \emph{warp}
+\item Zapisz $minByte$ dolnych bajtów liczby $diff$ do odpowiedniego miejsca w tablicy wynikowej
+\item Jeśli $w_{l}(t)(mod 2) == 1$ Zapisz swoje $minByte$ oraz $sign$ (4 bity) oraz kolejnego wątku (razem 1 bajt) na odpowiednie miejsce w nagłówku.
+\item Powiększ przesunięcie o wielkość zapisanego bloku (wynik sumy prefiksowej) + 16
+\item Powiększ $beg o 32$ 
+\item Ustaw wartość przewidywaną na wartość elementu przetwarzanego przez ostatni wątek w \emph{warpie} czyli na element o indeksie $beg - 1$
+\item Jeśli wątek jest ostatnim wątkiem w swoim \emph{warp} to zapisuje przesunięcie do tablicy przesunięć w rekordzie o indeksie równym globalnemu numerowi tego \emph{warp-a}
+\end{enumerate}
+
+
+\begin{algorithm}[H]
+ \caption{Pseudokod algorytmu kompresji GFC dla wątku t}
+ \KwData{
+  $beg$ -- początkowy indeks danych wejściowych dla danego \emph{warp}\;
+  $data$ -- wektor danych wejściowych\;
+  $last$ -- wartość przewidywana\;
+  $warp$ -- numer \emph{warp} (globalnie)\;
+  $warp_{idx}$ -- indeks wątku w \emph{warp}\;
+ }
+ \KwResult{
+ $compr$ -- tablica wynikowa\;
+ $offsets$ -- wielkości poszczególnych bloków w $compr$\; 
+ }
+ \tcc{DLA WSZYSTKICH WĄTKÓW CUDA:}
+ $last$ = 0\;
+ $i$ = 0\;
+ \While{$i < \lambda$}{ 
+  $diff$ = $data[\mu_{i}(t)]$ - $last$\;
+  $sign$ = bit znaku liczby $diff$\;
+  $diff = abs(diff)$\;
+  $minByte = \sigma(diff)$\;
+  $size$ = wykonaj sumę prefixową na minByte w warpie\;
+  $save(compr, diff, minByte)$ \tcp*{zapisz $minByte$ bajtów liczby $diff$ do tablicy wynikowej}
+  $saveMeta(compr, minByte, sign)$ \tcp*{zapisz minByte oraz sign do tablicy wynikowej}
+  $off = off + size + 16$\;
+  $beg = beg + 32$\; 
+  $last = data[beg-1]$\;
+ }	
+ \If{$warp_{idx} == 31$}{$offsets[warp] = off$\;}
+\end{algorithm}
