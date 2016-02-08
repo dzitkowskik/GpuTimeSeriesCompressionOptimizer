@@ -550,10 +550,75 @@ opisane w czêœci poœwiêconej 2 fazie algorytmu optymalizatora.
     \end{figure}
 
 \section{Statystyki}
-statystyki
-\subsection{Precyzja}
+
+Aby podejmowaæ dobre decyzje optymalizator musi znaæ charakterystykê danych na których operuje.
+G³ówne zastosowanie statystyk w tym systemie, opiera siê na przesiewaniu wszystkich mo¿liwych drzew,
+do tych najistotniejszych, które mog¹ uzyskaæ dobry wspó³czynnik kompresji. Ponadto niektóre statystyki
+wykorzystywane s¹ przez same kodowania, aby odpowiednio dzia³aæ. W tym systemie zaimplementowano statystyki
+takie jak:
+\begin{enumerate}
+\item \emph{IsFloatingPoint} -- czy dane maj¹ typ zmiennoprzecinkowy czy ca³kowity
+\item \emph{Sorted} -- czy dane s¹ posortowane (obojêtnie czy rosn¹co czy malej¹co)
+\item \emph{Min} i \emph{Max} -- wartoœæ minimalna i maksymalna w zbiorze danych
+\item \emph{Precision} -- maksymalna dok³adnoœæ (precyzja) danych, czyli iloœæ miejsc po przecinku
+\item \emph{MinBitLength} -- minimalna liczba bitów na których mo¿na zakodowaæ ka¿d¹ liczbê ze zbioru
+\item \emph{Size} -- rozmiar danych
+\item \emph{RleMetric(N)} -- statystyka dla kodowania RLE opisana dok³adnie w nastêpnej podsekcji
+\item \emph{Dictionary Counter} -- histogram wszystkich unikalnych wartoœci ze zbioru
+\item \emph{Mean} -- œrednia arytmetyczna liczb w zbiorze      
+\end{enumerate}
 
 \subsection{Metryka RLE}
+Jest to œrednia d³ugoœæ maksymalnych ci¹gów równych liczb, nie d³u¿szych ni¿ N w danych D, ozn. $RLE_{M}(D, N)$. Jest to ciekawa statystyka, mog¹ca wskazywaæ na zasadnoœæ u¿ycia kodowania RLE do jakiœ danych. Mo¿na uznaæ ¿e jeœli $RLE_{M}(D, N) > N/2$ to warto u¿yæ RLE do kodowania danych $D$. Dla przyk³adu jeœli weŸmiemy $N=2$ oraz dane D: $1112234444555555$ wtedy odczytane ci¹gi równych liczb nie d³u¿sze niæ 2 wynosz¹: $22121122212222$, z czego œrednia jest równa $\frac{26}{15} \approx 1,7$, natomiast bior¹c $N=4$: $3212114321444$ oraz œrednia $\frac{32}{13} \approx 2,5$. W obu wypadkach wychodzi zatem, ¿e powinniœmy u¿yæ RLE do kompresji takich danych. Daje to wyobra¿enie o œredniej d³ugoœci ci¹gów równych liczb w danych, a ponadto jest bardzo wydajne obliczeniowo. Wyliczanie takiej statystyki jest trywialnie równoleg³e, poniewa¿
+mo¿na w ka¿dym w¹tku wyliczaæ ci¹g pocz¹wszy od innego indeksu, niezale¿nie. Pseudokod wyliczania ci¹gu dla pojedynczego w¹tku CUDA pokazuje algorytm \ref{alg:rle_metric}. PóŸniej wystarczy obliczyæ sumê, korzystaj¹c na przyk³ad z gotowej funkcji z biblioteki \emph{Thrust}.
+
+\begin{algorithm}[H]
+ \scriptsize
+ \caption{Obliczanie metryki RLE}
+ \KwIn{DATA -- wektor danych wejœciowych\;
+ N -- wspó³czynnik metryki RLE (maks. d³ugoœæ sprawdzanego ci¹gu)\;
+ IDX -- globalny indeks w¹tku (unikalny)
+ }
+ \KwOut{LENGTHS -- d³ugoœci ci¹gów równych liczb}
+ \SetKwFunction{algo}{GetRunLenN}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \myalg{\algo{}}{
+ 	\nl \If{$IDX >= length(DATA)-N$}{ \nl \Return{} }
+ 	\nl $num \gets 1, out \gets 1, last \gets 1$\;
+ 	\nl \For{$i=1$ to $N$}{
+ 		\nl $out \gets DATA[IDX] == DATA[IDX+i]$\;
+ 		\nl $num += out \& last$\;
+ 		\nl $last \gets out$\;
+ 	}
+ 	\nl $LENGTHS[IDX] \gets num$\;
+ }
+ \label{alg:rle_metric}
+\end{algorithm}
+
+\subsection{Precyzja}
+Kolejn¹ wa¿n¹ statystyk¹ dla liczb zmiennoprzecinkowych jest precyzja, gdy¿ mówi czy warto zastosowaæ zmianê wartoœci na typ ca³kowitoliczbowy, stosuj¹c przemno¿enie przez odpowiedni¹ potêgê liczby 10 (patrz kodowanie \emph{FLOAT\_TO\_INT}). Analogicznie do metryki RLE algorytm wyliczania precyzji jest trywialnie równoleg³y, a obliczanie precyzji pokazuje algorytm \ref{alg:precision}.
+
+\begin{algorithm}[H]
+ \scriptsize
+ \caption{Obliczanie precyzji}
+ \KwIn{VALUE -- wartoœæ u³amkowa\; 
+ MAX\_PREC -- maksymalna precyzja
+ }
+ \KwOut{PREC -- precyzja}
+ \SetKwFunction{algo}{GetPrecision}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \myalg{\algo{}}{
+	\nl $E \gets 1$\;
+	\nl $MP \gets 10^{MAX\_PREC}$\;
+	\nl \While{$(\frac{round(VALUE*E)}{E} \neq VALUE)\ \&\&\ (E < MP)$}{
+		\nl $E \gets E*10$\;
+	}
+	\nl \Return{$\frac{log_{f}(E)}{log{f}(10)}$}\;
+ }
+ \label{alg:precision}
+\end{algorithm}
+
+W systemie w bardzo ³atwy sposób mo¿na implementowaæ dodatkowe statystyki i udostêpniaæ je do optymalizatora w celu implementacji dodatkowych regu³.
 
 \section{Optymalizator}
 
