@@ -10,10 +10,9 @@ tags
 gpuStore
 build/
 config.ini
-sample_data/nyse.*
-sample_data/generated.inf
-sample_data/generated.csv
-sample_data/infoWithErrors.inf
+sample_data/*.inf
+sample_data/*.csv
+sample_data/*.log
 
 ### OSX ###
 .DS_Store
