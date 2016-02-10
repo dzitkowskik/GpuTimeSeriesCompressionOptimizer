@@ -505,6 +505,8 @@ do kompresji. Sama przebiega jak pokazuje algorytm \ref{alg:rec_tree}.
  }
  \label{alg:rec_tree}
 \end{algorithm}
+\normalsize
+
 \newpage
 \subsubsection{Dekompresja}
 Po odtworzeniu drzewa na korzeniu wywo³ywana jest metoda \emph{Decompress}, która nie
@@ -538,6 +540,7 @@ to algorytm \ref{alg:tree_decompress}.
  }
  \label{alg:tree_decompress}
 \end{algorithm}
+\normalsize
 
 Podsumowuj¹c jest to implementacja kaskadowej kompresji (rekurencyjnej z u¿yciem drzew jako reprezentacji).
 Dodatkowo drzewa te posiadaj¹ wskaŸnik na statystyki drzewa i mog¹ je uaktualniaæ, co bêdzie szerzej
@@ -550,28 +553,420 @@ opisane w czêœci poœwiêconej 2 fazie algorytmu optymalizatora.
     \end{figure}
 
 \section{Statystyki}
-statystyki
-\subsection{Precyzja}
+
+Aby podejmowaæ dobre decyzje optymalizator musi znaæ charakterystykê danych na których operuje.
+G³ówne zastosowanie statystyk w tym systemie, opiera siê na przesiewaniu wszystkich mo¿liwych drzew,
+do tych najistotniejszych, które mog¹ uzyskaæ dobry wspó³czynnik kompresji. Ponadto niektóre statystyki
+wykorzystywane s¹ przez same kodowania, aby odpowiednio dzia³aæ. W tym systemie zaimplementowano statystyki
+takie jak:
+\begin{enumerate}
+\item \emph{IsFloatingPoint} -- czy dane maj¹ typ zmiennoprzecinkowy czy ca³kowity
+\item \emph{Sorted} -- czy dane s¹ posortowane (obojêtnie czy rosn¹co czy malej¹co)
+\item \emph{Min} i \emph{Max} -- wartoœæ minimalna i maksymalna w zbiorze danych
+\item \emph{Precision} -- maksymalna dok³adnoœæ (precyzja) danych, czyli iloœæ miejsc po przecinku
+\item \emph{MinBitLength} -- minimalna liczba bitów na których mo¿na zakodowaæ ka¿d¹ liczbê ze zbioru
+\item \emph{Size} -- rozmiar danych
+\item \emph{RleMetric(N)} -- statystyka dla kodowania RLE opisana dok³adnie w nastêpnej podsekcji
+\item \emph{Dictionary Counter} -- histogram wszystkich unikalnych wartoœci ze zbioru
+\item \emph{Mean} -- œrednia arytmetyczna liczb w zbiorze      
+\end{enumerate}
 
 \subsection{Metryka RLE}
+Jest to œrednia d³ugoœæ maksymalnych ci¹gów równych liczb, nie d³u¿szych ni¿ N w danych D, ozn. $RLE_{M}(D, N)$. Jest to ciekawa statystyka, mog¹ca wskazywaæ na zasadnoœæ u¿ycia kodowania RLE do jakiœ danych. Mo¿na uznaæ ¿e jeœli $RLE_{M}(D, N) > N/2$ to warto u¿yæ RLE do kodowania danych $D$. Dla przyk³adu jeœli weŸmiemy $N=2$ oraz dane D: $1112234444555555$ wtedy odczytane ci¹gi równych liczb nie d³u¿sze niæ 2 wynosz¹: $22121122212222$, z czego œrednia jest równa $\frac{26}{15} \approx 1,7$, natomiast bior¹c $N=4$: $3212114321444$ oraz œrednia $\frac{32}{13} \approx 2,5$. W obu wypadkach wychodzi zatem, ¿e powinniœmy u¿yæ RLE do kompresji takich danych. Daje to wyobra¿enie o œredniej d³ugoœci ci¹gów równych liczb w danych, a ponadto jest bardzo wydajne obliczeniowo. Wyliczanie takiej statystyki jest trywialnie równoleg³e, poniewa¿
+mo¿na w ka¿dym w¹tku wyliczaæ ci¹g pocz¹wszy od innego indeksu, niezale¿nie. Pseudokod wyliczania ci¹gu dla pojedynczego w¹tku CUDA pokazuje algorytm \ref{alg:rle_metric}. PóŸniej wystarczy obliczyæ sumê, korzystaj¹c na przyk³ad z gotowej funkcji z biblioteki \emph{Thrust}.
+
+\begin{algorithm}[H]
+ \small
+ \caption{Obliczanie metryki RLE}
+ \KwIn{DATA -- wektor danych wejœciowych\;
+ N -- wspó³czynnik metryki RLE (maks. d³ugoœæ sprawdzanego ci¹gu)\;
+ IDX -- globalny indeks w¹tku (unikalny)
+ }
+ \KwOut{LENGTHS -- d³ugoœci ci¹gów równych liczb}
+ \SetKwFunction{algo}{GetRunLenN}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \myalg{\algo{}}{
+ 	\nl \If{$IDX >= length(DATA)-N$}{ \nl \Return{} }
+ 	\nl $num \gets 1, out \gets 1, last \gets 1$\;
+ 	\nl \For{$i=1$ to $N$}{
+ 		\nl $out \gets DATA[IDX] == DATA[IDX+i]$\;
+ 		\nl $num += out \& last$\;
+ 		\nl $last \gets out$\;
+ 	}
+ 	\nl $LENGTHS[IDX] \gets num$\;
+ }
+ \label{alg:rle_metric}
+\end{algorithm}
+\normalsize
+
+\subsection{Precyzja}
+Kolejn¹ wa¿n¹ statystyk¹ dla liczb zmiennoprzecinkowych jest precyzja, gdy¿ mówi czy warto zastosowaæ zmianê wartoœci na typ ca³kowitoliczbowy, stosuj¹c przemno¿enie przez odpowiedni¹ potêgê liczby 10 (patrz kodowanie \emph{FLOAT\_TO\_INT}). Analogicznie do metryki RLE algorytm wyliczania precyzji jest trywialnie równoleg³y, a obliczanie precyzji pokazuje algorytm \ref{alg:precision}.
+
+\begin{algorithm}[H]
+ \small
+ \caption{Obliczanie precyzji}
+ \KwIn{VALUE -- wartoœæ u³amkowa\; 
+ MAX\_PREC -- maksymalna precyzja
+ }
+ \KwOut{PREC -- precyzja}
+ \SetKwFunction{algo}{GetPrecision}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \myalg{\algo{}}{
+	\nl $E \gets 1$\;
+	\nl $MP \gets 10^{MAX\_PREC}$\;
+	\nl \While{$(\frac{round(VALUE*E)}{E} \neq VALUE)\ \&\&\ (E < MP)$}{
+		\nl $E \gets E*10$\;
+	}
+	\nl \Return{$\frac{log_{f}(E)}{log{f}(10)}$}\;
+ }
+ \label{alg:precision}
+\end{algorithm}
+\normalsize
+\noindent
+W systemie w bardzo ³atwy sposób mo¿na implementowaæ dodatkowe statystyki i udostêpniaæ je do optymalizatora w celu implementacji dodatkowych regu³.
 
 \section{Optymalizator}
+Algorytm optymalizatora kompresji maksymalizuje wspó³czynnik kompresji jednoczeœnie staraj¹c siê wybraæ jak najmniejsze i najni¿sze drzewo kompresji. G³ównym pomys³em jest tworzenie statystyk krawêdzi drzewa kompresji o kszta³cie pe³nego drzewa binarnego (z tego wzglêdu kodowania mog¹ zwracaæ co najwy¿ej 2 wyniki). Nic nie stoi jednak na przeszkodzie, aby algorytm ten uogólniæ na kodowania zwracaj¹ce dowolnie du¿¹ iloœæ wyników.
+Algorytm sk³ada siê z 3 faz, a jego zarys wygl¹da nastêpuj¹co:
+\begin{enumerate}
+\item Dla ma³ego fragmentu danych generujemy najciekawsze drzewa kompresji, zapisuj¹c statystyki krawêdzi w drzewie binarnym, po czym wybieramy drzewo o najlepszym wspó³czynniku kompresji z niewielk¹ poprawk¹ od wysokoœci drzewa.
+\item Kompresujemy odpowiednio du¿¹ paczkê danych u¿ywaj¹c drzewa ustawionego jako optymalne i odpowiednio aktualizujemy statystyki krawêdzi podczas kompresji.
+\item Jeœli kompresja siê pogorszy³a, zmieniamy drzewo, wymieniaj¹c odpowiednie poddrzewo na lepsze wed³ug statystyk krawêdzi.
+\end{enumerate}
 
 \subsection{Faza 1 - generowanie}
+Rekurencyjny algorytm generowania interesuj¹cych drzew na postawie statystyk. Wyjaœniê najpierw co to znaczy, ¿e drzewo jest interesuj¹ce. Jest to takie drzewo, którego ka¿dy wêze³ zosta³ wybrany jako dobra kontynuacja
+wêz³a poprzedniego, wedle okreœlonych regu³. Regu³y tworzone s¹ na podstawie statystyk danych, które dany wêze³ ma dostaæ do kompresji, typu poprzedzaj¹cej go kompresji oraz typu danych. Dany jest tak¿e aktualny poziom drzewa na którym ma siê znaleŸæ nowy wêze³. Metodê zwracaj¹c¹ dobre kontynuacje nazwijmy roboczo \emph{GetContinuations} i zwraca ona listê typów kodowañ, które spe³niaj¹ regu³y. Kilka przyk³adów:
+\begin{itemize}
+\item Jeœli poprzednik kodowaniem nie by³o \emph{FLOAT\_TO\_INT}, a dane maj¹ nisk¹ precyzjê, ponadto typ danych to double i ich wartoœæ maksymalna jest niewielka, to dodaj do listy kontynuacji typ kodowania \emph{FLOAT\_TO\_INT}, poniewa¿ jest zasadne.
+\item Jeœli poprzednim kodowaniem by³o \emph{GFC} albo \emph{AFL} to nie kompresuj ju¿ wiêcej i jako jedyn¹
+mo¿liw¹ kontynuacjê zwróæ NONE. Jeœli nie, a typ danych to float lub double to na pewno dodaj \emph{GFC} do listy mo¿liwych kontynuacji, w p.p. dodaj \emph{AFL}. 
+\end{itemize}
+
+Algorytm kompresuje dane w trakcie generowania drzew oraz jednoczeœnie oblicza i uaktualnia statystyki krawêdzi w drzewie binarnym (o tym w fazie 2). Tê fazê optymalizatora implementuje metoda \emph{FullStatisticsUpdate}, której pseudokod pokazany jest jako algorytm \ref{alg:faza1}.
+
+\begin{algorithm}[H]
+ \scriptsize
+ \caption{Faza 1 algorytmu optymalizatora}
+ \KwIn{DATA -- ma³a paczka danych\; 
+ ET -- typ kompresji, DT -- typ danych\; 
+ LEVEL -- aktualny poziom drzewa 
+ }
+ \KwOut{RES -- lista interesuj¹cych drzew z ich wynikami}
+ \SetKwFunction{algo}{FullStatisticsUpdate}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \myalg{\algo{}}{
+	\nl $STAT \gets$ policz statystyki dla $DATA$\;
+	\nl $RES \gets$ pusty wektor drzew\;
+	\nl $CONT \gets$ wywo³aj $GetContinuations(ET, DT, STAT, LEVEL)$ \tcp{pobierz mo¿liwe kontynuacje}
+	\ForEach{$C$ from $CONT$}{
+		\nl $T \gets$ stwórz drzewo o jednym wêŸle reprezentuj¹cym kodowanie $C$ z typem danych $DT$\;
+		\nl $COMPR \gets$ zakoduj dane $DATA$ u¿ywaj¹c $T$\;
+		\nl $DT \gets$ typ danych zwracany przez kodowanie $C$\;
+		\nl zaktualizuj w $T$ uzyskany wspó³czynnik kompresji\;
+		\eIf{liczba wyników zwracana przez $C$ jest równa 1}{
+			\nl $PART1 \gets$ wywo³aj $FullStatisticsUpdate(COMPR[1], C, DT, LEVEL+1)$\;
+			\nl $PART1 \gets$ wywo³aj $CrossTrees(T, PART1, length(DATA), length(COMPR[0])$\;
+		}(\tcp*[f]{jest równa 2}){
+			\nl $PART1 \gets$ wywo³aj $FullStatisticsUpdate(COMPR[1], C, DT, LEVEL+1)$\;
+			\nl $PART2 \gets$ wywo³aj $FullStatisticsUpdate(COMPR[2], C, DT, LEVEL+1)$\;
+			\nl $PART1 \gets$ wywo³aj $CrossTrees(T, PART1, PART2, length(DATA), length(COMPR[0])$\;
+		}
+		\If{$PART1$ jest pusty}{
+			\nl dodaj $T$ do $PART1$\;
+		}
+		\Else{
+			\nl dopisz $PART1$ na koñcu wektora $RES$\;
+		}
+	}
+	\nl \Return{$RES$}\;
+ }
+ \label{alg:faza1}
+\end{algorithm}
+\normalsize
+\noindent
+Metody \emph{CrossTrees} tworz¹ wszystkie mo¿liwe kompinacje, w których $T$ jest wierzcho³kiem, a drzewa
+z kolejnych dwóch argumentów (wektory drzew) ich poddrzewami. Dodatkowo uaktualniany jest wspó³czynnik 
+kompresji po³¹czonych drzew. Przyk³adem dzia³ania tej metody jest rysunek \ref{ref:phase1}.
+
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.5cm}\includegraphics[scale=0.75]{img/phase1}
+        \caption{Przyk³ad dzia³ania metody CrossTrees}
+        \label{ref:phase1}
+    \end{figure}
+\noindent
+Zatem w skrócie wyliczamy statystyki i na ich podstawie przewidujemy mo¿liwe wêz³y potomne, aby drzewo
+by³o interesuj¹ce, a nastêpnie kompresujemy danym kodowaniem dane i dla nich rekurencyjnie wyznaczamy interesuj¹ce drzewa. Nastêpnie ³¹czymy wyniki we wszystkie mo¿liwe kombinacje ale zachowuj¹c hierarchiê i 
+do³¹czamy do mo¿liwych rozwi¹zañ. Przy okazji wiemy jak dobrze ka¿de skonstruowane drzewo zachowuje siê
+dla danych wejœciowych. Na koñcu drzewo o najlepszej statystyce wybierane jest jako optymalne.
 
 \subsection{Faza 2 - kompresja}
+W tej fazie w³aœciwe dane (du¿a paczka danych) jest kompresowana przez drzewo wybrane jako optymalne, ale
+co wa¿niejsze uaktualniane s¹ statystyki krawêdzi drzewa binarnego. W tej czêœci opiszê jak wygl¹daj¹ te
+statystyki i jak s¹ uaktualniane. Wa¿ne jest równie¿, ¿e drzewo optymalne pamiêta ostatni¹ kopiê statystyk,
+która jest tworzona w momencie ustawienia nowego drzewa jako optymalne.
+
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.5cm}\includegraphics[scale=0.75]{img/bin_tree}
+        \caption{Przyk³ad numerowania krawêdzi w drzewie binarnym i kompresji}
+        \label{ref:bintree}
+    \end{figure}
+\noindent
+Krawêdzie w drzewie kompresji odpowiadaj¹ parom kompresji na pewnym miejscu w odpowiadaj¹cym mu pe³nym drzewie
+binarnym, co pokazuje rysunek \ref{ref:bintree}. Chcemy analizowaæ pary kompresji, poniewa¿ ka¿da wczeœniejsza kompresja wp³ywa na nastêpn¹ i niejako przygotowuje dla niej dane.
+Dla przyk³adu czêsto okazuje siê, ¿e kompresja \emph{AFL} dzia³a dla jakiœ danych bardzo s³abo, ale poprzedzona
+kodowaniem \emph{DELTA} lub \emph{PATCH} osi¹ga bardzo dobre wyniki, zaœ poprzedzona kodowaniem \emph{DICT} ma
+wynik jeszcze s³abszy. Wtedy dwie wczeœniejsze konfiguracje bêd¹ mia³y na tym miejscu wysokie statystyki, a trzecia niskie.
+
+Ka¿dej parze nastêpuj¹cych po sobie kompresji da siê przypisaæ krawêdŸ w pe³nym drzewie binarnym o tej, lub
+wiêkszej wysokoœci. Wynika to z tego, ¿e ka¿da kompresja mo¿e mieæ co najwy¿ej dwójkê nastêpców (dzieci). 
+Ponadto jeœli krawêdŸ ma indeks $i$, to ³atwo policzyæ indeksy krawêdzi odchodz¹cych od niej jako $2*(i+1)$ oraz $2*(i+1)+1$. Program konstruuje tabelê statystyk, w której pod indeksem $\lambda$ bêd¹ przechowywane statystyki
+par kompresji na miejscu $\lambda$ w drzewie binarnym. 
+
+Dla danej pary kompresji na wybranym miejscu w drzewie, statystyka jest liczona jako œrednia arytmetyczna, ze 
+starej wartoœci statystyki (na pocz¹tku ma wartoœæ 1.0) oraz uzyskanego przez poddrzewo odpowiadaj¹ce danej
+krawêdzi wspó³czynnika kompresji:
+$$ \alpha_{new} = \frac{\alpha_{old} + CR_{e}}{2} $$
+Dla przyk³adu jeœli krawêdŸ $1$ z par¹ kompresji $(A,B)$ uzyska³a $CR_{e} = 2$ a potem $3$, to statystyka dla tej pary na tej krawêdzi bêdzie wynosi³a $\alpha_ = \frac{\frac{1+2}{2}+3}{2} = 2,25$. Taka statystyka sprawia, ¿e nigdy nie bêdzie wiêksza ni¿ najlepszy wspó³czynnik kompresji uzyskany przez t¹ parê oraz, ¿e statystyka ta d¹¿y do tego wspó³czynnika (w granicy), jeœli jest sta³y. W ca³ym programie wspó³czynnik kompresji krawêdzi $(A,B)$ ozn. $CR_{e}$ liczony jest jako œrednia arytmetyczna wspó³czynników kompresji osi¹gniêtych przez poddrzewo definiowane
+przez wêze³ $A$ i poddrzewo definiowane przez $B$: $CR_{e} = \frac{CR(A) + CR(B)}{2}$. Natomiast wspó³czynnik kompresji dla wêz³a jest stosunkiem wielkoœci danych wejœciowych do danych wyjœciowych po kompresji. Dziêki temu
+wspó³czynnik kompresji krawêdzi w lepszy sposób definiuje jakoœæ takiej pary kompresji w drzewie, zmniejszaj¹c
+wp³yw jak¹ ma jakoœæ kompresji drugiego poddrzewa odchodz¹cego od $A$ na statystykê krawêdzi do której to poddrzewo nie nale¿y.
+
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.5cm}\includegraphics[scale=1]{img/stats}
+        \caption{Tablica statystyk krawêdzi}
+        \label{ref:bintree}
+    \end{figure}
+
+Statystyki krawêdzi uaktualniane s¹ w ten sposób podczas trwania ka¿dej kompresji o ile wskaŸnik na statystyki,
+ustawiony jest w drzewie. W momencie ukoñczenia kompresji statystyki powinny ju¿ byæ aktualne.
 
 \subsection{Faza 3 - poprawa}
+Po dokonaniu kompresji na du¿ym kawa³ku danych lub nawet kilku paczkach, jesteœmy w stanie du¿o lepiej stwierdziæ jak dobrze dane drzewo kompresji siê sprawuje. Jeœli jakoœæ ta wzros³a lub pozosta³a bez zmian, znaczy to ¿e nic nie trzeba zmieniaæ i wybrane drzewo kompresji jest optymalne. W przeciwnym przypadku nale¿y drzewo poprawiæ, stosuj¹c now¹ wiedzê, uzyskan¹ w formie statystyk krawêdzi z nowych danych.
+Aby to osi¹gn¹æ algorytm sprawdza statystyki krawêdzi i wybiera krawêdŸ o najmniejszym indeksie dla której statystyka siê pogorszy³a (drzewo wybrane jako optymalne trzyma kopiê statystyk oraz wspó³czynnika kompresji z momentu wybrania go na optymalne). Mo¿na te¿ w tym momencie wybieraæ krawêdŸ dla której statystyka pogorszy³a siê
+najbardziej np. procentowo. Wybran¹ krawêdŸ kasujemy (usuwamy j¹ z drzewa razem z poddrzewem). Na miejscu usuniêtej krawêdzi, zach³annie, wstawiamy parê kompresji o najwiêkszej statystyce dla tej krawêdzi. Podobnie
+wstawiamy jej dzieci, a¿ do limitu wysokoœci drzewa. Proces ten dok³adniej opisuj¹ algorytmy \ref{alg:faza2_correct} i \ref{alg:faza2_replace}, z prostym przyk³adem w formie rysunku \ref{ref:mutate}.
+
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.5cm}\includegraphics[scale=0.5]{img/mutate}
+        \caption{Przyk³ad numerowania krawêdzi w drzewie binarnym i kompresji}
+        \label{ref:mutate}
+    \end{figure}
+
+Wymieniaj¹c krawêdŸ algorytm w zasadzie wymienia poddrzewo w grafie, zaczynaj¹c od pocz¹tku lub koñca krawêdzi (oszczêdzaj¹c pocz¹tek). Na rysunku \ref{} widzimy oba przypadki. Na przyk³ad w pierwszej \emph{mutacji} tylko
+jedna odnoga \emph{DICT} zosta³a zmieniona, podczas gdy w przejœciu drugim zosta³a wymieniona ca³a krawêdŸ \emph{AFL-NONE}.
+
+\begin{algorithm}[H]
+ \tiny
+ \caption{Faza 2 - poprawianie drzewa (TryCorrectTree)}
+ \KwIn{OPT -- drzewo wybrane jako optymalne, $STAT_{new}$ -- aktualne statystyki\;}
+ \SetKwFunction{algo}{TryCorrectTree}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \tcc{X.TO i X.FROM, X.NO to wêze³ koñcowy, pocz¹tkowy oraz numer krawêdzi X}
+ \myalg{\algo{}}{
+	\nl $CR_{new} \gets$ pobierz aktualny wspó³czynnik kompresji drzewa $OPT$\;
+	\nl $CR_{old} \gets$ pobierz historyczny wspó³czynnik kompresji $OPT$\;
+	\If{$CR_{new} \geq CR_{old}$}{
+		\nl \Return{false}\;
+	}
+	\nl $STAT_{OLD} \gets$ pobierz historyczne statystyki z $OPT$\;
+	\nl $EDGES \gets$ pobierz krawêdzie drzewa $OPT$\;
+	\ForEach{$E$ from $EDGES$}{
+		\nl $VAL_{OLD} \gets$ wartoœæ statystyki krawêdzi $E$ z $STAT_{OLD}$\;
+		\nl $BEST \gets$ pobierz wartoœæ najlepszej statystyki na miejscu $E$ z $STAT_{NEW}$\;
+		\If{$BEST > VAL_{OLD}$}{
+			\nl $NEW, VAL_{NEW} \gets$ pobierz ze statystyk $STAT_{NEW}$ parê na miejscu $E$ zaczynaj¹c¹ siê t¹ sam¹ kompresj¹, o najwiêkszej statystyce oraz jej wartoœæ\;
+			\If{$VAL_{NEW} > VAL_{OLD}$}{
+				\nl wymieñ E.TO na NEW.TO, kasuj¹c ca³e poddrzewo od E.TO\;
+				\nl wykonaj $Replace(NEW.TO, STAT_{NEW}, 2*(E.NO + 1))$\;
+			}
+			\Else{
+				\nl $NEW \gets$ pobierz ze statystyk $STAT_{NEW}$ parê na miejscu $E$ o najwiêkszej statystyce\;
+				\nl wymieñ E.FROM na NEW.FROM, kasuj¹c ca³e poddrzewo od E.FROM\;
+				\eIf{E.NO jest parzyste}{
+					\nl $NO \gets E.NO-1$\;
+				}{
+					\nl $NO \gets E.NO$\;
+				}
+				\nl wykonaj $Replace(NEW.FROM, STAT_{NEW}, NO)$\;
+			}
+			\nl wyjdŸ z pêtli\;
+		}
+	}
+	\nl \Return{true}\;
+ }
+ \label{alg:faza2_correct}
+\end{algorithm}
+
+Podsumowuj¹c program mutuje drzewo kompresji dopóki wspó³czynnik kompresji nie zacznie siê poprawiaæ. Pojedyncza
+mutacja mo¿e zmieniæ jeden wêze³, ale mo¿e tak¿e wymieniæ ca³e drzewo, co dzieje siê bardzo czêsto. Wymiany s¹
+dokonywane tylko jeœli wed³ug statystyk nast¹pi poprawa kompresji. W ten sposób nawet jeœli charakterystyka
+danych siê zmieni, algorytm powinien dostosowaæ drzewo do nowych warunków.  
+
+\begin{algorithm}[H]
+ \scriptsize
+ \caption{Faza 2 - poprawianie drzewa (Replace)}
+ \KwIn{NODE -- wymieniany wêze³ drzewa, STATS -- statystyki krawêdzi\;
+ $EDGE_{NO}$ -- numer wymienionej krawêdzi, $MAX_{H}$ -- maksymalna wysokoœæ drzewa\;
+ }
+ \SetKwFunction{algo}{Replace}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \myalg{\algo{}}{
+	\nl \lIf{$EDGE_{NO} > 2^{MAX_{H}}-3$}{\Return}
+	\nl $K \gets$ kodowanie wêz³a $NODE$
+	\nl $RES_{CNT} \gets$ pobierz iloœæ wyników zwracanych przez $K$\;
+	\For{$i=0$ to $RES_{CNT}$}{
+		\nl $BEST, BEST_{VAL} \gets$ pobierz ze $STATS$ parê zaczynaj¹c¹ siê na $K$ o najwiêkszej statystyce na pozycji $EDGE_{NO}+i$ w drzewie binarnym oraz jej wartoœæ\;
+		\If{$BEST_{VAL} > 1.0$}{
+			\nl $CHLD \gets$ wêze³ reprezentuj¹cy kodowanie BEST.TO\;
+			\nl dodaj $CHLD$ jako dziecko $NODE$\;
+			\nl wywo³aj $Replace(CHLD, STATS, 2*(EDGE_{NO}+i)+2$\;
+		}
+		\Else{
+			\nl dodaj do $NODE$ dziecko z kodowaniem \emph{NONE}\;
+		}
+	}
+	\Return
+ }
+ \label{alg:faza2_replace}
+\end{algorithm}
+\normalsize
+
+\subsection{Ca³oœæ}
+
+\begin{algorithm}[H]
+ \scriptsize
+ \caption{Ca³oœæ kompresji optymalizatorem}
+ \KwIn{DATA -- dane do skompresowania, DT -- typ danych\;}
+ \KwOut{RES -- skompresowane dane}
+ \SetKwFunction{algo}{CompressData}
+ \SetKwProg{myalg}{Funkcja}{}{}
+ \myalg{\algo{}}{
+	\If(\tcc*[f]{heurystyka}){warto przejrzeæ ponownie interesuj¹ce drzewa}{
+		\nl $SAMPLE \gets$ pobierz kawa³ek danych z $DATA$\;
+		\nl $TREES \gets$ wywo³aj $FullStatisticsUpdate(SAMPLE, NONE, DT, 0)$\;
+		\nl $BEST \gets$ pobierz drzewo z najlepszym wynikiem\;
+		\nl ustaw $BEST$ jako optymalne drzewo
+	}
+	\nl $RES \gets$ wykonaj kompresjê optymalnym drzewem\;
+	\nl $UPDATE \gets$ wywo³aj $TryCorrectTree$ na optymalnym drzewie\;
+	\If{$UPDATE$ is $true$}{
+		\nl ustaw ponownie optymalne drzewo\;
+	}
+	\nl \Return{RES}
+ }
+ \label{alg:compress}
+\end{algorithm}
+\normalsize
+
+Przebieg dzia³ania kompresji z u¿yciem optymalizatora pokazuje algorytm \ref{alg:compress}.
+Co pewien czas próbujemy przejrzeæ wszystkie interesuj¹ce drzewa uaktualniaj¹c statystyki i wybieraj¹c
+inne optymalne drzewo. Próbujemy równie¿ je poprawiaæ i jeœli siê uda³o, to ponownie zapisujemy je jako
+optymalne, tworz¹c now¹ kopiê statystyk (historycznych).
 
 \subsection{Usprawnienie}
+Iloœæ drzew do sprawdzenia w fazie 1 mo¿e lawinowo rosn¹c wzglêdem iloœci ró¿nych kompresji zaimplementowanych w systemie, w zale¿noœci od zastosowanych regu³. Warto zaimplementowaæ zbiory regu³ produkuj¹cych mniej i wiêcej
+takich drzew, aby lepiej przeszukiwaæ przestrzeñ rozwi¹zañ. Jednak przeszukiwanie du¿ej iloœci drzew jest pomimo
+zastosowania GPU, zbyt czasoch³onne jak na planowane zastosowania. Mo¿liwym rozwi¹zaniem (jeszcze nie zaimplementowanym ale planowanym), jest niezale¿ne i równoleg³e wykonywanie fazy 1 dla ró¿nych zbiorów regu³, równolegle do faz 2 i 3, w sposób pokazany na rysunku \ref{ref:threads}. Na tym rysunku numery 1,2,3 stanowi¹ numer fazy, a 
+A,B,C zbiory regu³ w których A s¹ najbardziej restrykcyjne i produkuj¹ ma³o drzew, zaœ C bardzo du¿o.
+
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.5cm}\includegraphics[scale=0.5]{img/threads}
+        \caption{Zrównoleglenie fazy 1 w optymalizatorze}
+        \label{ref:threads}
+    \end{figure}
+
+W ten sposób oba w¹tki mog¹ pracowaæ nawet na 2 oddzielnych urz¹dzeniach wielokrotnie zwiêkszaj¹c nie tylko
+wydajnoœæ ale i wspó³czynnik kompresji z racji przeszukania wiêkszej iloœci opcji. Algorytm powinien
+tak¿e lepiej dostosowywaæ siê do zmian danych. Taka równoleg³oœæ jest mo¿liwe, poniewa¿ statystyki
+zosta³y zaimplementowane w taki sposób aby umo¿liwiæ do nich równoleg³y dostêp bez obaw o niespójnoœæ danych.
 
 \section{Równoleg³y kompresor}
+Szeregi czasowe zwykle sk³adaj¹ siê z wielu kolumn, które maj¹ ró¿ne charakterystyki, wiêc mog¹ byæ
+kompresowane niezale¿nie i równolegle. Oprócz mo¿liwoœci wykorzystania do tego celu wielu urz¹dzeñ GPU
+jednoczeœnie, mo¿na wykorzystaæ \emph{CUDA STREAMS} aby wykonywaæ jednoczeœnie wiele \emph{kerneli} oraz kopiowañ danych na tej samej karcie. Samymi \emph{stream'ami} w nowych wersjach CUDA ($>7.0$) nie 
+trzeba siê przejmowaæ, gdy¿ ka¿dy w¹tek automatycznie dostaje osobny i niezale¿ny (domyœlny) stream 0,
+który dodatkowo nie powoduje niejawnej synchronizacji. Wszystko pod warunkiem kompilacji programu z flag¹ --default-stream per-thread lub zdefiniowaniu CUDA\_API\_PER\_THREAD\_DEFAULT\_STREAM. 
+Po zastosowaniu tej opcji wszystkie kernele oraz kopiowania pochodz¹ce z ró¿nych w¹tków, bêd¹ mog³y
+byæ zrównoleglone, pomimo ich u¿ycia na domyœlnym streamie 0.
 
 \subsection{Opis algorytmu}
+W programie równoleg³a kompresja opiera siê na puli w¹tków zaimplementowanej jako \emph{Task Scheduler}
+w bibliotece \emph{CORE}, w oparciu o bibliotekê \emph{BOOST}. Sama kompresja i dekompresja polega na
+uruchamianiu zadañ kompresji lub dekompresji kawa³ków danych z u¿yciem instancji jakiegoœ optymalizatora, unikalnego dla danej kolumny. Oczywiœcie zadania te musz¹ byæ odpowiednio synchronizowane.
 
-\subsubsection{Zadanie kompresji}
+\subsubsection{Kompresja}
+Równoleg³a kompresja kolumn jest opisana przez pseudokod w algorytmie \ref{alg:parallel}.
 
-\subsubsection{Zadanie dekompresji}
+\begin{algorithm}[H]
+ \scriptsize
+ \caption{Ca³oœæ kompresji optymalizatorem}
+ \KwIn{$FILE_{IN}$ -- plik wejœciowy, $FILE_{OUT}$ -- plik wyjœciowy\;}
+ \SetKwFunction{algo}{$ParallelCompressor \rightarrow Compress$}
+ \SetKwProg{myalg}{Metoda}{}{}
+ \myalg{\algo{}}{
+ 	\nl $ID \gets 1$\;
+	\Repeat{koniec pliku $FILE_{IN}$}{
+		\nl $TS \gets$ odczytaj paczkê danych z pliku $FILE_{IN}$\;
+		\If{niezainizjalizowany}{
+			\tcc{inicjalizuje kompresor tworzy optymalizator dla ka¿dej kolumny wejœciowych danych oraz tworzy pulê w¹tków}
+			\nl wywo³aj $init()$
+		}
+		\nl $COL_{N} \gets$ pobierz iloœæ kolumn z $TS$\;
+		\For{$i=0$ to $N$}{
+			\nl $TASK \gets$ stwórz zadanie kompresji z optymalizatorem dla kolumny $i$ oraz danymi $TS[i]$ (i-ta kolumna szeregu TS) o numerze $ID$\;
+			\nl dodaj $TASK$ do schedulera oraz powiêksz $ID$ o 1\;
+		}
+		\nl zaczekaj na wykonanie wszystkich zadañ\;
+	}
+ }
+ \label{alg:parallel}
+\end{algorithm}
+\normalsize
+
+W tym przypadku wa¿ne jest jak dzia³a samo zadanie kompresji, przy czym kluczowym elementem 
+jest synchronizacja zapisu do pliku wynikowego, który to przedstawia rysunek \ref{ref:parallel}.
+Zadanie to przebiega nastêpuj¹co:
+\begin{enumerate}
+\item Otrzymane dane kopiowane s¹ na GPU
+\item Dane s¹ kompresowane przy u¿yciu podanego optymalizatora
+\item Dane s¹ zapisywane z powrotem do pamiêci RAM
+\item Nastêpnie przy u¿yciu metod synchronizacji w¹tki zapisuj¹ dane do pliku wyjœciowego.
+	\begin{itemize}
+	\item w¹tek czeka a¿ wszystkie w¹tki o mniejszych numerach zakoñcz¹ pracê
+	\item w¹tek zapisuje dane poprzedzaj¹c je ich rozmiarem
+	\end{itemize}
+\item Oznacz zadanie jako ukoñczone
+\item Jeœli jakikolwiek z powy¿szych pkt. siê nie powiedzie oznacz zadanie jako zakoñczone pora¿k¹
+\end{enumerate}
+
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.5cm}\includegraphics[scale=0.5]{img/parallel}
+        \caption{Wykonanie zadañ kompresji przez w¹tki}
+        \label{ref:parallel}
+    \end{figure}
+
+\subsubsection{Dekompresja}
+Dekompresja przebiega na tyle prosto, ¿e ograniczê siê do krótkiego opisu bez pseudokodu i obrazków.
+\begin{enumerate}
+\item Kawa³ek po kawa³ku zgodnie z zapisanymi rozmiarami czytamy skompresowane dane kolumn.
+\item Dla ka¿dego kawa³ka tworzone jest zadanie dekompresuj¹ce (posiadaj¹ce wskaŸnik na wspóln¹ instancjê szeregu czasowego), które:
+	\begin{enumerate}
+	\item Zaczytuje dane na GPU
+	\item Dekompresuje je
+	\item Dopisuje na koñcu kolumny któr¹ obs³uguje w szeregu czasowym
+	\end{enumerate}
+\item Po zdekodowaniu liczby kawa³ków równej liczbie kolumn czekamy a¿ w¹tki zakoñcz¹ pracê i zapisujemy szereg na wyjœciem.
+\item Czyœcimy szereg czasowy aby nie zapisywaæ kolejny raz tych samych danych
+\item Jeœli to nie koniec danych do dekompresji, wracamy do punktu pierwszego
+\end{enumerate}
+
 
 \chapter{Wyniki}
 
@@ -581,7 +976,7 @@ statystyki
 %-----------Koniec czêœci zasadniczej-----------
 
 \begin{thebibliography}{11}
-
+\small
 \bibitem[1]{PPS} Mark Harris, Shubhabrata Sengupta, and John D. Owens. \emph{"Parallel Prefix Sum (Scan) with CUDA"}. In Hubert Nguyen, editor, GPU Gems 3, chapter 39, pages 851–876. Addison Wesley, August 2007
 \bibitem[2]{SORT} Nadathur Satish, Mark Harris, and Michael Garland. \emph{"Designing Efficient Sorting Algorithms for Manycore GPUs"}. In Proceedings of the 23rd IEEE International Parallel \& Distributed Processing Symposium, May 2009
 \bibitem[3]{PHASH} Alcantara, Dan A., et al. \emph{"Real-time parallel hashing on the GPU."} ACM Transactions on Graphics (TOG) 28.5 (2009): 154
