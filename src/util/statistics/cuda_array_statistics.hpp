@@ -11,6 +11,7 @@
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
 #include "core/not_implemented_exception.hpp"
+#include "core/logger.h"
 #include "data_type.hpp"
 
 #define MAX_PRECISION 10
@@ -35,6 +36,11 @@ struct DataStatistics
 class CudaArrayStatistics
 {
 public:
+	CudaArrayStatistics() : _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CudaArrayStatistics"))) {}
+	~CudaArrayStatistics(){}
+	CudaArrayStatistics(const CudaArrayStatistics&) = default;
+
+public:
     template<typename T> std::tuple<T,T> MinMax(SharedCudaPtr<T> data);
     template<typename T> char MinBitCnt(SharedCudaPtr<T> data);
     template<typename T> int Precision(SharedCudaPtr<T> data);
@@ -49,6 +55,7 @@ private:
 
 private:
     ExecutionPolicy _policy;
+    log4cplus::Logger _logger;
 };
 
 } /* namespace ddj */

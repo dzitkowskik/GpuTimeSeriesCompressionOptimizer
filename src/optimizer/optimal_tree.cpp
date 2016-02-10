@@ -20,16 +20,16 @@ void OptimalTree::Replace(
 
 	auto encoding = node->GetEncodingFactory()->Get();
 	int resultCnt = encoding->GetNumberOfResults();
-	DataType type = encoding->GetReturnType(node->GetEncodingFactory()->dataType);
+	auto returnTypes = encoding->GetReturnTypes(node->GetEncodingFactory()->dataType);
 	for(int i = 0; i < resultCnt; i++)
 	{
 		auto best = stats->GetBest(edgeNo+i, node->GetEncodingType());
 		if(best.value > 1) {
 			// TODO: Get correct data type
-			auto newChld = CompressionNode::make_shared(best.type.second, type);
+			auto newChld = CompressionNode::make_shared(best.type.second, returnTypes[i]);
 			node->AddChild(newChld);
 			Replace(newChld, stats, 2*(edgeNo+i) + 2);
-		} else node->AddChild(CompressionNode::make_shared(EncodingType::none, type));
+		} else node->AddChild(CompressionNode::make_shared(EncodingType::none, returnTypes[i]));
 	}
 
 	return;

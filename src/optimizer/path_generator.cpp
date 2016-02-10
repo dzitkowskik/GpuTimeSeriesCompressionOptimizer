@@ -76,10 +76,10 @@ void CreateTree(CompressionTree& tree, Path& path, DataType type, int parentId, 
 	if(encType == EncodingType::none) return;
 
 	auto encoding = encFactory->Get();
-	type = encoding->GetReturnType(type);
+	auto returnTypes = encoding->GetReturnTypes(type);
 	auto childrenCnt = encoding->GetNumberOfResults();
 	for(int i = 1; i <= childrenCnt; i++)
-		CreateTree(tree, path, type, node->GetNo(), ++id);
+		CreateTree(tree, path, returnTypes[i-1], node->GetNo(), ++id);
 }
 
 CompressionTree PathGenerator::GenerateTree(Path path, DataType type)

@@ -25,16 +25,18 @@ class DecompressionTask : public Task
 {
 public:
 	DecompressionTask(SharedTimeSeriesPtr ts, int columnId)
-		: _ts(ts), _columnId(columnId), _deviceId(0)
-	{ init(); }
+		: _ts(ts), _columnId(columnId), _deviceId(0),
+		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("DecompressionTask")))
+	{}
 
 	virtual ~DecompressionTask() {}
 
 	DecompressionTask(const DecompressionTask& other)
 		: _ts(other._ts),
 		  _columnId(other._columnId),
-		  _deviceId(other._deviceId)
-	{ init(); }
+		  _deviceId(other._deviceId),
+		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("DecompressionTask")))
+	{}
 
 public:
 	void SetDevice(int deviceId) { _deviceId = deviceId; }
@@ -49,12 +51,6 @@ public:
 
 protected:
 	void execute();
-
-private:
-	void init()
-	{
-		_logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("DecompressionTask"));
-	}
 
 private:
 	int _deviceId;

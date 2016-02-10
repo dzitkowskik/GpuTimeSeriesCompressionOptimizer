@@ -116,15 +116,17 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 		parent.first.FindNode(0)->SetCompressionRatio(
 				Encoding::GetCompressionRatio(data->size(), parent.second));
 
+		auto returnTypes = encoding->GetReturnTypes(dt);
+
 		if(encoding->GetNumberOfResults() == 1)
 		{
-			part1 = FullStatisticsUpdate(compr[1], c, dt, level+1);
+			part1 = FullStatisticsUpdate(compr[1], c, returnTypes[0], level+1);
 			part1 = CrossTrees(parent, part1, data->size(), compr[0]->size());
 		}
 		else if(encoding->GetNumberOfResults() == 2)
 		{
-			part1 = FullStatisticsUpdate(compr[1], c, dt, level+1);
-			part2 = FullStatisticsUpdate(compr[2], c, dt, level+1);
+			part1 = FullStatisticsUpdate(compr[1], c, returnTypes[0], level+1);
+			part2 = FullStatisticsUpdate(compr[2], c, returnTypes[1], level+1);
 			part1 = CrossTrees(parent, part1, part2, data->size(), compr[0]->size());
 		}
 

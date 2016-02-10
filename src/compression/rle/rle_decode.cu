@@ -32,6 +32,8 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
 	auto metadata = input[0];
 	CUDA_CALL( cudaMemcpy(&length, metadata->get(), sizeof(int), CPY_DTH) );
 
+	LOG4CPLUS_TRACE_FMT(_logger, "RLE decoding - LENGTH = %d", length);
+
 	// PREPARE INPUT DATA
     int* lengths = reinterpret_cast<int*>(input[1]->get());
     T* values = reinterpret_cast<T*>(input[2]->get());
@@ -46,6 +48,8 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
     // output size is sum of the run lengths
     int n = lengthsVector.back();
 
+    LOG4CPLUS_TRACE_FMT(_logger, "RLE decoding - INCLUSIVE SCAN DONE (n = %d)", n);
+
     // compute input index for each output element
     thrust::device_vector<int> indices(n);
     thrust::lower_bound(
@@ -54,6 +58,8 @@ SharedCudaPtr<T> RleEncoding::Decode(SharedCudaPtrVector<char> input)
         thrust::counting_iterator<int>(1),
         thrust::counting_iterator<int>(n + 1),
         indices.begin());
+
+    LOG4CPLUS_TRACE(_logger, "RLE decoding - LOWER BOUND DONE");
 
     // gather input elements
     auto result = CudaPtr<T>::make_shared(n);

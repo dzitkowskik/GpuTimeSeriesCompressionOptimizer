@@ -30,10 +30,10 @@ class CompressionOptimizer : private boost::noncopyable
 {
 public:
 	CompressionOptimizer()
-		: _partsProcessed(0), _totalBytesProcessed(0), _maxTreeHeight(5)
+		: _partsProcessed(0), _totalBytesProcessed(0), _maxTreeHeight(5),
+		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CompressionOptimizer")))
 	{
 		_statistics = CompressionStatistics::make_shared(_maxTreeHeight);
-		_logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CompressionOptimizer"));
 		LOG4CPLUS_TRACE(_logger, "Compression optimizer created");
 	}
 	~CompressionOptimizer(){}

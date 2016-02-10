@@ -47,7 +47,7 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<T> data)
 
 	cudaDeviceSynchronize();
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
-	LOG4CPLUS_INFO_FMT(_logger, "AFL enoding END");
+	LOG4CPLUS_INFO(_logger, "AFL enoding END");
 
 	return SharedCudaPtrVector<char> {metadata, result};
 }
@@ -105,7 +105,7 @@ SharedCudaPtr<T> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 	// Perform decoding
 	auto result = DecodeAfl<T>((T*)data->get(), data->size(), minBit, rest);
 
-	LOG4CPLUS_INFO_FMT(_logger, "AFL decoding END");
+	LOG4CPLUS_INFO(_logger, "AFL decoding END");
 	return result;
 }
 
@@ -158,7 +158,7 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<float> data)
 	}
 
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
-	LOG4CPLUS_INFO_FMT(_logger, "AFL (FLOAT) enoding END");
+	LOG4CPLUS_INFO(_logger, "AFL (FLOAT) enoding END");
 
 	return SharedCudaPtrVector<char>{ metadata, CudaArrayCopy().Concatenate(resultVector) };
 }
@@ -245,7 +245,7 @@ SharedCudaPtr<float> AflEncoding::Decode(SharedCudaPtrVector<char> input)
 			result->get());
 	cudaDeviceSynchronize();
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
-	LOG4CPLUS_INFO_FMT(_logger, "AFL decoding END");
+	LOG4CPLUS_INFO(_logger, "AFL decoding END");
 
 	return result;
 }

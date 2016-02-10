@@ -166,10 +166,13 @@ size_t CompressionNode::PredictCompressionSize(SharedCudaPtr<char> data, DataTyp
 	size_t size = encoding->GetMetadataSize(data, type) + sizeof(EncodingMetadataHeader);
 	if(_isLeaf) return size + encoding->GetCompressedSize(data, type);
 	auto compressed = encoding->Encode(data, type);
-	type = encoding->GetReturnType(type);
+	auto returnTypes = encoding->GetReturnTypes(type);
 	int i = 1;
 	for(auto& child : _children)
-		size += child->PredictCompressionSize(compressed[i++], type);
+	{
+		size += child->PredictCompressionSize(compressed[i], returnTypes[i-1]);
+		i++;
+	}
 	return size;
 }
 

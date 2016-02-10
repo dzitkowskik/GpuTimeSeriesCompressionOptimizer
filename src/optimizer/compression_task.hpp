@@ -29,8 +29,9 @@ public:
 		  _columnId(columnId),
 		  _optimizer(optimizer),
 		  _deviceId(0),
-		  _outputFile(outputFile)
-	{ init(); }
+		  _outputFile(outputFile),
+		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CompressionTask")))
+	{}
 
 	virtual ~CompressionTask() {}
 
@@ -39,8 +40,9 @@ public:
 		  _columnId(other._columnId),
 		  _optimizer(other._optimizer),
 		  _deviceId(other._deviceId),
-		  _outputFile(other._outputFile)
-	{ init(); }
+		  _outputFile(other._outputFile),
+		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CompressionTask")))
+	{}
 
 public:
 	void SetDevice(int deviceId) { _deviceId = deviceId; }
@@ -57,12 +59,6 @@ public:
 
 protected:
 	void execute();
-
-private:
-	void init()
-	{
-		_logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CompressionTask"));
-	}
 
 private:
 	int _deviceId;

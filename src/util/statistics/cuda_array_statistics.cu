@@ -173,6 +173,7 @@ DataStatistics CudaArrayStatistics::GenerateStatistics(SharedCudaPtr<char> data,
 		case DataType::d_double:
 			return getStatistics(boost::reinterpret_pointer_cast<CudaPtr<double>>(data));
 		default:
+			LOG4CPLUS_ERROR(_logger, "No statistics implementation for type " << GetDataTypeString(type));
 			throw NotImplementedException("No CudaArrayStatistics::GenerateStatistics implementation for that type");
 	}
 }

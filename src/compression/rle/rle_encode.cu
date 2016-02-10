@@ -26,7 +26,7 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
     thrust::device_vector<T> output(data->size());
     thrust::device_vector<int>  lengths(data->size());
 
-    LOG4CPLUS_TRACE_FMT(_logger, "START REDUCE BY KEY");
+    LOG4CPLUS_TRACE(_logger, "START REDUCE BY KEY");
 
     // compute run lengths
     auto reduceResult = thrust::reduce_by_key(
@@ -38,6 +38,8 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
 
     // get true output length
     int len = reduceResult.first - output.begin();
+
+    LOG4CPLUS_TRACE_FMT(_logger, "RLE encoding - len = %d", len);
 
     // prepare metadata result
     auto metadata = CudaPtr<char>::make_shared(sizeof(int));
@@ -51,7 +53,6 @@ SharedCudaPtrVector<char> RleEncoding::Encode(SharedCudaPtr<T> data)
     resultValues->fillFromHost(output.data().get(), len);
 
     CUDA_ASSERT_RETURN( cudaGetLastError() );
-    LOG4CPLUS_INFO(_logger, "RLE enoding END");
 
     return SharedCudaPtrVector<char> {
     	metadata,

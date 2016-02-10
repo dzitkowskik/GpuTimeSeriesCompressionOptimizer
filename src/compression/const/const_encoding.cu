@@ -70,7 +70,7 @@ SharedCudaPtrVector<char> ConstEncoding::Encode(SharedCudaPtr<T> data)
 	);
 
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
-    LOG4CPLUS_INFO_FMT(_logger, "CONST enoding END");
+    LOG4CPLUS_INFO(_logger, "CONST enoding END");
 
 	return SharedCudaPtrVector<char> { resultMetadata, resultData };
 }

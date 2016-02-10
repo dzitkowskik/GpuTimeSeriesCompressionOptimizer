@@ -68,7 +68,7 @@ public:
 	}
 
 	virtual unsigned int GetNumberOfResults() = 0;
-	virtual DataType GetReturnType(DataType type) { return type; }
+	virtual std::vector<DataType> GetReturnTypes(DataType type) { return std::vector<DataType>{type}; }
 
 	// TODO: make abstract
 	virtual size_t GetMetadataSize(SharedCudaPtr<char> data, DataType type) = 0;
