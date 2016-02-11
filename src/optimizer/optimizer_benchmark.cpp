@@ -214,7 +214,7 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_Time)(benchmar
 	}
 	SetStatistics(state, DataType::d_time);
 }
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_Time)->Range(1<<16, 1<<24);
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_Time)->Range(1<<16, 1<<23);
 
 } /* namespace ddj */
 
