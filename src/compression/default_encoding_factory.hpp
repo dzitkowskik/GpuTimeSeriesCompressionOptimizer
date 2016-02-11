@@ -47,17 +47,17 @@ public:
 				switch(dataType)
 				{
 					case DataType::d_int:
-						return boost::make_shared<PatchEncodingFactory<int>>(dataType, PatchType::outside);
+						return boost::make_shared<PatchEncodingFactory<int>>(dataType, PatchType::lower);
 					case DataType::d_time:
-						return boost::make_shared<PatchEncodingFactory<time_t>>(dataType, PatchType::outside);
+						return boost::make_shared<PatchEncodingFactory<time_t>>(dataType, PatchType::lower);
 					case DataType::d_float:
-						return boost::make_shared<PatchEncodingFactory<float>>(dataType, PatchType::outside);
+						return boost::make_shared<PatchEncodingFactory<float>>(dataType, PatchType::lower);
 					case DataType::d_double:
-						return boost::make_shared<PatchEncodingFactory<double>>(dataType, PatchType::outside);
+						return boost::make_shared<PatchEncodingFactory<double>>(dataType, PatchType::lower);
 					case DataType::d_short:
-						return boost::make_shared<PatchEncodingFactory<short>>(dataType, PatchType::outside);
+						return boost::make_shared<PatchEncodingFactory<short>>(dataType, PatchType::lower);
 					case DataType::d_char:
-						return boost::make_shared<PatchEncodingFactory<char>>(dataType, PatchType::outside);
+						return boost::make_shared<PatchEncodingFactory<char>>(dataType, PatchType::lower);
 					default:
 						throw NotImplementedException("Encoding of this type not implemented");
 				}

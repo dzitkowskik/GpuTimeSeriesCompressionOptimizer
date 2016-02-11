@@ -44,11 +44,11 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressByBestTree_ChoosenI
 			trainDataChar,
 			EncodingType::none,
 			DataType::d_int,
-			DataStatistics(),
 			0);
 
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 	results[0].first.Fix();
+	results[0].first.Print();
 
     while (state.KeepRunning())
 	{
@@ -70,7 +70,6 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPha
 				data,
 				EncodingType::none,
 				DataType::d_int,
-				DataStatistics(),
 				0);
 	}
 
@@ -89,7 +88,6 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPha
 				data,
 				EncodingType::none,
 				DataType::d_int,
-				DataStatistics(),
 				0);
 	}
 
@@ -112,7 +110,6 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_
 			trainDataChar,
 			EncodingType::none,
 			DataType::d_int,
-			DataStatistics(),
 			0);
 
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
@@ -142,7 +139,6 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3_Ra
 			trainDataChar,
 			EncodingType::none,
 			DataType::d_int,
-			DataStatistics(),
 			0);
 
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
@@ -155,9 +151,7 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3_Ra
 	{
 		optimalTree->GetTree().FindNode(0)->SetCompressionRatio(1.0);
 		bool corrected = optimalTree->TryCorrectTree();
-		if(!corrected) printf("NOT CORRECTED!!\n");
 	}
-
 	SetStatistics(state, DataType::d_int);
 }
 BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3_RandomInt)->Arg(1<<20);
@@ -173,12 +167,54 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)(ben
 	{
 		optimizer.CompressData(data, DataType::d_int);
 	}
-
-//	optimizer.GetOptimalTree()->GetTree().Print();
-
 	SetStatistics(state, DataType::d_int);
 }
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)->Arg(1<<22)->Arg(1<<24)->Arg(1<<26);
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)->Range(1<<16, 1<<25);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_PatternA_Int)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<int, char>(
+			GetFakeDataWithPatternA<int>(0, state.range_x()));
+
+	while (state.KeepRunning())
+	{
+		optimizer.CompressData(data, DataType::d_int);
+	}
+	SetStatistics(state, DataType::d_int);
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_PatternA_Int)->Range(1<<16, 1<<25);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_PatternB_Int)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<int, char>(
+			GetFakeDataWithPatternA<int>(0, state.range_x()));
+
+	while (state.KeepRunning())
+	{
+		optimizer.CompressData(data, DataType::d_int);
+	}
+	SetStatistics(state, DataType::d_int);
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_PatternB_Int)->Range(1<<16, 1<<25);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_Time)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto randomIntData = GetFakeDataForTime(state.range_x());
+	auto data = CastSharedCudaPtr<time_t, char>(randomIntData);
+
+	while (state.KeepRunning())
+	{
+		optimizer.CompressData(data, DataType::d_time);
+	}
+	SetStatistics(state, DataType::d_time);
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_Time)->Range(1<<16, 1<<24);
 
 } /* namespace ddj */
 

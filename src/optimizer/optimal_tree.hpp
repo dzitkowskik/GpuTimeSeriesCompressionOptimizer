@@ -10,7 +10,7 @@
 
 #include "tree/compression_tree.hpp"
 #include "tree/compression_statistics.hpp"
-
+#include "core/logger.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <queue>
@@ -26,7 +26,8 @@ class OptimalTree
 {
 public:
 	OptimalTree(CompressionTree tree)
-		: _maxHeight(5)
+		: _maxHeight(5),
+		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("OptimalTree")))
 	{
 		this->_ratio = tree.GetCompressionRatio();
 		this->_tree = tree;
@@ -56,6 +57,7 @@ private:
 	double _ratio;
 	CompressionTree _tree;
 	SharedCompressionStatisticsPtr _statistics;
+	log4cplus::Logger _logger;
 };
 
 } /* namespace ddj */

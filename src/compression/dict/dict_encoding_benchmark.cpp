@@ -14,7 +14,7 @@ BENCHMARK_DEFINE_F(DictEncodingBenchmark, BM_Dict_Random_Int_Encode)(benchmark::
     DictEncoding encoding;
     Benchmark_Encoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Int_Encode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Int_Encode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(DictEncodingBenchmark, BM_Dict_Random_Int_Decode)(benchmark::State& state)
 {
@@ -23,7 +23,7 @@ BENCHMARK_DEFINE_F(DictEncodingBenchmark, BM_Dict_Random_Int_Decode)(benchmark::
     DictEncoding encoding;
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Int_Decode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Int_Decode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(DictEncodingBenchmark, BM_Dict_Random_Float_Encode)(benchmark::State& state)
 {
@@ -32,7 +32,7 @@ BENCHMARK_DEFINE_F(DictEncodingBenchmark, BM_Dict_Random_Float_Encode)(benchmark
     DictEncoding encoding;
     Benchmark_Encoding(encoding, data, DataType::d_float, state);
 }
-BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Float_Encode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Float_Encode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(DictEncodingBenchmark, BM_Dict_Random_Float_Decode)(benchmark::State& state)
 {
@@ -41,6 +41,6 @@ BENCHMARK_DEFINE_F(DictEncodingBenchmark, BM_Dict_Random_Float_Decode)(benchmark
     DictEncoding encoding;
     Benchmark_Decoding(encoding, data, DataType::d_float, state);
 }
-BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Float_Decode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(DictEncodingBenchmark, BM_Dict_Random_Float_Decode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 } /* namespace ddj */

@@ -9,6 +9,8 @@
 #include <util/transform/cuda_array_transform.hpp>
 #include <util/statistics/cuda_array_statistics.hpp>
 #include "core/macros.h"
+#include <limits>
+#include <cmath>
 
 namespace ddj
 {
@@ -28,7 +30,19 @@ namespace ddj
 		SharedCudaPtr<int> resultData;
 		FloatingPointToIntegerOperator<T, int> op { precision };
 
+		// Make sure we won't overflow
+		bool transform = false;
 		if(precision < MAX_PRECISION)
+		{
+			auto minMax = CudaArrayStatistics().MinMax(data);
+			int scaleFactor = std::pow(10, precision);
+			if((std::get<0>(minMax) * scaleFactor) > std::numeric_limits<int>::min() &&
+					(std::get<1>(minMax) * scaleFactor) < std::numeric_limits<int>::max())
+				transform = true;
+			else precision = MAX_PRECISION;
+		}
+
+		if(transform)
 			resultData = CudaArrayTransform().Transform<T, int>(data, op);
 		else
 			resultData = CastSharedCudaPtr<T, int>(data->copy());

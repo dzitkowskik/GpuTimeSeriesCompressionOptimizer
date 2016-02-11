@@ -10,12 +10,20 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/execution_policy.hpp"
+#include "core/logger.h"
 
 namespace ddj
 {
 
 class Splitter
 {
+public:
+	Splitter()
+		: _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("Splitter")))
+	{}
+	~Splitter(){}
+	Splitter(const Splitter&) = default;
+
 public:
 	template<typename T> SharedCudaPtrTuple<T>
 	Split(SharedCudaPtr<T> data, SharedCudaPtr<int> stencil);
@@ -37,6 +45,7 @@ private:
 
 private:
     ExecutionPolicy _policy;
+    log4cplus::Logger _logger;
 };
 
 } /* namespace ddj */

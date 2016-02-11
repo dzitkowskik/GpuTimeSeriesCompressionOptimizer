@@ -46,12 +46,19 @@ SharedCudaPtrVector<char> LowerPatchEncoding::Encode(SharedCudaPtr<T> data)
 
     // Split according to the stencil
     Stencil stencil = Stencil::Create(data, GetOperator<T>());
+    LOG4CPLUS_TRACE(_logger, "PATCH (LOWER) - STENCIL CREATED");
+
     auto stencilPacked = stencil.pack();
+
+    LOG4CPLUS_TRACE(_logger, "PATCH (LOWER) - STENCIL PACKED");
+
     auto splittedData = this->_splitter.Split(data, *stencil);
 
+    LOG4CPLUS_TRACE(_logger, "PATCH (LOWER) - SPLIT DONE");
+
     // Return results as vector with compressed stencil as metadata
-    auto operatorTrue = MoveSharedCudaPtr<T, char>(std::get<0>(splittedData));
-    auto operatorFalse = MoveSharedCudaPtr<T, char>(std::get<1>(splittedData));
+    auto operatorTrue = CastSharedCudaPtr<T, char>(std::get<0>(splittedData));
+    auto operatorFalse = CastSharedCudaPtr<T, char>(std::get<1>(splittedData));
 
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
     LOG4CPLUS_INFO(_logger, "PATCH (LOWER) enoding END");

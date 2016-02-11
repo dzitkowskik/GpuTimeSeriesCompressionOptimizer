@@ -968,21 +968,124 @@ Dekompresja przebiega na tyle prosto, ¿e ograniczê siê do krótkiego opisu bez ps
 \end{enumerate}
 
 \chapter{Wyniki}
+W tym rozdziale opiszê uzyskane wyniki pod wzglêdem wspó³czynników kompresji dla ró¿nych danych, jak równie¿ wygenerowane schematy kompresji. PóŸniej porównam wydajnoœæ ca³oœci jak i poszczególnych elementów systemu, z istniej¹cymi rozwi¹zaniami. 
 
 \section{Platforma testowa}
+Wszystkie testy wykonano na komputerze stacjonarnym pod systemem \emph{Ubuntu 14.04.3 LTS},
+z zainstalowanymi sterownikami \emph{NVIDIA 352.68} oraz \emph{CUDA 7.5}. Parametry komputera:
+\begin{itemize}
+\item Procesor: AMD FX(tm)-8350 Eight-Core Processor
+\item Karta graficzna: 2 x GeForce GT 640
+\item Pamiêæ RAM: 16 GB (1600 Mhz)
+\item Dysk: SSD 40 GB
+\item P³yta g³ówna: 970A-UD3 - Gigabyte
+\end{itemize}
+
 \section{Dane}
 \subsection{Rzeczywiste}
-\subsubsection{Pomiar parametrów dzia³ania komputera MAC}
-\subsubsection{Dane z High Frequency Trading NYSE}
+Dane rzeczywiste pochodz¹ z dwóch Ÿróde³. Pierwsze pochodz¹ z pomiarów dzia³aj¹cego komputera MAC,
+wykonane za pomoc¹ prostego programu OsxSystemDataLogger\footnote{https://github.com/dzitkowskik/osx-system-data-logger}, które zawieraj¹ pola takie jak czas, napiêcie na procesorze oraz temperaturê procesora i GPU. Dane te dalej bêdê nazywa³ \emph{INFO}. Drugie pochodz¹ z \emph{New York Stock Exchange} i s¹ danymi historycznymi wszystkich zdarzeñ w czasie rzeczywistym w formie \emph{NYSE OpenBook}\footnote{http://www.nyxdata.com/Data-Products/NYSE-OpenBook} zawieraj¹cymi ponad 20 kolumn, a w tym czas, wolumen, cenê, stronê, symbol i inne. Dane te dalej bêdê nazywa³ \emph{NYSE}.
 \subsection{Wygenerowane}
 \subsubsection{Czas}
+Dane maj¹ s¹ liczbami ca³kowitymi o d³ugoœci $64bit$ monotonicznie rosn¹cymi od zadanej wartoœci startowej. Dane rosn¹ o losow¹ wielkoœæ z zadanego przedzia³u, z pewnym prawdopodobieñstwem. Dla prawdopodobieñstwa 0 czas siê nie zmienia, natomiast dla prawdopodobieñstwa 1, nie bêdzie dwóch tych samych liczb w wygenerowanym ci¹gu. 
+\begin{lstlisting}[caption=Time pattern,label={lst:time},basicstyle=\small]
+	//                              ------------
+	//                        ------
+	//          --------------
+	//       ---
+	// ------                                   min
+\end{lstlisting}
+										
 \subsubsection{Pattern A}
+Dane te s¹ liczbami dowolnego typu i wielkoœci, z przedzia³u od zadanego minimum($v_{min}$) do maksimum($v_{max}$).
+Wartoœæ generowanych punktów zmienia siê co $len$ kroków, oraz przed ka¿d¹ zmian¹ generowany jest
+pojedynczy punkt o wartoœci $v_{max}$.
+
+\begin{lstlisting}[caption=Pattern A,label={lst:patternA},basicstyle=\small]
+	// *       *       *       *      *      * max
+	//                  -------
+	//          -------         ------
+	//  -------                        ------  min
+	//  <-len->
+\end{lstlisting}
+
 \subsubsection{Pattern B}
+Dane B sk³adaj¹ siê z dwóch czêœci po³o¿onych na przemian co $len$ kroków, z których pierwsza
+sk³ada siê z naprzemian po³o¿onych wartoœci bliskich $v_{max}$ i $v_{min}$. Druga czêœæ sk³ada
+siê z wartoœci malej¹cych z wartoœci maksymalnej do minimalnej co ustalon¹ wartoœæ a nastêpnie
+rosn¹ca z powrotem.
+\begin{lstlisting}[caption=Pattern B,label={lst:patternB},basicstyle=\small]
+//   pattern 1     |       pattern 2       |     pattern 1
+// * * * * * * * *  *                       * * * * * * * * max-rand(0,5)
+//  # # # # # # #     *                   *  # # # # # # #  max-rand(0,5)
+//                      *               *
+//                        *           *
+//                          *       *
+//  * * * * * * * *           *   *          * * * * * * * min+rand(0,5)
+//   # # # # # # #              *             # # # # # #  min+rand(0,5)
+//  <------len-----> <---------len---------> <-----len---->
+\end{lstlisting}
+
 
 \section{Badanie wspó³czynnika kompresji}
+Omówienie jakoœci kompresji
+\begin{table}[h!]
+\centering
+\caption{Wspó³czynnik kompresji dla plików CSV z danymi w porównaniu ze standardowymi kompresorami}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+&	optymalizator &	tar.gz&	zip& 	7z \\ \hline
+INFO			&27.26			&17.89&	22.60	&30.31 \\
+NYSE			&8.12			&4.89	&5.64	&7.42  \\
+GEN1			&17.40			&6.66	&7.95	&10.91 \\
+browsermarket	&4.75			&3.72	&4.15	&5.40 \\
+\hline
+\end{tabular} 
+\end{table}
+
 \section{Wygenerowane schematy}
+Omówienie generowanych schematów dla ró¿nych danych
+\begin{table}[]
+\centering
+\caption{Dzia³anie optymalizatora dla danych ca³kowitych Pattern B}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+It. & Scheme									&		Ratio	&	Pattern	\\ \hline
+1	& patch,scale,dict,none,none,scale,afl,none &	3.599712	&	1\\
+2	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+3	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+4	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+5	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+6	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+7	& patch,scale,dict,none,none,scale,afl,none	&	14.814815	&	2\\
+8	& patch,scale,dict,none,none,scale,afl,none	&	14.814815	&	2\\
+9	& patch,scale,dict,none,none,scale,afl,none	&	14.814815	&	2\\
+10	& rle,delta,none,delta,none					&	294.117645	&	2\\
+11	& rle,const,none,delta,none					&	285.714294	&	2\\
+12	& rle,patch,afl,none,afl,none,delta,none	&	188.679245	&	2\\
+13	& rle,none,delta,none						&	0.499351	&	1\\
+14	& rle,delta,rle,none,none,delta,none		&	0.995025	&	1\\
+15	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+16	& scale,rle,delta,none,delta,none			&	0.499102	&	1\\
+17	& delta,rle,const,none,const,none			&	1.019992	&	1\\
+18	& rle,const,none,const,none					&	1.021242	&	1\\
+19	& rle,delta,rle,none,none,const,none		&	204.081635	&	2\\
+20	& rle,delta,none,delta,none					&	294.117645	&	2\\
+21	& rle,patch,afl,none,afl,none,delta,none	&	188.679245	&	2\\
+22	& rle,const,none,delta,none					&	285.714294	&	2\\
+23	& rle,const,none,delta,none					&	285.714294	&	2\\
+24	& rle,const,none,delta,none					&	285.714294	&	2\\
+25	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+26	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+\hline
+\end{tabular} 
+\end{table}
+
 \section{Szybkoœæ dzia³ania}
-\section{Porównanie}
+Omówienie szybkoœci dzia³ania
+
 
 \chapter{Podsumowanie}
 

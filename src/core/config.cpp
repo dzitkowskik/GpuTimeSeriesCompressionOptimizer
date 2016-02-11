@@ -17,6 +17,31 @@ namespace ddj
 
 Config* Config::_instance(0);
 
+ConfigOptions GetDefaultProgramOptions()
+{
+	ConfigOptions options;
+
+	// SET CONSOLE OPTIONS
+	po::options_description consoleOptions("Config file options");
+	options.ConsoleOptions.add(consoleOptions);
+
+	// SET CONSOLE POSITIONAL OPTIONS
+	po::positional_options_description consolePositionalOptions;
+	options.ConsolePositionalOptions = consolePositionalOptions;
+
+	// SET CONFIG FILE OPTIONS
+	po::options_description configFileOptions("Config file options");
+	configFileOptions.add_options()
+	    ("TEST_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing test time series data")
+	    ("BENCHMARK_DATA_LOG", po::value<std::string>()->default_value(""), "default file containing benchmark time series data")
+	    ("NYSE_DATA_1GB", po::value<std::string>()->default_value(""), "default file containing nyse time series data from openbook")
+		("LOG_CONFIG", po::value<std::string>()->default_value("logger.prop", "file containing log4cplus configuration"))
+	    ;
+	options.ConfigFileOptions.add(configFileOptions);
+
+	return options;
+}
+
 Config::Config(ConfigDefinition definition)
 {
 	try
@@ -62,7 +87,7 @@ Config::Config(ConfigDefinition definition)
 Config* Config::GetInstance()
 {
 	if (!_instance)
-		throw std::runtime_error("Config not initialized!");
+		Initialize(ConfigDefinition{0, nullptr, "config.ini", GetDefaultProgramOptions()});
 
 	return _instance;
 }

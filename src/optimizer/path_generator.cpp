@@ -94,7 +94,12 @@ Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistic
 {
 	Path result;
 
-	if(et == EncodingType::afl || et == EncodingType::gfc || stats.size <= 0)
+	if(level != 0 && (et == EncodingType::none || stats.size <= 0))
+		return result;
+	else
+		result.push_back(EncodingType::none);
+
+	if(et == EncodingType::afl || et == EncodingType::gfc)
 		return result;
 
 	if(level < MAX_LEVEL)
@@ -108,18 +113,15 @@ Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistic
 			result.push_back(EncodingType::scale);
 
 		// FLOAT
-		if(et != EncodingType::floatToInt)
-		{
-			if(dt == DataType::d_float)
-				result.push_back(EncodingType::floatToInt);
-		}
+		if(et != EncodingType::floatToInt && dt == DataType::d_float)
+			result.push_back(EncodingType::floatToInt);
 
 		// PATCH
-		if(et != EncodingType::patch)
+		if(et != EncodingType::patch && et != EncodingType::dict)
 			result.push_back(EncodingType::patch);
 
 		// DICT
-		if(et != EncodingType::dict)
+		if(et != EncodingType::dict && et != EncodingType::patch)
 			result.push_back(EncodingType::dict);
 
 		if(stats.sorted || stats.rlMetric > 2)

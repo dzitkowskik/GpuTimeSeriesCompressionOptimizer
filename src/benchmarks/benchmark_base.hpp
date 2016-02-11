@@ -43,6 +43,22 @@ protected:
 	SharedCudaPtr<time_t> GetTsIntDataFromFile(int n);
 	SharedCudaPtr<float> GetTsFloatDataFromFile(int n);
 	SharedCudaPtr<int> GetFakeIntDataForHistogram(int n);
+	SharedCudaPtr<time_t> GetFakeDataForTime(size_t n)
+	{
+		return _generator.GetFakeDataForTime(1e5, 0.1f, n);
+	}
+
+	template<typename T>
+	SharedCudaPtr<T> GetFakeDataWithPatternA(int p, size_t n)
+	{
+		return _generator.GetFakeDataWithPatternA(p, (size_t)1e2, (T)5, (T)1, (T)1e6, n);
+	}
+
+	template<typename T>
+	SharedCudaPtr<T> GetFakeDataWithPatternB(int p, size_t n)
+	{
+		return _generator.GetFakeDataWithPatternB(p, n, (T)3, (T)1e7, n);
+	}
 
 	void SetStatistics(benchmark::State& state, DataType type);
 

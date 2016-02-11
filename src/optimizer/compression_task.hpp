@@ -28,7 +28,7 @@ public:
 		: _ts(ts),
 		  _columnId(columnId),
 		  _optimizer(optimizer),
-		  _deviceId(0),
+		  _deviceId(1),
 		  _outputFile(outputFile),
 		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CompressionTask")))
 	{}

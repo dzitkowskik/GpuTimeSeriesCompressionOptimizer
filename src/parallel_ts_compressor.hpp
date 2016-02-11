@@ -25,6 +25,7 @@ public:
 public:
 	void Compress(File& inputFile, File& outputFile);
 	void Decompress(File& inputFile, File& outputFile, FileDefinition& def);
+	void SetBatchSize(size_t size);
 
 private:
 	void init(SharedTimeSeriesPtr ts);

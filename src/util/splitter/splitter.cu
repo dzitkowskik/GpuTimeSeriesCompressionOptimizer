@@ -67,13 +67,16 @@ template<typename T>
 SharedCudaPtrTuple<T> Splitter::Split(
 	SharedCudaPtr<T> data, SharedCudaPtr<int> stencil)
 {
+	LOG4CPLUS_DEBUG_FMT(_logger, "SPLITTER SPLIT START data size = %lu", data->size());
 	int out_size = 0;
 	auto prefixSum_true = exclusivePrefixSum_thrust(stencil, out_size);
 	auto neg_stencil = NegateStencil(stencil);
 	auto prefixSum_false = exclusivePrefixSum_thrust(neg_stencil);
 
+	LOG4CPLUS_DEBUG_FMT(_logger, "SPLITTER TRUE_SIZE = %d, FALSE_SIZE = %d", out_size, (int)data->size()-out_size);
+
 	auto yes = CudaPtr<T>::make_shared(out_size);
-	auto no = CudaPtr<T>::make_shared(data->size()-out_size);
+	auto no = CudaPtr<T>::make_shared((int)data->size()-out_size);
 
 	if(data->size() > 0)
     {
@@ -90,6 +93,8 @@ SharedCudaPtrTuple<T> Splitter::Split(
     }
 
 	cudaDeviceSynchronize();
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
+	LOG4CPLUS_DEBUG(_logger, "SPLITTER SPLIT END");
 
 	return std::make_tuple(yes, no);
 }
@@ -173,7 +178,7 @@ SharedCudaPtr<T> Splitter::Merge(SharedCudaPtrTuple<T> data, SharedCudaPtr<int> 
 	);
 
 	cudaDeviceSynchronize();
-	CUDA_CALL( cudaGetLastError() );
+	CUDA_ASSERT_RETURN( cudaGetLastError() );
 
 	return result;
 }

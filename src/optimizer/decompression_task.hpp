@@ -25,7 +25,7 @@ class DecompressionTask : public Task
 {
 public:
 	DecompressionTask(SharedTimeSeriesPtr ts, int columnId)
-		: _ts(ts), _columnId(columnId), _deviceId(0),
+		: _ts(ts), _columnId(columnId), _deviceId(1),
 		  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("DecompressionTask")))
 	{}
 

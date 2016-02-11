@@ -22,6 +22,11 @@ ParallelTSCompressor::ParallelTSCompressor(SharedTimeSeriesReader reader)
 	  _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("ParallelTSCompressor")))
 {}
 
+void ParallelTSCompressor::SetBatchSize(size_t size)
+{
+	_batchSize = size;
+}
+
 void ParallelTSCompressor::init(SharedTimeSeriesPtr ts)
 {
 	_columnNumber = ts->getColumnsNumber();
@@ -41,7 +46,7 @@ void ParallelTSCompressor::Compress(File& inputFile, File& outputFile)
 	{
 		// read batch data from source
 		ts = _reader->Read(inputFile, _batchSize);
-		ts->print(5);
+//		ts->print(5);
 
 		if(!_initialized) init(ts);
 
@@ -79,6 +84,7 @@ void ParallelTSCompressor::Decompress(File& inputFile, File& outputFile, FileDef
 		_taskScheduler->Schedule(DecompressionTask::make_shared(ts, i++));
 		if(i == _columnNumber)
 		{
+			LOG4CPLUS_DEBUG(_logger, "SYNC!");
 			i = 0;
 
 			// wait for all tasks to complete
@@ -88,6 +94,7 @@ void ParallelTSCompressor::Decompress(File& inputFile, File& outputFile, FileDef
 			// write part of time series to file
 			ts->updateRecordsCnt();
 			_reader->Write(outputFile, *ts);
+			LOG4CPLUS_DEBUG_FMT(_logger, "%d records written to a file", ts->getRecordsCnt());
 		}
 	}
 	LOG4CPLUS_DEBUG(_logger, "Decompression done");

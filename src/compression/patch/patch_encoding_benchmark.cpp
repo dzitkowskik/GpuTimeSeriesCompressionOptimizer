@@ -16,7 +16,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     OutsidePatchEncoding encoding(0, n, 0.2);
     Benchmark_Encoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Encode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Encode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Decode)(benchmark::State& state)
 {
@@ -26,7 +26,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     OutsidePatchEncoding encoding(0, n, 0.2);
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Decode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Int_Decode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Encode)(benchmark::State& state)
 {
@@ -36,7 +36,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_E
     OutsidePatchEncoding encoding(10, 1000);
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Encode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Encode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Decode)(benchmark::State& state)
 {
@@ -46,7 +46,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_D
     OutsidePatchEncoding encoding(10, 1000);
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Decode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_Random_OutsideOperator_Int_Decode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 
 BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Encode)(benchmark::State& state)
@@ -57,7 +57,7 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     OutsidePatchEncoding encoding(0, n, 0.25);
     Benchmark_Encoding(encoding, data, DataType::d_float, state);
 }
-BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Encode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Encode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Decode)(benchmark::State& state)
 {
@@ -67,6 +67,6 @@ BENCHMARK_DEFINE_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOp
     OutsidePatchEncoding encoding(0, n, 0.25);
     Benchmark_Decoding(encoding, data, DataType::d_float, state);
 }
-BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Decode)->Arg(1<<15)->Arg(1<<20);
+BENCHMARK_REGISTER_F(PatchEncodingBenchmark, BM_Patch_ConsecutiveNumbers_OutsideOperator_Float_Decode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 } /* namespace ddj */

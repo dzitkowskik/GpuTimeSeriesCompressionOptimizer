@@ -39,7 +39,6 @@ bool OptimalTree::TryCorrectTree()
 {
 	auto oldRatio = this->_ratio;
 	auto newRatio = this->_tree.GetCompressionRatio();
-	this->_ratio = this->_tree.GetCompressionRatio();
 	if(oldRatio <= newRatio && oldRatio > 1) return false;
 
 	// Get the weaker edge with minimal index
@@ -51,32 +50,43 @@ bool OptimalTree::TryCorrectTree()
 	{
 		auto edgeNo = edges[i].GetNo();
 		auto oldValue = oldStats->Get(edgeNo, edges[i].GetType());
-		// check if edge i should be replaced
+		auto newValue = newStats->Get(edgeNo, edges[i].GetType());
+
 		auto bestEdge = newStats->GetBest(edgeNo);
-		if(bestEdge.value > oldValue)
+
+		// check if edge i should be replaced
+		if(newValue < oldValue || bestEdge.value > newValue)
 		{
 			// check if whole parent node must be replaced or only one edge
 			auto newEdgeWithSameBeginning = newStats->GetBest(edgeNo, edges[i].GetType().first);
-			if(newEdgeWithSameBeginning.value > oldValue)
+			if(newEdgeWithSameBeginning.value > newValue)
 			{
 				// replace single edge
-				// TODO: Get correct data type
+
+				LOG4CPLUS_INFO_FMT(_logger, "Replace %s with %s",
+						GetEncodingTypeString(edges[i].To()->GetEncodingType()).c_str(),
+						GetEncodingTypeString(newEdgeWithSameBeginning.type.second).c_str());
+
 				auto encFactory = DefaultEncodingFactory().Get(newEdgeWithSameBeginning.type.second, edges[i].To()->GetDataType());
 				edges[i].To()->Reset(encFactory);
 				Replace(edges[i].To(), newStats, 2*(edgeNo + 1));
 			} else {
 				// replace whole parent node
-				// TODO: Get correct data type
+				LOG4CPLUS_INFO_FMT(_logger, "Replace %s with %s",
+					GetEncodingTypeString(edges[i].From()->GetEncodingType()).c_str(),
+					GetEncodingTypeString(bestEdge.type.first).c_str());
 
 				auto encFactory = DefaultEncodingFactory().Get(bestEdge.type.first, edges[i].From()->GetDataType());
 				edges[i].From()->Reset(encFactory);
 				Replace(edges[i].From(), newStats, edgeNo%2 ? edgeNo-1 : edgeNo);
 			}
-			break;
+
+			this->_ratio = this->_tree.GetCompressionRatio();
+			this->_statistics = this->_tree.GetStatistics();
+			return true;
 		}
 	}
-
-	return true;
+	return false;
 }
 
 } /* namespace ddj */

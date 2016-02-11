@@ -245,19 +245,18 @@ void OptimizerTest::CompressDecompressNPartsData(SharedCudaPtrVector<T> data)
 	// Compress
 	for(int i = 0; i < N; i++)
 	{
-		auto compressedPart = optimizer.CompressData(
-			CastSharedCudaPtr<T, char>(data[i]),
-			GetDataType<T>());
+		auto dataToCompress = CastSharedCudaPtr<T, char>(data[i]);
+		auto compressedPart = optimizer.CompressData(dataToCompress, GetDataType<T>());
 		compressedDataParts.push_back(compressedPart);
 
 		CompressionTree& optimalTree = optimizer.GetOptimalTree()->GetTree();
 		LOG4CPLUS_INFO_FMT(
 			_logger,
-			"Optimal tree: \n\t %s \n Ratio = %f \n %s",
-			optimalTree.ToString().c_str(),
-			optimalTree.GetCompressionRatio(),
+			"%s",
 			optimizer.GetStatistics()->ToStringShort().c_str()
 		);
+
+		LOG4CPLUS_INFO_FMT(_logger, "COMPRESSION RATIO = %f", (float)dataToCompress->size()/compressedPart->size());
 	}
 
 	// Check

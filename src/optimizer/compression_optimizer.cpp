@@ -46,7 +46,7 @@ std::vector<PossibleTree> CompressionOptimizer::CrossTrees(
 	{
 		auto tree = parent.first.Copy();
 		auto root = child.first.FindNode(0)->Copy();
-		auto outputSize = child.second + parentMetadataSize;
+		auto outputSize = child.second + parentMetadataSize + 8;
 		tree.AddNode(root, 0);
 		tree.FindNode(0)->SetCompressionRatio(Encoding::GetCompressionRatio(inputSize, outputSize));
 		results.push_back(std::make_pair(tree, outputSize));
@@ -67,7 +67,7 @@ std::vector<PossibleTree> CompressionOptimizer::CrossTrees(
 		for(auto& childRight : childrenRight)
 		{
 			auto tree = parent.first.Copy();
-			size_t outputSize = childLeft.second + childRight.second + parentMetadataSize;
+			size_t outputSize = childLeft.second + childRight.second + parentMetadataSize + 8;
 			tree.AddNode(childLeft.first.FindNode(0)->Copy(), 0);
 			tree.AddNode(childRight.first.FindNode(0)->Copy(), 0);
 			tree.FindNode(0)->SetCompressionRatio(Encoding::GetCompressionRatio(inputSize, outputSize));
@@ -141,7 +141,7 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 
 bool CompressionOptimizer::IsFullUpdateNeeded()
 {
-	if(_optimalTree == nullptr || _partsProcessed % 10 == 7) return true;
+	if(_optimalTree == nullptr || _partsProcessed % 5 == 4) return true;
 	return false;
 }
 
@@ -149,9 +149,8 @@ size_t CompressionOptimizer::GetSampleDataForFullUpdateSize(size_t partDataSize,
 {
 	size_t typeSizeInBytes = GetDataTypeSize(type);
 	size_t numberOfElements = partDataSize / typeSizeInBytes;
-	if(numberOfElements <= 1000) return partDataSize;
-	else if (numberOfElements <= 10000) return 1000*typeSizeInBytes;
-	else return (numberOfElements/100)*typeSizeInBytes;
+	if (numberOfElements <= 10000) return partDataSize;
+	else return 10000*typeSizeInBytes;
 }
 
 SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataPart, DataType type)
@@ -172,19 +171,28 @@ SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataP
 			tree.first.SetStatistics(_statistics);
 		}
 
-		auto bestTree = std::min_element(
+		auto bestTree = std::max_element(
 			possibleTrees.begin(),
 			possibleTrees.end(),
-			[&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
+			[&](PossibleTree A, PossibleTree B){ return A.first.GetCompressionRatio() < B.first.GetCompressionRatio(); });
+
+	//		for(int i = 0; i < 10; i++)
+	//		{
+	//			LOG4CPLUS_INFO_FMT(_logger, "PossibleTree[%d](size = %lu)(val = %f): %s",
+	//					i, possibleTrees[i].second, possibleTrees[i].first.GetCompressionRatio(),
+	//					possibleTrees[i].first.ToString().c_str());
+	//		}
+
+		LOG4CPLUS_INFO_FMT(_logger, "Found %d interesting trees (best score = %f)",
+				possibleTrees.size(), (*bestTree).first.GetCompressionRatio());
 
 		_optimalTree = OptimalTree::make_shared((*bestTree).first);
-		LOG4CPLUS_INFO(_logger, "Optimal tree: \n" << _optimalTree->GetTree().ToString());
 	}
 
 	auto compressedData = _optimalTree->GetTree().Compress(dataPart);
+	LOG4CPLUS_INFO(_logger, "Optimal tree: " << _optimalTree->GetTree().ToString());
 	bool treeCorrected = _optimalTree->TryCorrectTree();
-
-	LOG4CPLUS_TRACE_FMT(_logger, "Tree corrected = %s\n", treeCorrected ? "true" : "false");
+	LOG4CPLUS_INFO_FMT(_logger, "Tree corrected = %s\n", treeCorrected ? "true" : "false");
 	_partsProcessed++;
 	_totalBytesProcessed += dataPart->size();
 	return compressedData;

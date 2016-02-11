@@ -49,7 +49,6 @@ BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDeltaPatchA
 
     CompressionTree compressionTree;
 	auto pef = new PatchEncodingFactory<int>(DataType::d_int, PatchType::lower);
-	pef->factor = 0.2;
 	auto root = boost::make_shared<CompressionNode>(boost::make_shared<ScaleEncodingFactory>(DataType::d_int));
 	auto delta = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
 	auto patch = boost::make_shared<CompressionNode>(boost::shared_ptr<PatchEncodingFactory<int>>(pef));
@@ -85,7 +84,6 @@ BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDeltaPatchA
 
     CompressionTree compressionTree;
 	auto pef = new PatchEncodingFactory<int>(DataType::d_int, PatchType::lower);
-	pef->factor = 0.2;
 	auto root = boost::make_shared<CompressionNode>(boost::make_shared<ScaleEncodingFactory>(DataType::d_int));
 	auto delta = boost::make_shared<CompressionNode>(boost::make_shared<DeltaEncodingFactory>(DataType::d_int));
 	auto patch = boost::make_shared<CompressionNode>(boost::shared_ptr<PatchEncodingFactory<int>>(pef));
