@@ -114,11 +114,11 @@ Many devices such as sensors, measuring stations or even servers produce enormou
 
 \chapter{Wstêp}
 Poni¿sza praca zawiera opis implementacji optymalizatora kompresji szeregów czasowych, bazuj¹cego na dynamicznie generowanych statystykach danych. Pomys³ opiera siê na tworzeniu drzew kompresji (kompresja kaskadowa) oraz zbieraniu statystyk o krawêdziach takich drzew - jak dobrze dana para kompresji sprawdza siê dla nap³ywaj¹cych danych. System bêdzie równie¿ dynamicznie zmienia³ - korygowa³, takie drzewa w zale¿noœci od charakterystyki kolejnych paczek danych.
-W za³o¿eniu system ma umo¿liwiæ kompresjê du¿ych iloœci danych przy wykorzystaniu potencja³u obliczeniowego wspó³czesnych kart graficznych.
+W za³o¿eniu program ma umo¿liwiæ kompresjê du¿ych iloœci danych przy wykorzystaniu potencja³u obliczeniowego wspó³czesnych kart graficznych.
 
 \section{Procesory graficzne}
-Procesory graficzne sta³y siê znacz¹cymi i potê¿nymi koprocesorami obliczeñ dla wielu aplikacji i systemów, takich jak bazy danych, badania naukowe czy wyszukiwarki www. Nowoczesne GPU posiadaj¹ moc obliczeniow¹ o rz¹d wiêksz¹ ni¿ zwykle, wielordzeniowe procesory CPU, takie jak AMD FX 8XXX czy Intel Core i7. Dla przyk³adu flagowa konstrukcja firmy NVIDIA - GeForce GTX Titan X osi¹ga moc 6600 GFLOPS (miliardów operacji zmiennoprzecinkowych na sekundê), przy $336 GB/s$ przepustowoœci pamiêci, podczas gdy najszybsze procesory takie jak Intel Core i7-5960x osi¹gaj¹ nieca³e 180 GFLOPS, przy przepustowoœci $68 GB/s$. Kartom graficznym dorównuj¹ tylko inne jednostki typu SIMD, na przyk³¹d karty obliczeniowe Xeon Phi. Pomimo tak osza³amiaj¹cych wyników, programowanie na jednostkach SIMD jest o wiele trudniejsze,
-jak równie¿ ograniczone przepustowoœci¹ szyny PCI-E, która wynosi w porywach $8 GB/s$, co dodatkowo przemawia za u¿yciem kompresji przy przetwarzaniu szeregów czasowych, choæby w celu przyspieszenia kopiowania danych z i na kartê graficzn¹ w celu wykonania obliczeñ.
+Procesory graficzne sta³y siê znacz¹cymi i potê¿nymi koprocesorami obliczeñ dla wielu aplikacji i systemów takich jak bazy danych, badania naukowe czy wyszukiwarki www. Nowoczesne GPU posiadaj¹ moc obliczeniow¹ o rz¹d wiêksz¹ ni¿ zwykle, wielordzeniowe procesory CPU, takie jak AMD FX 8XXX czy Intel Core i7. Dla przyk³adu flagowa konstrukcja firmy NVIDIA - GeForce GTX Titan X osi¹ga moc 6600 GFLOPS (miliardów operacji zmiennoprzecinkowych na sekundê), przy $336 GB/s$ przepustowoœci pamiêci, podczas gdy najszybsze procesory takie jak Intel Core i7-5960x osi¹gaj¹ nieca³e 180 GFLOPS, przy przepustowoœci $68 GB/s$. Kartom graficznym dorównuj¹ tylko inne jednostki typu SIMD, na przyk³ad karty obliczeniowe Xeon Phi. Pomimo tak osza³amiaj¹cych wyników, programowanie na jednostkach SIMD jest o wiele trudniejsze,
+jak równie¿ ograniczone przepustowoœci¹ szyny PCI-E, która wynosi w porywach $8 GB/s$, co dodatkowo przemawia za u¿yciem kompresji przy przetwarzaniu szeregów czasowych, choæby w celu przyspieszenia kopiowania danych z i na kartê graficzn¹.
 
 \section{Szeregi czasowe}
 
@@ -129,56 +129,55 @@ jak równie¿ ograniczone przepustowoœci¹ szyny PCI-E, która wynosi w porywach $8 
 		\label{ref:ts}
 	\end{figure}
 
-Terabajty danych w postaci szeregów czasowych s¹ przetwarzane i analizowane ka¿dego dnia na ca³ym œwiecie. Zapytania i agregacje na tak wielkich porcjach danych jest czasoch³onne i wymaga du¿ej iloœci zasobów. Aby zmierzyæ siê z tym problemem, powsta³y wyspecjalizowane bazy danych, wspieraj¹ce analizê szeregów czasowych. Wa¿nym czynnikiem w tych rozwi¹zaniach jest kompresja oraz u¿ycie procesorów graficznych w celu przyspieszenia obliczeñ. Aby przetwarzaæ dane na GPU bez koniecznoœci ich ci¹g³ego kopiowania poprzez szynê PCI-E, powstaj¹ bazy danych po stronie GPU (najczêœciej rozproszone), takie jak MapD lub DDJ (zaproponowana miêdzy innymi przeze mnie w poprzedniej pracy - in¿ynierskiej).
+Terabajty danych w postaci szeregów czasowych s¹ przetwarzane i analizowane ka¿dego dnia na ca³ym œwiecie. Zapytania i agregacje na tak wielkich porcjach danych jest czasoch³onne i wymaga du¿ej iloœci zasobów. Aby zmierzyæ siê z tym problemem, powsta³y wyspecjalizowane bazy danych, wspieraj¹ce analizê szeregów czasowych. Wa¿nym czynnikiem w tych rozwi¹zaniach jest kompresja oraz u¿ycie procesorów graficznych w celu przyspieszenia obliczeñ. Aby przetwarzaæ dane na GPU bez koniecznoœci ich ci¹g³ego kopiowania poprzez szynê PCI-E, powstaj¹ bazy danych po stronie GPU (najczêœciej rozproszone), takie jak MapD\footnote{Baza danych GPU - http://www.mapd.com/}\cite{MOSTAK} lub DDJ\footnote{https://github.com/d-d-j -  zaproponowana we wczeœniejszej pracy in¿ynierskiej}.
 Innymi rozwi¹zaniami s¹ koprocesory obliczeniowe GPU, wspomagaj¹ce dzia³anie baz takich jak Cassandra, HBase, TepoDB, OpenTSDB czy PostgreSQL. Charakterystyka danych wielu szeregów wskazuje, ¿e przy odpowiedniej obróbce mog¹ byæ kompresowane z bardzo du¿ym wspó³czynnikiem, szczególnie jeœli by³oby mo¿liwe kompresowanie za pomoc¹ dynamicznie zmieniaj¹cych siê ci¹gów (ró¿nych) algorytmów kompresji i transformacji danych. Dla przyk³adu, jeœli jakiœ fragment szeregu jest sta³y, z nielicznymi wyj¹tkami, warto by³oby usun¹æ wyj¹tki, a resztê skompresowaæ jako jedn¹ liczbê - uzyskuj¹c wspó³czynnik kompresji rzêdu d³ugoœci danych.
 
 \section{SIMD i lekka kompresja}
-Bazy danych przechowuj¹ce szeregi czasowe s¹ najczêœciej zorientowane kolumnowo oraz stosuj¹ metody lekkiej kompresji w celu oszczêdnoœci pamiêci. W tych przypadkach stosuje siê metody lekkiej kompresji, takie jak kodowanie s³ownikowe, delta lub sta³ej liczby bitów, zamiast bardziej skomplikowanych i wolniejszych metod, które czêsto zapewni³yby lepszy poziom kompresji. Systemy te ³aduj¹ swoje dane do pamiêci trwa³ej paczkami, które mog¹ byæ kompresowane osobo i byæ mo¿e przy u¿yciu ró¿nych algorytmów, zmieniaj¹cych siê dynamicznie w czasie. Takie kolumny wartoœci numerycznych tego samego typu wspaniale przetwarza siê przy u¿yciu procesorów typu SIMD, co daje wielokrotne przyspieszenie w stosunku do tradycyjnych architektur. Okazuje siê ¿e wiêkszoœæ algorytmów lekkiej kompresji mo¿e z du¿ym powodzeniem byæ w ten sposób zrównoleglona. Równie¿ dynamiczne generowanie statystyk nap³ywaj¹cych danych mo¿e byæ przyspieszone z u¿yciem SIMD, co otwiera mo¿liwoœæ implementacji wydajnych systemów, dynamicznie optymalizuj¹cych u¿yte kompresje w celu zwiêkszenia wspó³czynnika kompresji danych. Dodatkowo u¿ycie kaskadowej kompresji mo¿e wielokrotnie wzmocniæ poziom kompresji, pod warunkiem stworzenia dobrego planu kompresji, w³aœnie na podstawie wygenerowanych statystyk. Ogromna moc obliczeniowa procesorów graficznych mo¿e pozwoliæ wygenerowaæ taki plan w rozs¹dnym czasie. Takie u¿ycie jest mo¿liwe np. w bazach danych po stronie GPU, gdzie jest to niezmiernie wa¿ne z powodu œcis³ego limitu pamiêci na kartach i ich wysokiego kosztu.
+Bazy danych przechowuj¹ce szeregi czasowe s¹ najczêœciej zorientowane kolumnowo oraz stosuj¹ metody lekkiej kompresji w celu oszczêdnoœci pamiêci. W tych przypadkach stosuje siê metody lekkiej kompresji, takie jak kodowanie s³ownikowe, delta lub sta³ej liczby bitów, zamiast bardziej skomplikowanych i wolniejszych metod, które czêsto zapewni³yby lepszy poziom kompresji. Systemy te ³aduj¹ swoje dane do pamiêci trwa³ej paczkami, które mog¹ byæ kompresowane osobno, przy u¿yciu ró¿nych algorytmów, zmieniaj¹cych siê dynamicznie w czasie. Takie kolumny wartoœci numerycznych tego samego typu wspaniale przetwarza siê przy u¿yciu procesorów typu SIMD, co daje wielokrotne przyspieszenie w stosunku do tradycyjnych architektur. Okazuje siê ¿e wiêkszoœæ algorytmów lekkiej kompresji mo¿e z du¿ym powodzeniem byæ w ten sposób zrównoleglona. Równie¿ dynamiczne generowanie statystyk nap³ywaj¹cych danych mo¿e byæ przyspieszone z u¿yciem SIMD, co otwiera mo¿liwoœæ implementacji wydajnych systemów, dynamicznie optymalizuj¹cych u¿yte kompresje w celu zwiêkszenia wspó³czynnika kompresji danych. Dodatkowo u¿ycie kaskadowej kompresji mo¿e wielokrotnie wzmocniæ poziom kompresji, pod warunkiem stworzenia dobrego planu kompresji, w³aœnie na podstawie wygenerowanych statystyk. Ogromna moc obliczeniowa procesorów graficznych mo¿e pozwoliæ wygenerowaæ odpowiedni plan w rozs¹dnym czasie. Takie u¿ycie jest mo¿liwe np. w bazach danych po stronie GPU, gdzie jest to niezmiernie wa¿ne z powodu œcis³ego limitu pamiêci na kartach i ich wysokiego kosztu.
 
 \section{Zawartoœæ pracy}
-W tej pracy przedstawiê planer kompresji (optymalizator) kompresuj¹cy nap³ywaj¹ce paczki danych. Zaprezentujê nowe podejœcie, planera buduj¹cego drzewa kompresji i ucz¹cego siê ich konstrukcji na podstawie na bie¿¹co generowanych statystyk wêz³ów takich drzew (jak równie¿ statystyk nap³ywaj¹cych danych). Przedstawiê równie¿ zaimplementowane œrodowisko oraz u¿yte algorytmy lekkiej kompresji. W ramach tej pracy stworzone zosta³y 4 biblioteki, wykorzystuj¹ce technologiê NVIDIA CUDA, tworz¹ce framework optymalizatora kompresji oraz program w sposób równoleg³y kompresuj¹cy kolumny podanego szeregu czasowego.
-Nastêpny podrozdzia³ zawiera opis wczeœniejszych prac prowadzonych w tych tematach, a tak¿e krótki opis architektury CUDA. W rozdziale 2 omówiê stworzony framework oraz metody lekkiej kompresji, ze szczególnym uwzglêdnieniem kompresji FL oraz GFC. Rozdzia³ 3 jest w ca³oœci poœwiêcony optymalizatorowi kompresji oraz generowaniu drzew i statystyk. Nastêpnie przedstawiê wyniki prac i eksperymentów. Ostatni rozdzia³ (pi¹ty) to podsumowanie oraz zakres przysz³ych prac i optymalizacji.
+W tej pracy przedstawiê planer kompresji (optymalizator) kompresuj¹cy nap³ywaj¹ce paczki danych. Zaprezentujê nowe podejœcie do planera buduj¹cego drzewa kompresji i ucz¹cego siê ich konstrukcji na podstawie statystyk wêz³ów takich drzew generowanych w czasie rzeczywistym\footnote{jak równie¿ statystyk nap³ywaj¹cych danych}. Przedstawiê równie¿ zaimplementowane œrodowisko oraz u¿yte algorytmy lekkiej kompresji. W ramach tej pracy stworzone zosta³y 4 biblioteki, wykorzystuj¹ce technologiê \emph{NVIDIA CUDA}, tworz¹ce framework optymalizatora kompresji oraz program kompresuj¹cy kolumny podanego szeregu czasowego w sposób równoleg³y.
+Nastêpny podrozdzia³ zawiera opis wczeœniejszych prac prowadzonych w tych tematach, a tak¿e krótki opis architektury CUDA. W rozdziale 2 omówiê stworzony framework oraz metody lekkiej kompresji, ze szczególnym uwzglêdnieniem kompresji FL oraz GFC. Rozdzia³ 3 jest w ca³oœci poœwiêcony optymalizatorowi kompresji oraz generowaniu drzew i statystyk. Nastêpnie przedstawiê wyniki prac i eksperymentów. Ostatni rozdzia³ to podsumowanie oraz zakres przysz³ych prac i optymalizacji.
 
 \section{Powi¹zane prace}
 
 \subsection{Szeregi czasowe}
-Szeregi czasowe s¹ typem danych dla których istnieje wiele efektywnych sposobów kompresji zale¿nych od ich charakterystyki. W wielu pracach przedstawiono podejœcia do tego problemu od strony lekkiej kompresji. Najczêstszymi z nich s¹ kodowanie ekstremami \cite{FINK}, sta³ej d³ugoœci bitów \cite{PRZYMUS1}, czyli tzw. NULL Suppression (NS) oraz proste kodowania s³ownikowe np. wszystkich unikalnych wartoœci, które mo¿na zakodowaæ pewn¹ za³o¿on¹ z góry liczb¹ bitów \cite{ABADI}. \\
-Dodatkowo do kompresji szeregów stosuje siê metody regresji \cite{MENSMANN}. Autor stosuje Piecewise Regression - regresjê odcinkow¹, polegaj¹c¹ na przybli¿aniu kawa³ków szeregu funkcj¹, np. wielomianem. Ma to swoj¹ wersjê stratn¹ jak i bezstratn¹, gdzie mo¿emy zapisaæ ró¿nicê od zadanej funkcji i wynik zapisaæ na mniejszej liczbie bitów. \\ Szeregi czasowe to nie tylko liczby ca³kowitoliczbowe. Analizuje siê tak¿e wiele sposobów kompresji liczb zmiennoprzecinkowych pojedynczej i podwójnej precyzji. Najczêœciej próbuje siê zamieniæ liczbê u³amkow¹ na ca³kowit¹ stosuj¹c skalowanie \cite{PRZYMUS2}. Istniej¹ te¿ bardziej skomplikowane metody na przyk³ad kompresji liczb double algorytmem FPC \cite{BURTSCHER}, który kompresuje liniow¹ sekwencjê liczb o podwójnej precyzji (IEEE 754), sekwencyjnie przewiduj¹c ka¿d¹ wartoœæ, a nastêpnie wykonuj¹c operacjê XOR z prawdziw¹ wartoœci¹ szeregu, po czym usuwane s¹ wiod¹ce zera.
+Szeregi czasowe s¹ typem danych dla których istnieje wiele efektywnych sposobów kompresji, zale¿nych od ich charakterystyki. W wielu pracach przedstawiono podejœcia do tego problemu od strony lekkiej kompresji. Najczêstszymi z nich s¹ kodowanie ekstremami \cite{FINK}, sta³ej d³ugoœci bitów \cite{PRZYMUS1}, czyli tzw. NULL Suppression (NS) oraz proste kodowania s³ownikowe np. wszystkich unikalnych wartoœci, które mo¿na zakodowaæ pewn¹ za³o¿on¹ z góry liczb¹ bitów \cite{ABADI}. \\
+Dodatkowo do kompresji szeregów stosuje siê metody regresji \cite{MENSMANN}. Autor stosuje Piecewise Regression - regresjê odcinkow¹, polegaj¹c¹ na przybli¿aniu kawa³ków szeregu funkcj¹, np. wielomianem. Ma to swoj¹ wersjê stratn¹ jak i bezstratn¹, gdzie mo¿emy zapisaæ ró¿nicê od zadanej funkcji i wynik zapisaæ na mniejszej liczbie bitów. \\ Szeregi czasowe to nie tylko liczby ca³kowite. Analizuje siê tak¿e wiele sposobów kompresji liczb zmiennoprzecinkowych pojedynczej i podwójnej precyzji. Najczêœciej próbuje siê zamieniæ liczbê u³amkow¹ na ca³kowit¹ stosuj¹c skalowanie \cite{PRZYMUS2}. Istniej¹ te¿ bardziej skomplikowane metody na przyk³ad kompresji liczb double algorytmem FPC \cite{BURTSCHER}, który kompresuje liniow¹ sekwencjê liczb o podwójnej precyzji (IEEE 754), sekwencyjnie przewiduj¹c ka¿d¹ wartoœæ, a nastêpnie wykonuj¹c operacjê XOR z prawdziw¹ wartoœci¹ szeregu, po czym usuwane s¹ wiod¹ce zera.
 
 \subsection{SIMD SSE}
-Bior¹c pod uwagê algorytmy lekkiej kompresji dla szeregów, warto zwróciæ uwagê na udane próby optymalizacji z u¿yciem prostego SIMD jakim s¹ operacje wektorowe SSE na procesorach Intel \cite{ZHAO} \cite{LEMIRE}. W tych pracach pokazano przek³ad algorytmów kodowania z wyrównaniem do bajtów (Byte-Aligned Coding) oraz do s³ów (Word-Aligned Coding) oraz zmierzono wydajnoœæ implementacji wektorowej wersji tych kodowañ z u¿yciem SSE. Autorzy zastosowali równie¿ binarne pakowanie (Binary Packing) w formie algorytmu FOR (Frame of Reference) \cite{GOLDSTEIN} dziel¹c dane na bloki o d³ugoœci 128 elementów (zmiennych ca³kowitych o d³ugoœci 32 bitów) i stosuj¹c patchowanie. Taki algorytm okaza³ siê najwydajniejszy. Pokazano, ¿e bez spadku jakoœci kompresji mo¿na uzyskaæ w ten sposób wzrost szybkoœci kompresji od 2 do 4 razy w stosunku to tradycyjnej implementacji.
+Bior¹c pod uwagê algorytmy lekkiej kompresji dla szeregów, warto zwróciæ uwagê na udane próby optymalizacji z u¿yciem prostego SIMD jakim s¹ operacje wektorowe SSE na procesorach Intel \cite{ZHAO, LEMIRE}. W tych pracach pokazano przek³ad algorytmów kodowania z wyrównaniem do bajtów (Byte-Aligned Coding) oraz do s³ów (Word-Aligned Coding) i zmierzono wydajnoœæ implementacji wektorowej wersji tych kodowañ z u¿yciem SSE. Autorzy zastosowali równie¿ binarne pakowanie (Binary Packing) w formie algorytmu FOR (Frame of Reference) \cite{GOLDSTEIN} dziel¹c dane na bloki o d³ugoœci 128 elementów (zmiennych ca³kowitych o d³ugoœci 32 bitów) i stosuj¹c patchowanie. Taki algorytm okaza³ siê najwydajniejszy. Pokazano, ¿e bez spadku jakoœci kompresji mo¿na uzyskaæ w ten sposób wzrost szybkoœci kompresji od 2 do 4 razy w stosunku to tradycyjnej implementacji.
 
 \subsection{Obliczenia GPU}
 Dziêki ogromnej mocy obliczeniowej kart graficznych uzyskano znacz¹cy wzrost wydajnoœci wielu algorytmów daj¹cych siê w mniejszym lub wiêkszym stopniu zrównolegliæ. Przyk³adowymi algorytmami o tej w³aœciwoœci s¹ choæby radix sort\cite{SORT}, hashowanie kuku³cze\cite{PHASH,CHASH}, sumy prefixowe\cite{PPS} i inne zaimplementowane w podstawowych bibliotekach takich jak
 CUDPP\footnote{CUDA Data Parallel Primitives - http://cudpp.github.io/}
-czy
-Thrust\footnote{Parallel algorithms library - https://developer.nvidia.com/thrust}. \\
-Najwa¿niejsze s¹ jednak bardzo zadowalaj¹ce rezultaty zrównoleglania algorytmów u¿ywanych w bazach danych takich jak index search\cite{ANH}, wszelkiego rodzaju agregacje i operacje join, scatter i gather\cite{RUSSEK} oraz obliczanie statystyk danych\cite{KACZMAR1} jak równie¿ dopasowywanie wyra¿eñ regularnych\cite{MORISHIMA}. Dla przyk³adu wzrost wydajnoœci oferowany przez algorytmy z biblioteki Thrust, która jest niejako odpowiednikiem Std, jest œrednio 10-krotny\cite{CUDA_PERF} w stosunku do najszybszych wersji CPU. Wiêkszoœæ przytoczonych wy¿ej przyk³adów równie¿ reprezentuje wzrost wydajnoœci o rz¹d wielkoœci. W pracach odnoœnie akceleracji baz danych za pomoc¹ technologii CUDA, autorzy otrzymuj¹ przyspieszenie $20-60$ krotne\cite{BAKKUM}, w przypadku operacji \emph{SELECT WHERE} i \emph{SELECT JOIN} z agregacjami\cite{RUSSEK}. Jednak jest to liczone bez uwzglêdniania czasu kopiowania danych na GPU. Jak obliczono zajmuje to œrednio ok $90\%$ czasu dzia³ania algorytmów\cite{KACZMAR2}.
+czy Thrust\footnote{Parallel algorithms library - https://developer.nvidia.com/thrust}. \\
+Najwa¿niejsze s¹ jednak bardzo zadowalaj¹ce rezultaty zrównoleglania algorytmów u¿ywanych w bazach danych takich jak index search\cite{ANH}, wszelkiego rodzaju agregacje i operacje join, scatter i gather\cite{RUSSEK} oraz obliczanie statystyk danych\cite{KACZMAR1}, jak równie¿ dopasowywanie wyra¿eñ regularnych\cite{MORISHIMA}. Dla przyk³adu, wzrost wydajnoœci oferowany przez algorytmy z biblioteki Thrust, która jest niejako odpowiednikiem Std, jest œrednio 10-krotny\cite{CUDA_PERF} w stosunku do najszybszych wersji CPU. Wiêkszoœæ przytoczonych wy¿ej przyk³adów równie¿ reprezentuje wzrost wydajnoœci o rz¹d wielkoœci. W pracach odnoœnie akceleracji baz danych za pomoc¹ technologii CUDA, autorzy otrzymuj¹ przyspieszenie $20-60$ krotne\cite{BAKKUM}, w przypadku operacji \emph{SELECT WHERE} i \emph{SELECT JOIN} z agregacjami\cite{RUSSEK}. Powy¿sze wyniki zwykle s¹ osi¹gane bez uwzglêdniania czasu kopiowania danych na GPU, co jak obliczono zajmuje to œrednio ok $90\%$ czasu dzia³ania algorytmów\cite{KACZMAR2}.
 
 \subsection{Kompresje}
-Opisane wy¿ej algorytmy lekkiej kompresji szeregów czasowych, w wiêkszoœci zosta³y zaimplementowane przez Fang et al.\cite{FANG} oraz Przymus et al.\cite{KACZMAR2} w ich pracach, gdzie autorzy zaznaczaj¹ ogromny wzrost przepustowoœci takich algorytmów oraz ich wysok¹ skutecznoœæ w kompresji szeregów. W przypadku pierwszego jest to nawet to 56 GB/s dekodowania, a dla drugiego od 2 do 40 GB/s kodowania w zale¿noœci od stopnia skomplikowania algorytmu. Wiêkszoœæ przewidzianych metod ma swoje odpowiedniki z patchowaniem, w którym elementy niepasuj¹ce odk³adane s¹ do osobnej tablicy wyj¹tków. Prace te odnosz¹ siê jednak tylko do liczb ca³kowitych, a najczêœciej ca³kowitych bez znaku (naturalnych). Lekk¹ kompresjê liczb zmiennopozycyjnych o podwójnej precyzji przestawi³ w swojej pracy O'Neil et al.\cite{ONEIL}, w której stosuj¹c technologiê CUDA i dziel¹c dane na odpowiednie bloki, zastosowano wariacjê algorytmu FOR i osi¹gniêto bardzo dobre wyniki rzêdu 75 Gb/s kodowania oraz a¿ 90 Gb/s dekodowania (daje to podobne rezultaty jak implementacja algorytmu FL dla liczb naturanlych\cite{PRZYMUS1}). Algorytm nazwano GFC i jest uogólnienie równie¿ dla liczb o pojedynczej precyzji przedstawiê dok³adnie w kolejnym rozdziale. \\
-Wzrost wydajnoœci osi¹gniêto równie¿ na tle bardziej skomplikowanych metod (daj¹cych czêsto lepsze wspó³czynniki kompresji) jak kodowanie Huffmana\cite{CURRY}, gdzie równoleg³a implementacja na GPU uzyska³a 2 do 5 krotne przyspieszenie, natomiast przepustowoœæ takiej kompresji to dla porównania 300 do 500 MB/s. Próby zoptymalizowania algorytmów takich jak LZSS w pracach Ozsoy et al.\cite{OZSOY}, skoñczy³y siê lekkim (max 2.2x) wzrostem wydajnoœci (w stosunku do wielordzeniowych implementacji CPU), przy uzyskanej przepustowoœci 1700 Mb/s w konfiguracji z dwoma kartami GPU\cite{OZSOY3}. Równie¿ inni autorzy maj¹ nadziejê na optymalizacje z u¿yciem kodowañ s³ownikowych takich jak LZW pobij¹ wyniki CPU jeœli dobrze przepisze siê je do architektury SIMD\cite{SHYNI}. Mo¿na dodatkowo spotkaæ wariacje algorytmu LZSS przepisanego na CUDA, takie jak CANLZSS\cite{DTU}, która wed³ug autora przewy¿sza wydajnoœci¹ ponad 60 razy seryjn¹ implementacjê zwyk³ego LZSS. Kolejna optymalizacja GLZSS, w której zreorganizowano s³ownik to postaci tablicy haszy, oraz przyspieszono porównywanie podci¹gów (substrings) równie¿ zrównoleglaj¹c je na GPU, osi¹gaj¹c dwukrotne przyspieszenie wzglêdem poprzednich prac\cite{ZU}. \\
-Porównuj¹c szybkoœæ dzia³ania oraz wspó³czynniki kompresji uzyskane przez autorów, mo¿na dojœæ do wniosku ¿e zastosowanie metod lekkich kompresji dla szeregów czasowych, w miejscach gdzie szczególnie wa¿na jest szybka dekompresja (bazy danych), jest uzasadnione.
+Opisane wy¿ej algorytmy lekkiej kompresji szeregów czasowych, w wiêkszoœci zosta³y zaimplementowane przez Fang et al.\cite{FANG} oraz Przymus et al.\cite{KACZMAR2} w ich pracach, gdzie autorzy zaznaczaj¹ ogromny wzrost przepustowoœci takich algorytmów oraz ich wysok¹ skutecznoœæ w kompresji szeregów. W przypadku pierwszego jest to nawet to 56 GB/s dekodowania, a dla drugiego od 2 do 40 GB/s kodowania w zale¿noœci od stopnia skomplikowania algorytmu. Wiêkszoœæ przewidzianych metod ma swoje odpowiedniki z patchowaniem, w którym elementy niepasuj¹ce odk³adane s¹ do osobnej tablicy wyj¹tków. Prace te odnosz¹ siê jednak tylko do liczb ca³kowitych, a najczêœciej ca³kowitych bez znaku (naturalnych).\\ 
+Lekk¹ kompresjê liczb zmiennopozycyjnych o podwójnej precyzji przestawi³ w swojej pracy O'Neil et al.\cite{ONEIL}, w której stosuj¹c technologiê CUDA i dziel¹c dane na odpowiednie bloki, zastosowano wariacjê algorytmu FOR i osi¹gniêto bardzo dobre wyniki rzêdu 75 Gb/s kodowania oraz a¿ 90 Gb/s dekodowania (daje to podobne rezultaty jak implementacja algorytmu FL dla liczb naturanlych\cite{PRZYMUS1}). Algorytm nazwano GFC, a jego uogólnienie dla liczb o pojedynczej precyzji przedstawiê dok³adnie w kolejnym rozdziale. \\
+Wzrost wydajnoœci osi¹gniêto równie¿ na tle bardziej skomplikowanych metod (daj¹cych czêsto lepsze wspó³czynniki kompresji) jak kodowanie Huffmana\cite{CURRY}, gdzie równoleg³a implementacja na GPU uzyska³a \emph{2-5} krotne przyspieszenie, natomiast przepustowoœæ takiej kompresji to dla porównania 300 do 500 MB/s. Próby zoptymalizowania algorytmów takich jak LZSS w pracach Ozsoy et al.\cite{OZSOY}, skoñczy³y siê lekkim (max 2.2x) wzrostem wydajnoœci (w stosunku do wielordzeniowych implementacji CPU), przy uzyskanej przepustowoœci 1700 Mb/s w konfiguracji z dwoma kartami GPU\cite{OZSOY3}. Równie¿ inni autorzy maj¹ nadziejê na optymalizacjê z u¿yciem kodowañ s³ownikowych, takich jak LZW, pobijaj¹c wyniki CPU po przepisaniu ich do architektury SIMD\cite{SHYNI}. Mo¿na dodatkowo spotkaæ wariacje algorytmu LZSS przepisanego na CUDA, takie jak CANLZSS\cite{DTU}, która wed³ug autora przewy¿sza wydajnoœci¹ ponad 60 razy seryjn¹ implementacjê zwyk³ego LZSS. Kolejna optymalizacja GLZSS, w której zreorganizowano s³ownik to postaci tablicy haszy, oraz przyspieszono porównywanie podci¹gów\footnote{równie¿ zrównoleglaj¹c je na GPU}, osi¹gaj¹c dwukrotne przyspieszenie wzglêdem poprzednich prac\cite{ZU}. \\
+Porównuj¹c szybkoœæ dzia³ania oraz wspó³czynniki kompresji uzyskane przez autorów, mo¿na dojœæ do wniosku, ¿e zastosowanie metod lekkich kompresji dla szeregów czasowych, w miejscach gdzie szczególne znaczenie ma szybka dekompresja, jest uzasadnione.
 
 \subsection{Planery kompresji}
-Okazuje siê, ¿e aby wielokrotnie zwiêkszyæ wspó³czynnik kompresji szeregu czasowego warto go przetransformowaæ przed kompresj¹ b¹dŸ nawet skompresowaæ wielokrotnie ró¿nymi algorytmami. W tym celu powsta³y planery kompresji które dzia³aj¹ na zasadzie kodowania kaskadowego, czyli ci¹gu nastêpuj¹cych po sobie kodowañ, tworz¹cych drzewo. Dziêki zastosowaniu procesorów graficznych osi¹gniêto bardzo dobre wyniki zarówno pod wzglêdem wspó³czynnika kompresji, jak i szybkoœci dzia³ania. Dla przyk³adu przepustowoœæ kodowania 45 GB/s oraz dekodowania 56 GB/s zosta³a osi¹gniêta przez Fang et al.\cite{FANG}. W tym przypadku pos³uguj¹c siê heurystykami wykorzystuj¹cymi statystyki danych wejœciowych, spoœród ogromnej iloœci dostêpnych schematów (> 500 tys.) kodowania (planów), wybierano najlepiej pasuj¹ce (np. dla danych posortowanych powinny zaczynaæ siê od RLE itd.). Nastêpnie wybierano spoœród nich plan spe³niaj¹cy zdefiniowane normy, np. plan o najwiêkszym wspó³czynniku kompresji. Statystyki na których oparty by³ algorytm brane by³y z informacji o kolumnie w bazie danych. Zanotowano du¿o lepsz¹ kompresjê ni¿ w przypadku tradycyjnego kodowania pojedyncz¹ metod¹, dla realistycznych danych. \\
-Kolejnym, podobnym podejœciem do planera jest praca Przymusa et al.\cite{PRZYMUS2}, w której plan z³o¿ony jest z trzech warstw metod nastêpuj¹cych po sobie: transformacji, kodowania bazowego i pomocniczego. Cech¹ charakterystyczn¹ tego rozwi¹zania jest dynamiczny generator statystyk, który uaktualnia statystyki w momencie tworzenia planu, wykorzystuj¹c w³aœciwoœci poszczególnych metod takiej kompresji (szczególnie w przypadku minimalnej iloœci bitów potrzebnych do zapisania ka¿dej liczby z danego wektora danych). Dodatkowo praca ta implementuje znajdowanie optimum ze wzglêdu na dwie sprzeczne zmienne (bi-objective optimizer): szybkoœæ dzia³ania i jakoœæ kompresji, stosuj¹c optymalnoœæ Pareto\cite{PARETO}. Generowanie statystyk dla takiego planera na GPU zapewnia do 70 razy lepsz¹ wydajnoœæ w stosunku do analogicznej implementacji na CPU\cite{KACZMAR2}.
-
+Okazuje siê, ¿e aby wielokrotnie zwiêkszyæ wspó³czynnik kompresji szeregu czasowego, warto go przetransformowaæ przed kompresj¹ b¹dŸ nawet skompresowaæ wielokrotnie ró¿nymi algorytmami. W tym celu powsta³y planery kompresji, które dzia³aj¹ na zasadzie kodowania kaskadowego, czyli ci¹gu nastêpuj¹cych po sobie kodowañ tworz¹cych drzewo. Dziêki zastosowaniu procesorów graficznych osi¹gniêto bardzo dobre wyniki zarówno pod wzglêdem wspó³czynnika kompresji, jak i szybkoœci dzia³ania. Dla przyk³adu przepustowoœæ kodowania 45 GB/s oraz dekodowania 56 GB/s zosta³a osi¹gniêta przez Fang et al.\cite{FANG}. W tym przypadku pos³uguj¹c siê heurystykami wykorzystuj¹cymi statystyki danych wejœciowych, spoœród ogromnej iloœci dostêpnych schematów kodowania, wyznaczano najlepiej pasuj¹ce\footnote{np. dla danych posortowanych powinny zaczynaæ siê od RLE itd.}. Nastêpnie wybierano spoœród nich plan spe³niaj¹cy zdefiniowane normy, np. plan o najwiêkszym wspó³czynniku kompresji. Statystyki na których oparty by³ algorytm pozyskiwano z informacji o kolumnie w bazie danych. Zanotowano du¿o lepsz¹ kompresjê ni¿ w przypadku tradycyjnego kodowania pojedyncz¹ metod¹ dla realistycznych danych. \\
+Kolejnym, podobnym podejœciem do planera jest praca Przymusa et al.\cite{PRZYMUS2}, w której plan z³o¿ony jest z trzech warstw metod nastêpuj¹cych po sobie: transformacji, kodowania bazowego i pomocniczego. Cech¹ charakterystyczn¹ tego rozwi¹zania jest dynamiczny generator statystyk, który uaktualnia statystyki w momencie tworzenia planu, wykorzystuj¹c w³aœciwoœci poszczególnych metod takiej kompresji\footnote{szczególnie w przypadku minimalnej iloœci bitów potrzebnych do zapisania ka¿dej liczby}. Dodatkowo praca ta implementuje znajdowanie optimum ze wzglêdu na dwie sprzeczne zmienne (bi-objective optimizer): szybkoœæ dzia³ania i jakoœæ kompresji, stosuj¹c optymalnoœæ Pareto\cite{PARETO}. Generowanie statystyk dla takiego planera na GPU zapewnia do 70 razy lepsz¹ wydajnoœæ w stosunku do analogicznej implementacji na CPU\cite{KACZMAR2}.
 \section{CUDA}
-
+Jedn¹ z wielu zalet architektury kart graficznych jest to, ¿e sk³adaj¹ siê z kilku multiprocesorów (SMs - Streaming Multiprocessors) architektury SIMD. Jest to w³aœciwie architektura typu SIMT, gdzie multiprocesor wykonuje w¹tki w grupach o licznoœci 32 zwanymi \emph{warps}. Architektura ta jest zbli¿ona do SIMD z t¹ ró¿nic¹, ¿e to nie organizacja wektora danych kontroluje jednostki obliczeniowe, a organizacja instrukcji pojedyñczego w¹tku. Umo¿liwia on zatem pisanie równolegle wykonywanego kodu dla niezale¿nych i skalowalnych w¹tków, jak i dla tych koordynowanych danymi.
 	\begin{figure}[h!]
 		\centering
-		\hspace*{-0.5cm}\includegraphics[scale=0.55]{img/CUDA_arch}
+		\hspace*{-0.5cm}\includegraphics[scale=0.50]{img/CUDA_arch}
+		\vspace*{-3mm}
 		\caption{Architektura NVIDIA CUDA}
 		\label{ref:cuda_arch}
 	\end{figure}
-
-Jedn¹ z wielu zalet architektury kart graficznych jest to, ¿e sk³adaj¹ siê z kilku multiprocesorów (SMs - Streaming Multiprocessors) architektury SIMD. Jest to w³aœciwie architektura typu SIMT, gdzie multiprocesor wykonuje w¹tki w grupach o licznoœci 32 zwanymi \emph{warps}. Architektura ta jest zbli¿ona do SIMD z t¹ ró¿nic¹, ¿e to nie organizacja wektora danych kontroluje jednostki obliczeniowe, a organizacja instrukcji pojedyñczego w¹tku. Umo¿liwia on zatem pisanie równolegle wykonywanego kodu dla niezale¿nych i skalowalnych w¹tków, jak i dla w¹tkuch koordynowanych danymi.
+\noindent
 Wszystkie w¹tki wykonuj¹ ten sam kod funkcji kernela. Ponadto CUDA tworzy abstrakcjê bloków w¹tków, które zorganizowane s¹ w siatkê (GRID) i wspó³dziel¹ zasoby multiprocesora. Wa¿na jest równie¿ hierarchia pamiêci, w której czêœæ przydzielana jest w¹tkom w postaci pamiêci lokalnej i rejestrów, oraz pamiêci wspó³dzielonej przez w¹tki z tego samego bloku (Shared Memory) - te pamiêci musz¹ byæ znane w trakcie kompilacji kernela. Najwolniejsza jest pamiêæ globalna (Device Memory), wspólna dla wszystkich w¹tków, wszystkich bloków, na wszystkich multiprocesorach. Dok³adny opis tej architektury mo¿na znaleŸæ bezpoœrednio na stronie producenta.
-
 	\begin{figure}[h!]
 		\centering
-		\hspace*{-0.5cm}\includegraphics[scale=0.55]{img/CUDA_grid}
+		\hspace*{-0.5cm}\includegraphics[scale=0.50]{img/CUDA_grid}
+		\vspace*{-6mm}
 		\caption{Abstrakcja bloków i siatki w CUDA}
 		\label{ref:cuda_grid}
 	\end{figure}
@@ -191,10 +190,11 @@ Przedstawiê krótko kodowania u¿yte w implementacji planera kompresji oraz ich mo
 
 \subsection{Podstawowe algorytmy transformacji szeregów}
 \begin{description}
-\item[Delta] -- Zapisuje zmiany pomiêdzy kolejnymi danymi w szeregu, zapisuj¹c pierwsz¹ wartoœæ w metadanych. Bardzo dobrze sprawdza siê na danych posortowanych b¹dŸ o zmianach liniowych o sta³ej wartoœci. Algorytm ten zosta³ zaimplementowany czêœciowo z u¿yciem biblioteki Thrust i funkcji \emph{inclusive\_scan} - do dekodowania.
-\item[Scale] Bardzo prosta transformacja, odmienna od wielu implementacji o tej samej nazwie, polegaj¹ca na odjêciu lub dodaniu (dla liczb ujemnych) najmniejszej dodatniej wartoœci szeregu. Bardzo dobrze sprawdza siê dla du¿ych wartoœci szeregu o ma³ej wariancji. Dla przyk³adu maj¹c wartoœci ${1234000, ..., 1234500, ..., 1234999}$ dane zostan¹ zapisane jako ${0, 1, ..., 999}$ i bêd¹ mog³y byæ zapisane na du¿o mniejszej liczbie bitów.
-\item[FloatToInt] -- To jest wersja algorytmu któr¹ czêsto w literaturze nazywa siê mianem scale. Znaj¹c maksymaln¹ precyzjê danych zmiennopozycyjnych, mo¿na zapisaæ te dane jako liczby ca³kowite, mno¿¹c przez odpowiedni¹ potêgê liczby 10. Tak wiêc maj¹c wektor cen w z³otówkach, mo¿na przemno¿yæ cenê 99.99 przez 100 otrzymuj¹c 9999 i zmieniæ reprezentacjê liczb na ca³kowite. Poniewa¿ reprezentacja liczb ca³kowitych mo¿e daæ siê lepiej skompresowaæ.
-\item[Patch] -- Bardzo wa¿nym zadaniem w kompresji szeregów czasowych jest usuwanie wartoœci odstaj¹cych tzw. \emph{outliers}. Kodowanie to dzieli wektor danych na dwa wektory wzglêdem zdefiniowanego operatora, mówi¹cego np. ¿e jako wartoœci odstaj¹ce nale¿y uznaæ wszystkie wartoœci przekraczaj¹ce $90\%$ wartoœci maksymalnej. W ten sposób wiele ró¿nych wersji patchowania mo¿e byæ zdefiniowanych, mo¿e na przyk³ad dzieliæ wartoœci na ujemne i dodatnie.
+\item[Delta] -- Zapisuje zmiany pomiêdzy kolejnymi danymi w szeregu, rejestruj¹c pierwsz¹ wartoœæ w metadanych. Bardzo dobrze sprawdza siê na danych posortowanych b¹dŸ o zmianach liniowych o sta³ej wartoœci. Algorytm ten zosta³ zaimplementowany czêœciowo z u¿yciem biblioteki Thrust i funkcji \emph{inclusive\_scan} - do dekodowania.
+\item[Scale] -- Bardzo prosta transformacja, odmienna od wielu implementacji o tej samej nazwie, polegaj¹ca na odjêciu lub dodaniu (dla liczb ujemnych) najmniejszej dodatniej wartoœci szeregu. Bardzo dobrze sprawdza siê dla du¿ych wartoœci szeregu o ma³ej wariancji. Dla przyk³adu, maj¹c wartoœci: $${1234000, ..., 1234500, ..., 1234999}$$ dane zostan¹ zapisane jako ${0, 1, ..., 999}$ i bêd¹ mog³y byæ zredukowane do du¿o mniejszej liczby bitów.
+\item[FloatToInt] -- Wersja algorytmu, któr¹ czêsto w literaturze nazywa siê mianem \emph{Scale}. Znaj¹c maksymaln¹ precyzjê danych zmiennopozycyjnych, mo¿liwe jest ich zapisanie w postaci liczb ca³kowitych, mno¿¹c przez odpowiedni¹ potêgê liczby 10. Oznacza to, ¿e maj¹c wektor cen w z³otówkach, mo¿na przemno¿yæ cenê 99.99 przez 100 otrzymuj¹c 9999 i zmieniæ reprezentacjê liczb na ca³kowite. 
+W wyniku takiego dzia³ania reprezentacja liczb ca³kowitych mo¿e ulec lepszej kompresji.
+\item[Patch] -- Bardzo wa¿nym zadaniem w kompresji szeregów czasowych jest usuwanie wartoœci odstaj¹cych tzw. \emph{outliers}. Kodowanie to dzieli wektor danych na dwa wektory wzglêdem zdefiniowanego operatora, mówi¹cego np. ¿e jako wartoœci odstaj¹ce nale¿y uznaæ wszystkie wartoœci przekraczaj¹ce $90\%$ wartoœci maksymalnej. W ten sposób mo¿e byæ zdefiniowanych wiele ró¿nych wersji ,,patchowania'', dla przyk³adu, dziel¹c wartoœci na ujemne i dodatnie.
 
 	\begin{figure}[h!]
 		\centering
@@ -203,14 +203,13 @@ Przedstawiê krótko kodowania u¿yte w implementacji planera kompresji oraz ich mo
 		\label{ref:patch}
 	\end{figure}
 
-W przeciwieñstwie do innych prac algorytm ten nie zapisuje wyj¹tków wraz z ich pozycjami, i umo¿liwia w ten sposób lepsze ich skompresowanie w dalszych krokach. Zamiast tego trzyma w metadanych zapisany bitowo stempel przynale¿noœci poszczególnych elementów wektora to pierwszej lub drugiej tablicy wynikowej. Rozmiar takich metadanych wynosi $(N+32)$ bitów, gdzie $N$ to liczba kompresowanych elementów.
+W przeciwieñstwie do innych prac algorytm ten nie zapisuje wyj¹tków wraz z ich pozycjami, umo¿liwiaj¹c lepsze ich skompresowanie w dalszych krokach. Zamiast tego przechowuje w metadanych zapisany bitowo stempel przynale¿noœci poszczególnych elementów wektora do pierwszej lub drugiej tablicy wynikowej. Rozmiar takich metadanych wynosi $(N+32)$ bitów, gdzie $N$ to liczba kompresowanych elementów.
 \end{description}
-\newpage
 
 \subsection{Global memory coalescing}
 
 
-Tablice zaalokowane w pamiêci urz¹dzenia GPU Nvidia s¹ wyrównane do bloków o wielkoœci 256 bajtów przez sterownik urz¹dzenia. Urz¹dzenie mo¿e dostaæ siê do pamiêci przez 32, 64 lub 128 bajtowe transakcje które s¹ wyrównane do ich wielkoœci. Odczytuj¹c lub zapisuj¹c do pamiêci globalnej, wa¿ne jest zatem aby w¹tki wymaga³y dostêpu zawsze do kolejnych rekordów tablicy, najlepiej wszystkie nale¿¹ce do tego samego \emph{warp}. Aby tak siê sta³o mo¿na zastosowaæ poni¿szy algorytm obliczania indeksów wejœciowych dla danego w¹tku CUDA. \\
+Tablice zaalokowane w pamiêci urz¹dzenia GPU Nvidia s¹ wyrównane do bloków o wielkoœci 256 bajtów przez sterownik urz¹dzenia. Urz¹dzenie mo¿e dostaæ siê do pamiêci przez 32, 64 lub 128 bajtowe transakcje ,które s¹ wyrównane do ich wielkoœci. Odczytuj¹c lub zapisuj¹c do pamiêci globalnej, wa¿ne jest zatem aby w¹tki wymaga³y dostêpu zawsze do kolejnych rekordów tablicy, najlepiej wszystkie nale¿¹ce do tego samego \emph{warp}. Dla osi¹gniêcia takiego rezultatu mo¿na zastosowaæ poni¿szy algorytm obliczania indeksów wejœciowych dla danego w¹tku CUDA. \\
 Oznaczmy jako:
 \begin{itemize}
 	\item $\Sigma$ -- iloœæ przetwarzanych elementów
@@ -250,7 +249,7 @@ Tworzy to podzia³ danych wejœciowych, który zgodnie z przyk³adem obrazuje rysune
 	\label{ref:cuda_data_blocks2}
 \end{figure}
 
-Dziêki takiemu u³o¿eniu kolejne w¹tki z tego samego warp, wykonuj¹ odczyt kolejnych rekordów z tablicy Ÿród³owej, poniewa¿ w¹tek 0 odczytuje rekord 0, w¹tek 1 rekord 1, a¿ wreszcie w¹tek $\omega$ rekord $\omega$, nastêpnie po przesuniêciu o $\omega$ w¹tki ponownie odczytuj¹ dane, które s¹ ze sob¹ s¹siaduj¹ce. Dziêki temu odczyt mo¿e byæ po³¹czony (Global Memory Coalescing\cite{UENG}). £¹czny odczyt mo¿e byæ wielokrotnie szybszy, ni¿ odczyty z nie kolejnych indeksów, co jest kluczowe przy budowie bardzo wydajnych algorytmów przetwarzaj¹cych dane na GPU.
+Dziêki takiemu u³o¿eniu kolejne w¹tki z tego samego warp, wykonuj¹ odczyt kolejnych rekordów z tablicy Ÿród³owej, poniewa¿ w¹tek 0 odczytuje rekord 0, w¹tek 1 rekord 1, a¿ wreszcie w¹tek $\omega$ rekord $\omega$. Nastêpnie po przesuniêciu o $\omega$ w¹tki ponownie odczytuj¹ dane, które s¹ ze sob¹ s¹siaduj¹ce. Dziêki temu odczyt mo¿e byæ po³¹czony (Global Memory Coalescing\cite{UENG}). £¹czny odczyt mo¿e byæ wielokrotnie szybszy ni¿ odczyty z nie kolejnych indeksów, co jest kluczowe przy budowie bardzo wydajnych algorytmów przetwarzaj¹cych dane na GPU.
 W przypadku CUDA grupa powinna mieæ licznoœæ 32, co odpowiada iloœci w¹tków w jednym \emph{warp}.
 
 \newpage
@@ -258,8 +257,8 @@ W przypadku CUDA grupa powinna mieæ licznoœæ 32, co odpowiada iloœci w¹tków w je
 \subsection{Algorytmy kompresji szeregów}
 \begin{description}
 \item[RLE] -- kodowanie d³ugoœci serii (Run-Length-Encoding) to sposób kompresji polegaj¹cy na zapisie ci¹gów takich samych wartoœci, jako wartoœæ i d³ugoœæ tego ci¹gu. W tym przypadku obie te wartoœci trafiaj¹ do 2 ró¿nych tablic, które nastêpnie mog¹ byæ kompresowane osobno. Szczególnie dobrze sprawdza siê w przypadku posortowanych danych, lub czêsto siê powtarzaj¹cych. Dla przyk³adu wektor ${5,5,5,5,1,1,1,1,17,17,17,17}$ zostanie skompresowany do ${5,1,17}$ oraz ${4,4,4}$. Data technika kompresji jest op³acalna jeœli œrednia d³ugoœæ ci¹gów przekracza 2 ($D_{sr} > 2$). \\ Dana metoda zosta³a zaimplementowana z u¿yciem biblioteki Thrust, stosuj¹c miêdzy innymi metodê \emph{reduce\_by\_key}.
-\item[Dict] -- Kolejn¹ grup¹ kompresji s¹ kompresje bazuj¹ce na pomyœle s³ownikowym ($Dict_{K}$). Wykorzystuj¹ one informacjê o licznoœci poszczególnych wartoœci w wektorze, tj. które wartoœci najczêœciej siê powtarzaj¹. Kompresja s³ownikowa wykorzystuje $K$ najczêœciej wystêpuj¹cych wartoœci i zapisuje ich tablicê w metadanych. Nastêpnie wartoœci z wektora danych s¹ kodowane indeksami w tej tablicy, przy u¿yciu jak najmniejszej liczby bitów $bit_{cnt} = log_{2}(K)$. Reszta niepasuj¹cych wartoœci zapisywana jest do osobnej tablicy, co dzia³a podobnie jak w kodowaniu \emph{Patch}.
-\item[Unique, Const] -- Zaimplementowane s¹ tak¿e lekko zoptymalizowane wersje kodowania $Dict_{K}$ dla $K=1$ - \emph{Const}, oraz $K=N_{u}$ - \emph{Unique}, gdzie $N_{u}$ jest liczb¹ unikalnych wartoœci w ca³ym kompresowanym wektorze. Dla przyk³adu jeœli wszystkie wartoœci s¹ równe, z nielicznymi wyj¹tkami, zostanie wybrane kodowanie \emph{Const}, które zapisze najczêstsz¹ wartoœæ w metadanych i stworzy tablicê wyj¹tków, uzyskuj¹c bardzo wysoki stopieñ kompresji.
+\item[Dict] -- Kolejn¹ grup¹ kompresji s¹ kodowania bazuj¹ce na pomyœle s³ownikowym ($Dict_{K}$). Wykorzystuj¹ one informacjê o licznoœci poszczególnych wartoœci w wektorze. Kompresja s³ownikowa wykorzystuje $K$ najczêœciej wystêpuj¹cych wartoœci i zapisuje ich tablicê w metadanych. Nastêpnie wartoœci z wektora danych s¹ kodowane indeksami w tej tablicy, przy u¿yciu jak najmniejszej liczby bitów $bit_{cnt} = log_{2}(K)$. Reszta niepasuj¹cych wartoœci zapisywana jest do osobnej tablicy, co dzia³a podobnie jak w kodowaniu \emph{Patch}.
+\item[Unique, Const] -- Zaimplementowane s¹ tak¿e lekko zoptymalizowane wersje kodowania $Dict_{K}$ dla $K=1$ - \emph{Const}, oraz $K=N_{u}$ - \emph{Unique}, gdzie $N_{u}$ jest liczb¹ unikalnych wartoœci w ca³ym kompresowanym wektorze. Dla przyk³adu, jeœli wszystkie wartoœci s¹ równe, z nielicznymi wyj¹tkami, zostanie wybrane kodowanie \emph{Const}, które zapisze najczêstsz¹ wartoœæ w metadanych i stworzy tablicê wyj¹tków, uzyskuj¹c bardzo wysoki stopieñ kompresji.
 \end{description}
 
 \subsubsection{AFL}
@@ -267,9 +266,9 @@ Ten rodzaj kodowania nazywany jest kodowaniem o sta³ej d³ugoœci z wyrównaniem. O
 \begin{enumerate}
 \item Obliczana jest najmniejsza liczba bitów potrzebna do zakodowania wszystkich s³ów w wektorze, nazwijmy go $W$ i oznaczmy liczbê bitów jako $\sigma$:
 $$ \sigma = log_{2}(max(W)) + 1 $$
-\item Nastêpnie wektor elementów jest dope³niany, aby jego d³ugoœæ by³a wielokrotnoœci¹ 1024, a liczba dope³nionych elementów wraz z potrzebn¹ do zapisania liczb liczb¹ bitów $\sigma$ zapisywana jest do metadanych.
+\item Nastêpnie wektor elementów jest dope³niany, aby jego d³ugoœæ by³a wielokrotnoœci¹ 1024, a liczba dope³nionych elementów wraz z potrzebn¹ do zakodowania ka¿dej wartoœci liczb¹ bitów $\sigma$ zapisywana jest do metadanych.
 \item Dla ka¿dego w¹tku $t$ CUDA ozn. \emph{$t=thread(b_{idx},t_{idx})$}, co oznacza w¹tek o indeksie $t_{idx}$ z bloku $b_{idx}$, wyznaczany jest pocz¹tkowy indeks danych wejœciowych i wyjœciowych dla tego w¹tku, zgodnie z algorytmem przedstawionym w poprzedniej sekcji.
-Wielkoœæ bloków w¹tków ustalmy na $ B_{size} = 32 * 8 $ co sprawi, ¿e ka¿dy blok bêdzie siê sk³ada³ z 8 warpów, a grupy bêd¹ mia³y licznoœæ 32 ($\omega = 32$, $w_{g} = 8$). Ponadto chcemy aby bloki danych by³y wielkoœci 32 elementów ($\kappa = 32$).
+Wielkoœæ bloków w¹tków ustalmy na $ B_{size} = 32 * 8 $ co sprawi, ¿e ka¿dy blok bêdzie siê sk³ada³ z 8 warpów, a grupy bêd¹ mia³y licznoœæ 32 ($\omega = 32$, $w_{g} = 8$). Ponadto, chcemy aby bloki danych by³y wielkoœci 32 elementów ($\kappa = 32$).
 Maj¹c dane wejœciowe o indeksach $ {\mu_{0}, \mu_{1}, ..., \mu_{\kappa-1}} $ w¹tek zapisuje $\sigma$ dolnych bitów ka¿dej z liczb spod tych indeksów, do rekordów tablicy wynikowej. Wielkoœci bloków s¹ tak dobrane, aby ka¿dy w¹tek kodowa³ $\kappa$ liczb u¿ywaj¹c $\sigma$ bitów i otrzymuj¹c w ten sposób $\sigma$ liczb o wielkoœci $\kappa$. Za³ó¿my, ¿e $\kappa = 8$ oraz $\sigma = 3$, wtedy \ref{ref:afl4} obrazuje u³o¿enie danych wejœciowych o wielkoœci 8 bitów, skompresowanych do wielkoœci 3 bitów w wektorze wynikowym, przyjmuj¹c 16 iloœæ w¹tków w grupie ($\omega = 16$). Jak widaæ skompresowane dane idealnie mieszcz¹ siê w 3 rekordach tablicy wynikowej.
 
 \begin{figure}[h!]
@@ -279,15 +278,15 @@ Maj¹c dane wejœciowe o indeksach $ {\mu_{0}, \mu_{1}, ..., \mu_{\kappa-1}} $ w¹t
 	\label{ref:afl4}
 \end{figure}
 
-Pocz¹tkowy indeks tablicy wynikowej pod który w¹tek ma zapisaæ skompresowane dane, wyliczane s¹ jako $ \nu_{0}(t) = d_{b}(t) * \sigma + W_{lane}(t) $. Do rekordu zapisywanych jest mo¿liwie najwiêcej bitów (tak jak pokazuje \ref{ref:afl4}), po czym jeœli brak³o miejsca dalsze bity przenoszone s¹ do nastêpnego rekordu, którego indeks wyliczany jest jako $ \nu_{k}(t) = \nu_{0}(t) + k * \omega $, gdzie $ k \in [1,\sigma-1] $. Tutaj równie¿ w¹tki pos³uguj¹ siê ³¹cznym dostêpem do pamiêci.
-\item Po skompresowaniu, dane powinny mieæ dok³adnie $\sigma * \Sigma$ bitów d³ugoœci, nie licz¹c metadanych które mo¿na zapisaæ w dwóch bajtach.
+Pocz¹tkowy indeks tablicy wynikowej pod który w¹tek ma zapisaæ skompresowane dane, wyliczany jest jako $ \nu_{0}(t) = d_{b}(t) * \sigma + W_{lane}(t) $. Do rekordu zapisywanych jest mo¿liwie najwiêcej bitów (tak jak pokazuje \ref{ref:afl4}), po czym jeœli brak³o miejsca dalsze bity przenoszone s¹ do nastêpnego rekordu, którego indeks wyliczany jest jako $ \nu_{k}(t) = \nu_{0}(t) + k * \omega $, gdzie $ k \in [1,\sigma-1] $. Tutaj równie¿ w¹tki pos³uguj¹ siê ³¹cznym dostêpem do pamiêci.
+\item Po skompresowaniu, dane powinny mieæ dok³adnie $\sigma * \Sigma$ bitów d³ugoœci, nie licz¹c metadanych, które mo¿na zapisaæ w dwóch bajtach.
 
 \end{enumerate}
 
 Tak zaimplementowany algorytm okazuje siê byæ oko³o dziesiêciokrotnie szybszy od tradycyjnej implementacji Fixed-Length encoding na CUDA, który jest równowa¿ny tej kompresji z $\omega = 1$.
 
 \subsubsection{GFC}
-GFC to zaproponowana przez Burtscher et al.\cite{ONEIL} modyfikacja algorytmu pFPC kompresji liczb zmiennoprzecinkowych o podwójnej precyzji, który jest równoleg³¹ wersj¹ algorytmu FPC zaimplementowan¹ na procesory graficzne. Zamiast operacji XOR na prawdziwej i przewidzianej wartoœci kompresowanej liczby, metoda ta u¿ywa zwyk³ego odejmowania i dodatkowo zapamiêtuje znak, a kompresuje wartoœæ absolutn¹ tej ró¿nicy. Algorytm ten równie¿ jest wyrównany u¿ywaj¹c ³¹czny dostêp do pamiêci, za to w przeciwieñstwie do algorytmu AFL nie wymaga aby iloœæ kompresowanych liczb przez pojedynczy w¹tek by³a podzielna przez 32. Mo¿e byæ to na przyk³ad 15. Blok danych bêdzie mia³ ponownie 32 wartoœci, poniewa¿ ka¿dy \emph{warp} musi przetworzyæ 32 wartoœci, aby uzyskaæ $\sigma$ liczb wynikowych. W tym algorytmie liczba $\sigma$ jest wyznaczana na bie¿¹co dla ka¿dej liczby osobno i wyra¿ona jest w bajtach. Opiszê tutaj wersjê algorytmu dla liczb o pojedynczej precyzji (32-bit) typu np. float. Zatem $\sigma$ mo¿e przybieraæ wartoœci 1, 2, 3 lub 4 i mo¿na zapisaæ j¹ na 2 bajtach. Iloœæ bajtów na których zostanie zapisana liczba x mo¿e byæ wyra¿ona w uproszczeniu jako: $ \sigma(x) = log_{2}(x)/8 + 1 $. Poni¿ej zamieszczam prosty pseudokod algorytmu wykonywanego przez ka¿dy w¹tek w kernelu CUDA:
+\emph{GFC} to zaproponowana przez Burtscher et al.\cite{ONEIL} modyfikacja algorytmu \emph{pFPC} kompresji liczb zmiennoprzecinkowych o podwójnej precyzji, który jest równoleg³¹ wersj¹ algorytmu \emph{FPC} zaimplementowan¹ na procesory graficzne. Zamiast operacji XOR na prawdziwej i przewidzianej wartoœci kompresowanej liczby, metoda ta u¿ywa zwyk³ego odejmowania i dodatkowo zapamiêtuje znak, a kompresuje wartoœæ absolutn¹ tej ró¿nicy. Algorytm ten równie¿ stosuje wyrównanie, u¿ywaj¹c ³¹czny dostêp do pamiêci, za to w przeciwieñstwie do algorytmu \emph{AFL} nie wymaga aby iloœæ kompresowanych liczb przez pojedynczy w¹tek by³a podzielna przez 32. Mo¿e byæ to na przyk³ad 15. Blok danych bêdzie mia³ ponownie 32 wartoœci, poniewa¿ ka¿dy \emph{warp} musi przetworzyæ 32 wartoœci, aby uzyskaæ $\sigma$ liczb wynikowych. W tym algorytmie liczba $\sigma$ jest wyznaczana na bie¿¹co dla ka¿dej liczby osobno i wyra¿ona jest w bajtach. Opiszê tutaj wersjê algorytmu dla liczb o pojedynczej precyzji (32-bit) typu np. float. Zatem $\sigma$ mo¿e przybieraæ wartoœci 1, 2, 3 lub 4 i mo¿na zapisaæ j¹ na 2 bajtach. Iloœæ bajtów na których zostanie zapisana liczba x mo¿e byæ przedstawiona w uproszczeniu jako: $ \sigma(x) = log_{2}(x)/8 + 1 $. Poni¿ej zamieszczam prosty pseudokod algorytmu wykonywanego przez ka¿dy w¹tek w kernelu CUDA:
 \begin{algorithm}[H]
  \caption{Pseudokod algorytmu kompresji GFC dla w¹tku t}
  \tcc{WEJŒCIE: $data$ - wektor do skompresowania}
@@ -318,18 +317,18 @@ $ c_{s} = (l_{W} + 1)*\frac{9}{2} $ bajtów miejsca.
 \begin{figure}[h!]
 	\centering
 	\hspace*{-0.5cm}\includegraphics[scale=0.75]{img/gfc}
-	\caption{wynik dzia³ania algorytmu GFC - tablica wyjœciowa}
+	\caption{wynik dzia³ania algorytmu \emph{GFC} - tablica wyjœciowa}
 	\label{ref:gfc}
 \end{figure}
 
-Kompresja znacz¹co ró¿ni siê od AFL pomimo podobnego podzia³u na bloki danych. Iloœæ stworzonych paczek danych przez ten algorytm wynosi - $ p_{n} = w_{g} * B_{n} $. Paczki skompresowane przez poszczególne \emph{warp-y} nie przylegaj¹ do siebie, co widaæ na rysunku \ref{ref:gfc}, przez to minusem tej metody jest to, ¿e po kompresji nale¿y przekopiowaæ wszystkie $p_{n}$ paczek, o ró¿nych rozmiarach do tablicy wynikowej. Kopiowanie to jest odpowiednio szybkie dla ma³ej iloœci paczek o wiêkszych rozmiarach. Wtedy zachodzi zale¿noœæ, ¿e kiedy $p_{n}$ roœnie wydajnoœæ kopiowania maleje, natomiast wydajnoœæ samego algorytmu wzrasta. Jeœli zmniejszymy $p_{n}$ automatycznie musimy zwiêkszyæ $\lambda$, bo $B_{n}$ zale¿y odwrotnie proporcjonalnie od $\lambda$, a im wiêksze $\lambda$, tym wolniejszy jest sam algorytm (pojedyncze w¹tki wykonuj¹ wiêcej pracy).
+Pomimo podobnego podzia³u na bloki danych, powy¿szy rodzaj kompresji znacz¹co ró¿ni siê od metody \emph{AFL}. Iloœæ stworzonych paczek danych przez ten algorytm wynosi $ p_{n} = w_{g} * B_{n} $. Paczki skompresowane przez poszczególne \emph{warp-y} nie przylegaj¹ do siebie, co widaæ na rysunku \ref{ref:gfc}, przez to minusem tej metody jest to, ¿e po kompresji nale¿y przekopiowaæ wszystkie $p_{n}$ paczek, o ró¿nych rozmiarach do tablicy wynikowej. Kopiowanie to jest odpowiednio szybkie dla ma³ej iloœci paczek o wiêkszych rozmiarach. Wtedy zachodzi zale¿noœæ, ¿e kiedy $p_{n}$ roœnie, wydajnoœæ kopiowania maleje, natomiast wydajnoœæ samego algorytmu wzrasta. Jeœli zmniejszymy $p_{n}$ automatycznie musimy zwiêkszyæ $\lambda$, bo $B_{n}$ zale¿y odwrotnie proporcjonalnie od $\lambda$, a im wiêksze $\lambda$, tym wolniejszy jest sam algorytm (pojedyncze w¹tki wykonuj¹ wiêcej pracy).
 Warto sprawdziæ zatem, czy napisanie dedykowanego algorytmu kopiowania (jako kernel CUDA), mo¿e przyspieszyæ takie kopiowania danych na GPU, wzglêdem tradycyjnych wywo³añ \emph{cudaMemcpy} w pêtli. Próby zrównoleglenia tych kopiowañ na ró¿nych \emph{stream-ach} na mojej karcie graficznej (GeForce GT 640) skoñczy³y siê gorsz¹ wydajnoœci¹ ni¿ seria kopiowañ na \emph{stream 0}.
 
 
 \section{Biblioteki}
 
-Projekt sk³ada siê z 4 bibliotek, których zale¿noœci wewnêtrzne pokazane s¹ na rysunku \ref{ref:libs}. Ponadto biblioteki \emph{CORE} oraz \emph{ENC} wykorzystuj¹ technologiê CUDA i musz¹ byæ kompilowane za pomoc¹ \emph{nvcc}. Wszystkie biblioteki korzystaj¹ z biblioteki \emph{Boost} oraz bibliotek do testowania i benchmarków (\emph{GTEST}, \emph{Google Benchmark}).
-Poni¿ej znajduje siê tak¿e opis poszczególnych bibliotek.
+Projekt sk³ada siê z 4 bibliotek, których zale¿noœci wewnêtrzne pokazane s¹ na rysunku \ref{ref:libs}. Dwie z nich, \emph{CORE} oraz \emph{ENC}, wykorzystuj¹ technologiê CUDA i musz¹ byæ kompilowane za pomoc¹ \emph{nvcc}. Wszystkie korzystaj¹ z biblioteki \emph{Boost} oraz bibliotek do testowania i benchmarków (\emph{GTEST}, \emph{Google Benchmark}).
+Poni¿ej znajduje siê tak¿e opis poszczególnych czêœci projektu.
 
 	\begin{figure}[h!]
 		\centering
@@ -338,8 +337,8 @@ Poni¿ej znajduje siê tak¿e opis poszczególnych bibliotek.
 		\label{ref:libs}
 	\end{figure}
 
-\subsection{TS}
-Jest to biblioteka definiuj¹ca strukturê szeregu czasowego, oraz udostêpniaj¹ca metody do odczytu i zapisu szeregów z plików binarnych oraz tekstowych o kolumnach rozdzielonych separatorem, na przyk³ad CSV. Ponadto umo¿liwia definicjê szeregu czasowego poprzez plik nag³ówkowy o strukturze wierszy: ([nazwa kolumny],[typ kolumny],[precyzja]), w której ka¿dy wiersz definiuje osobn¹ kolumnê. Przyk³adowa treœæ pliku nag³ówkowego zosta³a umieszczona na listingu~\ref{lst:tsheader}.
+\subsection{TS - TIME SERIES}
+Biblioteka definiuj¹ca strukturê szeregu czasowego, udostêpniaj¹ca metody do odczytu i zapisu szeregów z plików binarnych oraz tekstowych o kolumnach rozdzielonych separatorem, na przyk³ad \emph{CSV}. Ponadto umo¿liwia definicjê szeregu czasowego poprzez plik nag³ówkowy o strukturze wierszy: ([nazwa kolumny],[typ kolumny],[precyzja]), w której ka¿dy wiersz definiuje osobn¹ kolumnê. Przyk³adowa treœæ pliku nag³ówkowego zosta³a umieszczona na listingu~\ref{lst:tsheader}.
 \begin{lstlisting}[caption=Przyk³adowy plik opisu szeregu czasowego,label={lst:tsheader}]
 		timestamp,time,0
 		CORE VOLTAGE,float,6
@@ -347,13 +346,13 @@ Jest to biblioteka definiuj¹ca strukturê szeregu czasowego, oraz udostêpniaj¹ca 
 		GPU TEMP,float,6
 \end{lstlisting}
 \subsection{CORE}
-Tutaj zaimplementowane s¹ wszystkie podstawowe rzeczy takie jak logowanie, konfiguracja, inteligentny wskaŸnik na pamiêæ CUDA (zaimplementowany w oparciu o \emph{Shared Pointer} z biblioteki \emph{Boost}), operacje na wektorach danych po stronie GPU takie jak histogramy, wyliczanie statystyk itp., a tak¿e bazowe klasy testów i benchmarków wraz z generatorem danych.
-\subsection{ENC}
+Tutaj zaimplementowane s¹ wszystkie podstawowe elementy takie jak logowanie, konfiguracja, inteligentny wskaŸnik na pamiêæ CUDA (zaimplementowany w oparciu o \emph{Shared Pointer} z biblioteki \emph{Boost}), operacje na wektorach danych po stronie GPU takie jak histogramy, wyliczanie statystyk itp., a tak¿e bazowe klasy testów i benchmarków wraz z generatorem danych. Zawiera tak¿e ,,scheduler'' równoleg³ych zadañ kompresji.
+\subsection{ENC - ENCODINGS}
 Encodings to biblioteka mieszcz¹ce wszystkie zaimplementowane w ramach tego projektu algorytmy kodowania i transformacji zaimplementowane na CUDA, potrafi¹ce kodowaæ i dekodowaæ dane wszystkich typów obs³ugiwanych przez ten system (\emph{char, short, int, unsigned int, long, float, double}).
-\subsection{OPT}
+\subsection{OPT - OPTIMIZER}
 W³aœciwa biblioteka dla tego projektu mieszcz¹ca optymalizator kompresji, a tak¿e definicjê i implementacjê drzewa kompresji, jak równie¿ drzewa optymalnego (drzewa aktualnie u¿ywanego przez kompresor, które umo¿liwia pewne mutowanie tego drzewa, co zostanie opisane w nastêpnym rozdziale).
 \section{Program}
-Program wynikowy jest przyk³adowym programem wynikowym, który u¿ywaj¹c optymalizatora kompresji, wielow¹tkowo i równolegle kompresuje wiele kolumn szeregu czasowego podanego jako plik wejœciowy. Plik wejœciowy jest zaczytywany paczkami i w tym samym czasie czêœci ju¿ skompresowane mog¹ byæ zapisywane do podanego pliku wyjœciowego. Dok³adny opis tego algorytmu znajduje siê na koñcu rozdzia³u 3. Argumenty programu:
+Przyk³adowy program wynikowy, który u¿ywaj¹c optymalizatora kompresji, wielow¹tkowo i równolegle kompresuje wiele kolumn szeregu czasowego, podanego jako plik wejœciowy. Plik wejœciowy jest zaczytywany paczkami i w tym samym czasie czêœci ju¿ skompresowane mog¹ byæ zapisywane do podanego pliku wyjœciowego. Dok³adny opis tego algorytmu znajduje siê na koñcu rozdzia³u 3. Argumenty programu:
 \begin{itemize}
 \item \emph{--compress} lub \emph{-c}: opcja kompresji (nast¹pi kompresja pliku wejœciowego)
 \item \emph{--decompress} lub \emph{-d}: opcja dekompresji (nast¹pi dekompresja pliku wejœciowego)
@@ -361,26 +360,26 @@ Program wynikowy jest przyk³adowym programem wynikowym, który u¿ywaj¹c optymaliz
 \item \emph{--input} lub \emph{-i} \emph{[<œcie¿ka>]}: podanie œcie¿ki do pliku wejœciowego
 \item \emph{--output} lub \emph{-o} \emph{[<œcie¿ka>]}: podanie œcie¿ki do pliku wyjœciowego
 \item \emph{--generate} lub \emph{-g}: -- wygeneruj przyk³adowe pliki danych
-\item \emph{--padding} lub \emph{-p} \emph{[<ró¿nica>]}: w przypadku gdy wiersze szeregu w pliku binarnym s¹ wyrównane do jakieœ wielkoœci, podajemy w ten sposób ró¿nicê wzglêdem ich rzeczywistej wielkoœci, np. jeœli dane zajmuj¹ 12 bajtów a s¹ wyrównane do 16, powinniœmy uruchomiæ program z opcj¹ \emph{-p 4}.
+\item \emph{--padding} lub \emph{-p} \emph{[<ró¿nica>]}: w przypadku gdy wiersze szeregu w pliku binarnym s¹ wyrównane do jakieœ wielkoœci, podajemy w ten sposób ró¿nicê wzglêdem ich rzeczywistej wielkoœci, np. jeœli dane zajmuj¹ 12 bajtów, a s¹ wyrównane do 16, powinniœmy uruchomiæ program z opcj¹ \emph{-p 4}.
 \end{itemize}
 
 \chapter{Optymalizator kompresji}
 
-W tym rodziale opiszê algorytm nazwany roboczo \emph{Online Stat compression Planner}, który bêdzie uczy³ siê budowaæ jak najlepsze drzewo kompresji na podstawie nap³ywaj¹cych danych, jednoczeœnie je kompresuj¹c. Zatem wydajnoœæ - compression ratio, powinno z czasem rosn¹æ, a¿ znajdzie siê na optymalnym poziomie. Ponadto algorytm ten przeszukuj¹c przestrzeñ ciekawych drzew kompresji testuj¹c je na ma³ym fragmencie danych, bêdzie mia³ szansê znaleŸæ optymalne drzewo ju¿ na pocz¹tku swojego dzia³ania. Jednak w momencie zmiany charakterystyki danych, algorytm powinien zareagowaæ mutuj¹c drzewo, zmieniaj¹c jego wêz³y, aby dostosowaæ go do nowych danych. Na uwagê zas³uguje fakt, ¿e wszystkie dane na których operuj¹ optymalizator oraz drzewo, zawsze znajduj¹ siê na GPU, w celu minimalizacji liczby kompiowañ przez szynê PCI-E. Dodatkowo w oparciu o \emph{Shared Pointer} z biblioteki \emph{Boost} zaimplementowano inteligentne wskaŸniki na wektory danych w globalnej pamiêci GPU, takie wskaŸniki przechowuj¹ce tablicê bajtów bêdê dalej nazywa³ SCBP\footnote{SCBP - inteligentny wskaŸnik na tablicê bajtów w globalnej pamiêci GPU (Shared Cuda Byte Pointer)}.
+W tym rodziale opiszê algorytm nazwany roboczo \emph{Online Stat compression Planner}, który bêdzie uczy³ siê budowaæ jak najlepsze drzewo kompresji na podstawie nap³ywaj¹cych danych, jednoczeœnie je kompresuj¹c. Zatem wydajnoœæ - compression ratio, powinno z czasem rosn¹æ, a¿ znajdzie siê na optymalnym poziomie. Ponadto algorytm ten przeszukuj¹c przestrzeñ ciekawych drzew kompresji i testuj¹c je na ma³ym fragmencie danych, bêdzie mia³ szansê znaleŸæ optymalne drzewo ju¿ na pocz¹tku swojego dzia³ania. Jednak w momencie zmiany charakterystyki danych, algorytm powinien zareagowaæ mutuj¹c drzewo, zmieniaj¹c jego wêz³y, aby dostosowaæ go do nowych danych. Na uwagê zas³uguje fakt, ¿e wszystkie dane na których operuj¹ optymalizator oraz drzewo, zawsze znajduj¹ siê na GPU, w celu minimalizacji liczby kopiowañ przez szynê PCI-E. Dodatkowo w oparciu o \emph{Shared Pointer} z biblioteki \emph{Boost} zaimplementowano inteligentne wskaŸniki na wektory danych w globalnej pamiêci GPU. Takie wskaŸniki przechowuj¹ce tablicê bajtów bêdê dalej nazywa³ SCBP\footnote{SCBP - inteligentny wskaŸnik na tablicê bajtów w globalnej pamiêci GPU (Shared Cuda Byte Pointer)}.
 
 \section{Kodowanie}
 Wszystkie algorytmy kompresji zosta³y zaimplementowane jako klasy dziedzicz¹ce po
-abstrakcyjnej klasie kodowania (\emph{Encoding}) i implementuj¹ metody kompresji i
+abstrakcyjnej klasie kodowania (\emph{Encoding}), implementuj¹c metody kompresji i
 dekompresji dla wszystkich typów wspieranych przez system (optymalizator).
 Dla nas najwa¿niejsze s¹ dwie metody:
 \begin{description}[noitemsep,nolistsep]
 \item[Encode] -- przyjmuje dane do kompresji jako SCBP oraz typ danych do kompresji.
 Metoda ta kompresuje dane i zwraca wektor wskaŸników SCBP d³ugoœci 2 lub 3, z których pierwszy jest zawsze metadanymi.
-\item[Decode] -- przyjmuje w zasadzie to co zwraca \emph{Encode}, oraz typ danych,
+\item[Decode] -- przyjmuje w zasadzie to co zwraca \emph{Encode} oraz typ danych,
 a zwraca zdekodowane dane w postaci SCBP.
 \end{description}
 Obiekt ka¿dego kodowania mo¿e byæ stworzony za pomoc¹ fabryki, podaj¹c jego typ oraz typ danych jakie ma kompresowaæ.
-Aby kodowania, a raczej ich wynik by³ mo¿liwy do zserializowania, by potem odtworzyæ schemat u¿yty do kompresji, przed metadanymi wyniku dodawany jest header w postaci: \emph{[Typ Kodowania (16 bit), Typ danych (16 bit),
+Aby kodowania, a raczej ich wynik by³ mo¿liwy do zserializowania i w nastêpstwie pozwala³ odtworzyæ schemat u¿yty do kompresji, przed metadanymi wyniku dodawany jest header w postaci: \emph{[Typ Kodowania (16 bit), Typ danych (16 bit),
 D³ugoœæ metadanych (32 bit)]}, nazwijmy go EH\footnote{EH - header metadanych wyniku kodowania}.
 Ponadto kodowanie umo¿liwia sprawdzenie jaki jest jego typ wynikowy oraz ile skompresowanych czêœci zwraca, np. metody \emph{PATCH} lub \emph{DICT} zwracaj¹ po 2 wyniki.
 
@@ -399,9 +398,7 @@ zosta³o przedstawione na rysunku \ref{ref:tree}. Drzewo mo¿e byæ tak¿e zapisane 
 \newline
 \small{\textit{PATCH, RLE, AFL, NONE, SCALE, GFC, NONE, FLOAT\_TO\_INT, CONST, AFL, NONE}}
 \newline
-Nie bêdê tutaj opisywa³ algorytmu konwersji drzewa z i do takiego opisu, gdy¿ jest to
-prosty algorytm rekurencyjny przechodzenia drzewa wg³¹b. Jednak sam schemat jest o tyle wa¿ny,
-¿e w ten sposób bêd¹ u³o¿one fragmenty skompresowanych danych przez algorytm kompresji drzewem.
+Schemat ten jest o tyle wa¿ny, ¿e w ten sposób bêd¹ u³o¿one fragmenty skompresowanych danych przez algorytm kompresji drzewem.
 
 \subsection{Algorytm kompresji drzewem}
     \begin{figure}[h!]
@@ -454,10 +451,10 @@ dzieciom tego wêz³a. Dzia³anie kompresji opisuje algorytm \ref{alg:tree_compress
 \end{algorithm}
 
 Po skompresowaniu danych za pomoc¹ korzenia drzewa uzyskujemy wektor kawa³ków skompresowanych danych
-oraz nag³ówków. Ostatni¹ czynnoœci¹ w algorytmie jest po³¹czenie wych danych w jeden ci¹g wynikowy
+oraz nag³ówków. Ostatni¹ czynnoœci¹ w algorytmie jest po³¹czenie tych danych w jeden ci¹g wynikowy
 (pojedyncza tablica zaalokowana na GPU). Na rysunku \ref{ref:tree_compress} widaæ prosty przebieg dzia³ania
 algorytmu. Jako \emph{E\#} oznaczono nag³ówki doczepiane z ró¿nych kodowañ.
-Jak widaæ nag³ówki odzwierciedlaj¹ strukturê drzewa i s¹ to¿same z \emph{TreePath},
+Jak widaæ, nag³ówki odzwierciedlaj¹ strukturê drzewa i s¹ to¿same z \emph{TreePath},
 pomijaj¹c kawa³ki skompresowanych danych (\emph{A, B, C}). Dziêki temu mo¿na odtworzyæ drzewo do dekompresji.
 
 \subsection{Algorytm dekompresji drzewem}
@@ -466,11 +463,11 @@ dwóch faz: rekonstrukcji struktury drzewa i w³aœciwej dekompresji drzewem. Ogóln
 ca³oœci algorytmu pokazany jest na rysunku \ref{ref:tree_decompress}.
 
 \subsubsection{Rekonstrukcja drzewa}
-Kolejny algorytm rekurencyjny, który na wejœciu dostaje SCBP ze skomprsowanymi danymi, oraz
-offset - referencja do paramatru okreœlaj¹cego po³o¿enie ju¿ odczytanego fragmentu danych, tj.
+Kolejny algorytm rekurencyjny (patrz algorytm \ref{alg:rec_tree}), który na wejœciu dostaje SCBP ze skompresowanymi danymi oraz
+offset - referencja do parametru okreœlaj¹cego po³o¿enie ju¿ odczytanego fragmentu danych, tj.
 od jakiego bajtu nale¿y czytaæ dalsze dane wejœciowe. Idea algorytmu polega na odczytywaniu
 kolejnych nag³ówków \emph{EH} i budowaniu na ich podstawie drzewa, odpowiadaj¹cego drzewu u¿ytemu
-do kompresji. Sama przebiega jak pokazuje algorytm \ref{alg:rec_tree}.
+do kompresji.
 
 \begin{algorithm}[H]
  \scriptsize
@@ -542,7 +539,7 @@ to algorytm \ref{alg:tree_decompress}.
 \end{algorithm}
 \normalsize
 
-Podsumowuj¹c jest to implementacja kaskadowej kompresji (rekurencyjnej z u¿yciem drzew jako reprezentacji).
+Podsumowuj¹c, jest to implementacja kaskadowej kompresji (rekurencyjnej z u¿yciem drzew jako reprezentacji).
 Dodatkowo drzewa te posiadaj¹ wskaŸnik na statystyki drzewa i mog¹ je uaktualniaæ, co bêdzie szerzej
 opisane w czêœci poœwiêconej 2 fazie algorytmu optymalizatora.
     \begin{figure}[h!]
@@ -554,11 +551,7 @@ opisane w czêœci poœwiêconej 2 fazie algorytmu optymalizatora.
 
 \section{Statystyki}
 
-Aby podejmowaæ dobre decyzje optymalizator musi znaæ charakterystykê danych na których operuje.
-G³ówne zastosowanie statystyk w tym systemie, opiera siê na przesiewaniu wszystkich mo¿liwych drzew,
-do tych najistotniejszych, które mog¹ uzyskaæ dobry wspó³czynnik kompresji. Ponadto niektóre statystyki
-wykorzystywane s¹ przez same kodowania, aby odpowiednio dzia³aæ. W tym systemie zaimplementowano statystyki
-takie jak:
+Warunkiem podejmowania dobrych decyzji przez optymalizator jest znajomoœæ charakterystyki danych na których operuje. G³ówne zastosowanie statystyk w tym systemie, opiera siê na przesiewaniu wszystkich mo¿liwych drzew do tych najistotniejszych, które mog¹ uzyskaæ dobry wspó³czynnik kompresji. Ponadto, niektóre statystyki wykorzystywane s¹ przez same kodowania, aby odpowiednio dzia³aæ. W tym systemie zaimplementowano statystyki takie jak:
 \begin{enumerate}
 \item \emph{IsFloatingPoint} -- czy dane maj¹ typ zmiennoprzecinkowy czy ca³kowity
 \item \emph{Sorted} -- czy dane s¹ posortowane (obojêtnie czy rosn¹co czy malej¹co)
@@ -572,8 +565,10 @@ takie jak:
 \end{enumerate}
 
 \subsection{Metryka RLE}
-Jest to œrednia d³ugoœæ maksymalnych ci¹gów równych liczb, nie d³u¿szych ni¿ N w danych D, ozn. $RLE_{M}(D, N)$. Jest to ciekawa statystyka, mog¹ca wskazywaæ na zasadnoœæ u¿ycia kodowania RLE do jakiœ danych. Mo¿na uznaæ ¿e jeœli $RLE_{M}(D, N) > N/2$ to warto u¿yæ RLE do kodowania danych $D$. Dla przyk³adu jeœli weŸmiemy $N=2$ oraz dane D: $1112234444555555$ wtedy odczytane ci¹gi równych liczb nie d³u¿sze niæ 2 wynosz¹: $22121122212222$, z czego œrednia jest równa $\frac{26}{15} \approx 1,7$, natomiast bior¹c $N=4$: $3212114321444$ oraz œrednia $\frac{32}{13} \approx 2,5$. W obu wypadkach wychodzi zatem, ¿e powinniœmy u¿yæ RLE do kompresji takich danych. Daje to wyobra¿enie o œredniej d³ugoœci ci¹gów równych liczb w danych, a ponadto jest bardzo wydajne obliczeniowo. Wyliczanie takiej statystyki jest trywialnie równoleg³e, poniewa¿
-mo¿na w ka¿dym w¹tku wyliczaæ ci¹g pocz¹wszy od innego indeksu, niezale¿nie. Pseudokod wyliczania ci¹gu dla pojedynczego w¹tku CUDA pokazuje algorytm \ref{alg:rle_metric}. PóŸniej wystarczy obliczyæ sumê, korzystaj¹c na przyk³ad z gotowej funkcji z biblioteki \emph{Thrust}.
+\begin{definition}
+Metryk¹ RLE bêdziemy nazywaæ d³ugoœæ maksymalnych ci¹gów równych liczb, nie d³u¿szych ni¿ N w danych D, ozn. $RLE_{M}(D, N)$.
+\end{definition}
+Wskazuje na zasadnoœæ u¿ycia kodowania RLE do jakiœ danych. Mo¿na uznaæ, ¿e jeœli $RLE_{M}(D, N) > N/2$ to warto u¿yæ RLE do kodowania danych $D$. Dla przyk³adu, jeœli weŸmiemy $N=2$ oraz dane D: $1112234444555555$, wtedy odczytane ci¹gi równych liczb nie d³u¿sze ni¿ 2 wynosz¹: $22121122212222$, z czego œrednia jest równa $\frac{26}{15} \approx 1,7$. Natomiast podstawiaj¹c $N=4$: $3212114321444$, œrednia wyniesie $\frac{32}{13} \approx 2,5$. W obu wypadkach wychodzi zatem, ¿e powinniœmy u¿yæ RLE do kompresji takich danych. Daje to wyobra¿enie o œredniej d³ugoœci ci¹gów równych liczb w danych, a ponadto jest bardzo wydajne obliczeniowo. Wyliczanie takiej statystyki jest trywialnie równoleg³e, poniewa¿ mo¿na w ka¿dym w¹tku wyliczaæ ci¹g pocz¹wszy od innego indeksu, niezale¿nie. Pseudokod wyliczania ci¹gu dla pojedynczego w¹tku CUDA pokazuje algorytm \ref{alg:rle_metric}. PóŸniej wystarczy obliczyæ sumê, korzystaj¹c na przyk³ad z gotowej funkcji z biblioteki \emph{Thrust}.
 
 \begin{algorithm}[H]
  \small
@@ -600,7 +595,7 @@ mo¿na w ka¿dym w¹tku wyliczaæ ci¹g pocz¹wszy od innego indeksu, niezale¿nie. Pse
 \normalsize
 
 \subsection{Precyzja}
-Kolejn¹ wa¿n¹ statystyk¹ dla liczb zmiennoprzecinkowych jest precyzja, gdy¿ mówi czy warto zastosowaæ zmianê wartoœci na typ ca³kowitoliczbowy, stosuj¹c przemno¿enie przez odpowiedni¹ potêgê liczby 10 (patrz kodowanie \emph{FLOAT\_TO\_INT}). Analogicznie do metryki RLE algorytm wyliczania precyzji jest trywialnie równoleg³y, a obliczanie precyzji pokazuje algorytm \ref{alg:precision}.
+Kolejn¹ wa¿n¹ statystyk¹ dla liczb zmiennoprzecinkowych jest precyzja, która odnosi siê do tego, czy warto zastosowaæ zmianê wartoœci na typ ca³kowitoliczbowy, stosuj¹c przemno¿enie\footnote{patrz kodowanie \emph{FLOAT\_TO\_INT}} przez odpowiedni¹ potêgê liczby 10. Analogicznie do metryki RLE, algorytm wyliczania precyzji jest trywialnie równoleg³y, a obliczanie precyzji pokazuje algorytm \ref{alg:precision}.
 
 \begin{algorithm}[H]
  \small
@@ -626,7 +621,7 @@ Kolejn¹ wa¿n¹ statystyk¹ dla liczb zmiennoprzecinkowych jest precyzja, gdy¿ mówi
 W systemie w bardzo ³atwy sposób mo¿na implementowaæ dodatkowe statystyki i udostêpniaæ je do optymalizatora w celu implementacji dodatkowych regu³.
 
 \section{Optymalizator}
-Algorytm optymalizatora kompresji maksymalizuje wspó³czynnik kompresji jednoczeœnie staraj¹c siê wybraæ jak najmniejsze i najni¿sze drzewo kompresji. G³ównym pomys³em jest tworzenie statystyk krawêdzi drzewa kompresji o kszta³cie pe³nego drzewa binarnego (z tego wzglêdu kodowania mog¹ zwracaæ co najwy¿ej 2 wyniki). Nic nie stoi jednak na przeszkodzie, aby algorytm ten uogólniæ na kodowania zwracaj¹ce dowolnie du¿¹ iloœæ wyników.
+Algorytm optymalizatora kompresji maksymalizuje wspó³czynnik kompresji, jednoczeœnie staraj¹c siê wybraæ jak najmniejsze i najni¿sze drzewo kompresji. G³ównym pomys³em jest tworzenie statystyk krawêdzi drzewa kompresji o kszta³cie pe³nego drzewa binarnego (z tego wzglêdu kodowania mog¹ zwracaæ co najwy¿ej 2 wyniki). Nic nie stoi jednak na przeszkodzie, aby algorytm ten uogólniæ na kodowania zwracaj¹ce dowolnie du¿¹ iloœæ wyników.
 Algorytm sk³ada siê z 3 faz, a jego zarys wygl¹da nastêpuj¹co:
 \begin{enumerate}
 \item Dla ma³ego fragmentu danych generujemy najciekawsze drzewa kompresji, zapisuj¹c statystyki krawêdzi w drzewie binarnym, po czym wybieramy drzewo o najlepszym wspó³czynniku kompresji z niewielk¹ poprawk¹ od wysokoœci drzewa.
@@ -635,12 +630,16 @@ Algorytm sk³ada siê z 3 faz, a jego zarys wygl¹da nastêpuj¹co:
 \end{enumerate}
 
 \subsection{Faza 1 - generowanie}
-Rekurencyjny algorytm generowania interesuj¹cych drzew na postawie statystyk. Wyjaœniê najpierw co to znaczy, ¿e drzewo jest interesuj¹ce. Jest to takie drzewo, którego ka¿dy wêze³ zosta³ wybrany jako dobra kontynuacja
-wêz³a poprzedniego, wedle okreœlonych regu³. Regu³y tworzone s¹ na podstawie statystyk danych, które dany wêze³ ma dostaæ do kompresji, typu poprzedzaj¹cej go kompresji oraz typu danych. Dany jest tak¿e aktualny poziom drzewa na którym ma siê znaleŸæ nowy wêze³. Metodê zwracaj¹c¹ dobre kontynuacje nazwijmy roboczo \emph{GetContinuations} i zwraca ona listê typów kodowañ, które spe³niaj¹ regu³y. Kilka przyk³adów:
+Ten fragment opisuje rekurencyjny algorytm generowania interesuj¹cych drzew na postawie statystyk. 
+Wyjaœniê najpierw co to znaczy, ¿e drzewo jest interesuj¹ce.
+\begin{definition}[Interesuj¹ce drzewo]
+Drzewo, którego ka¿dy wêze³ zosta³ wybrany jako dobra kontynuacja wêz³a poprzedniego, wedle okreœlonych regu³.
+\end{definition}
+\noindent
+Regu³y tworzone s¹ na podstawie statystyk danych, które dany wêze³ ma dostaæ do kompresji, typu poprzedzaj¹cej go kompresji oraz typu danych. Dany jest tak¿e aktualny poziom drzewa na którym ma siê znaleŸæ nowy wêze³. Metodê zwracaj¹c¹ dobre kontynuacje nazwana roboczo \emph{GetContinuations}, zwraca  listê typów kodowañ, które spe³niaj¹ regu³y. Kilka przyk³adów:
 \begin{itemize}
-\item Jeœli poprzednik kodowaniem nie by³o \emph{FLOAT\_TO\_INT}, a dane maj¹ nisk¹ precyzjê, ponadto typ danych to double i ich wartoœæ maksymalna jest niewielka, to dodaj do listy kontynuacji typ kodowania \emph{FLOAT\_TO\_INT}, poniewa¿ jest zasadne.
-\item Jeœli poprzednim kodowaniem by³o \emph{GFC} albo \emph{AFL} to nie kompresuj ju¿ wiêcej i jako jedyn¹
-mo¿liw¹ kontynuacjê zwróæ NONE. Jeœli nie, a typ danych to float lub double to na pewno dodaj \emph{GFC} do listy mo¿liwych kontynuacji, w p.p. dodaj \emph{AFL}. 
+\item Jeœli poprzednikiem kodowania nie by³o \emph{FLOAT\_TO\_INT}, dane maj¹ nisk¹ precyzjê i niewielk¹ wartoœæ maksymaln¹, a ponadto typ danych to \emph{double}, to dodaj do listy kontynuacji typ kodowania \emph{FLOAT\_TO\_INT}, poniewa¿ jest zasadne.
+\item Jeœli poprzednim kodowaniem by³o \emph{GFC} albo \emph{AFL}, to nie kompresuj ju¿ wiêcej i jako jedyn¹ mo¿liw¹ kontynuacjê zwróæ NONE. Jeœli nie, a typ danych to \emph{float} lub \emph{double} to dodaj \emph{GFC} do listy mo¿liwych kontynuacji, w p.p. dodaj \emph{AFL}. 
 \end{itemize}
 
 Algorytm kompresuje dane w trakcie generowania drzew oraz jednoczeœnie oblicza i uaktualnia statystyki krawêdzi w drzewie binarnym (o tym w fazie 2). Tê fazê optymalizatora implementuje metoda \emph{FullStatisticsUpdate}, której pseudokod pokazany jest jako algorytm \ref{alg:faza1}.
@@ -685,9 +684,7 @@ Algorytm kompresuje dane w trakcie generowania drzew oraz jednoczeœnie oblicza i
 \end{algorithm}
 \normalsize
 \noindent
-Metody \emph{CrossTrees} tworz¹ wszystkie mo¿liwe kompinacje, w których $T$ jest wierzcho³kiem, a drzewa
-z kolejnych dwóch argumentów (wektory drzew) ich poddrzewami. Dodatkowo uaktualniany jest wspó³czynnik 
-kompresji po³¹czonych drzew. Przyk³adem dzia³ania tej metody jest rysunek \ref{ref:phase1}.
+Metody \emph{CrossTrees} tworz¹ wszystkie mo¿liwe kombinacje, w których $T$ jest wierzcho³kiem, a drzewa z kolejnych dwóch argumentów (wektory drzew), jego poddrzewami. Przyk³adem dzia³ania tej metody jest rysunek \ref{ref:phase1}. Dodatkowo uaktualniany jest wspó³czynnik kompresji po³¹czonych drzew. 
 
     \begin{figure}[h!]
         \centering
@@ -697,16 +694,12 @@ kompresji po³¹czonych drzew. Przyk³adem dzia³ania tej metody jest rysunek \ref{r
     \end{figure}
 \noindent
 Zatem w skrócie wyliczamy statystyki i na ich podstawie przewidujemy mo¿liwe wêz³y potomne, aby drzewo
-by³o interesuj¹ce, a nastêpnie kompresujemy danym kodowaniem dane i dla nich rekurencyjnie wyznaczamy interesuj¹ce drzewa. Nastêpnie ³¹czymy wyniki we wszystkie mo¿liwe kombinacje ale zachowuj¹c hierarchiê i 
-do³¹czamy do mo¿liwych rozwi¹zañ. Przy okazji wiemy jak dobrze ka¿de skonstruowane drzewo zachowuje siê
-dla danych wejœciowych. Na koñcu drzewo o najlepszej statystyce wybierane jest jako optymalne.
+by³o interesuj¹ce, a nastêpnie kompresujemy danym kodowaniem dane i dla nich rekurencyjnie wyznaczamy interesuj¹ce drzewa. Nastêpnie ³¹czymy wyniki we wszystkie mo¿liwe kombinacje ale zachowuj¹c hierarchiê i do³¹czamy do mo¿liwych rozwi¹zañ. Przy okazji, wiemy jak dobrze ka¿de skonstruowane drzewo zachowuje siê dla danych wejœciowych. Finalnie drzewo o najlepszej statystyce wybierane jest jako optymalne.
 
 \subsection{Faza 2 - kompresja}
-W tej fazie w³aœciwe dane (du¿a paczka danych) jest kompresowana przez drzewo wybrane jako optymalne, ale
-co wa¿niejsze uaktualniane s¹ statystyki krawêdzi drzewa binarnego. W tej czêœci opiszê jak wygl¹daj¹ te
-statystyki i jak s¹ uaktualniane. Wa¿ne jest równie¿, ¿e drzewo optymalne pamiêta ostatni¹ kopiê statystyk,
-która jest tworzona w momencie ustawienia nowego drzewa jako optymalne.
-
+W tej fazie w³aœciwe dane (du¿a paczka danych) s¹ kompresowane przez drzewo wybrane jako optymalne, ale
+co wa¿niejsze uaktualniane s¹ statystyki krawêdzi drzewa binarnego. Opiszê jak wygl¹daj¹ te
+statystyki i jak s¹ uaktualniane. Wa¿ne jest równie¿, ¿e drzewo optymalne pamiêta ostatni¹ kopiê statystyk, która jest tworzona w momencie ustawienia nowego drzewa jako optymalne.
     \begin{figure}[h!]
         \centering
         \hspace*{-0.5cm}\includegraphics[scale=0.75]{img/bin_tree}
@@ -714,9 +707,8 @@ która jest tworzona w momencie ustawienia nowego drzewa jako optymalne.
         \label{ref:bintree}
     \end{figure}
 \noindent
-Krawêdzie w drzewie kompresji odpowiadaj¹ parom kompresji na pewnym miejscu w odpowiadaj¹cym mu pe³nym drzewie
-binarnym, co pokazuje rysunek \ref{ref:bintree}. Chcemy analizowaæ pary kompresji, poniewa¿ ka¿da wczeœniejsza kompresja wp³ywa na nastêpn¹ i niejako przygotowuje dla niej dane.
-Dla przyk³adu czêsto okazuje siê, ¿e kompresja \emph{AFL} dzia³a dla jakiœ danych bardzo s³abo, ale poprzedzona
+Krawêdzie w drzewie kompresji odpowiadaj¹ parom kompresji na pewnym miejscu w odpowiadaj¹cym mu pe³nym drzewie binarnym, co pokazuje rysunek \ref{ref:bintree}. Z za³o¿enia, chcemy analizowaæ pary kompresji, poniewa¿ ka¿da wczeœniejsza kompresja wp³ywa na nastêpn¹ i niejako przygotowuje dla niej dane.
+Dla przyk³adu, czêsto okazuje siê, ¿e kompresja \emph{AFL} dzia³a dla jakiœ danych bardzo s³abo, ale poprzedzona
 kodowaniem \emph{DELTA} lub \emph{PATCH} osi¹ga bardzo dobre wyniki, zaœ poprzedzona kodowaniem \emph{DICT} ma
 wynik jeszcze s³abszy. Wtedy dwie wczeœniejsze konfiguracje bêd¹ mia³y na tym miejscu wysokie statystyki, a trzecia niskie.
 
@@ -729,7 +721,7 @@ Dla danej pary kompresji na wybranym miejscu w drzewie, statystyka jest liczona 
 starej wartoœci statystyki (na pocz¹tku ma wartoœæ 1.0) oraz uzyskanego przez poddrzewo odpowiadaj¹ce danej
 krawêdzi wspó³czynnika kompresji:
 $$ \alpha_{new} = \frac{\alpha_{old} + CR_{e}}{2} $$
-Dla przyk³adu jeœli krawêdŸ $1$ z par¹ kompresji $(A,B)$ uzyska³a $CR_{e} = 2$ a potem $3$, to statystyka dla tej pary na tej krawêdzi bêdzie wynosi³a $\alpha_ = \frac{\frac{1+2}{2}+3}{2} = 2,25$. Taka statystyka sprawia, ¿e nigdy nie bêdzie wiêksza ni¿ najlepszy wspó³czynnik kompresji uzyskany przez t¹ parê oraz, ¿e statystyka ta d¹¿y do tego wspó³czynnika (w granicy), jeœli jest sta³y. W ca³ym programie wspó³czynnik kompresji krawêdzi $(A,B)$ ozn. $CR_{e}$ liczony jest jako œrednia arytmetyczna wspó³czynników kompresji osi¹gniêtych przez poddrzewo definiowane
+Dla przyk³adu, jeœli krawêdŸ $1$ z par¹ kompresji $(A,B)$ uzyska³a $CR_{e} = 2$ a potem $3$, to statystyka dla tej pary na tej krawêdzi bêdzie wynosi³a $\alpha_ = \frac{\frac{1+2}{2}+3}{2} = 2,25$. Taka statystyka sprawia, ¿e nigdy nie bêdzie wiêksza ni¿ najlepszy wspó³czynnik kompresji uzyskany przez t¹ parê oraz, ¿e statystyka ta d¹¿y do tego wspó³czynnika (w granicy), jeœli jest sta³y. W ca³ym programie wspó³czynnik kompresji krawêdzi $(A,B)$ ozn. $CR_{e}$ liczony jest jako œrednia arytmetyczna wspó³czynników kompresji osi¹gniêtych przez poddrzewo definiowane
 przez wêze³ $A$ i poddrzewo definiowane przez $B$: $CR_{e} = \frac{CR(A) + CR(B)}{2}$. Natomiast wspó³czynnik kompresji dla wêz³a jest stosunkiem wielkoœci danych wejœciowych do danych wyjœciowych po kompresji. Dziêki temu
 wspó³czynnik kompresji krawêdzi w lepszy sposób definiuje jakoœæ takiej pary kompresji w drzewie, zmniejszaj¹c
 wp³yw jak¹ ma jakoœæ kompresji drugiego poddrzewa odchodz¹cego od $A$ na statystykê krawêdzi do której to poddrzewo nie nale¿y.
@@ -741,11 +733,10 @@ wp³yw jak¹ ma jakoœæ kompresji drugiego poddrzewa odchodz¹cego od $A$ na statyst
         \label{ref:bintree}
     \end{figure}
 
-Statystyki krawêdzi uaktualniane s¹ w ten sposób podczas trwania ka¿dej kompresji o ile wskaŸnik na statystyki,
-ustawiony jest w drzewie. W momencie ukoñczenia kompresji statystyki powinny ju¿ byæ aktualne.
+Statystyki krawêdzi uaktualniane s¹ w ten sposób podczas trwania ka¿dej kompresji, o ile wskaŸnik na statystyki ustawiony jest w drzewie. W momencie ukoñczenia kompresji statystyki powinny ju¿ byæ aktualne.
 
 \subsection{Faza 3 - poprawa}
-Po dokonaniu kompresji na du¿ym kawa³ku danych lub nawet kilku paczkach, jesteœmy w stanie du¿o lepiej stwierdziæ jak dobrze dane drzewo kompresji siê sprawuje. Jeœli jakoœæ ta wzros³a lub pozosta³a bez zmian, znaczy to ¿e nic nie trzeba zmieniaæ i wybrane drzewo kompresji jest optymalne. W przeciwnym przypadku nale¿y drzewo poprawiæ, stosuj¹c now¹ wiedzê, uzyskan¹ w formie statystyk krawêdzi z nowych danych.
+Po dokonaniu kompresji na du¿ym kawa³ku danych lub nawet kilku paczkach, jesteœmy w stanie du¿o lepiej stwierdziæ, jak dobrze dane drzewo kompresji siê sprawuje. Jeœli jakoœæ ta wzros³a lub pozosta³a bez zmian, znaczy to ¿e nic nie trzeba zmieniaæ i wybrane drzewo kompresji jest optymalne. W przeciwnym przypadku nale¿y drzewo poprawiæ, stosuj¹c now¹ wiedzê, uzyskan¹ w formie statystyk krawêdzi z nowych danych.
 Aby to osi¹gn¹æ algorytm sprawdza statystyki krawêdzi i wybiera krawêdŸ o najmniejszym indeksie dla której statystyka siê pogorszy³a (drzewo wybrane jako optymalne trzyma kopiê statystyk oraz wspó³czynnika kompresji z momentu wybrania go na optymalne). Mo¿na te¿ w tym momencie wybieraæ krawêdŸ dla której statystyka pogorszy³a siê
 najbardziej np. procentowo. Wybran¹ krawêdŸ kasujemy (usuwamy j¹ z drzewa razem z poddrzewem). Na miejscu usuniêtej krawêdzi, zach³annie, wstawiamy parê kompresji o najwiêkszej statystyce dla tej krawêdzi. Podobnie
 wstawiamy jej dzieci, a¿ do limitu wysokoœci drzewa. Proces ten dok³adniej opisuj¹ algorytmy \ref{alg:faza2_correct} i \ref{alg:faza2_replace}, z prostym przyk³adem w formie rysunku \ref{ref:mutate}.
@@ -757,8 +748,8 @@ wstawiamy jej dzieci, a¿ do limitu wysokoœci drzewa. Proces ten dok³adniej opisu
         \label{ref:mutate}
     \end{figure}
 
-Wymieniaj¹c krawêdŸ algorytm w zasadzie wymienia poddrzewo w grafie, zaczynaj¹c od pocz¹tku lub koñca krawêdzi (oszczêdzaj¹c pocz¹tek). Na rysunku \ref{} widzimy oba przypadki. Na przyk³ad w pierwszej \emph{mutacji} tylko
-jedna odnoga \emph{DICT} zosta³a zmieniona, podczas gdy w przejœciu drugim zosta³a wymieniona ca³a krawêdŸ \emph{AFL-NONE}.
+Wymieniaj¹c krawêdŸ, algorytm w zasadzie wymienia poddrzewo w grafie, zaczynaj¹c od pocz¹tku lub koñca krawêdzi (oszczêdzaj¹c pocz¹tek). Na rysunku \ref{ref:mutate} widzimy oba przypadki. Na przyk³ad, w pierwszej \emph{mutacji} tylko
+jedna odnoga \emph{DICT} zosta³a zmieniona, podczas gdy w przejœciu drugim wymianie podlega ca³a krawêdŸ \emph{AFL-NONE}.
 
 \begin{algorithm}[H]
  \tiny
@@ -802,9 +793,9 @@ jedna odnoga \emph{DICT} zosta³a zmieniona, podczas gdy w przejœciu drugim zosta
  \label{alg:faza2_correct}
 \end{algorithm}
 
-Podsumowuj¹c program mutuje drzewo kompresji dopóki wspó³czynnik kompresji nie zacznie siê poprawiaæ. Pojedyncza
+Podsumowuj¹c, program mutuje drzewo kompresji dopóki wspó³czynnik kompresji nie zacznie siê poprawiaæ. Pojedyncza
 mutacja mo¿e zmieniæ jeden wêze³, ale mo¿e tak¿e wymieniæ ca³e drzewo, co dzieje siê bardzo czêsto. Wymiany s¹
-dokonywane tylko jeœli wed³ug statystyk nast¹pi poprawa kompresji. W ten sposób nawet jeœli charakterystyka
+dokonywane tylko wtedy, gdy wed³ug statystyk nast¹pi poprawa kompresji. W ten sposób nawet jeœli charakterystyka
 danych siê zmieni, algorytm powinien dostosowaæ drzewo do nowych warunków.  
 
 \begin{algorithm}[H]
@@ -865,7 +856,7 @@ danych siê zmieni, algorytm powinien dostosowaæ drzewo do nowych warunków.
 
 Przebieg dzia³ania kompresji z u¿yciem optymalizatora pokazuje algorytm \ref{alg:compress}.
 Co pewien czas próbujemy przejrzeæ wszystkie interesuj¹ce drzewa uaktualniaj¹c statystyki i wybieraj¹c
-inne optymalne drzewo. Próbujemy równie¿ je poprawiaæ i jeœli siê uda³o, to ponownie zapisujemy je jako
+inne optymalne drzewo. Staramy siê je poprawiaæ i jeœli siê uda³o, to ponownie zapisujemy je jako
 optymalne, tworz¹c now¹ kopiê statystyk (historycznych).
 
 \subsection{Usprawnienie}
@@ -880,11 +871,11 @@ A,B,C zbiory regu³ w których A s¹ najbardziej restrykcyjne i produkuj¹ ma³o drze
         \caption{Zrównoleglenie fazy 1 w optymalizatorze}
         \label{ref:threads}
     \end{figure}
-
-W ten sposób oba w¹tki mog¹ pracowaæ nawet na 2 oddzielnych urz¹dzeniach wielokrotnie zwiêkszaj¹c nie tylko
+\noindent
+W ten sposób oba w¹tki mog¹ pracowaæ nawet na 2 oddzielnych urz¹dzeniach, wielokrotnie zwiêkszaj¹c nie tylko
 wydajnoœæ ale i wspó³czynnik kompresji z racji przeszukania wiêkszej iloœci opcji. Algorytm powinien
-tak¿e lepiej dostosowywaæ siê do zmian danych. Taka równoleg³oœæ jest mo¿liwe, poniewa¿ statystyki
-zosta³y zaimplementowane w taki sposób aby umo¿liwiæ do nich równoleg³y dostêp bez obaw o niespójnoœæ danych.
+tak¿e lepiej dostosowywaæ siê do zmian danych. Taka równoleg³oœæ jest mo¿liwa, poniewa¿ statystyki
+zosta³y zaimplementowane w taki sposób, aby umo¿liwiæ do nich równoleg³y dostêp bez obaw o niespójnoœæ danych.
 
 \section{Równoleg³y kompresor}
 Szeregi czasowe zwykle sk³adaj¹ siê z wielu kolumn, które maj¹ ró¿ne charakterystyki, wiêc mog¹ byæ
@@ -928,6 +919,7 @@ Równoleg³a kompresja kolumn jest opisana przez pseudokod w algorytmie \ref{alg:p
  \label{alg:parallel}
 \end{algorithm}
 \normalsize
+\noindent
 
 W tym przypadku wa¿ne jest jak dzia³a samo zadanie kompresji, przy czym kluczowym elementem 
 jest synchronizacja zapisu do pliku wynikowego, który to przedstawia rysunek \ref{ref:parallel}.
@@ -955,12 +947,12 @@ Zadanie to przebiega nastêpuj¹co:
 \subsubsection{Dekompresja}
 Dekompresja przebiega na tyle prosto, ¿e ograniczê siê do krótkiego opisu bez pseudokodu i obrazków.
 \begin{enumerate}
-\item Kawa³ek po kawa³ku zgodnie z zapisanymi rozmiarami czytamy skompresowane dane kolumn.
+\item Kawa³ek po kawa³ku, zgodnie z zapisanymi rozmiarami czytamy skompresowane dane kolumn.
 \item Dla ka¿dego kawa³ka tworzone jest zadanie dekompresuj¹ce (posiadaj¹ce wskaŸnik na wspóln¹ instancjê szeregu czasowego), które:
 	\begin{enumerate}
 	\item Zaczytuje dane na GPU
 	\item Dekompresuje je
-	\item Dopisuje na koñcu kolumny któr¹ obs³uguje w szeregu czasowym
+	\item Dopisuje na koñcu kolumny, któr¹ obs³uguje w szeregu czasowym
 	\end{enumerate}
 \item Po zdekodowaniu liczby kawa³ków równej liczbie kolumn czekamy a¿ w¹tki zakoñcz¹ pracê i zapisujemy szereg na wyjœciem.
 \item Czyœcimy szereg czasowy aby nie zapisywaæ kolejny raz tych samych danych
