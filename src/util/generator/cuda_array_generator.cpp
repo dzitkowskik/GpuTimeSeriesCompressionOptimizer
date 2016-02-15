@@ -111,7 +111,7 @@ namespace ddj
 		auto h_result = new T[size];
 		size_t start = part*size;
 		auto value = max;
-		auto step = (max-min)/len/2;
+		auto step = (max-min)/(len/2);
 
 		// Prepare data
 		for(size_t i = 0; i < size; i++)

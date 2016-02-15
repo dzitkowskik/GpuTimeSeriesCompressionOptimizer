@@ -64,7 +64,7 @@ SharedCudaPtrVector<char> ConstEncoding::Encode(SharedCudaPtr<T> data)
 	auto packedStencil = stencil.pack();
 	auto resultMetadata = CudaArrayCopy().Concatenate(
 		SharedCudaPtrVector<char> {
-			MoveSharedCudaPtr<T, char>(mostFrequent),
+			CastSharedCudaPtr<T, char>(mostFrequent),
 			packedStencil
 		}
 	);

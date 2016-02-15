@@ -107,7 +107,7 @@ TEST_F(ParallelTsCompressorTest, DISABLED_Decompress_CSV_Info_Test_Data_CompareF
 	auto reader = TimeSeriesReaderCSV::make_shared(CSVFileDefinition(fileDefinition));
 
 	ParallelTSCompressor compressor(reader);
-	compressor.SetBatchSize(2*1e5);
+	compressor.SetBatchSize(1e6);
 	compressor.Compress(inputFile, outputFileCompr);
 
 	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
@@ -140,7 +140,7 @@ TEST_F(ParallelTsCompressorTest, DISABLED_CompressDecompress_CSV_NYSE_CompareFil
 	auto reader = TimeSeriesReaderCSV::make_shared(CSVFileDefinition(fileDefinition));
 
 	ParallelTSCompressor compressor(reader);
-	compressor.SetBatchSize(5*1e5);
+	compressor.SetBatchSize(1e5);
 	compressor.Compress(inputFile, outputFileCompr);
 
 	LOG4CPLUS_INFO_FMT(_logger, "Compression input = %s with size %lu",
@@ -230,10 +230,9 @@ TEST_F(ParallelTsCompressorTest, DISABLED_CompressDecompress_Binary_Generated_Co
 			(float)inputFile.GetSize()/outputFileCompr.GetSize());
 }
 
-TEST_F(ParallelTsCompressorTest, CompressDecompress_CSV_Generated_CompareFile)
+TEST_F(ParallelTsCompressorTest, DISABLED_CompressDecompress_CSV_Generated_CompareFile)
 {
 	LOG4CPLUS_INFO(_logger, "OptimizerTest, CompressDecompress_CSV_Generated_CompareFile");
-	Save1MFrom1GNyseDataInSampleData(1e5);
 
 	auto inputFile = File("sample_data/generated.csv");
 	auto outputFileCompr = File::GetTempFile();

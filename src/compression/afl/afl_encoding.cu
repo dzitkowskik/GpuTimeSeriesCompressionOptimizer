@@ -1,5 +1,6 @@
 #include "compression/afl/afl_encoding.hpp"
 #include "afl_gpu.cuh"
+#include "core/cuda_array.hpp"
 #include "util/statistics/cuda_array_statistics.hpp"
 #include "util/transform/cuda_array_transform.hpp"
 #include "util/copy/cuda_array_copy.hpp"
@@ -16,6 +17,8 @@ SharedCudaPtrVector<char> AflEncoding::Encode(SharedCudaPtr<T> data)
 {
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
 	LOG4CPLUS_INFO_FMT(_logger, "AFL encoding START: data size = %lu", data->size());
+
+	LOG4CPLUS_TRACE_FMT(_logger, "AFL data to encode: %s", CudaArray().ToString(data->copy()).c_str());
 
 	if(data->size() <= 0)
 		return SharedCudaPtrVector<char>{

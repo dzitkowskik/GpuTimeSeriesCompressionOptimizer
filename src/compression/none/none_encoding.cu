@@ -24,7 +24,7 @@ SharedCudaPtrVector<char> NoneEncoding::Encode(SharedCudaPtr<T> data)
 	resultMetadata->fillFromHost((char*)&dataSize, sizeof(size_t));
 
 	CUDA_ASSERT_RETURN( cudaGetLastError() );
-    LOG4CPLUS_INFO(_logger, "NONE enoding END");
+    LOG4CPLUS_INFO(_logger, "NONE encoding END");
 
 	return SharedCudaPtrVector<char> {resultMetadata, resultData};
 }

@@ -50,9 +50,10 @@ TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_NoException)
 template<typename T>
 void CompressionTreeTestBase::CompressDecompressTest(CompressionTree& compressionTree, SharedCudaPtr<T> data)
 {
-	printf("Testing tree:\n");
-	compressionTree.Print();
-	auto compressed = compressionTree.Compress(CastSharedCudaPtr<T, char>(data));
+	LOG4CPLUS_TRACE_FMT(_logger, "Testing data: %s ...", CudaArray().ToString(data->copy(10)).c_str());
+	LOG4CPLUS_INFO_FMT(_logger, "Testing tree: %s", compressionTree.ToString().c_str());
+	auto dataToCompress = CastSharedCudaPtr<T, char>(data);
+	auto compressed = compressionTree.Compress(dataToCompress);
 
 	CompressionTree decompressionTree;
 	auto decompressed = decompressionTree.Decompress(compressed);
@@ -63,12 +64,7 @@ void CompressionTreeTestBase::CompressDecompressTest(CompressionTree& compressio
 	ASSERT_EQ(expected->size(), actual->size());
 	EXPECT_TRUE( CudaArray().Compare(expected, actual) );
 
-	// printf("Data size = %lu\n", data->size()*sizeof(T));
-	// printf("Compressed size = %lu\n", compressed->size());
-	// printf("Decompressed size = %lu\n", decompressed->size());
-
-	// HelperPrint::PrintSharedCudaPtr(expected, "expected");
-	// HelperPrint::PrintSharedCudaPtr(actual, "actual");
+	LOG4CPLUS_INFO(_logger, "Compression ratio: " << compressionTree.GetCompressionRatio());
 }
 
 TEST_P(CompressionTreeTest, SimpleOneNodeTree_Delta_Int_Compress_Decompress)
@@ -465,8 +461,6 @@ TEST_F(CompressionTreeTestBase, FakeDataPatternA_Float_SpecialCaseWithDict_Compr
 	// HelperPrint::PrintSharedCudaPtr(actual, "actual");
 }
 
-// delta[1],patch[1],delta[1],afl[1],none[1],delta[1],afl[1],none[1],
-//
 //				DELTA
 // 				  |
 // 				PATCH
@@ -490,7 +484,57 @@ TEST_F(CompressionTreeTestBase, RealTSData_Time_Delta_Patch_Delta_Afl)
 	CompressDecompressTest<time_t>(tree, timeData);
 }
 
+// 			DELTA
+//			  |
+//			 RLE
+//			/	\
+//		   AFL  AFL
+TEST_F(CompressionTreeTestBase, GoodTreeForPatternB_Second)
+{
+	int N = 25;
+	int SIZE = GetSize();
+	Path path
+	{
+		EncodingType::delta,
+			EncodingType::rle,
+				EncodingType::afl, EncodingType::none,
+				EncodingType::afl, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_int);
+	for(int i = 0; i < N; i++)
+	{
+		auto data = GetFakeDataWithPatternB<int>(i, 3*SIZE, -1e4, 1e4, SIZE/2);
+		CudaArray().Print(data->copy(10), "data");
+		CompressDecompressTest<int>(tree, data);
+	}
+}
 
+//			PATCH
+//         /	 \
+//		DELTA	DELTA
+//		  |		  |
+//		SCALE   SCALE
+//		  |		  |
+//		 AFL	 AFL
+TEST_F(CompressionTreeTestBase, GoodTreeForPatternB_First)
+{
+	int N = 25;
+	int SIZE = GetSize();
+	Path path
+	{
+		EncodingType::patch,
+			EncodingType::delta, EncodingType::scale,
+				EncodingType::afl, EncodingType::none,
+			EncodingType::delta, EncodingType::scale,
+				EncodingType::afl, EncodingType::none
+	};
+	auto tree = PathGenerator().GenerateTree(path, DataType::d_int);
+	for(int i = 0; i < N; i++)
+	{
+		auto data = GetFakeDataWithPatternB<int>(i, 3*SIZE, -1e4, 1e4, SIZE/2);
+		CompressDecompressTest<int>(tree, data);
+	}
+}
 
 
 

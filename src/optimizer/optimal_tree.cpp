@@ -39,6 +39,9 @@ bool OptimalTree::TryCorrectTree()
 {
 	auto oldRatio = this->_ratio;
 	auto newRatio = this->_tree.GetCompressionRatio();
+
+	LOG4CPLUS_INFO_FMT(_logger, "Old Ratio = %f, New Ratio = %f", oldRatio, newRatio);
+
 	if(oldRatio <= newRatio && oldRatio > 1) return false;
 
 	// Get the weaker edge with minimal index
@@ -62,7 +65,6 @@ bool OptimalTree::TryCorrectTree()
 			if(newEdgeWithSameBeginning.value > newValue)
 			{
 				// replace single edge
-
 				LOG4CPLUS_INFO_FMT(_logger, "Replace %s with %s",
 						GetEncodingTypeString(edges[i].To()->GetEncodingType()).c_str(),
 						GetEncodingTypeString(newEdgeWithSameBeginning.type.second).c_str());

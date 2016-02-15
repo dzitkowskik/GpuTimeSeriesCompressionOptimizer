@@ -8,7 +8,7 @@
 #include "compression/patch/lower_patch_encoding.hpp"
 
 #include "core/cuda_launcher.cuh"
-
+#include "core/cuda_array.hpp"
 #include "core/macros.h"
 #include "util/stencil/stencil.hpp"
 
@@ -45,16 +45,16 @@ SharedCudaPtrVector<char> LowerPatchEncoding::Encode(SharedCudaPtr<T> data)
     int size = data->size();
 
     // Split according to the stencil
-    Stencil stencil = Stencil::Create(data, GetOperator<T>());
-    LOG4CPLUS_TRACE(_logger, "PATCH (LOWER) - STENCIL CREATED");
+    auto op = GetOperator<T>();
 
+    LOG4CPLUS_TRACE(_logger, "PATCH (LOWER) - OP VALUE = " << op.value);
+
+    Stencil stencil = Stencil::Create(data, op);
     auto stencilPacked = stencil.pack();
-
-    LOG4CPLUS_TRACE(_logger, "PATCH (LOWER) - STENCIL PACKED");
-
     auto splittedData = this->_splitter.Split(data, *stencil);
 
-    LOG4CPLUS_TRACE(_logger, "PATCH (LOWER) - SPLIT DONE");
+    LOG4CPLUS_TRACE_FMT(_logger, "LEFT: %s ...", CudaArray().ToString(std::get<0>(splittedData)->copy()).c_str());
+    LOG4CPLUS_TRACE_FMT(_logger, "RIGHT: %s ...", CudaArray().ToString(std::get<1>(splittedData)->copy()).c_str());
 
     // Return results as vector with compressed stencil as metadata
     auto operatorTrue = CastSharedCudaPtr<T, char>(std::get<0>(splittedData));

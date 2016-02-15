@@ -9,10 +9,12 @@
 #include "core/macros.h"
 #include "core/cuda_macros.cuh"
 #include "core/cuda_launcher.cuh"
-
+#include "util/statistics/cuda_array_statistics.hpp"
 #include <cuda_runtime_api.h>
 #include <thrust/extrema.h>
 #include <thrust/device_ptr.h>
+#include <limits>
+#include <cmath>
 
 namespace ddj {
 
@@ -39,11 +41,15 @@ SharedCudaPtrVector<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
 	auto result_metadata = CudaPtr<char>::make_shared(sizeof(T));
 
 	// GET MIN VALUE OF DATA
-	thrust::device_ptr<T> data_ptr(data->get());
-	T min = thrust::min_element(data_ptr, data_ptr+data->size())[0];
+	auto minMax = CudaArrayStatistics().MinMax(data);
 
 	// TAKE ABSOLUTE VALUE
-	if (min < 0) min = -min;
+	T min = std::get<0>(minMax);
+	T max = std::get<1>(minMax);
+	if(min < 0)	// overflow detection
+		if((std::numeric_limits<T>::max() - max) < abs(min)) min = 0;
+
+	LOG4CPLUS_TRACE(_logger, "SCALE min = " << min);
 
 	// SCALE DATA BY MIN VALUE
 	this->_policy.setSize(data->size());

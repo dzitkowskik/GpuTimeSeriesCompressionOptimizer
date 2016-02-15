@@ -23,7 +23,7 @@ class CudaArray
 {
 public:
     template<typename T>
-    std::string ToString(SharedCudaPtr<T> ptr, std::string name = "")
+    std::string ToString(SharedCudaPtr<T> ptr, std::string name)
     {
         std::stringstream ss;
         PrintToStream(ss, ptr, name);
@@ -31,9 +31,25 @@ public:
     }
 
     template<typename T>
+    std::string ToString(SharedCudaPtr<T> ptr)
+    {
+        std::stringstream ss;
+        PrintToStream(ss, ptr);
+        return ss.str();
+    }
+
+    template<typename T>
     void Print(SharedCudaPtr<T> ptr, std::string name = "")
     {
         std::cout << ToString(ptr, name);
+    }
+
+    template<typename T>
+    void PrintToStream(std::ostream& stream, SharedCudaPtr<T> ptr)
+    {
+        thrust::device_ptr<T> data(ptr->get());
+        thrust::copy(data, data + ptr->size(), std::ostream_iterator<T>(std::cout, " "));
+        stream << std::endl;
     }
 
     template<typename T>

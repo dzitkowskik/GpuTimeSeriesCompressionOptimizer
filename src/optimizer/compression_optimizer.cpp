@@ -112,7 +112,7 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 		auto compr = encoding->Encode(data, dt);
 		LOG4CPLUS_DEBUG(_logger, "Compression success");
 
-		parent.second = _getSize(compr);
+		parent.second = _getSize(compr) + 8;
 		parent.first.FindNode(0)->SetCompressionRatio(
 				Encoding::GetCompressionRatio(data->size(), parent.second));
 
@@ -176,13 +176,6 @@ SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataP
 			possibleTrees.end(),
 			[&](PossibleTree A, PossibleTree B){ return A.first.GetCompressionRatio() < B.first.GetCompressionRatio(); });
 
-	//		for(int i = 0; i < 10; i++)
-	//		{
-	//			LOG4CPLUS_INFO_FMT(_logger, "PossibleTree[%d](size = %lu)(val = %f): %s",
-	//					i, possibleTrees[i].second, possibleTrees[i].first.GetCompressionRatio(),
-	//					possibleTrees[i].first.ToString().c_str());
-	//		}
-
 		LOG4CPLUS_INFO_FMT(_logger, "Found %d interesting trees (best score = %f)",
 				possibleTrees.size(), (*bestTree).first.GetCompressionRatio());
 
@@ -191,6 +184,7 @@ SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataP
 
 	auto compressedData = _optimalTree->GetTree().Compress(dataPart);
 	LOG4CPLUS_INFO(_logger, "Optimal tree: " << _optimalTree->GetTree().ToString());
+	LOG4CPLUS_INFO(_logger, "Compression ratio: " << _optimalTree->GetTree().GetCompressionRatio());
 	bool treeCorrected = _optimalTree->TryCorrectTree();
 	LOG4CPLUS_INFO_FMT(_logger, "Tree corrected = %s\n", treeCorrected ? "true" : "false");
 	_partsProcessed++;

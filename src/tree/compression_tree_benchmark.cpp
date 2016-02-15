@@ -32,13 +32,7 @@ BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDelta_Encod
 	Benchmark_Tree_Encoding(compressionTree, CastSharedCudaPtr<int,char>(data), DataType::d_int, state);
 }
 BENCHMARK_REGISTER_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDelta_Encoding_RandomInt)
-	->Arg(1<<18)
-	->Arg(1<<19)
-	->Arg(1<<20)
-	->Arg(1<<21)
-	->Arg(1<<22)
-	->Arg(1<<23)
-	->Arg(1<<24);
+	->Arg(1<<18)->Arg(1<<19)->Arg(1<<20)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23)->Arg(1<<24);
 
 
 //		SCALE
@@ -72,13 +66,7 @@ BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDeltaPatchA
 	Benchmark_Tree_Encoding(compressionTree, CastSharedCudaPtr<int,char>(data), DataType::d_int, state);
 }
 BENCHMARK_REGISTER_F(CompressionTreeBenchmark, BM_CompressionTree_ScaleDeltaPatchAfl_Encoding_RandomInt)
-	->Arg(1<<18)
-	->Arg(1<<19)
-	->Arg(1<<20)
-	->Arg(1<<21)
-	->Arg(1<<22)
-	->Arg(1<<23)
-	->Arg(1<<24);
+	->Arg(1<<18)->Arg(1<<19)->Arg(1<<20)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23)->Arg(1<<24);
 
 //			 DICT
 //			/	 \
@@ -104,13 +92,7 @@ BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_FakeDataPatternA
 	Benchmark_Tree_Encoding(tree, CastSharedCudaPtr<float,char>(data), DataType::d_float, state);
 }
 BENCHMARK_REGISTER_F(CompressionTreeBenchmark, BM_CompressionTree_FakeDataPatternA_Float_TreeWith_Dict_And_FloatToInt)
-	->Arg(1<<18)
-	->Arg(1<<19)
-	->Arg(1<<20)
-	->Arg(1<<21)
-	->Arg(1<<22)
-	->Arg(1<<23)
-	->Arg(1<<24);
+	->Arg(1<<18)->Arg(1<<19)->Arg(1<<20)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23)->Arg(1<<24);
 
 //			PATCH
 //			/	\
@@ -139,13 +121,7 @@ BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_FakeDataPatternA
 	Benchmark_Tree_Encoding(tree, CastSharedCudaPtr<float,char>(data), DataType::d_float, state);
 }
 BENCHMARK_REGISTER_F(CompressionTreeBenchmark, BM_CompressionTree_FakeDataPatternA_Float_GoodTree)
-	->Arg(1<<18)
-	->Arg(1<<19)
-	->Arg(1<<20)
-	->Arg(1<<21)
-	->Arg(1<<22)
-	->Arg(1<<23)
-	->Arg(1<<24);
+	->Arg(1<<18)->Arg(1<<19)->Arg(1<<20)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23)->Arg(1<<24);
 
 // GFC - 2xNONE
 BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_GFC)(benchmark::State& state)
@@ -160,13 +136,7 @@ BENCHMARK_DEFINE_F(CompressionTreeBenchmark, BM_CompressionTree_GFC)(benchmark::
 	Benchmark_Tree_Encoding(tree, CastSharedCudaPtr<float,char>(data), DataType::d_float, state);
 }
 BENCHMARK_REGISTER_F(CompressionTreeBenchmark, BM_CompressionTree_GFC)
-	->Arg(1<<18)
-	->Arg(1<<19)
-	->Arg(1<<20)
-	->Arg(1<<21)
-	->Arg(1<<22)
-	->Arg(1<<23)
-	->Arg(1<<24);
+	->Arg(1<<18)->Arg(1<<19)->Arg(1<<20)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23)->Arg(1<<24);
 
 } /* namespace ddj */
 

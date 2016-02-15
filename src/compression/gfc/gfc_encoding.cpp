@@ -7,6 +7,7 @@
 
 #include "compression/gfc/gfc_encoding.hpp"
 #include "compression/gfc/gfc_encoding_impl.cuh"
+#include "compression/afl/afl_encoding.hpp"
 
 namespace ddj
 {
@@ -106,47 +107,6 @@ SharedCudaPtr<float> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
 	return result;
 }
 
-// INT
-template<>
-SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<int> data)
-{ return SharedCudaPtrVector<char>(); }
-template<>
-SharedCudaPtr<int> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
-{ return SharedCudaPtr<int>(); }
-
-// TIME
-template<>
-SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<time_t> data)
-{ return SharedCudaPtrVector<char>(); }
-template<>
-SharedCudaPtr<time_t> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
-{ return SharedCudaPtr<time_t>(); }
-
-// SHORT
-template<>
-SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<short> data)
-{ return SharedCudaPtrVector<char>(); }
-template<>
-SharedCudaPtr<short> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
-{ return SharedCudaPtr<short>(); }
-
-// CHAR
-template<>
-SharedCudaPtrVector<char> GfcEncoding::Encode(SharedCudaPtr<char> data)
-{ return SharedCudaPtrVector<char>(); }
-template<>
-SharedCudaPtr<char> GfcEncoding::Decode(SharedCudaPtrVector<char> input)
-{ return SharedCudaPtr<char>(); }
-
-
-SharedCudaPtrVector<char> GfcEncoding::EncodeInt(SharedCudaPtr<int> data)
-{ return this->Encode<int>(data); }
-SharedCudaPtr<int> GfcEncoding::DecodeInt(SharedCudaPtrVector<char> data)
-{ return this->Decode<int>(data); }
-SharedCudaPtrVector<char> GfcEncoding::EncodeTime(SharedCudaPtr<time_t> data)
-{ return this->Encode<time_t>(data); }
-SharedCudaPtr<time_t> GfcEncoding::DecodeTime(SharedCudaPtrVector<char> data)
-{ return this->Decode<time_t>(data); }
 SharedCudaPtrVector<char> GfcEncoding::EncodeFloat(SharedCudaPtr<float> data)
 { return this->Encode<float>(data); }
 SharedCudaPtr<float> GfcEncoding::DecodeFloat(SharedCudaPtrVector<char> data)
@@ -155,13 +115,54 @@ SharedCudaPtrVector<char> GfcEncoding::EncodeDouble(SharedCudaPtr<double> data)
 { return this->Encode<double>(data); }
 SharedCudaPtr<double> GfcEncoding::DecodeDouble(SharedCudaPtrVector<char> data)
 { return this->Decode<double>(data); }
+
+SharedCudaPtrVector<char> GfcEncoding::EncodeInt(SharedCudaPtr<int> data)
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on INT (using AFL)!!");
+	auto result = AflEncoding().Encode<int>(data);
+	result.push_back(CudaPtr<char>::make_shared());
+	return result;
+}
+SharedCudaPtr<int> GfcEncoding::DecodeInt(SharedCudaPtrVector<char> data)
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on INT (using AFL)!!");
+	return AflEncoding().Decode<int>(data);
+}
+SharedCudaPtrVector<char> GfcEncoding::EncodeTime(SharedCudaPtr<time_t> data)
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on TIME (using AFL)!!");
+	auto result = AflEncoding().Encode<time_t>(data);
+	result.push_back(CudaPtr<char>::make_shared());
+	return result;
+}
+SharedCudaPtr<time_t> GfcEncoding::DecodeTime(SharedCudaPtrVector<char> data)
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on TIME (using AFL)!!");
+	return AflEncoding().Decode<time_t>(data);
+}
 SharedCudaPtrVector<char> GfcEncoding::EncodeShort(SharedCudaPtr<short> data)
-{ return this->Encode<short>(data); }
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on SHORT (using AFL)!!");
+	auto result = AflEncoding().Encode<short>(data);
+	result.push_back(CudaPtr<char>::make_shared());
+	return result;
+}
 SharedCudaPtr<short> GfcEncoding::DecodeShort(SharedCudaPtrVector<char> data)
-{ return this->Decode<short>(data); }
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on SHORT (using AFL)!!");
+	return AflEncoding().Decode<short>(data);
+}
 SharedCudaPtrVector<char> GfcEncoding::EncodeChar(SharedCudaPtr<char> data)
-{ return this->Encode<char>(data); }
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on CHAR (using AFL)!!");
+	auto result = AflEncoding().Encode<char>(data);
+	result.push_back(CudaPtr<char>::make_shared());
+	return result;
+}
 SharedCudaPtr<char> GfcEncoding::DecodeChar(SharedCudaPtrVector<char> data)
-{ return this->Decode<char>(data); }
+{
+	LOG4CPLUS_WARN(_logger, "GFC triggered on CHAR (using AFL)!!");
+	return AflEncoding().Decode<char>(data);
+}
 
 } /* namespace ddj */

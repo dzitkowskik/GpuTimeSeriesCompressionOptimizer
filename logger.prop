@@ -14,7 +14,7 @@ log4cplus.additivity.DecompressionTask=false
 log4cplus.logger.OptimalTree=OFF, STDOUT
 log4cplus.additivity.OptimalTree=false
 
-log4cplus.logger.CompressionOptimizer=OFF, STDOUT
+log4cplus.logger.CompressionOptimizer=INFO, STDOUT
 log4cplus.additivity.CompressionOptimizer=false
 
 log4cplus.logger.ParallelTSCompressor=OFF, STDOUT
