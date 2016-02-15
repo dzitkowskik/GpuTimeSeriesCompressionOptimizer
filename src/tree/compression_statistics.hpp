@@ -45,8 +45,7 @@ public:
 
 	double Get(int edgeNo, EdgeType edgeType);
 	EdgeStatistic GetAny(int edge);
-	EdgeStatistic GetBest(int edge);
-	EdgeStatistic GetBest(int edge, EncodingType beginningType);
+	EdgeStatistic GetBest(int edge,  EdgeType oldEdge, bool sameBeginning = false);
 	void Print(std::ostream& stream = std::cout);
 	void PrintShort(std::ostream& stream = std::cout);
 	std::string ToString();

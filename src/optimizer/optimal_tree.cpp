@@ -23,7 +23,8 @@ void OptimalTree::Replace(
 	auto returnTypes = encoding->GetReturnTypes(node->GetEncodingFactory()->dataType);
 	for(int i = 0; i < resultCnt; i++)
 	{
-		auto best = stats->GetBest(edgeNo+i, node->GetEncodingType());
+		auto t = node->GetEncodingType();
+		auto best = stats->GetBest(edgeNo+i, EdgeType{t,t});
 		if(best.value > 1) {
 			// TODO: Get correct data type
 			auto newChld = CompressionNode::make_shared(best.type.second, returnTypes[i]);
@@ -55,13 +56,13 @@ bool OptimalTree::TryCorrectTree()
 		auto oldValue = oldStats->Get(edgeNo, edges[i].GetType());
 		auto newValue = newStats->Get(edgeNo, edges[i].GetType());
 
-		auto bestEdge = newStats->GetBest(edgeNo);
+		auto bestEdge = newStats->GetBest(edgeNo, edges[i].GetType());
 
 		// check if edge i should be replaced
 		if(newValue < oldValue || bestEdge.value > newValue)
 		{
 			// check if whole parent node must be replaced or only one edge
-			auto newEdgeWithSameBeginning = newStats->GetBest(edgeNo, edges[i].GetType().first);
+			auto newEdgeWithSameBeginning = newStats->GetBest(edgeNo, edges[i].GetType(), true);
 			if(newEdgeWithSameBeginning.value > newValue)
 			{
 				// replace single edge

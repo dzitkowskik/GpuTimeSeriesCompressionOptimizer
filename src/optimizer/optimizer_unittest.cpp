@@ -242,11 +242,16 @@ void OptimizerTest::CompressDecompressNPartsData(SharedCudaPtrVector<T> data)
 	SharedCudaPtrVector<char> compressedDataParts;
 	int N = data.size();
 
+	size_t actualSizeSum = 0;
+	size_t compressedSizeSum = 0;
+
 	// Compress
 	for(int i = 0; i < N; i++)
 	{
 		auto dataToCompress = CastSharedCudaPtr<T, char>(data[i]);
+		actualSizeSum += dataToCompress->size();
 		auto compressedPart = optimizer.CompressData(dataToCompress, GetDataType<T>());
+		compressedSizeSum += compressedPart->size();
 		compressedDataParts.push_back(compressedPart);
 
 		CompressionTree& optimalTree = optimizer.GetOptimalTree()->GetTree();
@@ -269,6 +274,8 @@ void OptimizerTest::CompressDecompressNPartsData(SharedCudaPtrVector<T> data)
 
 		EXPECT_TRUE( CudaArray().Compare(data[i], decompressedData) );
 	}
+
+	LOG4CPLUS_INFO_FMT(_logger, "TOTAL COMPRESSION RATIO = %f", (float)actualSizeSum/compressedSizeSum);
 }
 
 TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeFloatData_PatternA_5Parts)
@@ -288,7 +295,7 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_Pat
 	int N = 25;
 	SharedCudaPtrVector<int> dataParts;
 	for(int i = 0; i < N; i++)
-		dataParts.push_back(GetFakeDataWithPatternA<int>(i, 1e4, 1, -10, 1e6, GetSize()));
+		dataParts.push_back(GetFakeDataWithPatternA<int>(i, 10, 1, -100, 1e6, GetSize()));
 
 	CompressDecompressNPartsData(dataParts);
 }
@@ -336,6 +343,21 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressData_3_TimeRealData_Compress)
 	for(int i = 0; i < N; i++)
 		dataParts.push_back(
 				CudaArrayTransform().Cast<time_t, int>(GetNextTsIntDataFromTestFile()));
+
+	CompressDecompressNPartsData(dataParts);
+}
+
+TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_PatternAB_25Parts)
+{
+	LOG4CPLUS_INFO(_logger, "OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_PatternA_25Parts");
+	int N = 25;
+	int SIZE = GetSize();
+	SharedCudaPtrVector<int> dataParts;
+	for(int i = 0; i < N; i++)
+	{
+		dataParts.push_back(GetFakeDataWithPatternA<int>(i, 1e2, 1, -100, 1e6, GetSize()));
+		dataParts.push_back(GetFakeDataWithPatternB<int>(i, 3*SIZE, -1e4, 1e4, SIZE/2));
+	}
 
 	CompressDecompressNPartsData(dataParts);
 }

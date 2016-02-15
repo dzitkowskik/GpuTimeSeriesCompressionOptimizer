@@ -504,7 +504,6 @@ TEST_F(CompressionTreeTestBase, GoodTreeForPatternB_Second)
 	for(int i = 0; i < N; i++)
 	{
 		auto data = GetFakeDataWithPatternB<int>(i, 3*SIZE, -1e4, 1e4, SIZE/2);
-		CudaArray().Print(data->copy(10), "data");
 		CompressDecompressTest<int>(tree, data);
 	}
 }

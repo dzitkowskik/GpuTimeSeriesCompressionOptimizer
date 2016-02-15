@@ -57,35 +57,18 @@ namespace ddj
 		 return EdgeStatistic { bestEdge, bestValue };
 	}
 
-	EdgeStatistic CompressionStatistics::GetBest(int edge)
+	EdgeStatistic CompressionStatistics::GetBest(int edge, EdgeType oldEdge, bool sameBeginning)
 	{
 		 std::lock_guard<std::mutex> guard(this->_mutex);
 
-		 EdgeType bestEdge;
+		 EdgeType bestEdge = std::make_pair(oldEdge.first, EncodingType::none);
 		 double bestValue = 1;
 
 		 for(auto& opt : (*_stat)[edge])
 		 {
-			 if(opt.second >= bestValue)
-			 {
-				 bestEdge = opt.first;
-				 bestValue = opt.second;
-			 }
-		 }
-
-		 return EdgeStatistic { bestEdge, bestValue };
-	}
-
-	EdgeStatistic CompressionStatistics::GetBest(int edge, EncodingType beginningType)
-	{
-		 std::lock_guard<std::mutex> guard(this->_mutex);
-
-		 EdgeType bestEdge = std::make_pair(beginningType, EncodingType::none);
-		 double bestValue = 1;
-
-		 for(auto& opt : (*_stat)[edge])
-		 {
-			 if(opt.first.first == beginningType && opt.second > bestValue)
+			 if(sameBeginning && opt.first.first != oldEdge.first)
+				 continue;
+			 if(opt.first.second != oldEdge.second && opt.second > bestValue)
 			 {
 				 bestEdge = opt.first;
 				 bestValue = opt.second;
@@ -121,7 +104,7 @@ namespace ddj
 		stream << "Compression tree statistics (tree height = " << _height << "):" << std::endl;
 		for(int edgeNo = 0; edgeNo < _stat->size(); edgeNo++)
 		{
-			auto edge = GetBest(edgeNo);
+			auto edge = GetBest(edgeNo, EdgeType{EncodingType::none, EncodingType::none});
 			if(edge.value > 1.0)
 			{
 				stream << "\t[" << edgeNo << "]:";

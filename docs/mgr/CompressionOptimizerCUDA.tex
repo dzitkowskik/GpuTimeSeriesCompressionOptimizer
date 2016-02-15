@@ -1031,9 +1031,9 @@ kompresorów \emph{7z, zip, tar.gz} dostêpnych w systemie \emph{Linux Ubuntu}.
 \hline
 &	optymalizator &	tar.gz&	zip& 	7z \\ \hline
 INFO			&27.26			&17.89  &22.60	&30.31 \\
-NYSE			&8.12			&4.89	&5.64	&7.42  \\
-GEN1			&17.40			&6.66	&7.95	&10.91 \\
-browsermarket	&4.75			&3.72	&4.15	&5.40 \\
+NYSE			&8.99			&4.89	&5.64	&7.42  \\
+GEN1			&17.43			&6.66	&7.95	&10.91 \\
+browsermarket	&5.12			&3.72	&4.15	&5.40 \\
 \hline
 \end{tabular}
 \end{table}
@@ -1044,47 +1044,71 @@ obie kompresje maj¹ porównywalne wyniki.
 
 \section{Wygenerowane schematy}
 Kolejny test polega³ na przeœledzeniu dzia³ania optymalizatora dla du¿ej iloœci
-danych w wariancie \emph{Pattern B}. Dla pierwszej czêœci spodziewamy siê, ¿e
-algorytm bêdzie stara³ siê podzieliæ dane na górne i dolne, a nastêpnie pakowaæ je
-za pomoc¹ kompresji s³ownikowej lub \emph{AFL}. Nastêpnie struktura danych siê zmieni,
-wiêc algorytm powinien zareagowaæ stosuj¹c kodowanie delta a nastêpnie const lub rle,
-uzyskuj¹c bardzo wysok¹ kompresjê.
+danych w wariancie \emph{Pattern B}. Patrz¹c na dane mo¿emy domyœlaæ siê jak powinna wygl¹daæ
+dobra kompresja dla obu czêœci. W pierwszym przypadku, algorytm powinien podzieliæ dane
+na górne i dolne operacj¹ patch, nastêpnie transformowaæ obie czêœci operacjami \emph{SCALE} i \emph{DELTA}, a na koniec skompresowaæ kodowaniem \emph{AFL} lub \emph{GFC}. W drugim spodziewamy
+siê kombinacji \emph{DELTA} z \emph{RLE} lub emph{CONST}. Przebieg dzia³ania algorytmu dla tych danych,
+pokazuje tabela \ref{tab:patternBworkflow}.
+
 \begin{table}[]
 \centering
 \caption{Dzia³anie optymalizatora dla danych ca³kowitych Pattern B}
-\label{my-label}
+\label{tab:patternBworkflow}
 \begin{tabular}{|l|l|l|l|l|}
 \hline
-It. & Scheme									&		Ratio	&	Pattern	\\ \hline
-1	& patch,scale,dict,none,none,scale,afl,none &	3.599712	&	1\\
-2	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
-3	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
-4	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
-5	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
-6	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
-7	& patch,scale,dict,none,none,scale,afl,none	&	14.814815	&	2\\
-8	& patch,scale,dict,none,none,scale,afl,none	&	14.814815	&	2\\
-9	& patch,scale,dict,none,none,scale,afl,none	&	14.814815	&	2\\
-10	& rle,delta,none,delta,none					&	294.117645	&	2\\
-11	& rle,const,none,delta,none					&	285.714294	&	2\\
-12	& rle,patch,afl,none,afl,none,delta,none	&	188.679245	&	2\\
-13	& rle,none,delta,none						&	0.499351	&	1\\
-14	& rle,delta,rle,none,none,delta,none		&	0.995025	&	1\\
-15	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
-16	& scale,rle,delta,none,delta,none			&	0.499102	&	1\\
-17	& delta,rle,const,none,const,none			&	1.019992	&	1\\
-18	& rle,const,none,const,none					&	1.021242	&	1\\
-19	& rle,delta,rle,none,none,const,none		&	204.081635	&	2\\
-20	& rle,delta,none,delta,none					&	294.117645	&	2\\
-21	& rle,patch,afl,none,afl,none,delta,none	&	188.679245	&	2\\
-22	& rle,const,none,delta,none					&	285.714294	&	2\\
-23	& rle,const,none,delta,none					&	285.714294	&	2\\
-24	& rle,const,none,delta,none					&	285.714294	&	2\\
-25	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
-26	& patch,scale,dict,none,none,scale,afl,none	&	3.599712	&	1\\
+Lp. &schemat kompresji								&ratio &pattern &zmiana \\
+\hline
+1	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+2	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+3	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+4	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+5	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+6	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+7	&scale,patch,afl,none,scale,afl,none 			&2.32829	&2&tak\\
+8	&scale,dict,afl,none,scale,afl,none				&2.32829	&2&tak\\
+9	&scale,patch,afl,none,scale,afl,none 			&2.32829	&2&tak\\
+10	&delta,rle,delta,none,delta,none 				&250.000	&2&tak\\
+11	&delta,scale,rle,none,none	 					&263.158	&2&nie\\
+12	&delta,scale,rle,none,none	 					&263.158	&2&nie\\
+13	&delta,scale,rle,none,none	 					&1.00000	&1&tak\\
+14	&delta,rle,delta,afl,none,delta,afl,none 		&1.00000	&1&tak\\
+15	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+16	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+17	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+18	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+19	&scale,patch,afl,none,scale,afl,none 			&2.32829	&2&tak\\
+20	&delta,rle,delta,none,delta,none 				&250.000	&2&tak\\
+21	&delta,rle,constData,none,delta,none 			&243.902	&2&tak\\
+22	&delta,rle,patch,afl,none,afl,none,delta,none 	&169.492	&2&tak\\
+23	&delta,rle,delta,afl,none,delta,none 			&227.273	&2&nie\\
+24	&delta,rle,delta,afl,none,delta,none 			&227.273	&2&tak\\
+25	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
+26	&scale,patch,afl,none,scale,afl,none 			&7.71010	&1&nie\\
 \hline
 \end{tabular}
 \end{table}
+
+Ca³kowity poziom kompresji wyniós³ lekko ponad $4$, co bior¹c pod uwagê pojedyncze statyczne scenariusze, jest dobrym wynikiem. Dla porównania skompresowanie ca³ych danych za pomoc¹ sugerowanych
+na pocz¹tku scenariuszy wynosz¹ odpowiednio $2.4$ oraz $1.3$ co pokazuje $listning$ \ref{lst:patternBresults}.
+\begin{lstlisting}[caption=Pattern B - wyniki przyk³adowych schematów,label={lst:patternBresults},basicstyle=\small]
+patch,delta,scale,afl,none,delta,scale,afl,none:  
+compression ratio = 2.43919
+
+delta,rle,afl,none,afl,none: 
+compression ratio = 1.3374
+\end{lstlisting}
+
+Tabela pokazuje jak algorytm dostosowuje siê do zmieniaj¹cej siê charakterystyki danych oraz
+jak mutuje schematy aby mieæ szansê otrzymania lepszego rozwi¹zania, np. zmiana pomiêdzy iteracj¹
+$10$ a $11$. Warto zauwa¿yæ, ¿e na koñcu po powrocie do dawnej charakterystyki algorytm stosuje
+ponownie ten sam schemat co na pocz¹tku, który by³ optymalny. \\
+
+Dla danych \emph{Pattern A} algorytm stosuje jedn¹ strategiê i jej nie zmienia, poniewa¿ charakterystyka szeregu jest sta³a. Strategia ta osi¹ga wspó³czynnik kompresji $46.8384$ i wygl¹da nastêpuj¹co: \\
+$rle,patch,rle,none,none,rle,none,none,patch,delta,afl,none,rle,none,none$
+Podobnie sprawa wygl¹da wygenerowanych punktów czasu (patrz listing \ref{lst:time}), gdzie
+algorytm stosuje kodowania \emph{RLE} oraz \emph{AFL} stosuj¹c równie¿ skalowanie oraz deltê.
+W ten sposób dla czasu osi¹gany wspó³czynnik kompresji jest rzêdu $100$.
+
 
 \section{Szybkoœæ dzia³ania}
 Omówienie szybkoœci dzia³ania
