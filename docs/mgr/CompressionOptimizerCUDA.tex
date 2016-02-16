@@ -980,7 +980,7 @@ Dane rzeczywiste pochodz¹ z dwóch Ÿróde³. Pierwsze pochodz¹ z pomiarów dzia³aj¹c
 wykonane za pomoc¹ prostego programu OsxSystemDataLogger\footnote{https://github.com/dzitkowskik/osx-system-data-logger}, które zawieraj¹ pola takie jak czas, napiêcie na procesorze oraz temperaturê procesora i GPU. Dane te dalej bêdê nazywa³ \emph{INFO}. Drugie pochodz¹ z \emph{New York Stock Exchange} i s¹ danymi historycznymi wszystkich zdarzeñ w czasie rzeczywistym w formie \emph{NYSE OpenBook}\footnote{http://www.nyxdata.com/Data-Products/NYSE-OpenBook} zawieraj¹cymi ponad 20 kolumn, a w tym czas, wolumen, cenê, stronê, symbol i inne. Dane te dalej bêdê nazywa³ \emph{NYSE}.
 \subsection{Wygenerowane}
 \subsubsection{Czas}
-Dane maj¹ s¹ liczbami ca³kowitymi o d³ugoœci $64bit$ monotonicznie rosn¹cymi od zadanej wartoœci startowej. Dane rosn¹ o losow¹ wielkoœæ z zadanego przedzia³u, z pewnym prawdopodobieñstwem. Dla prawdopodobieñstwa 0 czas siê nie zmienia, natomiast dla prawdopodobieñstwa 1, nie bêdzie dwóch tych samych liczb w wygenerowanym ci¹gu.
+Liczby ca³kowite o d³ugoœci $64bit$ monotonicznie rosn¹ce od zadanej wartoœci startowej, o losow¹ wielkoœæ z zadanego przedzia³u, z pewnym prawdopodobieñstwem. Dla prawdopodobieñstwa 0 czas siê nie zmienia, natomiast dla prawdopodobieñstwa 1, nie bêdzie dwóch tych samych liczb w wygenerowanym ci¹gu.
 \begin{lstlisting}[caption=Time pattern,label={lst:time},basicstyle=\small]
 	//                              ------------
 	//                        ------
@@ -990,8 +990,8 @@ Dane maj¹ s¹ liczbami ca³kowitymi o d³ugoœci $64bit$ monotonicznie rosn¹cymi od 
 \end{lstlisting}
 
 \subsubsection{Pattern A}
-Dane te s¹ liczbami dowolnego typu i wielkoœci, z przedzia³u od zadanego minimum($v_{min}$) do maksimum($v_{max}$).
-Wartoœæ generowanych punktów zmienia siê co $len$ kroków, oraz przed ka¿d¹ zmian¹ generowany jest
+Liczby dowolnego typu i wielkoœci, z przedzia³u od zadanego minimum($v_{min}$) do maksimum($v_{max}$).
+Wartoœæ generowanych punktów zmienia siê co $len$ kroków oraz przed ka¿d¹ zmian¹ generowany jest
 pojedynczy punkt o wartoœci $v_{max}$.
 
 \begin{lstlisting}[caption=Pattern A,label={lst:patternA},basicstyle=\small]
@@ -1005,7 +1005,7 @@ pojedynczy punkt o wartoœci $v_{max}$.
 \subsubsection{Pattern B}
 Dane B sk³adaj¹ siê z dwóch czêœci po³o¿onych na przemian co $len$ kroków, z których pierwsza
 sk³ada siê z naprzemian po³o¿onych wartoœci bliskich $v_{max}$ i $v_{min}$. Druga czêœæ sk³ada
-siê z wartoœci malej¹cych z wartoœci maksymalnej do minimalnej co ustalon¹ wartoœæ a nastêpnie
+siê z wartoœci malej¹cych od $v_{max}$ do $v_{min}$ co ustalon¹ wartoœæ, a nastêpnie
 rosn¹ca z powrotem.
 \begin{lstlisting}[caption=Pattern B,label={lst:patternB},basicstyle=\small]
 //   pattern 1     |       pattern 2       |     pattern 1
@@ -1023,14 +1023,14 @@ rosn¹ca z powrotem.
 \section{Badanie wspó³czynnika kompresji}
 
 Wyniki tego pomiaru otrzymano kompresuj¹c pliki \emph{CSV} z danymi rzeczywistymi
-omówionymi wczeœniej, za pomoc¹ zaimplementowanego równoleg³ego kompresora oraz
-kompresorów \emph{7z, zip, bz2} dostêpnych w systemie \emph{Linux Ubuntu}. Dane \emph{GEN1},
+omówionymi wczeœniej za pomoc¹ zaimplementowanego równoleg³ego kompresora oraz
+kompresorów \emph{7z, zip, bz2} dostêpnych w systemie \emph{Linux Ubuntu}. Dane \emph{GEN1}
 powsta³y z wygenerowanych kolumn Czasu oraz \emph{Pattern A i B}, opisanych wy¿ej, dla danych ca³kowitych
 oraz zmiennoprzecinkowych pojedynczej precyzji, natomiast \emph{BROW}, to dzienne wartoœci udzia³u w rynku przegl¹darek\footnote{http://www.economicswebinstitute.org/data/browsermarket01.xls}.
 \begin{table}[h!]
 \centering
 \caption{Wspó³czynnik kompresji dla plików CSV z danymi w porównaniu ze standardowymi kompresorami}
-\label{my-label}
+\label{tab:ratios}
 \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
 \hline
 \multirow{2}{*}{} & \multicolumn{2}{c|}{optymalizator} &	\multicolumn{2}{c|}{bz2} & \multicolumn{2}{c|}{zip} & \multicolumn{2}{c|}{7z} \\ 
@@ -1045,7 +1045,7 @@ BROW				&5.12  &1.43s			&4.51  &0.02s			&4.15  &0.02s		&5.40  &0.05s \\
 \end{tabular}
 \end{table}
 
-Z danych tych wynika, ¿e dla wiêkszoœci danych optymalizator zachowuje siê lepiej ni¿
+Z pomiarów (patrz tabela \ref{tab:ratios}) wynika, ¿e dla wiêkszoœci danych optymalizator zachowuje siê lepiej ni¿
 dostêpne w systemie kompresje, które poza tym s¹ o wiele wolniejsze dla du¿ych danych, 
 co widaæ dla danych \emph{NYSE} o rozmiarze \emph{720MB}. 
 W dwóch przypadkach jednak \emph{7z} okaza³ siê nieco lepszy, natomiast obie kompresje maj¹ porównywalne wyniki.
@@ -1059,7 +1059,7 @@ z dysku, co zajmuje wiêkszoœæ czasu.
 Kolejny test polega³ na przeœledzeniu dzia³ania optymalizatora dla du¿ej iloœci
 danych w wariancie \emph{Pattern B}. Patrz¹c na dane mo¿emy domyœlaæ siê jak powinna wygl¹daæ
 dobra kompresja dla obu czêœci. W pierwszym przypadku, algorytm powinien podzieliæ dane
-na górne i dolne operacj¹ patch, nastêpnie transformowaæ obie czêœci operacjami \emph{SCALE} i \emph{DELTA}, a na koniec skompresowaæ kodowaniem \emph{AFL} lub \emph{GFC}. W drugim spodziewamy
+na górne i dolne operacj¹ \emph{PATCH}, nastêpnie transformowaæ obie czêœci operacjami \emph{SCALE} i \emph{DELTA}, a na koniec skompresowaæ kodowaniem \emph{AFL} lub \emph{GFC}. W drugim spodziewamy
 siê kombinacji \emph{DELTA} z \emph{RLE} lub \emph{CONST}. Przebieg dzia³ania algorytmu dla tych danych,
 pokazuje tabela \ref{tab:patternBworkflow}.
 
@@ -1133,20 +1133,18 @@ u¿ytych algorytmów \cite{CURRY,KACZMAR2,FANG,ONEIL}. Ponadto wydajnoœæ ta w du¿e
         \caption{Wydajnoœæ kodowañ}
         \label{ref:enc_perf}
     \end{figure}
-Mo¿na przypuszczaæ, ¿e znacz¹cy wp³yw na spadek wydajnoœci kompresji ma u¿ycie w drzewie kodowañ bazuj¹cych na s³owniku,
-oraz precyzji i te metody powinny byæ optymalizowane w pierwszej kolejnoœci, natomiast u¿ycie transformacji nie powinno
-wp³ywaæ na wydajnoœæ drzewa, poniewa¿ s¹ one znacznie wydajniejsze od reszty kodowañ.
-Wydajnoœæ drzew kompresji w zale¿noœci od wielkoœci paczki danych kompresowanych przez pojedyncze drzewo, pokazano
-na rysunku \ref{ref:tcp}. Jak mo¿na siê domyœleæ, czym wiêksze i bardziej skomplikowane drzewo tym wolniejszy algorytm, dlatego te¿ warto wybieraæ ni¿sze drzewo, jeœli nie spowoduje to znacznego spadku jakoœci.
+Mo¿na przypuszczaæ, ¿e znacz¹cy wp³yw na spadek wydajnoœci kompresji ma u¿ycie w drzewie kodowañ bazuj¹cych na s³owniku lub precyzji i te metody powinny byæ optymalizowane w pierwszej kolejnoœci. Z drugiej strony, u¿ycie 
+transformacji nie powinno wp³ywaæ na wydajnoœæ drzewa, poniewa¿ s¹ one znacznie wydajniejsze od reszty kodowañ.
+Wydajnoœæ wybranych drzew kompresji w zale¿noœci od wielkoœci paczki danych kompresowanych przez pojedyncze drzewo, pokazano na rysunku \ref{ref:tcp}. Jak mo¿na siê domyœleæ, czym wiêksze i bardziej skomplikowane drzewo tym wolniejszy algorytm, dlatego te¿ warto wybieraæ ni¿sze drzewo, jeœli nie spowoduje to znacznego spadku jakoœci.
 Z uwagi na architekturê GPU, op³aca siê za jednym zamachem przetwarzaæ jak najwiêcej danych,
-pojedynczym drzewem, zatem zwykle op³aca siê dzieliæ przychodz¹ce dane na paczki o wielkoœci wiêkszej ni¿ milion elementów.
+pojedynczym drzewem, zatem powinno siê dzieliæ przychodz¹ce dane na paczki o wielkoœci wiêkszej ni¿ milion elementów.
 	\begin{figure}[h!]
         \centering
         \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/tcp}
         \caption{Wydajnoœæ kompresji drzewami}
         \label{ref:tcp}
     \end{figure}
-Ponadto bardzo znacz¹cy wp³yw na wydajnoœæ algorytmu ma wykonanie fazy 1, której wydajnoœæ plasuje siê na poziomie
+Ponadto, bardzo znacz¹cy wp³yw na wydajnoœæ algorytmu ma wykonanie fazy 1, której wydajnoœæ plasuje siê na poziomie
 jedynie $5 MB/s$, poniewa¿ sprawdza setki drzew. Mo¿e siê to wydawaæ ma³o, jednak faza ta wykonywana jest na bardzo ma³ej liczbie elementów lub równolegle do w³aœciwej kompresji. Wykonywana odpowiednio rzadko przestaje wp³ywaæ na w³aœciw¹
 wydajnoœæ kompresji.
 W przewa¿aj¹cej liczbie kodowañ prêdkoœæ dekompresji jest znacz¹co wiêksza ni¿ prêdkoœæ kompresji (patrz rysunek \ref{ref:enc_perf}). Przy dekodowaniu z danych optymalizatorem nie ma potrzeby wyliczania ¿adnych statystyk, ani sprawdzania wielu drzew. Wydajnoœæ dekompresji powinna byæ zatem du¿o wy¿sza, co potwierdzaj¹ testy pokazane na listingu \ref{lst:optim_results}. 
