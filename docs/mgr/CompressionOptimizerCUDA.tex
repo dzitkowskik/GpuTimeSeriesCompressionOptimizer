@@ -1112,22 +1112,41 @@ W ten sposób dla czasu osi¹gany wspó³czynnik kompresji jest rzêdu $100$.
 
 \section{Szybkoœæ dzia³ania}
 Omówienie szybkoœci dzia³ania
-
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/tcp}
+        \caption{Wydajnoœæ kompresji drzewami}
+        \label{ref:tcp}
+    \end{figure}
+    
+    \begin{figure}[h!]
+        \centering
+        \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/enc_perf}
+        \caption{Wydajnoœæ kodowañ}
+        \label{ref:enc_perf}
+    \end{figure}
 
 \chapter{Podsumowanie}
-Prodsumowuj¹c uda³o siê zaimplementowaæ dzia³aj¹cy prototyp optymalizatora kompresji
+Podsumowuj¹c uda³o siê zaimplementowaæ dzia³aj¹cy prototyp optymalizatora kompresji
 szeregów czasowych, który potrafi dostosowaæ siê do zmiennej charakterystyki nap³ywaj¹cych
 danych. Kompresor w dobrym tempie kompresuje dane zachowuj¹c wysoki poziom kompresji,
-dorównuj¹cy, a dla w³aœciwych szregów czasowych nawet przewy¿szaj¹cy niektóre istniej¹ce
+dorównuj¹cy, a dla w³aœciwych szeregów czasowych nawet przewy¿szaj¹cy niektóre istniej¹ce
 rozwi¹zania. Algorytm wykazuje wy¿szy poziom kompresji dla realistycznych danych ni¿
 szeroko stosowane kompresory 7z czy zip. Jednak jest to tylko prototyp i dla realistycznych
 rozwi¹zañ w bazach danych GPU uzyskana wydajnoœæ kompresji nie jest wystarczaj¹ca.
-Jednak patrz¹c na wydajnoœæ odopowiednio zoptymalizowanych odpowiedników wdro¿onych
-kompresji mo¿na uzanaæ, ¿e jest mo¿liwe ulepszenie tego rozwi¹zania by uzyska³o wymagan¹
+Jednak patrz¹c na wydajnoœæ odpowiednio zoptymalizowanych odpowiedników wdro¿onych
+kompresji mo¿na uznaæ, ¿e jest mo¿liwe ulepszenie tego rozwi¹zania by uzyska³o wymagan¹
 wydajnoœæ na poziomie kilkudziesiêciu Gb/s.
 
 \section{Konkluzja}
 \section{Przysz³e prace}
+Projekt nadal wymaga w³o¿enia du¿ego nak³adu pracy w celu optymalizacji wydajnoœci a tak¿e implementacji wielu algorytmów kodowania przydatnych do kompresji szeregów. Dalsze prace bêd¹
+prowadzone na temat implementacji kompresji za pomoc¹ regresji czêœciowej na GPU. Warto bêdzie
+równie¿ u¿yæ wersji niektórych algorytmów z wbudowanym \emph{patchowaniem} w celu przyspieszenia
+obliczeñ. Wa¿nym elementem, który bêdzie w przysz³oœci równie¿ zaimplementowany jest niezale¿ne
+wykonanie fazy 1 algorytmu optymalizatora, która zajmuje wiêkszoœæ czasu wykonania. Dodatkowo jest
+planowane udostêpnienie rozwi¹zania w formie \emph{Open Source}, wraz z przyk³adami oraz gotowym 
+œrodowiskiem uruchomieniowym w formie dockera\footnote{An open platform for distributed applications for developers and sysadmins: https://www.docker.com/}.
 
 
 %-----------Koniec czêœci zasadniczej-----------
