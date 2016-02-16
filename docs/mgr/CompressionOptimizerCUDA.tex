@@ -18,6 +18,7 @@ bindingoffset=10mm, top=25mm, bottom=25mm}
 \usepackage{palatino}
 \usepackage{array}
 \usepackage{pstricks}
+\usepackage{multirow}
 \usepackage{textcomp}
 \theoremstyle{definition}
 \newtheorem{theorem}{Twierdzenie}[section]
@@ -1020,34 +1021,46 @@ rosn¹ca z powrotem.
 
 
 \section{Badanie wspó³czynnika kompresji}
+
 Wyniki tego pomiaru otrzymano kompresuj¹c pliki \emph{CSV} z danymi rzeczywistymi
 omówionymi wczeœniej, za pomoc¹ zaimplementowanego równoleg³ego kompresora oraz
-kompresorów \emph{7z, zip, tar.gz} dostêpnych w systemie \emph{Linux Ubuntu}.
+kompresorów \emph{7z, zip, bz2} dostêpnych w systemie \emph{Linux Ubuntu}. Dane \emph{GEN1},
+powsta³y z wygenerowanych kolumn Czasu oraz \emph{Pattern A i B}, opisanych wy¿ej, dla danych ca³kowitych
+oraz zmiennoprzecinkowych pojedynczej precyzji, natomiast \emph{BROW}, to dzienne wartoœci udzia³u w rynku przegl¹darek\footnote{http://www.economicswebinstitute.org/data/browsermarket01.xls}.
 \begin{table}[h!]
 \centering
 \caption{Wspó³czynnik kompresji dla plików CSV z danymi w porównaniu ze standardowymi kompresorami}
 \label{my-label}
-\begin{tabular}{|l|l|l|l|l|}
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|}
 \hline
-&	optymalizator &	tar.gz&	zip& 	7z \\ \hline
-INFO			&27.26			&17.89  &22.60	&30.31 \\
-NYSE			&8.99			&4.89	&5.64	&7.42  \\
-GEN1			&17.43			&6.66	&7.95	&10.91 \\
-browsermarket	&5.12			&3.72	&4.15	&5.40 \\
+\multirow{2}{*}{} & \multicolumn{2}{c|}{optymalizator} &	\multicolumn{2}{c|}{bz2} & \multicolumn{2}{c|}{zip} & \multicolumn{2}{c|}{7z} \\ 
+
+& ratio & czas & ratio & czas & ratio & czas & ratio & czas \\ 
+\hline
+INFO				&27.26 &2.84s			&20.29 &3.88s  			&22.60 &0.66s		&30.31 &5.64s \\
+NYSE				&8.99  &37.40s			&6.60  &1m 19.62s		&5.64  &32.45s		&7.42  &6m 23.58s  \\
+GEN1				&17.43 &4.86s			&8.33  &5.34s			&7.95  &2.92s		&10.91 &36.05s \\
+BROW				&5.12  &1.43s			&4.51  &0.02s			&4.15  &0.02s		&5.40  &0.05s \\
 \hline
 \end{tabular}
 \end{table}
-Z danych tych wynika ¿e dla wiêkszoœci danych optymalizator zachowuje siê lepiej ni¿
-dostêpne w systemie kompresje, które poza tym s¹ o wiele wolniejsze, co poka¿ê w
-dalszej czêœci. W dwóch przypadkach jednak \emph{7z} okaza³ siê lepszy, natomiast
-obie kompresje maj¹ porównywalne wyniki.
+
+Z danych tych wynika, ¿e dla wiêkszoœci danych optymalizator zachowuje siê lepiej ni¿
+dostêpne w systemie kompresje, które poza tym s¹ o wiele wolniejsze dla du¿ych danych, 
+co widaæ dla danych \emph{NYSE} o rozmiarze \emph{720MB}. 
+W dwóch przypadkach jednak \emph{7z} okaza³ siê nieco lepszy, natomiast obie kompresje maj¹ porównywalne wyniki.
+W pomiarach kompresje korzystaj¹ ze wszystkich 8 rdzeni, a kompresor \emph{gzip} okaza³ siê najszybszy, daj¹c
+porównywalny wynik do optymalizatora. Algorytm korzystaj¹cy z \emph{CUDA} traci niestety du¿¹ czêœæ czasu na
+inicjalizacjê oraz transfer danych przez szynê \emph{PCI-E}. Wyniki te uzyskano dla przyk³adowego programu,
+u¿ywaj¹cego równoleg³ego kompresora opisanego wczeœniej, jest to zatem czas ca³kowity ³¹cznie z czytaniem danych
+z dysku, co zajmuje wiêkszoœæ czasu.
 
 \section{Wygenerowane schematy}
 Kolejny test polega³ na przeœledzeniu dzia³ania optymalizatora dla du¿ej iloœci
 danych w wariancie \emph{Pattern B}. Patrz¹c na dane mo¿emy domyœlaæ siê jak powinna wygl¹daæ
 dobra kompresja dla obu czêœci. W pierwszym przypadku, algorytm powinien podzieliæ dane
 na górne i dolne operacj¹ patch, nastêpnie transformowaæ obie czêœci operacjami \emph{SCALE} i \emph{DELTA}, a na koniec skompresowaæ kodowaniem \emph{AFL} lub \emph{GFC}. W drugim spodziewamy
-siê kombinacji \emph{DELTA} z \emph{RLE} lub emph{CONST}. Przebieg dzia³ania algorytmu dla tych danych,
+siê kombinacji \emph{DELTA} z \emph{RLE} lub \emph{CONST}. Przebieg dzia³ania algorytmu dla tych danych,
 pokazuje tabela \ref{tab:patternBworkflow}.
 
 \begin{table}[]
@@ -1089,7 +1102,7 @@ Lp. &schemat kompresji								&ratio &pattern &zmiana \\
 \end{table}
 
 Ca³kowity poziom kompresji wyniós³ lekko ponad $4$, co bior¹c pod uwagê pojedyncze statyczne scenariusze, jest dobrym wynikiem. Dla porównania skompresowanie ca³ych danych za pomoc¹ sugerowanych
-na pocz¹tku scenariuszy wynosz¹ odpowiednio $2.4$ oraz $1.3$ co pokazuje $listning$ \ref{lst:patternBresults}.
+na pocz¹tku scenariuszy wynosz¹ odpowiednio $2.4$ oraz $1.3$ co pokazuje listing \ref{lst:patternBresults}.
 \begin{lstlisting}[caption=Pattern B - wyniki przyk³adowych schematów,label={lst:patternBresults},basicstyle=\small]
 patch,delta,scale,afl,none,delta,scale,afl,none:  
 compression ratio = 2.43919
@@ -1109,44 +1122,113 @@ Podobnie sprawa wygl¹da wygenerowanych punktów czasu (patrz listing \ref{lst:tim
 algorytm stosuje kodowania \emph{RLE} oraz \emph{AFL} stosuj¹c równie¿ skalowanie oraz deltê.
 W ten sposób dla czasu osi¹gany wspó³czynnik kompresji jest rzêdu $100$.
 
-
-\section{Szybkoœæ dzia³ania}
-Omówienie szybkoœci dzia³ania
-    \begin{figure}[h!]
-        \centering
-        \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/tcp}
-        \caption{Wydajnoœæ kompresji drzewami}
-        \label{ref:tcp}
-    \end{figure}
-    
+\section{Wydajnoœæ}
+Wydajnoœæ kaskadowej kompresji jest limitowana przede wszystkim przez szybkoœæ najwolniejszej kompresji u¿ytej w planie.
+Niestety nie wszystkie u¿yte kompresje zosta³y zaimplementowane optymalnie, co ma znacz¹cy wp³yw na osi¹gi ca³oœci. 
+Bêdzie to jednak tematem nastêpnej pracy i zgodnie z wieloma publikacjami, jest mo¿liwa wydajniejsza implementacja
+u¿ytych algorytmów \cite{CURRY,KACZMAR2,FANG,ONEIL}. Ponadto wydajnoœæ ta w du¿ej mierze zale¿y od u¿ytej karty, która w tym przypadku jest relatywnie niska w porównaniu do drogich kart z wy¿szej pó³ki. Dla porównania wydajnoœæ analogicznej implementacji algorytmu \emph{GFC} uzyskana przez autorów wynosi³a oko³o $10GB/s$, natomiast na mojej karcie tylko nieca³e $2GB/s$. Przepustowoœæ poszczególnych kodowañ i dekodowañ umieszczona jest na rysunku \ref{ref:enc_perf}.
     \begin{figure}[h!]
         \centering
         \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/enc_perf}
         \caption{Wydajnoœæ kodowañ}
         \label{ref:enc_perf}
     \end{figure}
+Mo¿na przypuszczaæ, ¿e znacz¹cy wp³yw na spadek wydajnoœci kompresji ma u¿ycie w drzewie kodowañ bazuj¹cych na s³owniku,
+oraz precyzji i te metody powinny byæ optymalizowane w pierwszej kolejnoœci, natomiast u¿ycie transformacji nie powinno
+wp³ywaæ na wydajnoœæ drzewa, poniewa¿ s¹ one znacznie wydajniejsze od reszty kodowañ.
+Wydajnoœæ drzew kompresji w zale¿noœci od wielkoœci paczki danych kompresowanych przez pojedyncze drzewo, pokazano
+na rysunku \ref{ref:tcp}. Jak mo¿na siê domyœleæ, czym wiêksze i bardziej skomplikowane drzewo tym wolniejszy algorytm, dlatego te¿ warto wybieraæ ni¿sze drzewo, jeœli nie spowoduje to znacznego spadku jakoœci.
+Z uwagi na architekturê GPU, op³aca siê za jednym zamachem przetwarzaæ jak najwiêcej danych,
+pojedynczym drzewem, zatem zwykle op³aca siê dzieliæ przychodz¹ce dane na paczki o wielkoœci wiêkszej ni¿ milion elementów.
+	\begin{figure}[h!]
+        \centering
+        \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/tcp}
+        \caption{Wydajnoœæ kompresji drzewami}
+        \label{ref:tcp}
+    \end{figure}
+Ponadto bardzo znacz¹cy wp³yw na wydajnoœæ algorytmu ma wykonanie fazy 1, której wydajnoœæ plasuje siê na poziomie
+jedynie $5 MB/s$, poniewa¿ sprawdza setki drzew. Mo¿e siê to wydawaæ ma³o, jednak faza ta wykonywana jest na bardzo ma³ej liczbie elementów lub równolegle do w³aœciwej kompresji. Wykonywana odpowiednio rzadko przestaje wp³ywaæ na w³aœciw¹
+wydajnoœæ kompresji.
+W przewa¿aj¹cej liczbie kodowañ prêdkoœæ dekompresji jest znacz¹co wiêksza ni¿ prêdkoœæ kompresji (patrz rysunek \ref{ref:enc_perf}). Przy dekodowaniu z danych optymalizatorem nie ma potrzeby wyliczania ¿adnych statystyk, ani sprawdzania wielu drzew. Wydajnoœæ dekompresji powinna byæ zatem du¿o wy¿sza, co potwierdzaj¹ testy pokazane na listingu \ref{lst:optim_results}. 
+
+\begin{lstlisting}[caption=Benchmark optymalizatora,label={lst:optim_results},basicstyle=\small]
+Pattern A (type INT):
+Pack size = 32M
+Scheme = rle[266],patch[13],const[22],none[1],const[23],none,
+patch[9],delta[9],afl[9],none,const[23],none
+Ratio = 266.407
+Compression throughput = 431.267 MB/s
+Decompression throughput = 1.28074 GB/s
+
+Pattern B (type INT):
+Pack size = 32M
+Scheme = scale[7],patch[7],afl[10],none,scale[10],afl[10],none
+Ratio = 7.99996
+Compression throughput = 554.785MB/s
+Decompression throughput = 853.789MB/s
+
+Time (type LONG):
+Pack size = 16M
+Scheme = delta[33],patch[33],rle[1014],none,none,scale[63],afl[63],none
+Ratio = 33.77
+Compression throughput = 257.235MB/s
+Decompression throughput = 1.12897GB/s
+\end{lstlisting}
+\noindent
+Wartoœci w nawiasach odpowiadaj¹ uciêtym do jednoœci wartoœciom wspó³czynnika kompresji uzyskanego 
+w poszczególnych wêz³ach drzewa. Kompresowane dane w powy¿szym teœcie by³y podzielone na 25 paczek
+po ,,\emph{Pack size}'' elementów, a faza 1 wykonana zosta³a 2 do 3 razy w trakcie trwania testu.
+Bior¹c pod uwagê fakt, ¿e wydajnoœæ danych drzew jest porównywalna do szybkoœci optymalizatora,
+który je wywnioskowa³, mo¿na stwierdziæ, ¿e algorytm poprawiania i zgadywania drzew, nie spowalnia znacz¹co 
+samego procesu kompresji drzewem.
+
+\section{Statystyki}
+Podczas pierwszej fazy algorytmu, jak równie¿ w czasie trwania niektórych kodowañ, wyliczane s¹ statystyki
+aktualnych danych. Wyliczanie metryki \emph{RLE} zamiast prawdziwej maksymalnej lub œredniej d³ugoœci ci¹gów,
+poskutkowa³o bardzo wydajn¹ implementacj¹ na GPU. Wyliczanie precyzji nie zosta³o niestety odpowiednio
+zoptymalizowane pod k¹tem obliczeñ na \emph{CUDA} i jego wydajnoœæ ogranicza sumaryczn¹ przepustowoœæ obliczania
+statystyk do oko³o \emph{500 MB/s}.
+	\begin{figure}[h!]
+        \centering
+        \hspace*{-0.5cm}\includegraphics[scale=0.4]{img/stats_perf}
+        \caption{Wydajnoœæ wybranych statystyk}
+        \label{ref:stats_perf}
+    \end{figure}
+Ponadto w testach na danych typu ca³kowitego \emph{Pattern A}, maksymalna przepustowoœæ implementacji 
+histogramu oraz statystyki \emph{Dictionary Counter} wynios³y odpowiednio \emph{5.63227 GB/s} oraz
+\emph{790.123 MB/s}.
 
 \chapter{Podsumowanie}
-Podsumowuj¹c uda³o siê zaimplementowaæ dzia³aj¹cy prototyp optymalizatora kompresji
+Podsumowuj¹c, uda³o siê zaimplementowaæ dzia³aj¹cy prototyp optymalizatora kompresji
 szeregów czasowych, który potrafi dostosowaæ siê do zmiennej charakterystyki nap³ywaj¹cych
 danych. Kompresor w dobrym tempie kompresuje dane zachowuj¹c wysoki poziom kompresji,
 dorównuj¹cy, a dla w³aœciwych szeregów czasowych nawet przewy¿szaj¹cy niektóre istniej¹ce
 rozwi¹zania. Algorytm wykazuje wy¿szy poziom kompresji dla realistycznych danych ni¿
 szeroko stosowane kompresory 7z czy zip. Jednak jest to tylko prototyp i dla realistycznych
 rozwi¹zañ w bazach danych GPU uzyskana wydajnoœæ kompresji nie jest wystarczaj¹ca.
-Jednak patrz¹c na wydajnoœæ odpowiednio zoptymalizowanych odpowiedników wdro¿onych
+Z drugiej strony, patrz¹c na wydajnoœæ odpowiednio zoptymalizowanych odpowiedników wdro¿onych
 kompresji mo¿na uznaæ, ¿e jest mo¿liwe ulepszenie tego rozwi¹zania by uzyska³o wymagan¹
 wydajnoœæ na poziomie kilkudziesiêciu Gb/s.
 
 \section{Konkluzja}
+U¿ywaj¹c kaskadowej kompresji specyficznej dla konkretnego szeregu czasowego mo¿na osi¹gn¹æ
+du¿o lepsze rezultaty ni¿ stosuj¹c metody s³ownikowe, które czêsto wykazuj¹ nisk¹ wydajnoœæ.
+Uzyskano ponad dwukrotny wzrost jakoœci kompresji dla danych o zmiennej charakterystyce wzglêdem
+kompresji pojedynczym schematem. Wskazane zosta³y s³abe punkty dotychczasowej implementacji,
+których wyeliminowanie powinno prowadziæ do wyrównania wydajnoœci z istniej¹cymi rozwi¹zaniami
+kaskadowej kompresji na GPU. Co wiêcej mo¿na uznaæ, ¿e zaproponowane rozwi¹zanie ma szansê z 
+powodzeniem zostaæ wdro¿one jako kompresor w bazie danych po stronie GPU, który na bie¿¹co
+bêdzie kompresowa³ i dekompresowa³ nap³ywaj¹ce dane.
+
 \section{Przysz³e prace}
-Projekt nadal wymaga w³o¿enia du¿ego nak³adu pracy w celu optymalizacji wydajnoœci a tak¿e implementacji wielu algorytmów kodowania przydatnych do kompresji szeregów. Dalsze prace bêd¹
+Projekt nadal wymaga w³o¿enia du¿ego nak³adu pracy w celu optymalizacji wydajnoœci, a tak¿e implementacji wielu algorytmów kodowania przydatnych do kompresji szeregów. Dalsze prace bêd¹
 prowadzone na temat implementacji kompresji za pomoc¹ regresji czêœciowej na GPU. Warto bêdzie
 równie¿ u¿yæ wersji niektórych algorytmów z wbudowanym \emph{patchowaniem} w celu przyspieszenia
 obliczeñ. Wa¿nym elementem, który bêdzie w przysz³oœci równie¿ zaimplementowany jest niezale¿ne
 wykonanie fazy 1 algorytmu optymalizatora, która zajmuje wiêkszoœæ czasu wykonania. Dodatkowo jest
 planowane udostêpnienie rozwi¹zania w formie \emph{Open Source}, wraz z przyk³adami oraz gotowym 
-œrodowiskiem uruchomieniowym w formie dockera\footnote{An open platform for distributed applications for developers and sysadmins: https://www.docker.com/}.
+œrodowiskiem uruchomieniowym w formie dockera\footnote{An open platform for distributed applications for developers and sysadmins: https://www.docker.com/}. Ostatecznie projekt móg³by byæ wykorzystany w bazie danych szeregów czasowych,
+po stronie GPU.
 
 
 %-----------Koniec czêœci zasadniczej-----------
