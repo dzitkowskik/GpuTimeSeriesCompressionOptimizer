@@ -14,7 +14,8 @@ BENCHMARK_DEFINE_F(UniqueEncodingBenchmark, BM_Unique_Random_Int_Encode)(benchma
     		CudaArrayGenerator().GenerateRandomIntDeviceArray(n,0,3));
     Benchmark_Encoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(UniqueEncodingBenchmark, BM_Unique_Random_Int_Encode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
+BENCHMARK_REGISTER_F(UniqueEncodingBenchmark, BM_Unique_Random_Int_Encode)
+	->Arg(1<<21)->Arg(1<<22)->Arg(1<<23)->Arg(1<<24)->Arg(1<<25);
 
 BENCHMARK_DEFINE_F(UniqueEncodingBenchmark, BM_Unique_Random_Int_Decode)(benchmark::State& state)
 {
@@ -24,6 +25,7 @@ BENCHMARK_DEFINE_F(UniqueEncodingBenchmark, BM_Unique_Random_Int_Decode)(benchma
     		CudaArrayGenerator().GenerateRandomIntDeviceArray(n,0,3));
     Benchmark_Decoding(encoding, data, DataType::d_int, state);
 }
-BENCHMARK_REGISTER_F(UniqueEncodingBenchmark, BM_Unique_Random_Int_Decode)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
+BENCHMARK_REGISTER_F(UniqueEncodingBenchmark, BM_Unique_Random_Int_Decode)
+	->Arg(1<<21)->Arg(1<<22)->Arg(1<<23)->Arg(1<<24)->Arg(1<<25);
 
 } /* namespace ddj */

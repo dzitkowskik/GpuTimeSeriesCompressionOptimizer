@@ -75,7 +75,8 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPha
 
 	SetStatistics(state, DataType::d_int);
 }
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_RandomInt)->Arg(1<<20);
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_RandomInt)
+->Arg(1<<16)->Arg(1<<17)->Arg(1<<18)->Arg(1<<19)->Arg(1<<20);
 
 BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_Time)(benchmark::State& state)
 {
