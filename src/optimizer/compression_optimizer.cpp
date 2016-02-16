@@ -141,7 +141,7 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 
 bool CompressionOptimizer::IsFullUpdateNeeded()
 {
-	if(_optimalTree == nullptr || _partsProcessed % 5 == 4) return true;
+	if(_optimalTree == nullptr || _partsProcessed % 15 == 14) return true;
 	return false;
 }
 
@@ -149,7 +149,6 @@ size_t CompressionOptimizer::GetSampleDataForFullUpdateSize(size_t partDataSize,
 {
 	size_t typeSizeInBytes = GetDataTypeSize(type);
 	size_t numberOfElements = partDataSize / typeSizeInBytes;
-//	if(_optimalTree == nullptr) return 100*typeSizeInBytes;
 	if (numberOfElements <= 10000) return partDataSize;
 	else return 10000*typeSizeInBytes;
 }

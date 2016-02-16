@@ -124,7 +124,7 @@ Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistic
 		if(et != EncodingType::dict && et != EncodingType::patch)
 			result.push_back(EncodingType::dict);
 
-		if(stats.sorted || stats.rlMetric > 2)
+		if(stats.sorted || stats.rlMetric >= 2)
 		{
 			// CONST
 			if(et != EncodingType::constData)

@@ -76,25 +76,7 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPha
 	SetStatistics(state, DataType::d_int);
 }
 BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_RandomInt)
-->Arg(1<<16)->Arg(1<<17)->Arg(1<<18)->Arg(1<<19)->Arg(1<<20);
-
-BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_Time)(benchmark::State& state)
-{
-	auto intData = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromFile(state.range_x()));
-    auto data = CastSharedCudaPtr<int, char>(intData);
-
-    while (state.KeepRunning())
-	{
-		auto results = CompressionOptimizer().FullStatisticsUpdate(
-				data,
-				EncodingType::none,
-				DataType::d_int,
-				0);
-	}
-
-	SetStatistics(state, DataType::d_int);
-}
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_Time)->Arg(1<<20);
+	->Arg(1<<18)->Arg(1<<19)->Arg(1<<20)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_RandomInt)(benchmark::State& state)
 {
@@ -115,15 +97,18 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_
 
 	std::sort(results.begin(), results.end(), [&](PossibleTree A, PossibleTree B){ return A.second < B.second; });
 	results[0].first.Fix();
+	results[0].first.Print();
 
 	while (state.KeepRunning())
 	{
+		results[0].first.Compress(data);
 		results[0].first.UpdateStatistics(optimizer.GetStatistics());
 	}
 
 	SetStatistics(state, DataType::d_int);
 }
-BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_RandomInt)->Arg(1<<20);
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_UpdateStatistics_RawPhase2_RandomInt)
+	->Arg(1<<18)->Arg(1<<19)->Arg(1<<20)->Arg(1<<21)->Arg(1<<22)->Arg(1<<23);
 
 BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3_RandomInt)(benchmark::State& state)
 {
@@ -156,6 +141,24 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3_Ra
 	SetStatistics(state, DataType::d_int);
 }
 BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_TryCorrectTree_RawPhase3_RandomInt)->Arg(1<<20);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_Time)(benchmark::State& state)
+{
+	auto intData = CudaArrayTransform().Cast<time_t, int>(GetTsIntDataFromFile(state.range_x()));
+    auto data = CastSharedCudaPtr<int, char>(intData);
+
+    while (state.KeepRunning())
+	{
+		auto results = CompressionOptimizer().FullStatisticsUpdate(
+				data,
+				EncodingType::none,
+				DataType::d_int,
+				0);
+	}
+
+	SetStatistics(state, DataType::d_int);
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_FullStatisticsUpdate_RawPhase1_Time)->Arg(1<<20);
 
 BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_RandomInt)(benchmark::State& state)
 {
@@ -216,6 +219,115 @@ BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_CompressData_Time)(benchmar
 	SetStatistics(state, DataType::d_time);
 }
 BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_CompressData_Time)->Range(1<<16, 1<<23);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_Optimize_PatternA_Int)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<int, char>(GetFakeDataWithPatternA<int>(0, state.range_x()));
+	int N = 25;
+	while (state.KeepRunning())
+	{
+		for(int i = 0; i < N; i++)
+			optimizer.CompressData(data, DataType::d_int);
+	}
+	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x() * N);
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(int));
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_Optimize_PatternA_Int)->Range(1<<16, 1<<25);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_Optimize_PatternB_Int)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<int, char>(GetFakeDataWithPatternB<int>(0, state.range_x()));
+	int N = 25;
+	while (state.KeepRunning())
+	{
+		for(int i = 0; i < N; i++)
+			optimizer.CompressData(data, DataType::d_int);
+	}
+	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x() * N);
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(int));
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_Optimize_PatternB_Int)->Range(1<<16, 1<<25);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_Optimize_Time)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<time_t, char>(GetFakeDataForTime(state.range_x()));
+	int N = 25;
+	while (state.KeepRunning())
+	{
+		for(int i = 0; i < N; i++)
+			optimizer.CompressData(data, DataType::d_time);
+	}
+	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x() * N);
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(time_t));
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_Optimize_Time)->Range(1<<16, 1<<24);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_Optimizer_Decompress_PatternA_Int)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<int, char>(GetFakeDataWithPatternA<int>(0, state.range_x()));
+	auto compr = optimizer.CompressData(data, DataType::d_int);
+		data.reset();
+	int N = 25;
+	while (state.KeepRunning())
+	{
+		for(int i = 0; i < N; i++)
+			CompressionTree().Decompress(compr);
+	}
+	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x() * N);
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(int));
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_Optimizer_Decompress_PatternA_Int)->Range(1<<16, 1<<25);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_Optimizer_Decompress_PatternB_Int)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<int, char>(GetFakeDataWithPatternB<int>(0, state.range_x()));
+	auto compr = optimizer.CompressData(data, DataType::d_int);
+	data.reset();
+	int N = 25;
+	while (state.KeepRunning())
+	{
+		for(int i = 0; i < N; i++)
+			CompressionTree().Decompress(compr);
+	}
+	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x() * N);
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(int));
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_Optimizer_Decompress_PatternB_Int)->Range(1<<16, 1<<25);
+
+BENCHMARK_DEFINE_F(CompressionOptimizerBenchmark, BM_Optimizer_Decompress_Time)(benchmark::State& state)
+{
+	CompressionOptimizer optimizer;
+
+	auto data = CastSharedCudaPtr<time_t, char>(GetFakeDataForTime(state.range_x()));
+	auto compr = optimizer.CompressData(data, DataType::d_time);
+	data.reset();
+
+	int N = 25;
+	while (state.KeepRunning())
+	{
+		for(int i = 0; i < N; i++)
+			CompressionTree().Decompress(compr);
+	}
+	auto it_processed = static_cast<int64_t>(state.iterations() * state.range_x() * N);
+	state.SetItemsProcessed(it_processed);
+	state.SetBytesProcessed(it_processed * sizeof(time_t));
+}
+BENCHMARK_REGISTER_F(CompressionOptimizerBenchmark, BM_Optimizer_Decompress_Time)->Range(1<<16, 1<<24);
 
 } /* namespace ddj */
 

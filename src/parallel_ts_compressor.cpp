@@ -47,6 +47,7 @@ void ParallelTSCompressor::Compress(File& inputFile, File& outputFile)
 		// read batch data from source
 		ts = _reader->Read(inputFile, _batchSize);
 //		ts->print(5);
+		if(ts->getRecordsCnt() <= 0) break;
 
 		if(!_initialized) init(ts);
 

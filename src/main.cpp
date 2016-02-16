@@ -33,6 +33,7 @@ ConfigOptions GetProgramOptions()
 			("output-file,o", po::value<string>(), "output file")
 			("generate,g", po::value<int>()->default_value(DEFAULT_GENERATE_SIZE), "generate sample data")
 			("padding,p", po::value<int>(), "binary data padding")
+			("format,f", po::value<string>()->default_value("bin"), "input format")
 			;
 	options.ConsoleOptions.add(consoleOptions);
 
@@ -58,6 +59,24 @@ void initialize_logger()
 
 void generate(size_t size);
 
+boost::shared_ptr<TimeSeriesReader> getReader(FileDefinition& fileDefinition)
+{
+	boost::shared_ptr<TimeSeriesReader> result;
+	auto conf = ddj::Config::GetInstance();
+	bool useBinaryFormat = conf->GetValue<std::string>("format").compare("bin") == 0;
+
+	// get padding if available
+	if(useBinaryFormat)
+	{
+		int padding = 0;
+		if(conf->HasValue("padding")) padding = conf->GetValue<int>("padding");
+		result = TimeSeriesReaderBinary::make_shared(BinaryFileDefinition(fileDefinition), padding);
+	}
+	else result = TimeSeriesReaderCSV::make_shared(CSVFileDefinition(fileDefinition));
+
+	return result;
+}
+
 int main(int argc, char* argv[])
 {
 	// Configure program
@@ -71,19 +90,14 @@ int main(int argc, char* argv[])
 	auto inputFile = File(conf->GetValue<std::string>("input-file"));
 	auto outputFile = File(conf->GetValue<std::string>("output-file"));
 	auto headerFile = File(conf->GetValue<std::string>("header-file"));
+	auto fileDefinition = TimeSeriesReader::ReadFileDefinition(headerFile);
 
 	printf("Input file: %s\n", inputFile.GetPath().c_str());
 	printf("Output file: %s\n", outputFile.GetPath().c_str());
 	printf("Header file: %s\n", headerFile.GetPath().c_str());
 
-	// get padding if available
-	int padding = 0;
-	if(conf->HasValue("padding")) padding = conf->GetValue<int>("padding");
+	ParallelTSCompressor compressor(getReader(fileDefinition));
 
-	auto fileDefinition = TimeSeriesReader::ReadFileDefinition(headerFile);
-	auto reader = TimeSeriesReaderBinary::make_shared(BinaryFileDefinition(fileDefinition), padding);
-
-	ParallelTSCompressor compressor(reader);
 	if(conf->HasValue("compress")) // Compress
 	{
 		printf("START COMPRESSING\n");

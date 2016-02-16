@@ -15,7 +15,7 @@ SRC_EXT := cpp
 
 COMPILER := nvcc
 STANDART := --std=c++11 
-NVCC_FLAGS := --cudart static --relocatable-device-code=false --default-stream per-thread
+NVCC_FLAGS := --cudart static --relocatable-device-code=false
 
 LIBS := -lcudart -lboost_system -lboost_thread -lpthread \
 	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand -lcelero
@@ -68,14 +68,14 @@ debug: export EXCLUDED_FILES := \
 debug: export BUILD_PATH := build/debug
 debug: export BIN_PATH := bin/debug
 
-release: export CODE_FLAGS := -O3
+release: export CODE_FLAGS := -O3 --default-stream per-thread
 release: export EXCLUDED_FILES := \
 	-not -name '*_unittest*' \
 	-not -name '*_benchmark*'
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
-test: export CODE_FLAGS := -O3 # -G -g -O0 --debug --device-debug
+test: export CODE_FLAGS := -G -g -O0 --debug --device-debug
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -name '*_benchmark*'
