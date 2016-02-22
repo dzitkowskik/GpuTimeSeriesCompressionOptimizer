@@ -25,6 +25,7 @@ bindingoffset=10mm, top=25mm, bottom=25mm}
 \newtheorem{remark}{Uwaga}[section]
 \newtheorem{definition}{Definicja}[section]
 \newtheorem{alg}{Algorytm}[chapter]
+
 \newtheorem{prz}{Przypadek}[section]
 \newtheorem{np}{Przyk³ad}[section]
 \newtheorem{lemma}[theorem]{Lemat}
@@ -532,20 +533,39 @@ Warunkiem podejmowania dobrych decyzji przez optymalizator jest znajomoœæ charak
 \item \emph{Mean} -- œrednia arytmetyczna liczb w zbiorze
 \end{enumerate}
 
+\noindent
+W systemie w bardzo ³atwy sposób mo¿na implementowaæ dodatkowe statystyki i udostêpniaæ je do optymalizatora w celu implementacji dodatkowych regu³.
+
 \subsection{Metryka RLE}
 \begin{definition}
-Metryk¹ RLE bêdziemy nazywaæ d³ugoœæ maksymalnych ci¹gów równych liczb, nie d³u¿szych ni¿ N w danych D, ozn. $RLE_{M}(D, N)$.
+Metryk¹ RLE bêdziemy nazywaæ œredni¹ z d³ugoœci maksymalnych ci¹gów równych liczb, nie d³u¿szych ni¿ N, w danych D i ozn. $RLE_{M}(D, N)$, gdzie $N \geq 2$. Oznaczmy jako $l_{i}^{N}$ d³ugoœæ ci¹gu równych liczb, pocz¹wszy od indeksu $i$, nie d³u¿szego ni¿ $N$, oraz d³ugoœæ danych $D$ jako $k$. Wtedy $$RLE_{M}(D, N) = \frac{\sum_{i=0}^{k} l_{i}^{N}}{k} $$
 \end{definition}
-Wskazuje na zasadnoœæ u¿ycia kodowania RLE do jakiœ danych. Mo¿na uznaæ, ¿e jeœli $RLE_{M}(D, N) > N/2$ to warto u¿yæ RLE do kodowania danych $D$. Dla przyk³adu, jeœli weŸmiemy $N=2$ oraz dane D: $1112234444555555$, wtedy odczytane ci¹gi równych liczb nie d³u¿sze ni¿ 2 wynosz¹: $22121122212222$, z czego œrednia jest równa $\frac{26}{15} \approx 1,7$. Natomiast podstawiaj¹c $N=4$: $3212114321444$, œrednia wyniesie $\frac{32}{13} \approx 2,5$. W obu wypadkach wychodzi zatem, ¿e powinniœmy u¿yæ RLE do kompresji takich danych. Daje to wyobra¿enie o œredniej d³ugoœci ci¹gów równych liczb w danych, a ponadto jest bardzo wydajne obliczeniowo. Wyliczanie takiej statystyki jest trywialnie równoleg³e, poniewa¿ mo¿na w ka¿dym w¹tku wyliczaæ ci¹g pocz¹wszy od innego indeksu, niezale¿nie. Pseudokod wyliczania ci¹gu dla pojedynczego w¹tku CUDA pokazuje algorytm \ref{alg:rle_metric}. PóŸniej wystarczy obliczyæ sumê, korzystaj¹c na przyk³ad z gotowej funkcji z biblioteki \emph{Thrust}.
+Dla przyk³adu, jeœli weŸmiemy $N=2$ oraz dane D: $1112234444555555$, wtedy odczytane ci¹gi równych liczb nie d³u¿sze ni¿ 2 wynosz¹: $2212112221222221$, z czego œrednia jest równa $\frac{27}{16} \approx 1.7$. Natomiast podstawiaj¹c $N=4$: $3212114321444321$, œrednia wyniesie $\frac{38}{16} \approx 2.4$. Daje to wyobra¿enie o œredniej d³ugoœci ci¹gów równych liczb w danych, a ponadto jest bardzo wydajne obliczeniowo. Wyliczanie takiej statystyki jest trywialnie równoleg³e, poniewa¿ mo¿na w ka¿dym w¹tku wyliczaæ ci¹g pocz¹wszy od innego indeksu, niezale¿nie. Pseudokod wyliczania ci¹gu dla pojedynczego w¹tku CUDA pokazuje algorytm \ref{alg:rle_metric}. W ostatnim kroku wystarczy obliczyæ œredni¹, korzystaj¹c na przyk³ad z gotowej funkcji z biblioteki \emph{Thrust}. W tej pracy przyjmujê $N = 2$, poniewa¿ mo¿na udowodniæ, ¿e:
+\begin{lemma}
+Jeœli $RLE_{M}(D, 2) > 1.5$, to wykorzystanie kodowania RLE zmniejszy rozmiar danych $D$. 
+\begin{proof}
+Kodowanie ci¹gu równych liczb odbywa siê za pomoc¹ pary wartoœci, wiêc aby rozmiar danych siê zmniejszy³, ci¹gi œrednio musz¹ mieæ d³ugoœæ wiêksz¹ ni¿ 2. Przyjmuj¹c $n_{1}, n_{2}, ..., n_{m}$ jako d³ugoœci ci¹gów, oraz $n_{sr}$ jako œredni¹ d³ugoœæ tych ci¹gów, $\frac{\sum_{i=1}^{m} n_{i}}{m} = n_{sr} > 2$ implikuje wspó³czynnik kompresji wiêkszy od $1.0$.
+$$ \sum_{i=1}^{m} n_{i} = k \implies \frac{k}{m} > 2 $$
+Zatem warunkiem koniecznym i dostatecznym jest, aby $ m < \frac{k}{2} $. Mo¿na zauwa¿yæ, ¿e ci¹g o d³ugoœci $n_{i}$ zostanie przez algorytm zapisany jako ci¹g $n_{i}-1$ dwójek, oraz jedynkê, zatem wzór na metrykê mo¿na zapisaæ w zale¿noœci od $n_{i}$, jako:
+$$ RLE_{M}(D,2) = \frac{\sum_{i=1}^{m} (2*n_{i}-1)}{k} = \frac{2(n_{1}+...+n_{m})-m}{k}$$
+po przekszta³ceniu:
+$$ RLE_{M}(D,2) = 2 - \frac{m}{k} \implies (2 - RLE_{M}(D,2)) \cdot k = m < \frac{k}{2} $$
+A z tego ju¿ wprost wynika, ¿e $ RLE_{M}(D,2) > 1.5 $
 
-\begin{algorithm}[H]
+\end{proof}
+\end{lemma}
+
+W implementacji algorytmu, aby unikn¹æ sprawdzania warunku koñca tablicy, warto jest zrezygnowaæ z obliczania $N-1$
+ostatnich wartoœci, które maj¹ znikomy wp³yw na wynik, szczególnie dla du¿ego rozmiaru danych.
+\begin{algorithm}[]
  \small
  \caption{Obliczanie metryki RLE}
  \KwIn{DATA -- wektor danych wejœciowych\;
- N -- wspó³czynnik metryki RLE (maks. d³ugoœæ sprawdzanego ci¹gu)\;
+ N -- argument metryki RLE (maks. d³ugoœæ sprawdzanego ci¹gu)\;
  IDX -- globalny indeks w¹tku (unikalny)
  }
  \KwOut{LENGTHS -- d³ugoœci ci¹gów równych liczb}
+ \tcc{Wykonaj równolegle dla ka¿dego w¹tku CUDA}
  \SetKwFunction{algo}{GetRunLenN}
  \SetKwProg{myalg}{Funkcja}{}{}
  \myalg{\algo{}}{
@@ -553,7 +573,7 @@ Wskazuje na zasadnoœæ u¿ycia kodowania RLE do jakiœ danych. Mo¿na uznaæ, ¿e jeœl
  	\nl $num \gets 1, out \gets 1, last \gets 1$\;
  	\nl \For{$i=1$ to $N$}{
  		\nl $out \gets DATA[IDX] == DATA[IDX+i]$\;
- 		\nl $num += out \& last$\;
+ 		\nl $num += out$ \& $last$\;
  		\nl $last \gets out$\;
  	}
  	\nl $LENGTHS[IDX] \gets num$\;
@@ -585,8 +605,6 @@ Kolejn¹ wa¿n¹ statystyk¹ dla liczb zmiennoprzecinkowych jest precyzja, która odn
  \label{alg:precision}
 \end{algorithm}
 \normalsize
-\noindent
-W systemie w bardzo ³atwy sposób mo¿na implementowaæ dodatkowe statystyki i udostêpniaæ je do optymalizatora w celu implementacji dodatkowych regu³.
 
 \section{Optymalizator}
 Algorytm optymalizatora kompresji maksymalizuje wspó³czynnik kompresji, jednoczeœnie staraj¹c siê wybraæ jak najmniejsze i najni¿sze drzewo kompresji. G³ównym pomys³em jest tworzenie statystyk krawêdzi drzewa kompresji o kszta³cie pe³nego drzewa binarnego (z tego wzglêdu kodowania mog¹ zwracaæ co najwy¿ej 2 wyniki). Nic nie stoi jednak na przeszkodzie, aby algorytm ten uogólniæ na kodowania zwracaj¹ce dowolnie du¿¹ iloœæ wyników.
