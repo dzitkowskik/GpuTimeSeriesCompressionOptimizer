@@ -76,6 +76,22 @@ public:
 			T max=+1e5,
 			size_t size=1e6);
 
+	// *	*	*	*	*	**	*	***	*	  **		max+-(rand(0,32))
+	//					 -------
+	//			 -------		 ------
+	//	-------							------			min
+	//  <-len->
+	// outProb - chances for outliers "*"
+	template<typename T>
+	SharedCudaPtr<T> GetFakeDataWithOutliers(
+			int part=0,
+			size_t len=1e3,
+			T step=10,
+			T min=0,
+			T max=1e6,
+			double outProb=0.01,
+			size_t size=1e6);
+
 private:
     curandGenerator_t _gen;
     CudaArrayTransform _transform;

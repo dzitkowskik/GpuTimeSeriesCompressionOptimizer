@@ -145,4 +145,60 @@ Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistic
 	return result;
 }
 
+// Heuristic B
+//Path PathGenerator::GetContinuations(EncodingType et, DataType dt, DataStatistics stats, int level)
+//{
+//	Path result;
+//
+//	if(level != 0 && (et == EncodingType::none || stats.size <= 100))
+//		return result;
+//	else
+//		result.push_back(EncodingType::none);
+//
+//	if(et == EncodingType::afl || et == EncodingType::gfc)
+//		return result;
+//
+//	if(level < MAX_LEVEL)
+//	{
+//		// DELTA
+//		if(et != EncodingType::delta && level < 3)
+//			result.push_back(EncodingType::delta);
+//
+//		// SCALE
+//		if(et != EncodingType::scale && stats.min != 0 && level < 3)
+//			result.push_back(EncodingType::scale);
+//
+//		// FLOAT
+//		if(et != EncodingType::floatToInt && dt == DataType::d_float && level < 3)
+//			result.push_back(EncodingType::floatToInt);
+//
+//		// PATCH
+//		if(et != EncodingType::patch && et != EncodingType::dict && level < 3)
+//			result.push_back(EncodingType::patch);
+//
+//		// DICT
+//		if(et != EncodingType::dict && et != EncodingType::patch && level < 3)
+//			result.push_back(EncodingType::dict);
+//
+//		if(stats.sorted || stats.rlMetric > 2)
+//		{
+//			// CONST
+//			if(et != EncodingType::constData)
+//				result.push_back(EncodingType::constData);
+//
+//			// RLE
+//			if(et != EncodingType::rle)
+//				result.push_back(EncodingType::rle);
+//		}
+//	}
+//
+//	// AFL & GFC
+//	if(dt == DataType::d_float || dt == DataType::d_double)
+//		result.push_back(EncodingType::gfc);
+//	else if(stats.minBitCnt < 30)
+//		result.push_back(EncodingType::afl);
+//
+//	return result;
+//}
+
 } /* namespace ddj */

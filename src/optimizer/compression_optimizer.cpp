@@ -141,7 +141,7 @@ std::vector<PossibleTree> CompressionOptimizer::FullStatisticsUpdate(
 
 bool CompressionOptimizer::IsFullUpdateNeeded()
 {
-	if(_optimalTree == nullptr || _partsProcessed % 15 == 14) return true;
+	if(_optimalTree == nullptr || _partsProcessed % 10 == 9) return true;
 	return false;
 }
 
@@ -176,7 +176,7 @@ SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataP
 			possibleTrees.end(),
 			[&](PossibleTree A, PossibleTree B){ return A.first.GetCompressionRatio() < B.first.GetCompressionRatio(); });
 
-		LOG4CPLUS_INFO_FMT(_logger, "Found %d interesting trees (best score = %f)",
+		LOG4CPLUS_WARN_FMT(_logger, "Found %d interesting trees (best score = %f)",
 				possibleTrees.size(), (*bestTree).first.GetCompressionRatio());
 
 		_optimalTree = OptimalTree::make_shared((*bestTree).first);
@@ -186,7 +186,7 @@ SharedCudaPtr<char> CompressionOptimizer::CompressData(SharedCudaPtr<char> dataP
 	LOG4CPLUS_INFO(_logger, "Optimal tree: " << _optimalTree->GetTree().ToString());
 	LOG4CPLUS_INFO(_logger, "Compression ratio: " << _optimalTree->GetTree().GetCompressionRatio());
 	bool treeCorrected = _optimalTree->TryCorrectTree();
-	LOG4CPLUS_INFO_FMT(_logger, "Tree corrected = %s\n", treeCorrected ? "true" : "false");
+	LOG4CPLUS_DEBUG_FMT(_logger, "Tree corrected = %s\n", treeCorrected ? "true" : "false");
 	_partsProcessed++;
 	_totalBytesProcessed += dataPart->size();
 	return compressedData;

@@ -255,13 +255,13 @@ void OptimizerTest::CompressDecompressNPartsData(SharedCudaPtrVector<T> data)
 		compressedDataParts.push_back(compressedPart);
 
 		CompressionTree& optimalTree = optimizer.GetOptimalTree()->GetTree();
-		LOG4CPLUS_INFO_FMT(
+		LOG4CPLUS_DEBUG_FMT(
 			_logger,
 			"%s",
 			optimizer.GetStatistics()->ToStringShort().c_str()
 		);
 
-		LOG4CPLUS_INFO_FMT(_logger, "COMPRESSION RATIO = %f", (float)dataToCompress->size()/compressedPart->size());
+		LOG4CPLUS_DEBUG_FMT(_logger, "COMPRESSION RATIO = %f", (float)dataToCompress->size()/compressedPart->size());
 	}
 
 	// Check
@@ -361,5 +361,58 @@ TEST_F(OptimizerTest, CompressionOptimizer_CompressAndDecompress_FakeIntData_Pat
 
 	CompressDecompressNPartsData(dataParts);
 }
+
+class OptimizerTestForOutliers : public OptimizerTest, public ::testing::WithParamInterface<double> {};
+
+//INSTANTIATE_TEST_CASE_P(
+//	OptimizerTestForOutliers_Inst,
+//	OptimizerTestForOutliers,
+//    ::testing::Range(0.0, 1.0, 0.01));
+//
+//TEST_P(OptimizerTestForOutliers, CompressDataWithOptimizer_20parts)
+//{
+//	LOG4CPLUS_INFO_FMT(_logger, "OptimizerTestForOutliers.CompressDataWithOptimizer_50parts(param=%f)", GetParam());
+//	int N = 20;
+//	size_t SIZE = 1e5;
+//	double outProb = GetParam();
+//	SharedCudaPtrVector<int> dataParts;
+//	for(int i = 0; i < N; i++)
+//	{
+//		auto data = _generator.GetFakeDataWithOutliers<int>(i, 20, 1, 0, 1e6, outProb, SIZE);
+//		dataParts.push_back(data);
+//	}
+//
+//	CompressDecompressNPartsData(dataParts);
+//}
+
+//TEST_F(OptimizerTest, CompressionOptimizer_TreeCount)
+//{
+//	LOG4CPLUS_INFO(_logger, "OptimizerTest, CompressionOptimizer_TreeCount");
+//
+//	LOG4CPLUS_INFO(_logger, "NYSE time");
+//	CompressionOptimizer().CompressData(CastSharedCudaPtr<time_t, char>(GetTsIntDataFromTestFile()), DataType::d_time);
+//	LOG4CPLUS_INFO(_logger, "Float max precision 3");
+//	CompressionOptimizer().CompressData(
+//			CastSharedCudaPtr<float, char>(GetFloatRandomDataWithMaxPrecision(3)), DataType::d_float);
+//	LOG4CPLUS_INFO(_logger, "Random Int from 10, 10000");
+//	CompressionOptimizer().CompressData(
+//			CastSharedCudaPtr<int, char>(GetIntRandomData(10, 10000)), DataType::d_int);
+//	LOG4CPLUS_INFO(_logger, "Int consecutive");
+//	CompressionOptimizer().CompressData(
+//			CastSharedCudaPtr<int, char>(GetIntConsecutiveData()), DataType::d_int);
+//	LOG4CPLUS_INFO(_logger, "Int Pattern A");
+//	CompressionOptimizer().CompressData(
+//			CastSharedCudaPtr<int, char>(GetFakeDataWithPatternA<int>()), DataType::d_int);
+//	LOG4CPLUS_INFO(_logger, "Float Pattern A");
+//	CompressionOptimizer().CompressData(
+//			CastSharedCudaPtr<float, char>(GetFakeDataWithPatternA<float>()), DataType::d_float);
+//	LOG4CPLUS_INFO(_logger, "Int Pattern B");
+//	CompressionOptimizer().CompressData(
+//			CastSharedCudaPtr<int, char>(GetFakeDataWithPatternB<int>()), DataType::d_int);
+//	LOG4CPLUS_INFO(_logger, "Float Pattern B");
+//	CompressionOptimizer().CompressData(
+//			CastSharedCudaPtr<float, char>(GetFakeDataWithPatternB<float>()), DataType::d_float);
+//
+//}
 
 } /* namespace ddj */

@@ -161,8 +161,53 @@ namespace ddj
 		return d_result;
 	}
 
+	template<typename T>
+	SharedCudaPtr<T> CudaArrayGenerator::GetFakeDataWithOutliers(
+			int part,
+			size_t len,
+			T step,
+			T min,
+			T max,
+			double outProb,
+			size_t size)
+	{
+		const int maxRand = 10;
+		T oldMin = min;
+		auto h_result = new T[size];
+		size_t start = part*size;
+		int outCnt = 0;
+
+		// Prepare data
+		min = min + (T)(start/len)*step;
+
+		for(size_t i = 0; i < size; i++)
+		{
+			auto r = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+			auto value = min < max ? (min > oldMin ? min : oldMin) : max;
+
+			if(r < outProb) // outlier
+			{
+				value = max + (rand() % (2*maxRand)) - maxRand;
+				outCnt++;
+			}
+			else
+			{
+				min += step;
+				if(min > max || min < oldMin) step = -step;
+			}
+
+			h_result[i] = value;
+		}
+
+		auto d_result = CudaPtr<T>::make_shared(size);
+		d_result->fillFromHost(h_result, size);
+		delete [] h_result;
+		return d_result;
+	}
+
 	#define GENERATOR_SPEC(X) \
 		template SharedCudaPtr<X> CudaArrayGenerator::GetFakeDataWithPatternA<X>(int, size_t, X, X, X, size_t); \
+		template SharedCudaPtr<X> CudaArrayGenerator::GetFakeDataWithOutliers<X>(int, size_t, X, X, X, double, size_t); \
 		template SharedCudaPtr<X> CudaArrayGenerator::GetFakeDataWithPatternB<X>(int, size_t, X, X, size_t);
 	FOR_EACH(GENERATOR_SPEC, char, short, float, int, long, long long, unsigned int)
 
