@@ -157,8 +157,8 @@ Nastêpny podrozdzia³ zawiera opis wczeœniejszych prac prowadzonych w tych temata
 \section{Powi¹zane prace}
 
 \subsection{Szeregi czasowe}
-Szeregi czasowe s¹ typem danych dla których istnieje wiele efektywnych sposobów kompresji, zale¿nych od ich charakterystyki. W wielu pracach przedstawiono podejœcia do tego problemu od strony lekkiej kompresji. Najczêstszymi z nich s¹ kodowanie ekstremami \cite{FINK}, sta³ej d³ugoœci bitów \cite{PRZYMUS1}, czyli tzw. NULL Suppression (NS) oraz proste kodowania s³ownikowe np. wszystkich unikalnych wartoœci, które mo¿na zakodowaæ pewn¹ za³o¿on¹ z góry liczb¹ bitów \cite{ABADI}. \\
-Dodatkowo do kompresji szeregów stosuje siê metody regresji \cite{MENSMANN}. Autor stosuje Piecewise Regression - regresjê odcinkow¹, polegaj¹c¹ na przybli¿aniu kawa³ków szeregu funkcj¹, np. wielomianem. Ma to swoj¹ wersjê stratn¹ jak i bezstratn¹, gdzie mo¿emy zapisaæ ró¿nicê od zadanej funkcji i wynik zapisaæ na mniejszej liczbie bitów. \\ Szeregi czasowe to nie tylko liczby ca³kowite. Analizuje siê tak¿e wiele sposobów kompresji liczb zmiennoprzecinkowych pojedynczej i podwójnej precyzji. Najczêœciej próbuje siê zamieniæ liczbê u³amkow¹ na ca³kowit¹ stosuj¹c skalowanie \cite{PRZYMUS2}. Istniej¹ te¿ bardziej skomplikowane metody na przyk³ad kompresji liczb double algorytmem FPC \cite{BURTSCHER}, który kompresuje liniow¹ sekwencjê liczb o podwójnej precyzji (IEEE 754), sekwencyjnie przewiduj¹c ka¿d¹ wartoœæ, a nastêpnie wykonuj¹c operacjê XOR z prawdziw¹ wartoœci¹ szeregu, po czym usuwane s¹ wiod¹ce zera.
+Szeregi czasowe s¹ typem danych dla których istnieje wiele efektywnych sposobów kompresji, zale¿nych od ich charakterystyki. W wielu pracach przedstawiono podejœcia do tego problemu od strony lekkiej kompresji. Najczêstszymi z nich s¹ kodowanie ekstremami \cite{FINK}, sta³ej d³ugoœci bitów \cite{PRZYMUS1}, czyli tzw. NULL Suppression (NS)\cite{} oraz proste kodowania s³ownikowe np. wszystkich unikalnych wartoœci, które mo¿na zakodowaæ pewn¹ za³o¿on¹ z góry liczb¹ bitów \cite{ABADI}. \\
+Dodatkowo do kompresji szeregów stosuje siê metody regresji \cite{EICHINGER}. Autor stosuje Piecewise Regression - regresjê odcinkow¹, polegaj¹c¹ na przybli¿aniu kawa³ków szeregu funkcj¹, np. wielomianem. Ma to swoj¹ wersjê stratn¹ jak i bezstratn¹, gdzie mo¿emy zapisaæ ró¿nicê od zadanej funkcji i wynik zapisaæ na mniejszej liczbie bitów. \\ Szeregi czasowe to nie tylko liczby ca³kowite. Analizuje siê tak¿e wiele sposobów kompresji liczb zmiennoprzecinkowych pojedynczej i podwójnej precyzji. Najczêœciej próbuje siê zamieniæ liczbê u³amkow¹ na ca³kowit¹ stosuj¹c skalowanie \cite{PRZYMUS2}. Istniej¹ te¿ bardziej skomplikowane metody na przyk³ad kompresji liczb double algorytmem FPC \cite{BURTSCHER}, który kompresuje liniow¹ sekwencjê liczb o podwójnej precyzji (IEEE 754), sekwencyjnie przewiduj¹c ka¿d¹ wartoœæ, a nastêpnie wykonuj¹c operacjê XOR z prawdziw¹ wartoœci¹ szeregu, po czym usuwane s¹ wiod¹ce zera.
 
 \subsection{SIMD SSE}
 Bior¹c pod uwagê algorytmy lekkiej kompresji dla szeregów, warto zwróciæ uwagê na udane próby optymalizacji z u¿yciem prostego SIMD jakim s¹ operacje wektorowe SSE na procesorach Intel \cite{ZHAO, LEMIRE}. W tych pracach pokazano przek³ad algorytmów kodowania z wyrównaniem do bajtów (Byte-Aligned Coding) oraz do s³ów (Word-Aligned Coding) i zmierzono wydajnoœæ implementacji wektorowej wersji tych kodowañ z u¿yciem SSE. Autorzy zastosowali równie¿ binarne pakowanie (Binary Packing) w formie algorytmu FOR (Frame of Reference) \cite{GOLDSTEIN} dziel¹c dane na bloki o d³ugoœci 128 elementów (zmiennych ca³kowitych o d³ugoœci 32 bitów) i stosuj¹c patchowanie. Taki algorytm okaza³ siê najwydajniejszy. Pokazano, ¿e bez spadku jakoœci kompresji mo¿na uzyskaæ w ten sposób wzrost szybkoœci kompresji od 2 do 4 razy w stosunku to tradycyjnej implementacji.
@@ -186,8 +186,8 @@ jak równie¿ ograniczone przepustowoœci¹ szyny PCI-E, która wynosi w porywach $8 
 Jedn¹ z wielu zalet architektury kart graficznych jest to, ¿e sk³adaj¹ siê z kilku multiprocesorów (SMs - Streaming Multiprocessors) architektury SIMD. Jest to w³aœciwie architektura typu SIMT, gdzie multiprocesor wykonuje w¹tki w grupach o licznoœci 32 zwanymi \emph{warps}. Architektura ta jest zbli¿ona do SIMD z t¹ ró¿nic¹, ¿e to nie organizacja wektora danych kontroluje jednostki obliczeniowe, a organizacja instrukcji pojedyñczego w¹tku. Umo¿liwia on zatem pisanie równolegle wykonywanego kodu dla niezale¿nych i skalowalnych w¹tków, jak i dla tych koordynowanych danymi.
 	\begin{figure}[!ht]
 		\centering
-		\hspace*{-0.5cm}\includegraphics[scale=0.50]{img/CUDA_arch}
-		\vspace*{-3mm}
+		\hspace*{-0.5cm}\includegraphics[scale=0.4]{img/CUDA_arch}
+		\vspace*{-4mm}
 		\caption{Architektura NVIDIA CUDA}
 		\label{ref:cuda_arch}
 	\end{figure}
@@ -195,8 +195,8 @@ Jedn¹ z wielu zalet architektury kart graficznych jest to, ¿e sk³adaj¹ siê z kil
 Wszystkie w¹tki wykonuj¹ ten sam kod funkcji, któr¹ nazywa siê mianem kernela. Ponadto CUDA tworzy abstrakcjê bloków w¹tków, które zorganizowane s¹ w siatkê (GRID) i wspó³dziel¹ zasoby multiprocesora. Wa¿na jest równie¿ hierarchia pamiêci, w której czêœæ przydzielana jest w¹tkom w postaci pamiêci lokalnej i rejestrów, oraz pamiêci wspó³dzielonej przez w¹tki z tego samego bloku (Shared Memory) - te pamiêci musz¹ byæ znane w trakcie kompilacji kernela. Najwolniejsza jest pamiêæ globalna (Device Memory), wspólna dla wszystkich w¹tków, wszystkich bloków, na wszystkich multiprocesorach. Dok³adny opis tej architektury mo¿na znaleŸæ bezpoœrednio na stronie producenta.
 	\begin{figure}[!ht]
 		\centering
-		\hspace*{-0.5cm}\includegraphics[scale=0.50]{img/CUDA_grid}
-		\vspace*{-6mm}
+		\hspace*{-0.5cm}\includegraphics[scale=0.45]{img/CUDA_grid}
+		\vspace*{-7mm}
 		\caption{Abstrakcja bloków i siatki w CUDA}
 		\label{ref:cuda_grid}
 	\end{figure}
@@ -229,7 +229,7 @@ $$ d_{b}(t) = b_{idx}(t) * w_{g} * \lambda + \Psi(t) $$
 co dla naszego przyk³adu obrazuje rysunek \ref{ref:cuda_data_blocks}.
 \begin{figure}[!ht]
 	\centering
-	\hspace*{-0.5cm}\includegraphics[scale=0.55]{img/cuda_data_blocks}
+	\hspace*{-0.5cm}\includegraphics[scale=0.5]{img/cuda_data_blocks}
 	\caption{Przejœcie z u³o¿enia w¹tków w bloku na bloki danych}
 	\label{ref:cuda_data_blocks}
 \end{figure}
@@ -241,7 +241,7 @@ Tworzy to podzia³ danych wejœciowych, który zgodnie z przyk³adem obrazuje rysune
 
 \begin{figure}[!ht]
 	\centering
-	\hspace*{-0.5cm}\includegraphics[scale=0.55]{img/cuda_data_blocks2}
+	\hspace*{-0.5cm}\includegraphics[scale=0.5]{img/cuda_data_blocks2}
 	\caption{Indeksy danych wejœciowych}
 	\label{ref:cuda_data_blocks2}
 \end{figure}
@@ -1284,7 +1284,7 @@ Bêdzie to jednak tematem innej pracy i zgodnie z wieloma publikacjami, mo¿liwa j
 u¿ytych algorytmów \cite{CURRY,KACZMAR2,FANG,ONEIL}. Ponadto, wydajnoœæ ta w du¿ej mierze zale¿y od u¿ytej karty, która w tym przypadku jest relatywnie niska w porównaniu do drogich kart z wy¿szej pó³ki. Dla porównania wydajnoœæ analogicznej implementacji algorytmu \emph{GFC} uzyskana przez autorów wynosi³a oko³o $10GB/s$, natomiast na mojej karcie tylko nieca³e $2GB/s$. Przepustowoœæ poszczególnych kodowañ i dekodowañ umieszczona jest na rysunku \ref{ref:enc_perf}.
     \begin{figure}[!ht]
         \centering
-        \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/enc_perf}
+        \hspace*{-0.5cm}\includegraphics[scale=0.5]{img/enc_perf_new}
         \caption{Wydajnoœæ kodowañ}
         \label{ref:enc_perf}
     \end{figure}
@@ -1295,7 +1295,7 @@ Z uwagi na architekturê GPU, op³aca siê za jednym zamachem przetwarzaæ jak najwi
 pojedynczym drzewem, zatem powinno siê dzieliæ przychodz¹ce dane na paczki o wielkoœci wiêkszej ni¿ milion elementów.
 	\begin{figure}[!ht]
         \centering
-        \hspace*{-0.25cm}\includegraphics[scale=0.35]{img/tcp}
+        \hspace*{-0.25cm}\includegraphics[scale=0.5]{img/tcp_new}
         \caption{Wydajnoœæ kompresji drzewami}
         \label{ref:tcp}
     \end{figure}
@@ -1355,7 +1355,7 @@ po ,,\emph{Pack size}'' elementów, a faza 1 wykonana zosta³a 2 do 3 razy w trakc
 Bior¹c pod uwagê fakt, ¿e wydajnoœæ danych drzew jest porównywalna do szybkoœci optymalizatora,
 który je wywnioskowa³, mo¿na stwierdziæ, ¿e algorytm poprawiania i zgadywania drzew, nie spowalnia znacz¹co 
 samego procesu kompresji drzewem.
-
+\newpage
 \subsection{Generowanie statystyk}
 Podczas pierwszej fazy algorytmu, jak równie¿ w czasie trwania niektórych kodowañ, wyliczane s¹ statystyki
 aktualnych danych. Wyliczanie metryki \emph{RLE} zamiast prawdziwej, maksymalnej lub œredniej d³ugoœci ci¹gów,
@@ -1415,7 +1415,7 @@ po stronie GPU.
 \bibitem[5]{CURRY} Cloud RL, Curry ML, Ward HL, Skjellum A, Bangalore P. \emph{"Accelerating lossless data compression with GPUs."} arXiv preprint arXiv:1107.1525. 2011 Jun 21.
 \bibitem[6]{RUSSEK} Pietroñ, M., Pawel Russek, and Kazimierz Wiatr. \emph{"Accelerating SELECT WHERE and SELECT JOIN queries on a GPU."} Computer Science 14.2) (2013): 243-252.
 \bibitem[7]{DTU} Nicolaisen, Anders Lehrmann Vr?nning. \emph{"Algorithms for Compression on GPUs."} (2013).
-\bibitem[8]{MENSMANN} Mensmann, Jörg, Timo Ropinski, and Klaus Hinrichs. \emph{"A GPU-supported lossless compression scheme for rendering time-varying volume data."} 8th IEEE/EG international conference on Volume Graphics, 2–3 May 2010, Norrköping, Sweden. IEEE, 2010.
+\bibitem[8]{EICHINGER} Eichinger, Frank, et al. \emph{"A time-series compression technique and its application to the smart grid."} The VLDB Journal 24.2 (2015): 193-218.
 \bibitem[9]{BURTSCHER} Burtscher M, Ratanaworabhan P. \emph{"FPC: A high-speed compressor for double-precision floating-point data."} Computers, IEEE Transactions on. 2009 Jan;58(1):18-31.
 \bibitem[10]{BAKKUM} Bakkum, Peter, and Kevin Skadron. \emph{"Accelerating SQL database operations on a GPU with CUDA."} Proceedings of the 3rd Workshop on General-Purpose Computation on Graphics Processing Units. ACM, 2010.
 \bibitem[11]{FERRIERA} Ferreira, Miguel C. \emph{"Compression and query execution within column oriented databases."} Diss. Massachusetts Institute of Technology, 2005.
@@ -1429,7 +1429,6 @@ po stronie GPU.
 \bibitem[19]{CHASH} Alcantara, Dan A., et al. \emph{"Real-time parallel hashing on the GPU."} ACM Transactions on Graphics (TOG) 28.5 (2009): 154.
 \bibitem[20]{ONEIL} O'Neil, Molly A., and Martin Burtscher. \emph{"Floating-point data compression at 75 Gb/s on a GPU."} Proceedings of the Fourth Workshop on General Purpose Processing on Graphics Processing Units. ACM, 2011.
 \bibitem[21]{ZU} Zu, Yuan, and Bei Hua. \emph{"GLZSS: LZSS lossless data compression can be faster."} Proceedings of Workshop on General Purpose Processing Using GPUs. ACM, 2014.
-\bibitem[22]{GPUFS} Silberstein, Mark, et al. \emph{"GPUfs: Integrating a file system with GPUs."} ACM Transactions on Computer Systems (TOCS) 32.1 (2014): 1.
 \bibitem[23]{ACC} Al-Kiswany, Samer, Ammar Gharaibeh, and Matei Ripeanu. \emph{"GPUs as storage system accelerators."} Parallel and Distributed Systems, IEEE Transactions on 24.8 (2013): 1556-1566.
 \bibitem[23]{PRZYMUS2} Przymus, Piotr, and Krzysztof Kaczmarski. \emph{"Improving efficiency of data intensive applications on GPU using lightweight compression."} On the Move to Meaningful Internet Systems: OTM 2012 Workshops. Springer Berlin Heidelberg, 2012.
 \bibitem[24]{ABADI} Abadi, Daniel, Samuel Madden, and Miguel Ferreira. \emph{"Integrating compression and execution in column-oriented database systems."} Proceedings of the 2006 ACM SIGMOD international conference on Management of data. ACM, 2006.
@@ -1442,16 +1441,15 @@ po stronie GPU.
 \bibitem[31]{OZSOY3} Ozsoy, Adnan, Martin Swany, and Arun Chauhan. \emph{"Optimizing LZSS compression on GPGPUs."} Future Generation Computer Systems 30 (2014): 170-178.
 \bibitem[32]{PATEL} Patel, Ritesh A., et al. \emph{"Parallel lossless data compression on the GPU."} IEEE, 2012.
 \bibitem[33]{SIMD} Polychroniou, Orestis, Arun Raghavan, and Kenneth A. Ross. \emph{"Rethinking SIMD vectorization for in-memory databases."} Proceedings of the 2015 ACM SIGMOD International Conference on Management of Data. ACM, 2015.
-\bibitem[34]{SHREDDER} Bhatotia, Pramod, Rodrigo Rodrigues, and Akshat Verma. \emph{"Shredder: GPU-accelerated incremental storage and computation."} FAST. 2012.
 \bibitem[35]{ZUKOWSKI} Zukowski, Marcin, et al. \emph{"Super-scalar RAM-CPU cache compression."} Data Engineering, 2006. ICDE'06. Proceedings of the 22nd International Conference on. IEEE, 2006.
-\bibitem[36]{EICHINGER} Eichinger, Frank, et al. \emph{"A time-series compression technique and its application to the smart grid."} The VLDB Journal 24.2 (2015): 193-218.
+\bibitem[36]{MENSMANN} Mensmann, Jörg, Timo Ropinski, and Klaus Hinrichs. \emph{"A GPU-supported lossless compression scheme for rendering time-varying volume data."} 8th IEEE/EG international conference on Volume Graphics, 2–3 May 2010, Norrköping, Sweden. IEEE, 2010.
 \bibitem[37]{KACZMAR1} Przymus, Piotr, and Krzysztof Kaczmarski. \emph{"Time series queries processing with gpu support."} New Trends in Databases and Information Systems. Springer International Publishing, 2014. 53-60.
 \bibitem[38]{ZHAO} Zhao, Wayne Xin, et al. \emph{"A General SIMD-based Approach to Accelerating Compression Algorithms."} ACM Transactions on Information Systems (TOIS) 33.3 (2015): 15.
 \bibitem[39]{GOLDSTEIN} Goldstein, Jonathan, Raghu Ramakrishnan, and Uri Shaft. \emph{"Compressing relations and indexes."} Data Engineering, 1998. Proceedings., 14th International Conference on. IEEE, 1998.
-\bibitem[41]{CUDA_PERF} http://developer.download.nvidia.com/compute/cuda/compute-docs/cuda-performance-report.pdf
-\bibitem[42]{PARETO} Marler, R. Timothy, and Jasbir S. Arora. \emph{"Survey of multi-objective optimization methods for engineering."} Structural and multidisciplinary optimization 26.6 (2004): 369-395.
-\bibitem[43]{UENG} Ueng, Sain-Zee, et al. \emph{"CUDA-lite: Reducing GPU programming complexity."} Languages and Compilers for Parallel Computing. Springer Berlin Heidelberg, 2008. 1-15.
-\bibitem[44]{FPC} Burtscher, Martin, and Paruj Ratanaworabhan. \emph{"pFPC: A parallel compressor for floating-point data."} Data Compression Conference, 2009. DCC'09.. IEEE, 2009.
+\bibitem[40]{CUDA_PERF} http://developer.download.nvidia.com/compute/cuda/compute-docs/cuda-performance-report.pdf
+\bibitem[41]{PARETO} Marler, R. Timothy, and Jasbir S. Arora. \emph{"Survey of multi-objective optimization methods for engineering."} Structural and multidisciplinary optimization 26.6 (2004): 369-395.
+\bibitem[42]{UENG} Ueng, Sain-Zee, et al. \emph{"CUDA-lite: Reducing GPU programming complexity."} Languages and Compilers for Parallel Computing. Springer Berlin Heidelberg, 2008. 1-15.
+\bibitem[43]{FPC} Burtscher, Martin, and Paruj Ratanaworabhan. \emph{"pFPC: A parallel compressor for floating-point data."} Data Compression Conference, 2009. DCC'09.. IEEE, 2009.
 
 \end{thebibliography}
 \tableofcontents
@@ -1462,7 +1460,7 @@ po stronie GPU.
 \begin{center}
 \LARGE{Oœwiadczenie}
 \end{center}
-Oœwiadczam, ¿e pracê magistersk¹ pod tytu³em: ,,Tytu³ pracy'', której promotorem jest prof. dr hab. Jan Wybitny, wykona³em/am samodzielnie, co poœwiadczam w³asnorêcznym podpisem.
+Oœwiadczam, ¿e pracê magistersk¹ pod tytu³em: ,,Optymalizator kompresji szeregów czasowych na GPU'', której promotorem jest dr in¿. Krzysztof Kaczmarski, wykona³em/am samodzielnie, co poœwiadczam w³asnorêcznym podpisem.
 \vspace{2cm}
 \begin{flushright}
 ...........................................
