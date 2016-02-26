@@ -1169,7 +1169,7 @@ pokazuje tabela \ref{tab:patternBworkflow}.
 
 \begin{table}[]
 \centering
-\caption{Dzia³anie optymalizatora dla danych ca³kowitych Pattern B}
+\caption{Dzia³anie optymalizatora dla kolejnych paczek danych Pattern B}
 \label{tab:patternBworkflow}
 \begin{tabular}{|l|l|l|l|l|}
 \hline
@@ -1205,8 +1205,7 @@ Lp. &schemat kompresji								&ratio &pattern &zmiana \\
 \end{tabular}
 \end{table}
 
-Ca³kowity poziom kompresji wyniós³ lekko ponad $4$, co bior¹c pod uwagê pojedyncze statyczne scenariusze, jest dobrym wynikiem. Dla porównania skompresowanie ca³ych danych za pomoc¹ sugerowanych
-na pocz¹tku scenariuszy wynosz¹ odpowiednio $2.4$ oraz $1.3$ co przedstawia listing \ref{lst:patternBresults}.
+Ca³kowity poziom kompresji wyniós³ lekko ponad $4$, co bior¹c pod uwagê pojedyncze statyczne scenariusze, jest dobrym wynikiem. Dla porównania skompresowanie ca³ych danych za pomoc¹ sugerowanych na pocz¹tku scenariuszy wynosz¹ odpowiednio $2.4$ oraz $1.3$ co przedstawia listing \ref{lst:patternBresults}.
 \begin{lstlisting}[caption=Pattern B - wyniki przyk³adowych schematów,label={lst:patternBresults},basicstyle=\small]
 patch,delta,scale,afl,none,delta,scale,afl,none:  
 compression ratio = 2.43919
@@ -1222,6 +1221,42 @@ ponownie ten sam schemat co na pocz¹tku, który by³ optymalny. \\
 Dla danych \emph{Pattern A} algorytm stosuje jedn¹ strategiê i jej nie zmienia, poniewa¿ charakterystyka szeregu jest sta³a. Strategia ta osi¹ga wspó³czynnik kompresji $46.8384$ i wygl¹da nastêpuj¹co: \\
 $rle,patch,rle,none,none,rle,none,none,patch,delta,afl,none,rle,none,none$ \\
 Analogiczne zachowanie otrzymujemy dla wygenerowanych punktów czasu\footnote{patrz dane czasu - listing \ref{lst:time}}, gdzie algorytm u¿ywa kodowania \emph{RLE} oraz \emph{AFL}, stosuj¹c równie¿ skalowanie oraz deltê. W ten sposób dla czasu osi¹gany wspó³czynnik kompresji jest rzêdu $100$.
+
+\subsection{Pojedyncze schematy}
+Wykonano porównanie wspó³czynnika kompresji, osi¹ganego dla danych o zmiennej (okresowo) charakterystyce, przez optymalizator, w stosunku do optymalnego drzewa kompresji dla pierwszej
+paczki danych. Pomiary przeprowadzono dla optymalizatora
+wykonuj¹cego fazê 1 algorytmu raz na dziesiêæ paczek danych. 
+
+\begin{table}[ht!]
+\centering
+\small
+\caption{Porównanie optymalizatora do pojedynczych schematów}
+\label{tab:opt_vs_single}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+Dane & COpt & CSch & Schemat & Zysk \\
+\hline
+B              & 1.80 & 0.54 & scale,patch,afl,n,scale,afl,n & 3.33 \\
+A+B            & 4.71 & 0.67 & dict,scale,dict,n,n,rle,const,n,delta,afl,n & 7.03 \\
+Time+A         & 9.75 & 0.39 & patch,rle,const,n,delta,afl,n,const,n & 25.00 \\ 
+A+B+MaxPrec    & 2.00 & 0.40 & rle,patch,const,n,const,n,patch,n,const,n & 5.00 \\
+Time+Cons+Rand & 1.37 & 0.60 & rle,scale,afl,n,delta,dict,afl,n,n & 2.28 \\
+\hline
+\end{tabular}
+\end{table}
+\normalsize
+
+Wyniki testu przedstawia tabela \ref{tab:opt_vs_single}, w której:
+\begin{itemize}
+\item Dane - kombinacja paczek danych o ró¿nych charakterystykach co 5 paczek,
+\item COpt - wsp. kompresji osi¹gniêty przez optymalizator
+\item CSch - wsp. kompresji osi¹gniêty przez optymalne drzewo dla 1 paczki w kompresji ca³oœci danych
+\item Zysk - stosunek COpt do CSch, czyli wzrost wspó³czynnika kompresji przy u¿yciu optymalizatora
+\end{itemize}
+
+Œredni wzrost wspó³czynnika kompresji przy zastosowaniu optymalizatora zamiast pojedynczego
+drzewa kompresji wynosi $8.53$. Rozmiar danych zosta³ zmniejszony œrednio oko³o $4$ krotnie, co œwiadczy o tym, ¿e algorytm dobrze radzi sobie z danymi o zmiennej charakterystyce.
+
 \newpage
 \section{B³êdne odczyty}
 W wiêkszoœci danych pomiarowych trafiaj¹ siê b³êdne odczyty lub zaburzenia, które nie pasuj¹ do ogólnej charakterystyki
@@ -1352,8 +1387,7 @@ wydajnoœæ na poziomie kilkudziesiêciu Gb/s.
 \section{Konkluzja}
 U¿ywaj¹c kaskadowej kompresji specyficznej dla konkretnego szeregu czasowego mo¿na osi¹gn¹æ
 du¿o lepsze rezultaty ni¿ stosuj¹c metody s³ownikowe, które czêsto wykazuj¹ nisk¹ wydajnoœæ.
-Uzyskano ponad dwukrotny wzrost jakoœci kompresji\footnote{patrz listing \ref{lst:patternBresults}} dla danych o zmiennej charakterystyce wzglêdem
-kompresji pojedynczym schematem. Wskazane zosta³y s³abe punkty dotychczasowej implementacji,
+Uzyskano ponad oœmiokrotny wzrost jakoœci kompresji\footnote{patrz tabela \ref{tab:opt_vs_single}} dla danych o zmiennej charakterystyce wzglêdem kompresji pojedynczym schematem. Wskazane zosta³y s³abe punkty dotychczasowej implementacji,
 których wyeliminowanie powinno prowadziæ do wyrównania wydajnoœci z istniej¹cymi rozwi¹zaniami
 kaskadowej kompresji na GPU. Co wiêcej mo¿na uznaæ, ¿e zaproponowane rozwi¹zanie ma szansê z 
 powodzeniem zostaæ wdro¿one jako kompresor w bazie danych po stronie GPU, który na bie¿¹co
