@@ -45,7 +45,7 @@ public:
     template<typename T> char MinBitCnt(SharedCudaPtr<T> data);
     template<typename T> int Precision(SharedCudaPtr<T> data);
     template<typename T> bool Sorted(SharedCudaPtr<T> data);
-    template<typename T, int N=4> float RlMetric(SharedCudaPtr<T> data);
+    template<typename T, int N=2> float RlMetric(SharedCudaPtr<T> data);
     template<typename T> T Mean(SharedCudaPtr<T> data);
 
     DataStatistics GenerateStatistics(SharedCudaPtr<char> data, DataType type);
