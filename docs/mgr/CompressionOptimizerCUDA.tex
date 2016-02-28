@@ -105,13 +105,26 @@ podpis promotora & \hspace*{100pt} & podpis autora
 \renewcommand{\abstractname}{Abstrakt}
 
 \begin{abstract}
-Wiele urz¹dzeñ takich jak czujniki, stacje pomiarowe, czy nawet serwery, produkuj¹ ogromne iloœci danych w postaci szeregów czasowych, które nastêpnie s¹ przetwarzane i sk³adowane do póŸniejszej analizy. Ogromn¹ rolê w tym procesie stanowi przetwarzanie danych na kartach graficznych w celu przyspieszenia obliczeñ. Aby wydajnie korzystaæ z GPGPU przedstawiono szereg rozwi¹zañ, korzystaj¹cych z kart graficznych jako koprocesory w bazach danych lub nawet bazy danych po stronie GPU. We wszystkich rozwi¹zaniach bardzo istotn¹ rolê stanowi kompresja danych. Szeregi czasowe s¹ bardzo szczególnym rodzajem danych, dla których kluczowy jest dobór odpowiedniej kompresji wedle charakterystyki danych szeregu. W tej pracy przedstawiê nowe podejœcie do kompresji szeregów czasowych po stronie GPU, przy u¿yciu planera buduj¹cego na bie¿¹co drzewa kompresji na podstawie statystyk nap³ywaj¹cych danych. Przedstawione rozwi¹zanie kompresuje dane za pomoc¹ lekkich i bezstratnych kompresji w technologii CUDA.
+Wiele urz¹dzeñ takich jak czujniki, stacje pomiarowe, czy nawet serwery, produkuj¹ ogromne iloœci danych w postaci szeregów czasowych, które nastêpnie s¹ przetwarzane i sk³adowane do póŸniejszej analizy. Ogromn¹ rolê w tym procesie stanowi przetwarzanie danych na kartach graficznych w celu przyspieszenia obliczeñ. Aby wydajnie korzystaæ z GPGPU przedstawiono szereg rozwi¹zañ, korzystaj¹cych z kart graficznych jako koprocesory w bazach danych lub nawet bazy danych po stronie GPU. We wszystkich rozwi¹zaniach bardzo istotn¹ rolê stanowi kompresja danych. Szeregi czasowe s¹ bardzo szczególnym rodzajem danych, dla których kluczowy jest dobór odpowiedniej kompresji wedle charakterystyki danych szeregu. 
+
+Niniejsza praca ma charakter badawczy i przedstawia nowe podejœcie do kompresji szeregów czasowych 
+po stronie GPU, przy u¿yciu planera buduj¹cego na bie¿¹co drzewa kompresji na podstawie statystyk nap³ywaj¹cych danych. Przedstawione rozwi¹zanie kompresuje dane za pomoc¹ lekkich i bezstratnych kompresji w technologii CUDA. 
+
+Pocz¹tek dokumentu stanowi opis problemu wraz z analiz¹ istniej¹cych rozwi¹zañ i badañ, pod kierunkiem kompresji z u¿yciem architektur SIMD. Nastêpnie opisana jest u¿ywana technologia stworzona przez firmê NVIDIA, oraz zastosowane algorytmy lekkiej kompresji. Kolejne rozdzia³y zawieraj¹ opis implementacji algorytmu
+optymalizatora, wraz ze stworzonym œrodowiskiem i programem do równoleg³ej kompresji kolumn danych. Na koñcu 
+znajduj¹ siê wyniki eksperymentów dowodz¹cych przydatnoœæ takiego rozwi¹zania oraz opis dalszych prac, które bêd¹ prowadzone w danym temacie.
 \end{abstract}
 
 \renewcommand{\abstractname}{Abstract}
 
 \begin{abstract}
-Many devices such as sensors, measuring stations or even servers produce enormous amounts of data in the form of time series, which are then processed and stored for later analysis. A huge role in this process takes data processing on graphics cards in order to accelerate calculations. To efficiently use the GPGPU a number of solutions has been presented, that use the GPU as a coprocessor in a databases. There were also attempts to create a GPU-side databases. It has been known that data compression plays here the crucial role. Time series are special kind of data, for which choosing the right compression according to the characteristics of the data series is essencial. In this paper I present a new approach to compression of time series on the side of the GPU, using a planner to keep building the compression tree based on statistics of incoming data. The solution compresses data using lightweight and lossless compression in CUDA technology.
+Many devices such as sensors, measuring stations or even servers produce enormous amounts of data in the form of time series, which are then processed and stored for later analysis. A huge role in this process takes data processing on graphics cards in order to accelerate calculations. To efficiently use the GPGPU a number of solutions has been presented, that use the GPU as a coprocessor in a databases. There were also attempts to create a GPU-side databases. It has been known that data compression plays here the crucial role. Time series are special kind of data, for which choosing the right compression according to the characteristics of the data series is essencial. 
+
+This paper is a research and presents a new approach to compression of time series on the side of the GPU, using a planner to keep building the compression tree based on statistics of incoming data. The solution compresses data using lightweight and lossless compression in CUDA technology.
+
+The beginning of the document is a description of the problem, along with an analysis of existing solutions and research, under the direction of compression using SIMD architectures. Further it describes adopted technology developed by NVIDIA and implemented algorithms of light compression.
+The following sections describe the implementation of the optimizer algorithm, along with created environment and a program for parallel compression of data columns. 
+At the end are the results of experiments demonstrating the usefulness of such a solution and a description of further work that will be conducted in the topic.
 \end{abstract}
 
 %-----------Pocz¹tek czêœci zasadniczej-----------
@@ -1042,7 +1055,7 @@ w ograniczonym zakresie.
 
     \begin{figure}[!ht]
         \centering
-        \hspace*{-0.5cm}\includegraphics[scale=1.25]{img/access}
+        \hspace*{-0.5cm}\includegraphics[scale=1]{img/access}
         \caption{Schemat dostêpu do wartoœci o indeksie $i$ w paczce}
         \label{ref:access}
     \end{figure}
@@ -1375,7 +1388,7 @@ zoptymalizowane pod k¹tem obliczeñ na \emph{CUDA} i jego wydajnoœæ ogranicza sum
 statystyk do oko³o \emph{500 MB/s}.
 	\begin{figure}[!ht]
         \centering
-        \hspace*{-0.5cm}\includegraphics[scale=0.4]{img/stats_perf}
+        \hspace*{-0.5cm}\includegraphics[scale=0.45]{img/stats_perf_new}
         \caption{Wydajnoœæ wybranych statystyk}
         \label{ref:stats_perf}
     \end{figure}
