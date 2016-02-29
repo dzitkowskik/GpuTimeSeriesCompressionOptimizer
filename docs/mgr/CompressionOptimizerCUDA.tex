@@ -814,7 +814,7 @@ wstawiamy jej dzieci, a¿ do limitu wysokoœci drzewa. Proces ten dok³adniej opisu
         \label{ref:mutate}
     \end{figure}
 \noindent
-Wymieniaj¹c krawêdŸ, algorytm w zasadzie wymienia poddrzewo w grafie, zaczynaj¹c od pocz¹tku lub koñca krawêdzi (oszczêdzaj¹c pocz¹tek). Na rysunku \ref{ref:mutate} widzimy oba przypadki. Na przyk³ad, w pierwszej \emph{mutacji} tylko
+Wymieniaj¹c krawêdŸ, algorytm w zasadzie wymienia poddrzewo w grafie, zaczynaj¹c od pocz¹tku lub koñca krawêdzi (oszczêdzaj¹c pocz¹tek). Na rysunku \ref{ref:mutate} widzimy oba przypadki. Na przyk³ad, w pierwszej ,,mutacji'' tylko
 jedna odnoga \emph{DICT} zosta³a zmieniona, podczas gdy w przejœciu drugim wymianie podlega ca³a krawêdŸ \emph{AFL-NONE}. \\
 
 \begin{algorithm}[H]
@@ -889,7 +889,6 @@ jedna odnoga \emph{DICT} zosta³a zmieniona, podczas gdy w przejœciu drugim wymia
  }
 \end{algorithm}
 \normalsize
-
 Podsumowuj¹c, program mutuje drzewo kompresji dopóki wspó³czynnik kompresji nie zacznie siê poprawiaæ. Pojedyncza
 mutacja mo¿e zmieniæ jeden wêze³, ale mo¿e tak¿e wymieniæ ca³e drzewo, co dzieje siê bardzo czêsto. Wymiany s¹
 dokonywane tylko wtedy, gdy wed³ug statystyk nast¹pi poprawa kompresji. W ten sposób nawet jeœli charakterystyka
