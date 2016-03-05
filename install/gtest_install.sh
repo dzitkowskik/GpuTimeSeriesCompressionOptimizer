@@ -1,6 +1,7 @@
 #!/bin/bash
 
-sudo apt-get install cmake
+#install required packages
+sudo apt-get install cmake curl unzip -y
 
 #Create temp directory for installation
 mkdir gtestInstallTemp

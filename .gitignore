@@ -13,6 +13,7 @@ config.ini
 sample_data/*.inf
 sample_data/*.csv
 sample_data/*.log
+id_rsa
 
 ### OSX ###
 .DS_Store
