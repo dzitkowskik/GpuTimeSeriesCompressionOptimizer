@@ -64,6 +64,14 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 ### RUN TESTS VIA DOCKER ###
 
+To run this project using docker, nvidia-docker is required. It can be acquired from their github repository: [https://github.com/NVIDIA/nvidia-docker](https://github.com/NVIDIA/nvidia-docker)
+(see [installation](https://github.com/NVIDIA/nvidia-docker/wiki/Installation)).
+
+TEMPORARILY:
+To use a dockerfile you must have `id_rsa` file registered in bitbucket's repository
+`git@bitbucket.org:dzitkowskik/gpustore.git` as well as bitbucket.org added to known_hosts.
+
+AFTER THAT ONE CAN DO:
 ```bash
 docker build . -t dzitkowskik/gpustore
 nvidia-docker run dzitkowskik/gpustore /gpustore/gpuStore

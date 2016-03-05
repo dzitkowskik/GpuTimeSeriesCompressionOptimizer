@@ -1,4 +1,4 @@
 TEST_DATA_LOG = sample_data/info.log
 BENCHMARK_DATA_LOG = sample_data/info.log
-NYSE_DATA_1GB = sample_data/openbookultraAA_N20130403_1_of_1
+NYSE_DATA_1GB = sample_data/openbookultraMM_N20130403_1_of_1
 LOG_CONFIG = logger.prop
