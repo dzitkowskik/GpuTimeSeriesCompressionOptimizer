@@ -230,7 +230,7 @@ TEST_F(ParallelTsCompressorTest, DISABLED_CompressDecompress_Binary_Generated_Co
 			(float)inputFile.GetSize()/outputFileCompr.GetSize());
 }
 
-TEST_F(ParallelTsCompressorTest, CompressDecompress_CSV_Generated_CompareFile)
+TEST_F(ParallelTsCompressorTest, DISABLED_CompressDecompress_CSV_Generated_CompareFile)
 {
 	LOG4CPLUS_INFO(_logger, "OptimizerTest, CompressDecompress_CSV_Generated_CompareFile");
 

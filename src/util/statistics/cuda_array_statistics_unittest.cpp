@@ -161,16 +161,16 @@ TEST_F(CudaArrayStatisticsTest, RlMetric_FakeData_Int_Consecutive)
 	EXPECT_EQ(expected, actual);
 }
 
-TEST_F(CudaArrayStatisticsTest, RlMetric_FakeData_Int_3ofEach)
+TEST_F(CudaArrayStatisticsTest, RlMetric_FakeData_Int_2ofEach)
 {
 	int N = GetSize();
 	int* h_data = new int[N];
 	for(int i = 0; i < N; i++)
-		h_data[i] = i/3;
+		h_data[i] = i/2;
 	auto d_data = CudaPtr<int>::make_shared(N);
 	d_data->fillFromHost(h_data, N);
 
-	float expected = 2;
+	float expected = 1.5;
 	float actual = CudaArrayStatistics().RlMetric(d_data);
 
 	EXPECT_EQ(expected, actual);
