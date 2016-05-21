@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#install required packages
+sudo apt-get install wget -y
+
 cd /tmp
 
 wget http://sourceforge.net/projects/log4cplus/files/log4cplus-stable/1.1.2/log4cplus-1.1.2.tar.gz

@@ -1,0 +1,9 @@
+sample_data/
+src/
+docs/
+modules/
+install/
+build/
+bin/
+.git/
+.settings/

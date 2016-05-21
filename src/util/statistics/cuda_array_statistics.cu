@@ -94,7 +94,7 @@ bool CudaArrayStatistics::Sorted(SharedCudaPtr<T> data)
 
 
 
-template<typename T, int N=3> __global__
+template<typename T, int N> __global__
 void _rlMetricKernel(T* data, size_t size, int* result)
 {
 	unsigned int idx = blockDim.x * blockIdx.x + threadIdx.x;
@@ -128,14 +128,14 @@ float CudaArrayStatistics::RlMetric(SharedCudaPtr<T> data)
 			result->get());
 
 	auto sum = reduce_thrust(result, thrust::plus<int>());
-	return sum / size;
+	return sum / (double)size;
 }
 
 template<typename T>
 T CudaArrayStatistics::Mean(SharedCudaPtr<T> data)
 {
 	auto sum = reduce_thrust(data, thrust::plus<T>());
-	return sum / data->size();
+	return sum / (double)data->size();
 }
 
 template<typename T>
@@ -150,7 +150,7 @@ DataStatistics CudaArrayStatistics::getStatistics(SharedCudaPtr<T> data)
 	stats.minBitCnt = BITLEN(stats.min, stats.max);
 	stats.precision = Precision(data);
 	stats.sorted = Sorted(data);
-	stats.rlMetric = RlMetric(data);
+	stats.rlMetric = RlMetric<T,2>(data);
 	stats.mean = Mean(data);
 	return stats;
 }

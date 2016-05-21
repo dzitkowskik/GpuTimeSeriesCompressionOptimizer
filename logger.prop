@@ -11,6 +11,9 @@ log4cplus.additivity.CompressionTask=false
 log4cplus.logger.DecompressionTask=OFF, STDOUT
 log4cplus.additivity.DecompressionTask=false
 
+log4cplus.logger.CudaArrayStatistics=OFF, STDOUT
+log4cplus.additivity.CudaArrayStatistics=false
+
 log4cplus.logger.OptimalTree=OFF, STDOUT
 log4cplus.additivity.OptimalTree=false
 
