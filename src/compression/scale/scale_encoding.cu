@@ -47,7 +47,7 @@ SharedCudaPtrVector<char> ScaleEncoding::Encode(SharedCudaPtr<T> data)
 	T min = std::get<0>(minMax);
 	T max = std::get<1>(minMax);
 	if(min < 0)	// overflow detection
-		if((std::numeric_limits<T>::max() - max) < abs(min)) min = 0;
+		if((std::numeric_limits<T>::max() - max) < std::abs<T>(min)) min = 0;
 
 	LOG4CPLUS_TRACE(_logger, "SCALE min = " << min);
 
