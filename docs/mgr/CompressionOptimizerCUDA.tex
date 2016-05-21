@@ -102,40 +102,35 @@ podpis promotora & \hspace*{100pt} & podpis autora
 \hyphenation{Syl-ves-tra}
 \hyphenation{Syl-ves-ter-a}
 
-\tableofcontents
-
 \renewcommand{\abstractname}{Abstrakt}
-
 \begin{abstract}
-Wiele urz¹dzeñ takich jak czujniki, stacje pomiarowe, czy nawet serwery, produkuj¹ ogromne iloœci danych w postaci szeregów czasowych, które nastêpnie s¹ przetwarzane i sk³adowane do póŸniejszej analizy. Ogromn¹ rolê w tym procesie stanowi przetwarzanie danych na kartach graficznych w celu przyspieszenia obliczeñ. Aby wydajnie korzystaæ z GPGPU (General Purpose Graphical Processing Unit) przedstawiono szereg rozwi¹zañ, korzystaj¹cych z kart graficznych jako koprocesory w bazach danych lub nawet bazy danych ze sk³adem po stronie GPU. We wszystkich rozwi¹zaniach bardzo istotn¹ rolê stanowi kompresja danych. Szeregi czasowe s¹ bardzo szczególnym rodzajem danych, dla których kluczowy jest dobór odpowiedniej kompresji wedle charakterystyki danych szeregu. 
+Wiele urz¹dzeñ takich jak czujniki, stacje pomiarowe, czy nawet serwery, produkuj¹ ogromne iloœci danych w postaci szeregów czasowych, które nastêpnie s¹ przetwarzane i sk³adowane do póŸniejszej analizy. Ogromn¹ rolê w tym procesie stanowi przetwarzanie danych na kartach graficznych w celu przyspieszenia obliczeñ. Aby wydajnie korzystaæ z GPGPU (General Purpose Graphical Processing Unit) przedstawiono szereg rozwi¹zañ, korzystaj¹cych z kart graficznych jako koprocesory w bazach danych lub nawet bazy danych ze sk³adem po stronie GPU. We wszystkich rozwi¹zaniach bardzo istotn¹ rolê stanowi kompresja danych. Szeregi czasowe s¹ bardzo szczególnym rodzajem danych, dla których kluczowy jest dobór odpowiedniej kompresji wedle charakterystyki danych szeregu.
 
-Niniejsza praca dyplomowa ma charakter badawczy i przedstawia nowe podejœcie do kompresji szeregów czasowych 
+Niniejsza praca dyplomowa ma charakter badawczy i przedstawia nowe podejœcie do kompresji szeregów czasowych
 po stronie GPU, przy u¿yciu planera buduj¹cego na bie¿¹co schematy kompresji na podstawie statystyk nap³ywaj¹cych danych. Przedstawione rozwi¹zanie kompresuje dane za pomoc¹ lekkich i bezstratnych kompresji w technologii CUDA. Celem jest stworzenie optymalizatora o wysokiej wydajnoœci pod wzglêdem uzyskiwanego wspó³czynnika kompresji dla danych o zmiennej charakterystyce.
 
 Pocz¹tek dokumentu stanowi opis problemu wraz z analiz¹ istniej¹cych rozwi¹zañ i badañ, pod kierunkiem kompresji z u¿yciem architektur SIMD (Single Instruction Multiple Data). Nastêpnie opisana jest u¿ywana technologia stworzona przez firmê NVIDIA, oraz zastosowane algorytmy lekkiej kompresji dla GPU. Kolejne rozdzia³y zawieraj¹ opis implementacji algorytmu
-optymalizatora, wraz ze stworzonym œrodowiskiem i programem do równoleg³ej kompresji kolumn danych. Na koñcu 
-znajduj¹ siê wyniki eksperymentów dowodz¹cych przydatnoœæ takiego rozwi¹zania oraz opis mo¿liwych rozszerzeñ i usprawnieñ.
-Opisywana metoda ma zastosowanie we wszystkich rodzajach kolumnowych sk³adów danych, co bêdzie przedmiotem
-dalszych prac badawczych. 
+optymalizatora, wraz ze stworzonym œrodowiskiem i programem do równoleg³ej kompresji kolumn danych. Na koñcu
+znajduj¹ siê wyniki eksperymentów dowodz¹cych przydatnoœæ takiego rozwi¹zania.
+Metoda ma zastosowanie we wszystkich rodzajach kolumnowych sk³adów danych, co bêdzie przedmiotem
+dalszych prac badawczych.
 \end{abstract}
-
 \renewcommand{\abstractname}{Abstract}
-
 \begin{abstract}
 Many devices such as sensors, measuring stations or even servers produce enormous amounts of data in the form of time series, which are then processed and stored for later analysis. A huge role in this process takes data processing on graphics cards in order to accelerate calculations. To efficiently use the GPGPU
-(General Purpose Graphical Processing Unit) a number of solutions has been presented, that use the GPU as a coprocessor in a databases. There were also attempts to create a GPU-side databases. It has been known that data compression plays here the crucial role. Time series are special kind of data, for which choosing the right compression according to the characteristics of the data series is essencial. 
+(General Purpose Graphical Processing Unit) a number of solutions has been presented, that use the GPU as a coprocessor in a databases. There were also attempts to create a GPU-side databases. It has been known that data compression plays here the crucial role. Time series are special kind of data, for which choosing the right compression according to the characteristics of the data series is essencial.
 
 This paper is a research and presents a new approach to compression of time series on the side of the GPU, using a planner to keep building the compression scheme based on statistics of incoming data, in the incremental manner. The solution compresses columnar data using lightweight and lossless compressions in CUDA technology. The aim of the work is to create an optimizer with high performance in terms of obtained compression ratio for data of variable characteristics.
 
 The beginning of the document is a description of the problem, along with an analysis of existing solutions and research, under the direction of compression using SIMD (Single Instruction Multiple Data) architectures. Further it describes adopted technology developed by NVIDIA and implemented algorithms of light compression for GPU.
-The following sections describe the implementation of the optimizer algorithm, along with created environment and a program for parallel compression of data columns. 
+The following sections describe the implementation of the optimizer algorithm, along with created environment and a program for parallel compression of data columns.
 At the end are the results of experiments demonstrating the usefulness of such a solution and a description of further work that will be conducted in the topic.
 This method is applicable in all types of columnar data warehouses, which will be the subject
 further research.
 \end{abstract}
 
 %-----------Pocz¹tek czêœci zasadniczej-----------
-
+\setcounter{page}{1}
 \chapter{Wstêp}
 Poni¿sza praca zawiera opis implementacji optymalizatora kompresji szeregów czasowych, bazuj¹cego na dynamicznie generowanych statystykach danych. Pomys³ opiera siê na tworzeniu planów kompresji (kompresja kaskadowa) oraz zbieraniu informacji o parach kodowañ w nich wystêpuj¹cych - jak dobrze sprawdzaj¹ siê dla nap³ywaj¹cych danych. System bêdzie równie¿ dynamicznie je zmienia³ - korygowa³, w zale¿noœci od charakterystyki kolejnych paczek danych.
 W za³o¿eniu program ma umo¿liwiæ kompresjê du¿ych iloœci danych przy wykorzystaniu potencja³u obliczeniowego wspó³czesnych kart graficznych.
@@ -160,7 +155,7 @@ dwoma pomiarami mo¿na przybli¿yæ stosuj¹c interpolacjê liniow¹, co mo¿e byæ przy
 Najwa¿niejsze jednak jest to, ¿e jako pomiary pewnej wielkoœci, dane te najczêœciej zmieniaj¹ siê w charakterystyczny dla nich sposób, z pewnymi odstêpstwami w postaci b³êdów, które nazywaæ bêdê z ang. \emph{Outliers}.
 
 \section{Lekka kompresja z SIMD}
-Bazy danych przechowuj¹ce szeregi czasowe s¹ najczêœciej zorientowane kolumnowo oraz stosuj¹ metody lekkiej kompresji w celu oszczêdnoœci pamiêci. W tych przypadkach stosuje siê metody lekkiej kompresji, takie jak kodowanie s³ownikowe, delta lub sta³ej liczby bitów, zamiast bardziej skomplikowanych i wolniejszych metod, które czêsto zapewni³yby lepszy poziom kompresji. Systemy te ³aduj¹ swoje dane do pamiêci trwa³ej paczkami, które mog¹ byæ kompresowane osobno, przy u¿yciu ró¿nych algorytmów, zmieniaj¹cych siê dynamicznie w czasie. Takie kolumny wartoœci numerycznych tego samego typu wydajnie przetwarza siê przy u¿yciu procesorów typu SIMD\footnote{Single Instruction Multiple Data (patrz str. \pageref{sec:cuda})}, co daje wielokrotne przyspieszenie w stosunku do tradycyjnych architektur. 
+Bazy danych przechowuj¹ce szeregi czasowe s¹ najczêœciej zorientowane kolumnowo oraz stosuj¹ metody lekkiej kompresji w celu oszczêdnoœci pamiêci. W tych przypadkach stosuje siê metody lekkiej kompresji, takie jak kodowanie s³ownikowe, delta lub sta³ej liczby bitów, zamiast bardziej skomplikowanych i wolniejszych metod, które czêsto zapewni³yby lepszy poziom kompresji. Systemy te ³aduj¹ swoje dane do pamiêci trwa³ej paczkami, które mog¹ byæ kompresowane osobno, przy u¿yciu ró¿nych algorytmów, zmieniaj¹cych siê dynamicznie w czasie. Takie kolumny wartoœci numerycznych tego samego typu wydajnie przetwarza siê przy u¿yciu procesorów typu SIMD\footnote{Single Instruction Multiple Data (patrz str. \pageref{sec:cuda})}, co daje wielokrotne przyspieszenie w stosunku do tradycyjnych architektur.
 	\begin{figure}[!ht]
 		\centering
 		\hspace*{-0.5cm}\includegraphics[scale=0.55]{img/cascade}
@@ -315,7 +310,7 @@ Ten rodzaj kodowania (Aligned Fixed-Length Encoding) nazywany jest kodowaniem o 
 \begin{enumerate}
 \item Obliczana jest najmniejsza liczba bitów potrzebna do zakodowania ka¿dego ze s³ów w wektorze, nazwijmy go $W$ i oznaczmy liczbê bitów jako $\sigma$:
 $$ w = max(W) $$
-$$ \sigma = 
+$$ \sigma =
 \begin{cases}
 log_{2}(w) + 1  & \quad \text{dla } w > 0\\
 32 				& \quad \text{dla } w \leq 0\\
@@ -1466,6 +1461,8 @@ po stronie GPU.
 
 \bibliographystyle{unsrt}
 \bibliography{bibliography_auto}
+
+\tableofcontents
 
 \clearpage
 \pagestyle{empty}
