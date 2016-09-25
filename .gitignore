@@ -10,9 +10,6 @@ tags
 gpuStore
 build/
 config.ini
-sample_data/*.inf
-sample_data/*.csv
-sample_data/*.log
 id_rsa
 modules/unittest
 
