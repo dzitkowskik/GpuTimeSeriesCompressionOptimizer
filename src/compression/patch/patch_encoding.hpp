@@ -14,7 +14,7 @@
 #include "util/stencil/stencil_operators.hpp"
 #include "util/splitter/splitter.hpp"
 #include "util/statistics/cuda_array_statistics.hpp"
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 #include "compression/encoding_type.hpp"
 #include "compression/patch/patch_type.hpp"
 #include "compression/encoding.hpp"

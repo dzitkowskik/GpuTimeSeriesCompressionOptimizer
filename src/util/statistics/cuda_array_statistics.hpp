@@ -12,7 +12,7 @@
 #include "core/execution_policy.hpp"
 #include "core/not_implemented_exception.hpp"
 #include "core/logger.h"
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 
 #define MAX_PRECISION 10
 

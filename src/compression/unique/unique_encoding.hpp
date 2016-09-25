@@ -15,7 +15,7 @@
 
 #include "core/not_implemented_exception.hpp"
 #include "compression/encoding_factory.hpp"
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 #include "compression/encoding_type.hpp"
 
 #include <boost/make_shared.hpp>

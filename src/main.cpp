@@ -6,7 +6,7 @@
  */
 
 #include "parallel_ts_compressor.hpp"
-#include "time_series_reader.hpp"
+#include "data/time_series_reader.hpp"
 #include "core/logger.h"
 #include "core/config.hpp"
 #include "util/generator/cuda_array_generator.hpp"

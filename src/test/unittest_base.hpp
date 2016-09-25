@@ -8,12 +8,12 @@
 #ifndef DDJ_UNITTEST_BASE_HPP_
 #define DDJ_UNITTEST_BASE_HPP_
 
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 #include "core/cuda_device.hpp"
 #include "util/generator/cuda_array_generator.hpp"
 #include "core/cuda_ptr.hpp"
-#include "time_series.hpp"
-#include "time_series_reader.hpp"
+#include "data/time_series.hpp"
+#include "data/time_series_reader.hpp"
 #include "core/logger.h"
 
 #include <vector>

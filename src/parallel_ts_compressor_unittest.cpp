@@ -6,7 +6,7 @@
  */
 
 #include "parallel_ts_compressor.hpp"
-#include "time_series.hpp"
+#include "data/time_series.hpp"
 #include "test/unittest_base.hpp"
 
 #include <gtest/gtest.h>

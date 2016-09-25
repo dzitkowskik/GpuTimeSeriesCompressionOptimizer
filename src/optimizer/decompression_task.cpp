@@ -6,7 +6,7 @@
  */
 
 #include "optimizer/decompression_task.hpp"
-#include "file.hpp"
+#include "data/file.hpp"
 #include "core/task/task_queue_synchronizer.hpp"
 #include "core/cuda_device.hpp"
 

@@ -10,7 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "compression/encoding_type.hpp"
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 #include "compression/encoding_factory.hpp"
 #include "compression/default_encoding_factory.hpp"
 

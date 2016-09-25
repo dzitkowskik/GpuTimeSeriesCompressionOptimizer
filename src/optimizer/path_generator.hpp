@@ -9,7 +9,7 @@
 #define PATH_GENERATOR_HPP_
 
 #include "compression/encoding_type.hpp"
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 #include "tree/compression_tree.hpp"
 #include "util/statistics/cuda_array_statistics.hpp"
 

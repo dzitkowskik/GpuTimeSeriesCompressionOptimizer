@@ -8,9 +8,9 @@
 #ifndef DECOMPRESSION_TASK_HPP_
 #define DECOMPRESSION_TASK_HPP_
 
-#include "file.hpp"
+#include "data/file.hpp"
 #include "core/task/task.hpp"
-#include "time_series.hpp"
+#include "data/time_series.hpp"
 #include "core/logger.h"
 #include "optimizer/compression_optimizer.hpp"
 #include <boost/make_shared.hpp>

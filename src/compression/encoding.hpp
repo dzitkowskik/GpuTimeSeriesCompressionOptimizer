@@ -10,7 +10,7 @@
 
 #include "core/cuda_ptr.hpp"
 #include "core/logger.h"
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 #include <boost/pointer_cast.hpp>
 
 namespace ddj {
@@ -20,7 +20,7 @@ class Encoding
 public:
 	Encoding() : _logger(log4cplus::Logger::getRoot()) {}
 	Encoding(const char* loggerName)
-		: _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(loggerName))) 
+		: _logger(log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(loggerName)))
 	{}
 	virtual ~Encoding(){}
 

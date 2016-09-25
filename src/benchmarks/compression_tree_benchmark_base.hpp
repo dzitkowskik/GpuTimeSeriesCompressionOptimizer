@@ -10,7 +10,7 @@
 
 #include "benchmarks/benchmark_base.hpp"
 #include "tree/compression_tree.hpp"
-#include "data_type.hpp"
+#include "data/data_type.hpp"
 #include "core/cuda_device.hpp"
 
 namespace ddj {

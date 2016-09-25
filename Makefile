@@ -17,7 +17,7 @@ COMPILER := nvcc
 STANDART := --std=c++11
 NVCC_FLAGS := --cudart static --relocatable-device-code=false
 
-LIBS := -lcudart -lboost_system -lboost_thread -lpthread \
+LIBS := -lcudart -lboost_system -lpthread \
 	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand
 
 GENCODE_SM30    := -gencode arch=compute_30,code=sm_30
@@ -27,18 +27,20 @@ ifeq ($(OS),Darwin)
 	LIB_DIRS := -L"/usr/local/cuda/lib" -L"/usr/local/lib"
 	DATE := gdate
 	GENCODE_FLAGS   := $(GENCODE_SM30)
+	LIBS := $(LIBS) -lboost_thread-mt
 else
 	LIB_DIRS := -L"/usr/local/cuda/lib64" -L"/usr/local/lib"
 	DATE := date
 	GENCODE_FLAGS   := $(GENCODE_SM35)
+	LIBS := $(LIBS) -lboost_thread
 endif
 
 INCLUDES := -I"src"
 DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
-MODULES := data gtest
-MODULES_PATHS := data unittest/googletest
+MODULES := gtest benchmark
+MODULES_PATHS := unittest/googletest benchmark
 MODULE_LIBS := $(MODULES:%=-l%)
 MODULE_LIB_DIRS := $(MODULES_PATHS:%=-L"modules/%/lib")
 MODULE_INCLUDES := $(MODULES_PATHS:%=-I"modules/%/include")
@@ -101,25 +103,27 @@ DEP := $(OBJS:.o=.d)
 ################################################################################
 
 .PHONY: modules
-modules: $(MODULES)
+modules: $(MODULES:%=module_%)
 	@echo "All modules built!"
 
-.PHONY: data
-data:
-	@echo "Beginning module DATA build"
-	@$(START_TIME)
-	@cmake -Bmodules/data -Hmodules/data -DCMAKE_BUILD_TYPE=Release
-	@$(MAKE) -C "modules/data" --no-print-directory
-	@echo "Total build time: "
-	@$(END_TIME)
-
-.PHONY: gtest
-gtest:
+.PHONY: module_gtest
+module_gtest:
 	@echo "Beginning module gtest build"
 	@$(START_TIME)
 	@$(MAKE) -C "modules/unittest/googletest/make" --no-print-directory
-	@mkdir modules/unittest/googletest/lib
-	@cp modules/unittest/googletest/make/gtest_main.a modules/unittest/googletest/lib/gtest.a
+	@mkdir -p modules/unittest/googletest/lib
+	@cp modules/unittest/googletest/make/gtest_main.a modules/unittest/googletest/lib/libgtest.a
+	@echo "Total build time: "
+	@$(END_TIME)
+
+.PHONY: module_benchmark
+module_benchmark:
+	@echo "Beginning module benchmark build"
+	@$(START_TIME)
+	@test -f modules/benchmark/Makefile || cmake -DCMAKE_BUILD_TYPE=Release -Bmodules/benchmark -Hmodules/benchmark
+	@$(MAKE) benchmark -C "modules/benchmark" --no-print-directory
+	@mkdir -p modules/benchmark/lib
+	@cp modules/benchmark/src/libbenchmark.a modules/benchmark/lib/libbenchmark.a
 	@echo "Total build time: "
 	@$(END_TIME)
 

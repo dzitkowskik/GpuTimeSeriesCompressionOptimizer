@@ -10,7 +10,7 @@
 
 #include "optimizer/compression_optimizer.hpp"
 #include "core/task/task_scheduler.hpp"
-#include "time_series_reader.hpp"
+#include "data/time_series_reader.hpp"
 #include "core/logger.h"
 
 namespace ddj
