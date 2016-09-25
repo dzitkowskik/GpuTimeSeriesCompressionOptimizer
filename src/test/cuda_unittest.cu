@@ -1,4 +1,5 @@
 #include "core/cuda_ptr.hpp"
+#include "core/cuda_device.hpp"
 #include "util/copy/cuda_array_copy.hpp"
 #include "test/unittest_base.hpp"
 
@@ -9,6 +10,10 @@ class CudaPtrTest : public UnittestBase {};
 
 TEST_F(CudaPtrTest, Concatenate_EqualSize_Vectors_Int_Size)
 {
+    CudaDevice hc;
+    int devId = hc.SetCudaDeviceWithMaxFreeMem();
+    cudaGetLastError();
+
     int N = 10;
     SharedCudaPtrVector<int> randomIntDataVector;
     for(int i = 0; i < N; i++)
@@ -21,7 +26,11 @@ TEST_F(CudaPtrTest, Concatenate_EqualSize_Vectors_Int_Size)
 
 TEST_F(CudaPtrTest, MakeShared_AllocateArray_Size_32M_Int)
 {
-    int N = 1<<25;
+    CudaDevice hc;
+    int devId = hc.SetCudaDeviceWithMaxFreeMem();
+    cudaGetLastError();
+
+    int N = 1<<20;
     auto data = CudaPtr<int>::make_shared(N);
     data->set(1);
     data->clear();

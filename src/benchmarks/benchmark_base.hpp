@@ -10,8 +10,8 @@
 
 #include "core/cuda_ptr.hpp"
 #include "util/generator/cuda_array_generator.hpp"
-#include "data/data/time_series_reader.hpp"
-#include "data/data/data_type.hpp"
+#include "data/time_series_reader.hpp"
+#include "data/data_type.hpp"
 
 #include <benchmark/benchmark.h>
 

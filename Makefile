@@ -15,7 +15,7 @@ SRC_EXT := cpp
 
 COMPILER := nvcc
 STANDART := --std=c++11
-NVCC_FLAGS := --cudart static --relocatable-device-code=false
+NVCC_FLAGS := #--cudart static --relocatable-device-code=false
 
 LIBS := -lcudart -lboost_system -lpthread \
 	-lboost_program_options -llog4cplus -lgtest -lbenchmark -lcurand
@@ -28,15 +28,18 @@ ifeq ($(OS),Darwin)
 	DATE := gdate
 	GENCODE_FLAGS   := $(GENCODE_SM30)
 	LIBS := $(LIBS) -lboost_thread-mt
+	DEBUG_CODE_FLAGS :=
 else
 	LIB_DIRS := -L"/usr/local/cuda/lib64" -L"/usr/local/lib"
 	DATE := date
 	GENCODE_FLAGS   := $(GENCODE_SM35)
 	LIBS := $(LIBS) -lboost_thread
+	DEBUG_CODE_FLAGS := -G -g -O0 --debug --device-debug
 endif
 
 INCLUDES := -I"src"
 DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
+
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
 MODULES := gtest benchmark
@@ -64,7 +67,7 @@ ifeq ($(V),true)
 	CMD_PREFIX :=
 endif
 
-debug: export CODE_FLAGS := -G -g -O0 --debug --device-debug
+debug: export CODE_FLAGS := $(DEBUG_CODE_FLAGS)
 debug: export EXCLUDED_FILES := \
 	-not -name '*_unittest*' \
 	-not -name '*_benchmark*'
@@ -78,7 +81,7 @@ release: export EXCLUDED_FILES := \
 release: export BUILD_PATH := build/release
 release: export BIN_PATH := bin/release
 
-test: export CODE_FLAGS := -G -g -O0 --debug --device-debug
+test: export CODE_FLAGS := $(DEBUG_CODE_FLAGS)
 test: export EXCLUDED_FILES := \
 	-not -iname 'main.cpp' \
 	-not -name '*_benchmark*'
