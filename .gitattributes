@@ -1,0 +1,2 @@
+sample_data/*.inf filter=lfs diff=lfs merge=lfs -text
+sample_data/*.log filter=lfs diff=lfs merge=lfs -text
