@@ -1,7 +1,6 @@
 #include <benchmark/benchmark.h>
 #include "core/config.hpp"
 #include "core/logger.h"
-#include <celero/Celero.h>
 
 using namespace std;
 using namespace ddj;
@@ -30,6 +29,5 @@ int main(int argc, char** argv)
 	initialize_logger();
     ::benchmark::Initialize(&argc, argv);
     ::benchmark::RunSpecifiedBenchmarks();
-    celero::Run(argc, argv);
     return 0;
 }
