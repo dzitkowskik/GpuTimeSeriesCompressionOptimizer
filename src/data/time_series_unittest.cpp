@@ -1,4 +1,6 @@
 #include "data/time_series_reader.hpp"
+#include "core/config.hpp"
+
 #include <gtest/gtest.h>
 
 //#define DDJ_USE_BOOST 1
@@ -24,7 +26,7 @@ TimeSeries GenerateFakeTimeSeries(std::string name, int N)
 }
 
 TEST(TimeSeries, ReadWrite_CSV_Data_ToFile)
-{ 
+{
     auto testFile = File::GetTempFile();
     TimeSeries fake = GenerateFakeTimeSeries("fake", 1000);
     CSVFileDefinition fileDefinition;
@@ -40,7 +42,9 @@ TEST(TimeSeries, ReadWrite_CSV_Data_ToFile)
 
 TEST(TimeSeries, ReadWrite_CSV_Data_FromFile)
 {
-    File realDataFile("../../sample_data/info.log");
+    auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
+
+    File realDataFile(dataFilePath);
     File testFile = File::GetTempFile();
     File testFile2 = File::GetTempFile();
     CSVFileDefinition fileDefinition;
@@ -76,7 +80,9 @@ TEST(TimeSeries, ReadWrite_Binary_Data_ToFile)
 
 TEST(TimeSeries, Read_CSV_Data_InMultipleParts_FromFile_CheckWithOnePartRead)
 {
-	File realDataFile("../test/data/info.log");
+    auto dataFilePath = ddj::Config::GetInstance()->GetValue<std::string>("TEST_DATA_LOG");
+
+	File realDataFile(dataFilePath);
 	CSVFileDefinition fileDefinition;
     fileDefinition.Columns = std::vector<DataType> {
             DataType::d_time,
@@ -102,7 +108,7 @@ TEST(TimeSeries, Read_CSV_Data_InMultipleParts_FromFile_CheckWithOnePartRead)
 
 TEST(TimeSeries, Read_Header_File)
 {
-	File headerFile("../test/data/info.header");
+	File headerFile("sample_data/info.header");
 	auto fileDef = TimeSeriesReader::ReadFileDefinition(headerFile);
 
     // check
@@ -116,10 +122,10 @@ TEST(TimeSeries, Read_Header_File)
 
 TEST(TimeSeries, Read_Binary_With_Header_File)
 {
-    File headerFile("../test/data/info.header");
+    File headerFile("sample_data/info.header");
     auto fileDef = TimeSeriesReader::ReadFileDefinition(headerFile);
 
-    File realDataFile("../test/data/info.inf");
+    File realDataFile("sample_data/info.inf");
     auto result = TimeSeriesReaderBinary(fileDef, 4).Read(realDataFile);
 
 //    result->print(5);
@@ -128,10 +134,10 @@ TEST(TimeSeries, Read_Binary_With_Header_File)
 TEST(TimeSeries, Read_CSV_With_Header_File_Write_And_Compare)
 {
     File testFile = File::GetTempFile();
-    File headerFile("../test/data/info.header");
+    File headerFile("sample_data/info.header");
     auto fileDef = TimeSeriesReader::ReadFileDefinition(headerFile);
 
-    File realDataFile("../test/data/info.log");
+    File realDataFile("sample_data/info.log");
     auto result = TimeSeriesReaderCSV(fileDef).Read(realDataFile);
 
     TimeSeriesReaderCSV(fileDef).Write(testFile, *result);
@@ -142,13 +148,11 @@ TEST(TimeSeries, Read_CSV_With_Header_File_Write_And_Compare)
 TEST(TimeSeries, Read_Binary_With_Header_File_Write_And_Compare)
 {
     File testFile = File::GetTempFile();
-    File headerFile("../test/data/info.header");
+    File headerFile("sample_data/info.header");
     auto fileDef = TimeSeriesReader::ReadFileDefinition(headerFile);
 
-    File realDataFile("../test/data/info.inf");
+    File realDataFile("sample_data/info.inf");
     auto result = TimeSeriesReaderBinary(fileDef, 4).Read(realDataFile);
-
-//    result->print(100000);
 
     TimeSeriesReaderBinary(fileDef, 4).Write(testFile, *result);
 
@@ -160,10 +164,10 @@ TEST(TimeSeries, Read_Binary_With_Header_File_Write_And_Compare)
 TEST(TimeSeries, Read_NYSE_CSV_With_Header_File)
 {
     File testFile = File::GetTempFile();
-    File headerFile("../test/data/nyse.header");
+    File headerFile("sample_data/nyse.header");
     auto fileDef = TimeSeriesReader::ReadFileDefinition(headerFile);
 
-    File realDataFile("../test/data/nyse.csv");
+    File realDataFile("sample_data/nyse.csv");
     auto result = TimeSeriesReaderCSV(fileDef).Read(realDataFile);
 
     TimeSeriesReaderCSV(fileDef).Write(testFile, *result);

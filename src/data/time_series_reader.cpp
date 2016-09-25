@@ -24,8 +24,6 @@ std::vector<std::string> ReadHeader(std::ifstream& inFile, CSVFileDefinition& de
     } while(std::string::npos != position);
 
     definition.Header = result;
-
-    printf("%s\n", "Header read success");
     return result;
 }
 
