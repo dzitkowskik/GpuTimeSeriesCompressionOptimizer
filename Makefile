@@ -37,10 +37,11 @@ INCLUDES := -I"src"
 DEFINES := #-D __GXX_EXPERIMENTAL_CXX0X__ -DBOOST_HAS_INT128=1 -D_GLIBCXX_USE_CLOCK_REALTIME -DHAVE_WTHREAD_SAFETY
 WARNINGS_ERRORS := -pedantic -Wall -Wextra -Wno-deprecated -Wno-unused-parameter  -Wno-enum-compare -Weffc++
 
-MODULES := data
+MODULES := data gtest
+MODULES_PATHS := data unittest/googletest
 MODULE_LIBS := $(MODULES:%=-l%)
-MODULE_LIB_DIRS := $(MODULES:%=-L"modules/%/lib")
-MODULE_INCLUDES := $(MODULES:%=-I"modules/%/include")
+MODULE_LIB_DIRS := $(MODULES_PATHS:%=-L"modules/%/lib")
+MODULE_INCLUDES := $(MODULES_PATHS:%=-I"modules/%/include")
 
 LIBS := $(LIBS) $(MODULE_LIBS)
 LIB_DIRS := $(LIB_DIRS) $(MODULE_LIB_DIRS)
@@ -100,15 +101,25 @@ DEP := $(OBJS:.o=.d)
 ################################################################################
 
 .PHONY: modules
-modules: data_module
+modules: $(MODULES)
 	@echo "All modules built!"
 
-.PHONY: data_module
-data_module:
+.PHONY: data
+data:
 	@echo "Beginning module DATA build"
 	@$(START_TIME)
 	@cmake -Bmodules/data -Hmodules/data -DCMAKE_BUILD_TYPE=Release
 	@$(MAKE) -C "modules/data" --no-print-directory
+	@echo "Total build time: "
+	@$(END_TIME)
+
+.PHONY: gtest
+gtest:
+	@echo "Beginning module gtest build"
+	@$(START_TIME)
+	@$(MAKE) -C "modules/unittest/googletest/make" --no-print-directory
+	@mkdir modules/unittest/googletest/lib
+	@cp modules/unittest/googletest/make/gtest_main.a modules/unittest/googletest/lib/gtest.a
 	@echo "Total build time: "
 	@$(END_TIME)
 
