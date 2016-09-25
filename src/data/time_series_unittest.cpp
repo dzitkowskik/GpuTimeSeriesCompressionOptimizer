@@ -23,8 +23,8 @@ TimeSeries GenerateFakeTimeSeries(std::string name, int N)
     return result;
 }
 
-TEST(TimeSeriesTest, ReadWrite_CSV_Data_ToFile)
-{
+TEST(TimeSeries, ReadWrite_CSV_Data_ToFile)
+{ 
     auto testFile = File::GetTempFile();
     TimeSeries fake = GenerateFakeTimeSeries("fake", 1000);
     CSVFileDefinition fileDefinition;
@@ -33,13 +33,14 @@ TEST(TimeSeriesTest, ReadWrite_CSV_Data_ToFile)
     TimeSeriesReaderCSV reader(fileDefinition);
     reader.Write(testFile, fake);
     auto result = reader.Read(testFile);
+
     EXPECT_TRUE(result->compare(fake));
     testFile.Delete();
 }
 
 TEST(TimeSeries, ReadWrite_CSV_Data_FromFile)
 {
-    File realDataFile("../test/data/info.log");
+    File realDataFile("../../sample_data/info.log");
     File testFile = File::GetTempFile();
     File testFile2 = File::GetTempFile();
     CSVFileDefinition fileDefinition;

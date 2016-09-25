@@ -69,7 +69,7 @@ File File::GetTempFile()
     return File(mktemp(const_cast<char*>(name.c_str())));
 }
 
-int File::ReadRaw(char* data, size_t size)
+int File::ReadRaw(char* data, size_t size) 
 {
     Open(O_RDONLY);
     ssize_t charRead = SafeRead(_fd, data, size);

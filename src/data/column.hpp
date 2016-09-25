@@ -192,8 +192,6 @@ public:
         return _dataSize;
     }
 
-
-
     bool compare(Column other)
     {
         if(_type != other.getType() || _actualSize != other.getSize())

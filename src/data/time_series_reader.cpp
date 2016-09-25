@@ -24,6 +24,8 @@ std::vector<std::string> ReadHeader(std::ifstream& inFile, CSVFileDefinition& de
     } while(std::string::npos != position);
 
     definition.Header = result;
+
+    printf("%s\n", "Header read success");
     return result;
 }
 
@@ -111,12 +113,11 @@ void WriteLine(
 void TimeSeriesReaderCSV::Write(File& file, TimeSeries& series)
 {
     std::ofstream outFile(file.GetPath(), std::ios::app);
+
     // Write header as column names
-    if(_definition.HasHeader)
-    {
+    if(_definition.HasHeader && _lastFilePosition == 0)
         WriteLine(outFile, series.getColumnNames(), _definition);
-    	_definition.HasHeader = false;
-    }
+
     for(size_t i = 0; i < series.getRecordsCnt(); i++)
         WriteLine(outFile, series.getRecordAsStrings(i), _definition);
 
@@ -137,7 +138,6 @@ void TimeSeriesReaderBinary::Write(File& file, TimeSeries& series)
             memcpy(data+offset, rawData.Data, rawData.Size);
             offset += rawData.Size;
         }
-//        printf("Try to write %d bytes to file %s", size, file.GetPath().c_str());
         if (file.WriteRaw(data, size))
             throw std::runtime_error("Error while writting to a file");
     }
